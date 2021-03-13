@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 块级元素水平垂直居中 */
+        /* 行级元素水平居中 单行垂直居中 */
+        /* 基于定位的三种方式 */
+        /* .outer1 {
+            width: 200px;
+            height: 200px;
+            background-color: #ccc;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .a1 {
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -50px;
+            margin-left: -50px;
+            text-align: center;
+            line-height: 100px;
+        } */
+        /* 这种方式可以不考虑其宽高 但是a1必须有宽高 */
+        /* .outer1 {
+            width: 200px;
+            height: 200px;
+            background-color: #ccc;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .a1 {
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+            text-align: center;
+            line-height: 100px;
+        }
+         */
+        /* 和第一种方式很相似 只是往回拉不用具体的狂高/2实现 而是用transform函数实现 */
+        /* 不需要具体宽高 不兼容 */
+        /* .outer1 {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            background-color: #ccc;
+            margin: 0 auto;
+        }
+        
+        .a1 {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            line-height: 100px;
+        } */
+        /* 不兼容 移动端现在该方案较常使用 */
+        /* .outer1 {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ccc;
+            margin: 0 auto;
+        }
+        
+        .a1 {
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            text-align: center;
+            line-height: 100px;
+        } */
+    </style>
+</head>
+
+<body>
+    <div class="outer1"><span class="a1">span</span></div>
+    <script>
+        let HTML = document.documentElement,
+            // 一屏幕的宽度  
+            winW = HTML.clientWidth,
+            // 一屏幕的高度
+            winH = HTML.clientHeight,
+            boxW =
+    </script>
+</body>
+
+</html>
