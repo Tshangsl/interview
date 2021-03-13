@@ -1,0 +1,65 @@
+/* 外边距塌陷 */
+
+
+/* 弹性盒模型 */
+
+
+/*
+    盒模型概念：
+        网页中，每一个元素都占有一定的空间
+        无论是div h1-h6 还是p 都可以看成是盒子
+    盒模型组成：
+    盒模型分类：
+        上下左右
+        上下 左右
+        上 左右 下
+        上右下左
+*/
+
+
+/*
+    margin重叠 外边距塌陷
+        标准文档流中，两个盒子，分别有上下外边距
+        竖直方向的margin不叠加 只取较大的值作为margin
+        水平方向的margin是可以叠加的
+*/
+
+
+/*
+    margin这个属性：本质上描述兄弟和兄弟之间的距离
+        最好不要用margin表示父子之间的距离
+        设置父子之间的距离 我们最好使用父元素的padding
+*/
+
+
+/*
+    border-style:solid dotted double dashed
+*/
+
+
+/*
+    css标准/怪异盒模型
+        W3C标准盒子/内容盒子/标准模式(content-box):盒子总宽度 = width+padding+border+margin
+            盒子的大小会以内容有限 自动扩展 子元素可以撑开父元素
+        IE盒子/怪异盒模型/怪异模式(border-box):盒子总宽度 = width(包含padding和border)+margin
+            一般在IE中默认为这种怪异盒模型 但由于其自身特殊性 手机页面中也有使用怪异盒模型
+            怪异盒模型中，父元素的盒模型确定，子元素无法撑开父元素的盒模型 大小不能被内容所改变
+    css3属性 box-sizing
+        1.content-box 标准模式
+        2.border-box 怪异模式
+*/
+
+
+/*
+css盒子模型-box model
+    外边距 margin
+    边框 border
+    内边距 padding
+    内容 content
+*/
+
+
+/*
+    指定一个css元素的宽高时 
+    只是设置内容区域的宽高
+*/
