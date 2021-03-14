@@ -88,3 +88,4 @@ UDP（User Data Protocol，用户数据报协议）是与TCP相对应的协议�
 10.ajax请求时，如何解释json数据
     如果是字符串形式的json：eval("("+ajax.response+")")
     如果是本地的json文件：JSON.parse(data)
+11.HTTPS握手过程

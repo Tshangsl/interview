@@ -6,9 +6,9 @@
     用来保存函数的所有的实参的数组
 3.闭包
     在外部函数的内部声明内部函数，在内部函数里引用了外部函数中的局部变量，当外部函数调用完毕后，局部变量不被释放
-4.OOA(analysis)：面向对象的分析
-  OOD(design):面向对象的设计
-  OOP(programming):面向对象编程
+4.OOA(Object-Oriented Analysis)：面向对象的分析
+  OOD(Object-Oriented Design):面向对象的设计
+  OOP(Object-Oriented Programming):面向对象编程
 5._proto_原型链：被设计出来的目的就是用来做继承
 6.类：具有相同的属性和方法的对象的集合
 7.es5之前定义类，属性放在构造函数中，方法放在原型中
