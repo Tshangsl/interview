@@ -1,1 +1,21 @@
 1.虚拟DOM
+2.DOM怎么添加移除移动复制创建和查找节点
+    获取子节点
+    父节点.children
+    父节点.childNodes
+    获取父节点
+    子节点.parentNode
+    子节点.offsetParent
+    创建
+    document.createElement(‘标签名’)
+    document.createTextNode(‘文本内容’)
+    添加
+    父节点.appendChild(子节点)
+    父节点.insertBefore(newChild，refChild)
+    复制
+    被复制的节点.cloneNode(true)
+    删除：
+    节点.remove()
+    父节点.removeChild（子节点）
+    替换
+    父节点.replaceChild（newChild，refChild）

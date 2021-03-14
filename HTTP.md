@@ -84,4 +84,7 @@ TCP（Transmission Control Protocol，传输控制协议）是基于连接的协
 
 UDP（User Data Protocol，用户数据报协议）是与TCP相对应的协议。它是面向非连接的协议，它不与对方建立连接，而是直接就把数据包发送过去！UDP适用于一次只传送少量数据、对可靠性要求不高的应用环境
 
-9.SSL又几次握手，具体过程
+9.SSL有几次握手，具体过程
+10.ajax请求时，如何解释json数据
+    如果是字符串形式的json：eval("("+ajax.response+")")
+    如果是本地的json文件：JSON.parse(data)
