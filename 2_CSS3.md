@@ -41,6 +41,11 @@ CSS3
     两列布局：
     BFC+float float + 负 margin flex 实现两栏布局
     三列布局
+        1.基于float实现 使左右两个aside分别浮动到左右两侧
+        2.基于position:absolute实现
+        3.基于display:flex实现
+        4.基于display:table实现
+        5.基于display:grid实现
 5.外边距塌陷及形成原因
     定义：也称为外边距合并，是指两个在正常流中相邻（兄弟或父子关系）的块级元素的外边距
         组合在一起变成单个外边距，不过只有上下外边距才会有塌陷，左右外边距不会出现这种问题。
@@ -159,10 +164,11 @@ CSS3
             一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小。
         4.flex-basis属性 定义了在分配多余空间之前，项目占据的主轴空间（main size）。浏览器根据这个属性，计算主轴是否有多余空间。它的默认值为auto，即项目的本来大小。
         5.flex属性 是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
-            该属性有两个快捷值：auto (1 1 auto) 和 none (0 0 auto)。
+            该属性有三个快捷值：auto (1 1 auto) 和 none (0 0 auto)和 initial(0 1 auto)。
             建议优先使用这个属性，而不是单独写三个分离的属性，因为浏览器会推算相关值。
         6.align-self属性 允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。        
 11.使用CSS 让一个div不可视,visibility display opacity(可以设置过渡效果)区别
+            rgba和opacity 0-1 完全透明-完全不透明
         1.display:none;
         2.  z-index:-10s;
             position:relative;
