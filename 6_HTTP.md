@@ -372,7 +372,20 @@
             Server Push
     30.keep-alive标签的原理 有什么功能
     31.同源的标签里传递数据 用什么方法
-
+    32.axios是什么
+        是一个基于promise的HTTP库 可以用在浏览器和node.js中
+        特点：
+            1.从浏览器中创建XMLHttpRequests
+            2.从node.js创建http请求
+            3.支持Promsie API
+            4.拦截请求和响应
+            5.转换请求数据和响应数据
+            6.取消请求
+            7.自动转换JSON数据
+            8.客户端支持防御XSRF
+        安装：
+            使用npm
+                npm install axios
 
 
         // err ctx.status即是response.status
