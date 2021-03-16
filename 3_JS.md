@@ -34,7 +34,7 @@
             3.使用 new 实例化对象，在构造函数中的this指向实例化对象。
             4.使用call或apply或bind改变this的指向。
     this指向的改变方法 call(参数列表) apply(参数数组) bind
-4.call(参数列表) apply(参数数组) bind 作用即区别
+4.call(参数列表) apply(参数数组) bind 作用
     首先要了解this的指向问题：
         （1）this的指向不是在函数定义时确定的，而是在函数调用时确定，this默认情况下指向window，严格模式下为undefined
         （2）使用new 调用构造函数时，构造函数内的this 指向新创建的对象
@@ -258,8 +258,10 @@
         是不太具体的节点应该更早接收到事件，而最具体的节点应该最后接收到事件。事件捕获的用意在于事件到达预定目标之前捕获它。
 16.为什么JavaScript是单线程
         JavaScript语言的一大特点就是单线程，也就是说，同一个时间只能做一件事。那么，为什么JavaScript不能有多个线程呢？这样能提高效率啊。
-        JavaScript的单线程，与它的用途有关。作为浏览器脚本语言，JavaScript的主要用途是与用户互动，以及操作DOM。这决定了它只能是单线程，否则会带来很复杂的同步问题。比如，假定JavaScript同时有两个线程，一个线程在某个DOM节点上添加内容，另一个线程删除了这个节点，这时浏览器应该以哪个线程为准？
-        所以，为了避免复杂性，从一诞生，JavaScript就是单线程，这已经成了这门语言的核心特征，将来也不会改变。
+        1.JavaScript的单线程，与它的用途有关。
+            1.作为浏览器脚本语言，JavaScript的主要用途是与用户互动，以及操作DOM。这决定了它只能是单线程，否则会带来很复杂的同步问题。
+            2.比如，假定JavaScript同时有两个线程，一个线程在某个DOM节点上添加内容，另一个线程删除了这个节点，这时浏览器应该以哪个线程为准？
+            3.所以，为了避免复杂性，从一诞生，JavaScript就是单线程，这已经成了这门语言的核心特征，将来也不会改变。
         为了利用多核CPU的计算能力，HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程，但是子线程完全受主线程控制，且不得操作DOM。所以，这个新标准并没有改变JavaScript单线程的本质。
 17.数组去重
     1.indexOf()
@@ -288,24 +290,33 @@
     1.keys
     2.values
     3.entries
-    4.forEach 遍历数组中的每一个元素，默认没有返回值
-    5.filter 对数组元素进行条件筛选 返回一个数组 将原数组符合条件的元素放入数组中 filter方法不改变原数组
-    6.reduce reduce(callback(total,item,index,arr),initial)方法有两个参数 
-        第一个参数是一个回调函数必须 
-        第二个参数是初始值可选 
-        数组将上一次的返回值作为下一次循环的初始值 最后将这个结果返回 如果没有初始值 则reduce会将数组的第一个元素作为循环开始的初始值
-        常用于数组元素的累加累乘 reduce方法不改变原数组
-    7.map 返回一个数组 这个新数组的每一个元素都是原数组元素执行了回调函数之后的返回值 map方法不改变原数组
-    8.for of 具有interator接口的数据都可以使用for of 进行遍历
+    4.forEach 遍历数组中的每一个元素，默认没有返回值 forEach方法不改变原数组
+    5.filter 
+        对数组元素进行条件筛选 返回一个数组 将原数组符合条件的元素放入数组中 
+        filter方法不改变原数组
+    6.reduce 
+        reduce(callback(total,item,index,arr),initial)方法有两个参数 
+        1.第一个参数是一个回调函数必须 
+        2.第二个参数是初始值可选 
+        数组将上一次的返回值作为下一次循环的初始值 最后将这个结果返回 
+        如果没有初始值 则reduce会将数组的第一个元素作为循环开始的初始值
+        常用于数组元素的累加累乘 
+        reduce方法不改变原数组
+    7.map 返回一个数组 这个新数组的每一个元素都是原数组元素执行了回调函数之后的返回值 
+        map方法不改变原数组
+    8.for of 具有interator(迭代器)接口的数据都可以使用for of 进行遍历
                 常见的有数组 类数组 Set Map等 不包含对象
-                如果想用for of的方法遍历数组并使用索引index 可以用for of遍历arr.entries()方法
+                如果想用for of的方法遍历数组并使用索引index 
+                可以用for of遍历arr.entries()方法
     9.some every方法(返回布尔值)：some和every的用法类似 数组的每一个元素都会执行回调函数 
         当返回值全为true时 every方法返回true 否则返回false 
         当返回值全为false时 some方法返回false 否则返回true
         some every 方法不改变原数组
 19.对象遍历方法
-    1.for in 循环遍历对象自身的和继承的可枚举属性(不含Symbol属性)
-    2.Object.keys(obj):返回一个数组 包含对象自身的所有可枚举属性(不含继承和Symbol属性)
+    1.for in 
+        循环遍历对象自身的和继承的可枚举属性(不含Symbol属性)
+    2.Object.keys(obj):
+        返回一个数组 包含对象自身的所有可枚举属性(不含继承和Symbol属性)
     3.Object.getOwnPropertyNames(obj):返回一个数组 包含对象自身的所有属性(不含Symbol属性 包含不可枚举属性)
     4.Object.getOwnPropertySymbols(obj)：返回一个数组，包含对象自身的所有 Symbol 属性。
     5.Reflect.ownKeys(obj)：返回一个数组，包含对象自身的所有属性（不含继承的）。
@@ -429,15 +440,74 @@
 40.使用typeof(bar) === object风险
 41.NaN Number
 42.什么是回调函数
-    在js里函数都是对象，这表示它们可以作为参数传递给其他的函数。举例：当函数b()作为参数传递给函数a()，那么在某一时刻函数a()可能会执行或者调用函数b()。这种情况下，函数b()就被称为回调函数，也可以简称叫做回调(下面是栗子)。
+    1.在js里函数都是对象，这表示它们可以作为参数传递给其他的函数。
+        举例：当函数b()作为参数传递给函数a()，那么在某一时刻函数a()可能会执行或者调用函数b()。这种情况下，函数b()就被称为回调函数，也可以简称叫做回调(下面是栗子)。
 43.怎么拿到缓存区代码
 44.用class创建对象和用function构建函数对象有什么不同
 45.axios的底层用了什么
 46.新的fetch请求时怎么实行的
 47.宏任务微任务与EventLoop
+    1.在当前的微任务没有执行完成时，是不会执行下一个宏任务的。
+    2.setTimeout就是作为宏任务来存在的，而Promise.then则是具有代表性的微任务，上述代码的执行顺序就是按照序号来输出的。
+    3.所有会进入的异步都是指的事件回调中的那部分代码
+        new Promise在实例化的过程中所执行的代码都是同步进行的，而then中注册的回调才是异步执行的。
+    4.在Promise/A+的规范中，Promise的实现可以是微任务，也可以是宏任务，但是普遍的共识表示(至少Chrome是这么做的)，Promise应该是属于微任务阵营的
+    宏任务：
+        I/O setTimeout setInterval 浏览器和Node中都是宏任务
+        setImmediate 浏览器中不是宏任务 Node中是
+        requestAnimationFrame浏览器中是宏任务 Node中不是
+    微任务：
+        process.nextTick
+        MutationObserver	
+        Promise.then catch finally
+    Event-Loop
+        JavaScript是一个单进程的语言，同一时间不能处理多个任务，所以何时执行宏任务，何时执行微任务？我们需要有这样的一个判断逻辑存在。
+        1.检查还有没有微任务需要处理）
+        2.结束本次宏任务、检查还有没有宏任务需要处理
+        每完成一个任务都会进行一次，而这样的操作就被称为Event Loop。
+        Event Loop只是负责告诉你该执行那些任务，或者说哪些回调被触发了，真正的逻辑还是在进程中执行的。
+        宏任务必然是在微任务之后才执行的（因为微任务实际上是宏任务的其中一个步骤）
 48.js中将多个对象合并成一个对象
     1.利用assign(浅拷贝)合并多个对象，第一个参数为目标对象，后面可以有多个源对象。
     2.需要注意的是利用扩展运算符...合并对象 同样是进行浅拷贝
     3.手写函数（浅拷贝实现）
     4.手写函数（实现深拷贝）
     5.最后介绍最后一种办法Lodash's中的merge( )方法。Lodash's是node中的库。它也是一种深拷贝的办法。
+49.可枚举属性 不可枚举属性
+    可枚举属性
+        1.是指那些内部 “可枚举” 标志设置为 true 的属性。对于通过直接的赋值和属性初始化的属性，该标识值默认为即为 true。但是对于通过 Object.defineProperty 等定义的属性，该标识值默认为 false。
+        2.其中js中基本包装类型的原型属性是不可枚举的，如Object, Array, Number等。
+        3.可枚举的属性可以通过for...in循环进行遍历（除非该属性名是一个Symbol），或者通过Object.keys()方法返回一个可枚举属性的数组。
+50.JS基本包装类
+    在基本数据类型中有3个特殊的存在：
+        String Number Boolean
+        这三个基本类型都有自己对应的包装对象。
+        包装对象，其实就是对象，有相应的属性和方法。
+        调用方法的过程，是在后台偷偷发生的，所以我们称作为基本包装类型。
+        引用类型和基本包装对象区别：
+            生存期
+        引用类型所创建的对象，在执行的期间一直在内存中，而基本包装对象只是存在了一瞬间。
+        我们无法直接给基本类型添加方法：
+        给基本类型添加方法或者属性:
+            在基本包装对象的原型下面添加，每个对象都有原型。
+51. concurrency并发
+    non-blocking 非阻塞
+    event-loop
+    callback 回调函数
+    asynchronous 异步的
+    single-threaded 单线程
+    FPS(frames-per-second)
+    JS有
+        call stack
+        event loop
+        callback quene
+        API
+    V8有
+        heap
+        callstack(调用栈)
+    web API
+        DOM
+        AJAX
+        timeout(setTimeout setInterval)
+    single threaded === single call stack === do one thing at a time
+

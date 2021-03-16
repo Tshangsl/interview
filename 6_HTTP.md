@@ -1,4 +1,3 @@
-token鉴权的几种实现方式
 缓存策略
 1.HTTP状态码
 101     切换请求协议 从HTTP切换到WebSocket
@@ -244,6 +243,12 @@ token鉴权的几种实现方式
         1.可用于应用管理，避开同源策略
         2.避免 CSRF(Cross Site Request Forgery) 跨站请求伪造 攻击
         3.实现无状态服务端，能够在多个服务间使用，可扩展性好
+12.目前常用的鉴权
+    1.HTTP Basic Authentication
+         这种授权方式是浏览器遵守http协议实现的基本授权方式,HTTP协议进行通信的过程中，HTTP协议定义了基本认证认证允许HTTP服务器对客户端进行用户身份证的方法。
+    2.session-cookie
+    3.Token 验证
+    4.OAuth(开放授权)
 13.HTTP缓存
     1.强缓存
     2.协商缓存
@@ -304,6 +309,10 @@ token鉴权的几种实现方式
             AJAX 客户端发起 
             WebSocket 服务器端和客户端相互推送
     20.WebSocket
+        WebSocket协议本质上是一个基于TCP的协议
+        WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。
+        使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
+        在 WebSocket API 中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。
         长轮询和短轮询，WebSocket 是长轮询。
             具体比如在一个电商场景，商品的库存可能会变化，所以需要及时反映给用户，所以客户端会不停的发请求，然后服务器端会不停的去查变化，不管变不变，都返回，这个是短轮询。
             而长轮询则表现为如果没有变，就不返回，而是等待变或者超时（一般是十几秒）才返回，如果没有返回，客户端也不需要一直发请求，所以减少了双方的压力。
@@ -361,41 +370,12 @@ token鉴权的几种实现方式
             头部压缩
             多路信道复用
             Server Push
-    29.计算机网络当中客户端发送请求到客户端可以怎么发送
     30.keep-alive标签的原理 有什么功能
     31.同源的标签里传递数据 用什么方法
 
-创建两个项目
-myblog-pc 前端
-vue create myblog-pc
-npm run serve
-npmjs.com中搜索vue-axios 显示相关操作
-npm i --save vue-axios axios 
-
-myblog-rd 后端 数据服务 不需要界面展示
-
-npmjs.com中搜索koa-generator 显示相关操作
-npm install -g koa-generator
-koa2 /tmp/foo 
-cd /tmp/foo
-npm install
-npm start
-
-npmjs.com中搜索koa-cors 显示相关操作
-cors解决跨域问题
-npm install koa-cors
 
 
-使用token需要下载下列中间件
-npmjs.com中搜索jsonwebtoken中间件 显示相关操作
-验证token
-npm install jsonwebtoken
-
-JWT -- JSON WEB TOKEN
-json:javascript的对象表示法
-
-
-// err ctx.status即是response.status
+        // err ctx.status即是response.status
         // ctx被翻译成上下文context 
         // 只是koa这个框架用到的一个名词 同时封装了request和response中这些属性
         // express框架中没有ctx这个概念
@@ -423,6 +403,7 @@ json:javascript的对象表示法
 get方式 传参 两种
 1.？+键值对(?blogid=3)
 3.命名传参 (:blogId)
+
 
 
 
