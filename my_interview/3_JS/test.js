@@ -12,3 +12,7 @@ const promise2 = promise1.then(res => {
 })
 console.log('1', promise1);
 console.log('2', promise2);
+var p1 = new Object;
+p1.name = 'lisi';
+p1.age = 23;
+console.log(Object.prototype.toString.call(p1));

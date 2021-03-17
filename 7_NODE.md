@@ -1,5 +1,14 @@
 1. 什么是nodejs？我们在哪里使用它？
     Nodejs是服务器端的一门技术，而非语言，它是基于Google V8 JavaScrit引擎而开发的，用来开发可扩展的服务器端程序
+    Google V8 JavaScrit引擎:
+    是由谷歌开源的一个高性能 JavaScript 引擎。
+    该引擎采用 C++ 编写，Google Chrome 浏览器用的就是这个引擎。
+    V8 可以单独运行，也可以嵌入 C++ 应用当中。和其他的 JavaScript 引擎一样，
+    V8 会编译、执行 JavaScript 代码，
+    并一样会管理内存、垃圾回收等。
+    就是因为 V8 的高性能以及跨平台等特性，所以它也是 Node.js 的 JavaScript 引擎。
+
+2.什么是KOA
 2.为什么要使用node js？
     nodejs会让我们的编程工作变得简单，它主要包含如下几点几个好处:
     1.执行快速。
