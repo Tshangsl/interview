@@ -280,15 +280,35 @@
         2.Array.from()转成数组
     6.reduce方法
         .....
+17.JS中的类数组 把类数组转变成数组
+    类数组：
+        一种类似数组的对象 并提供了一种用于访问原始二进制数据的机制，但不是真正的数组
+    JS中的类数组对象：
+        1.arguments
+        2.NodeList
+        3.HTMLCollection a._proto_
+        4.jQuery
+    JS中类数组对象特性：
+        1.拥有length属性
+        2.可以使用数组下标方式访问对象
+        3.不能使用数组原型方法
+        4.使用instanceof操作不属于Array
+        5.可以被转换为真数组
+            1.Array.prototypr.slice.call()
+            2.Array.from()
+        6.可自定义其他属性
 18.数组遍历方法和操作
+    (map reduce filter forEach every&some不改变原数组)
     1.keys
     2.values
     3.entries
-    4.forEach 遍历数组中的每一个元素，默认没有返回值 forEach方法不改变原数组
-    5.filter 
+    4.forEach(不改变原数组)
+        遍历数组中的每一个元素，默认没有返回值 forEach方法不改变原数组
+        forEach语法主要用于数组 但是它也可以应用于任何Collection对象
+    5.filter (不改变原数组)
         对数组元素进行条件筛选 返回一个数组 将原数组符合条件的元素放入数组中 
         filter方法不改变原数组
-    6.reduce 
+    6.reduce (不改变原数组)
         reduce(callback(total,item,index,arr),initial)方法有两个参数 
         1.第一个参数是一个回调函数必须 
         2.第二个参数是初始值可选 
@@ -296,17 +316,25 @@
         如果没有初始值 则reduce会将数组的第一个元素作为循环开始的初始值
         常用于数组元素的累加累乘 
         reduce方法不改变原数组
-    7.map 返回一个数组 这个新数组的每一个元素都是原数组元素执行了回调函数之后的返回值 
+    7.map (不改变原数组)
+        返回一个数组 这个新数组的每一个元素都是原数组元素执行了回调函数之后的返回值 
         map方法不改变原数组
-    8.for of 具有interator(迭代器)接口的数据都可以使用for of 进行遍历
+    8.some every(不改变原数组)
+        (返回布尔值)：some和every的用法类似 数组的每一个元素都会执行回调函数 
+            当返回值全为true时 every方法返回true 否则返回false 
+            当返回值全为false时 some方法返回false 否则返回true
+            some every 方法不改变原数组
+    9.for of 具有interator(迭代器)接口的数据都可以使用for of 进行遍历
                 常见的有数组 类数组 Set Map等 不包含对象
                 如果想用for of的方法遍历数组并使用索引index 
                 可以用for of遍历arr.entries()方法
-    9.some every方法(返回布尔值)：some和every的用法类似 数组的每一个元素都会执行回调函数 
-        当返回值全为true时 every方法返回true 否则返回false 
-        当返回值全为false时 some方法返回false 否则返回true
-        some every 方法不改变原数组
+    10.for in可以遍历数组 但是最好不要使用
+        1.for in循环会遍历到数组中的原型链的属性
+        只有具有Enumerable(可枚举)属性的属性才能被for in 遍历 例如constructor便是最常见的不可枚举的属性之一
+        2.如果使用for in循环遍历数组 可以用hasOwnProperty来检测属性是否来自原型链
+    11.while
 19.对象遍历方法
+        对象不可以用for of方法遍历 对象的原型中没有Symbol.iterator方法
     1.for in 
         循环遍历对象自身的和继承的可枚举属性(不含Symbol属性)
     2.Object.keys(obj):
@@ -543,3 +571,42 @@
         1.表层原因是，V8最初为浏览器而设计，不太可能遇到用大量内存的场景
         2.深层原因是，V8的垃圾回收机制的限制（如果清理大量的内存垃圾是很耗时间，这样回引起JavaScript线程暂停执行的时间，那么性能和应用直线下降）
     前面说到栈内的内存，操作系统会自动进行内存分配和内存释放，而堆中的内存，由JS引擎（如Chrome的V8）手动进行释放，当我们代码的按照正确的写法时，会使得JS引擎的垃圾回收机制无法正确的对内存进行释放（内存泄露），从而使得浏览器占用的内存不断增加，进而导致JavaScript和应用、操作系统性能下降。
+53.JS中的iterator(迭代器)
+    背景:
+        JavaScript中存在Array Object String以及ES6引入的Set和Map等可迭代的数据结构 
+        这些可迭代的数据结构的迭代方法也是各式各样的
+        随着ES6迭代器的推出 可以用一个方法来同意数据迭代的江湖
+
+        ECMAScript 2015的补充 不是新的内置实现或语法 而是协议
+        这些协议可以被任何遵守某些约定的对象来实现
+
+        两个协议：
+            1.可迭代协议
+            2.迭代器协议
+    使用方法：
+        ES6中所有可迭代对象的迭代器存放在对象的Symbol.iterator属性下
+        拥有迭代器的对象都可以用for of进行迭代
+    定义：
+        迭代器是一种接口 为各种不同的数据结构提供统一的访问机制 任何数据结构只要部署iterator接口就可以完成遍历(迭代)操作
+    简单实现：
+        迭代器利用闭包保护保存的特性，实现一个封闭的作用域，并提供一个迭代方法通过修改索引的方式，来读取数据以及状态。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
