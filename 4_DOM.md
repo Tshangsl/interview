@@ -1,3 +1,4 @@
+//几个获取宽度的方法
 1.虚拟DOM
 2.所有事件绑定都是异步的
 2.DOM怎么添加移除移动复制创建和查找节点
@@ -33,7 +34,7 @@
     1.getElementById:通过元素的id获取该元素对象 oBtn一个此对象 
         任何浏览器无兼容性问题
         此只有用document. 因为id文档中是唯一的
-    2.getElementsByTagName:通过元素的标签名称获取元素 oLi一个li的数组
+    2.getElementsByTagName(htmlCollection):通过元素的标签名称获取元素 oLi一个li的数组
         任何浏览器无兼容性问题 返回一个htmlCollection
         aLi是一个伪数组  没有push方法 只有可以往里存东西的 和获取长度的方法
     3.getElementsByClassname:通过元素的class获取元素
@@ -95,6 +96,14 @@
         对象属性 和自定义的dom属性 是不通的
         对象属性不能在dom中看到
         自定义dom属性 不饿能通过对象属性的方式获取到
+11.DOM自定义属性
+    自定义属性:
+        1.标签原本没有这个属性,为了存储数据,程序员自己添加的属性
+        2.自定义属性无法直接通过DOM对象的方式获取或者设置
+    自定义属性的操作：
+        1.对象.getAttribute(“自定义属性名字”);获取自定义属性的值
+        2.对象.setAttribute(“属性名字”,“值”);设置自定义属性及值
+        3.对象.removeAttribute(“属性的名字”); 移除自定义属性
 11.事件
     事件源：事件由哪个元素触发的
     事件处理函数：如何处理这个事件的函数（当你触发这个事件后具体要做什么）
@@ -166,15 +175,25 @@
     执行时间和事件触发时间
     e有兼容性问题 兼容标准浏览器和IE浏览器 按顺序
     e = e || window.event;
+    target事件源中的一个属性 知道是哪一个元素触发了该事件
     target也有兼容性问题 标准浏览器 IE浏览器
     var target = e.target||e.srcElement;
+17.dom中e.target和this的区别
+    e.target 返回的是触发事件的对象（元素）  this 返回的是绑定事件的对象（元素）
+    区别 ： e.target 点击了那个元素，就返回那个元素 。this 那个元素绑定了这个点击事件，那么就返回谁
 17. 选项卡实现
     事件委托实现选项卡
-    dom属性实现选项卡
+    自定义dom属性实现选项卡
 18. 轮播图
+        实现思路
     滑动轮播图
     拖拽
+        onmouseup onmousedown onmousemove
+        event.clientX event.clientY
+            鼠标相对于浏览器窗口可视区域的X，Y坐标（窗口坐标）
+            口坐标），
     放大镜
+        。。。
 
 
 

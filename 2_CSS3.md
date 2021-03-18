@@ -1,7 +1,62 @@
-CSS3
-1.CSS3有什么新特性
-    CSS3最新的CSS标准
-2.css水平垂直居中
+CSS CSS3是什么
+    CSS: 
+        层叠样式表 Cascading Style Sheets 一种用来表现HTML或XML等文件样式的计算机语言
+    CSS3:
+        最新的CSS标准
+1.BFC(块级格式化上下文规则)和IFC(行级格式化上下文) BFC是什么 有哪几种实现方式 分别适用于哪些场景
+    FC:(formatting context)
+        格式化上下文
+    BFC:
+        BFC(Block formatting context)直译为“块级格式化上下文”，它是一个独立的渲染区域。
+        只有Block-level box参与 
+        它规定了内部的Block-level Box如何布局 并且和这个区域外部毫不相干
+    Box：css布局基本单位
+        Box是CSS布局的对象和基本单位 直观点来说 一个页面是由很多个 Box 组成的。
+        元素的类型和 display 属性，决定了这个 Box 的类型。
+        不同类型的 Box， 会参与不同的 Formatting Context(格式化上下文)（一个决定如何渲染文档的容器）
+        因此Box内的元素会以不同的方式渲染。让我们看看有哪些盒子：
+            1.block-level 
+                box:display 属性为 block, list-item, table 的元素，
+                    会生成 block-level box。并且参与 block fomatting context；
+            2.inline-level 
+                box:display 属性为 inline, inline-block, inline-table 的元素，
+                    会生成 inline-level box。并且参与 inline formatting context；
+            3.run-in box: css3 中才有
+    Formatting Context(格式化上下文)：-页面中的一块渲染区域 并有一套渲染规则 决定了其子元素将如何定位 以及和其他元素的关系和相互作用
+        是W3C CSS2.1规范中的一个概念 它是页面中的一块渲染区域 并且有一套渲染规则 它决定了其子元素将如何定位 以及和其他元素的关系和相互作用
+        最常见的Formatting Context有
+            1.Block Fromatting Context BFC 块级格式化上下文
+                BFC是一个独立的布局环境，其中的元素布局是不受外界的影响.
+                并且在一个BFC中，块盒与行盒（行盒由一行中所有的内联元素所组成）都会垂直的沿着其父元素的边框排列。
+            2.Inline Formatting Context IFC 行级格式化上下文
+    BFC布局规则：(BFC的区域不会和float box重叠)
+        1.内部的Box会在垂直方向 一个接一个地放置
+        2.Box垂直方向的距离由margin决定 属于同一个BFC的两个相邻Box的margin会发生重叠
+        3.每个盒子（块盒与行盒）的margin box的左边，与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
+        4.BFC的区域不会与float box重叠。
+        5.BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。
+        6.计算BFC的高度时，浮动元素也参与计算。
+    如何创建BFC：
+        1.float的值不是none。
+        2.position的值不是static或者relative。
+        3.display的值是inline-block、table-cell、flex、table-caption或者inline-flex
+        4.overflow的值不是visible
+    BFC作用：
+        1.利用BFC避免margin重叠。
+            根据：属于同一个BFC的两个相邻的Box会发生margin重叠
+        2.自适应两栏布局
+            根据：
+                1.每个盒子的margin box的左边，与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
+                2.BFC的区域不会与float box重叠。
+                3.清除浮动……
+    总结：
+        BFC就是页面上的一个隔离的独立容器 容器里面的子元素不会影响到外面的元素 反之也是如此
+
+        因为BFC内部的元素和外部的元素绝对不会互相影响，因此， 当BFC外部存在浮动时，它不应该影响BFC内部Box的布局，BFC会通过变窄，而不与浮动有重叠。
+        同样的，当BFC内部有浮动时，为了不影响外部元素的布局，BFC计算高度时会包括浮动的高度。避免margin重叠也是这样的一个道理。
+
+        当一个元素具备了触发新块格式化上下文的条件，并且挨着一个浮动元素时，它就会忽略自己的边界必须接触自己的包含块边界的规则此时这个元素会收缩到适当大小 不仅行盒子如此 所有盒子都如此
+2.CSS水平垂直居中 div充满整个屏幕 css九宫格实现
     五种方法，前三种定位，一种flex，弹性盒子实现，一种用javascript实现。
         该方法需要知道子元素具体宽高
     1.父元素相对定位，子元素绝对定位，top:-50%,left:-50%,margin-left:-width/2,margin-top:-height/2;
@@ -10,15 +65,20 @@ CSS3
         该方法不需要子元素有宽高，但是不兼容
     3.父元素相对定位，子元素绝对定位，使用CSS中transform:translate(-50%,-50%)
     4.Flex 父元素display:flex; justify-content:center; align-columns:center;
-    5.JavaScript
+    5.JavaScript 
+
+    1.margin:0 相对100%
+    2.margin 绝对定位 top right bottom left
+
+    .....
 3.CSS3清除浮动方式
 目的：为了解决，父元素因为子元素浮动引起的内部高度为0的问题
         解决方法：
-            1. 额外标签法，在最后一个浮动标签后，新加一个标签，给其设置clear:both     
+            1. 额外标签法(不推荐使用)
+                在最后一个浮动标签后，新加一个标签，给其设置clear:both     
                 本质:闭合浮动，让父盒子闭合出口和入口，不让子盒子出来
                 优点：通俗易懂，方便
                 缺点：添加无意义标签，语义化差
-                不建议使用。
             2.父级添加overflow属性（父元素添加overflow:hidden）
                 优点：代码简洁
                 缺点：内容增多的时候容易造成不会自动换行导致内容被隐藏掉，无法显示要溢出的元素
@@ -34,8 +94,8 @@ CSS3
                 .clearfix{
                     *zoom: 1;/*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
                 }
-            4.使用before和after双为元素清除浮动
-            5.给浮动元素腹肌设置高度
+            4.给浮动元素父级设置高度
+            5.使用before和after双伪元素清除浮动
             6.父级同时浮动(需要给父级同级元素添加浮动)
 4.css三列布局，中间自适应，水平方向垂直方向都说
     两列布局：
@@ -55,28 +115,28 @@ CSS3
         3.基于display:flex实现
         4.基于display:table实现
         5.基于display:grid实现
-5.外边距塌陷及形成原因
+5.外边距塌陷及形成原因(由BFC决定)
     定义：也称为外边距合并，是指两个在正常流中相邻（兄弟或父子关系）的块级元素的外边距
         组合在一起变成单个外边距，不过只有上下外边距才会有塌陷，左右外边距不会出现这种问题。
         1.当上下相邻的两个块级元素相遇，上面的元素有下边距margin-bottom，下面的元素有上边距margin-top，则它们之间的垂直距离取两个值中的较大者。
             尽量只给一个盒子添加margin值
         2.对于两个嵌套关系的块元素，如果父元素没有上内边距及边框，父元素的上外边距会与子元素的上外边距发生合并，合并后的外边距为两者中的较大者。
-            ①给父元素定义上边框
-            ②给父元素定义上内边距
-            ③给父元素添加 overflow：hidden；
-            ④添加浮动
-            ⑤添加绝对定位
+            1.给父元素定义上边框
+            2.给父元素定义上内边距
+            3.给父元素添加 overflow：hidden；
+            4.添加浮动
+            5.添加绝对定位
+            6.使用BFC
         3.如果存在一个空的块级元素，border、padding、inline content、height、min-height都不存在，那么上下边距中间将没有任何阻隔，上下外边距将会合并。
-        
-    当外边距塌陷时，外边距之间的计算方式是怎样的？
+    当外边距塌陷时，外边距之间的计算方式是怎样的 由BFC决定
         1.两个都是正数，取较大的值
         2.两个都是负数，取绝对值较大的值
         3.一正一负，取两个值得和
     原因：由块级格式上下文决定的，BFC，元素在 BFC 中会进行上下排列，然后垂直距离由 margin 决定，并且会发生重叠，具体表现为同正取最大的，同负取绝对值最大的，一正一负，相加BFC 是页面中一个独立的隔离容器，内部的子元素不会影响到外部的元素。
 6.CSS动画有哪些
     CSS3中由三个关于动画的样式属性 
-        transform transition animation
-    transform：
+        transform(变形) transition(过渡) animation(动画)
+    transform(变形)：(不会产生动画 仅是原有形态的改变)(translate是transform一个属性)
         可以用来设置元素的形状改变
             rotate(旋转)
             scale(缩放)
@@ -91,39 +151,35 @@ CSS3
             x,y可以 百分比 rem px或
             x:left center right
             y:top center bottom
-    transition：
+    transition(过渡)：
         用来设置样式的属性值如何从一种状态变平滑过渡到另一种状态 它有四个属性值
             transition-property(变换的属性，即那种形式的变换：大小、位置、扭曲等)
             transition-duration（变换延续的时间）
             transition-timing-function（变换的速率）
             transition-delay（变换的延时）
-    animation:类似于 flash 中的逐帧动画，逐帧动画就像电影的播放 一样，表现非常细腻并且有非常大的灵活性。然而transition只是指定了开始和结束态，整个动画的过程也是由特定的函数控制。
-    animation-name 设置动画的名称，可以同时赋值多个动画名称，用,隔开：
-    animation-duration 设置动画的持续时间，单位为s，默认值为0：
-    animation-timing-function 和transition-timing-function类似：
-    animation-delay 设置动画的开始时间
-    animation-iteration-count 它是来设置动画循环的次数，默认为1，infinite为无限次数的循环：
-    animation-direction 
-    animation：
-        animation-name、animation-duration、animation-timing-function、animation-delay、animation-iteration-count、animation-direction的简写
-========
-    transform我们可以理解为元素的几何变形，它是有规律可寻的，这种变形并不会产生动画效果仅仅是原有形状的改变；transition和animation它们很像 flash 中的补间动画和逐帧动画；transition是从一个状态变化到另外一种状态，当变化有了平滑的效果后就产生了动画，它是一个公式化的变化，在比较规则的动画效果中我们可以使用，例如：旋转的风车、行驶的汽车、颜色的渐变等等；animation的动画效果更加灵活，可以实现像影片一样的复杂无规则的动画。
-========
-    animation transition transform translate 
-    animation:用于设置动画属性，他是一个简写的属性，包含6个属性
-    transition:用于设置元素的样式过度，和animation有着类似的效果，但细节上有很大的不同
-    transform:用于元素进行旋转、缩放、移动或倾斜，和设置样式的动画并没有什么关系
-    translate:translate只是transform的一个属性值，即移动，除此之外还有 scale 等
+    animation(动画):
+        类似于 flash 中的逐帧动画，逐帧动画就像电影的播放 一样，表现非常细腻并且有非常大的灵活性。然而transition只是指定了开始和结束态，整个动画的过程也是由特定的函数控制。
+        animation-name 设置动画的名称，可以同时赋值多个动画名称，用,隔开：
+        animation-duration 设置动画的持续时间，单位为s，默认值为0：
+        animation-timing-function 和transition-timing-function类似：
+        animation-delay 设置动画的开始时间
+        animation-iteration-count 它是来设置动画循环的次数，默认为1，infinite为无限次数的循环：
+        animation-direction 
+        animation：以下六个元素的简写
+        animation-name、animation-duration、animation-timing-function、animation-delay、animation-iteration-count、animation-direction
+    transition和animation:
+        它们很像 flash 中的补间动画和逐帧动画；transition是从一个状态变化到另外一种状态，当变化有了平滑的效果后就产生了动画，它是一个公式化的变化，在比较规则的动画效果中我们可以使用，例如：旋转的风车、行驶的汽车、颜色的渐变等等；animation的动画效果更加灵活，可以实现像影片一样的复杂无规则的动画。
 7.CSS动画特性可以用JS实现，为什么还要用CSS实现
         让你的页面动画在移动设备上运行的更快一些
-        JavaScript效率低的两大原因：操作DOM和使用页面动画
-        通常我们会通过频繁的操作 DOM的CSS来实现视觉上的动画效果
-        频繁的操作DOM和CSS时，浏览器会不停的执行重排（reflow）和重绘（repaint）
-        移动设备分配给浏览器(指内置浏览器)的内存可没有PC版本的浏览器内存可观
+        JavaScript效率低的两大原因：
+            操作DOM和使用页面动画
+            通过频繁的操作 DOM的CSS来实现视觉上的动画效果
+            频繁的操作DOM和CSS时，浏览器会不停的执行重排（reflow）和重绘（repaint）
+            对于pc端设备还好 移动设备分配给浏览器(指内置浏览器)的内存可没有PC版本的浏览器内存可观 会造成卡顿延迟等现象 影响用户体验
         优点:
-        1. 不占用JS主线程；
+            1. 不占用JS主线程；
 　　        2. 可以利用硬件加速；
-　　        3. 浏览器可对动画做优化（元素不可见时不动画，减少z             FPS--每秒传输帧数的影响）。
+　　        3. 浏览器可对动画做优化（元素不可见时不动画，减少FPS--每秒传输帧数的影响）。
         缺点：浏览器对渲染的批量异步化处理让动画难以控制
 8.css选择器优先级
             !important
@@ -138,7 +194,7 @@ CSS3
 9.px rem em vw vh
     1.px像素：相对长度单位，像素px是相对于显示器屏幕分辨率而言的
             利用px设置字体大小及元素狂高等比较稳定和精确,px的缺点是其不能适应浏览器缩放时产生的变化，因此一般不用于响应式网站
-    2.em：相对长度单位，相对于当前对象的内文本的字体尺寸，如当前对行内字体尺寸未人为设置，则相对于浏览器的默认字体尺寸(一般16px)
+    2.em：(font size of the element)相对长度单位，相对于当前对象的内文本的字体尺寸，如当前对行内字体尺寸未人为设置，则相对于浏览器的默认字体尺寸(一般16px)
         em除了可以用来指定font-size，还可以用来设置margin和padding大小
     3.rem：(font size of the root element)
         CSS3新增的一个相对单位(root em 根em)
@@ -147,7 +203,27 @@ CSS3
         根据窗口的宽高 分成100等份 100vh代表满高
         vh 和 vw与百分比的区别
             百分比是基于父元素的设置而言的，如果父元素为100px，那么子元素100%也就是100px。而 vh 和 vw 始终是针对窗口的宽高。
-10.Flex基础概念，父级容器属性，子级容器属性
+11.rem移动端适配
+    PC 端浏览器下（以谷歌浏览器为主），字体的默认大小是16px，字体最小为12px 。 
+    但是在移动端下字体没有默认大小。
+    iphone5下 1rem=16px
+    1.获取html的宽
+        let htmlwidth=document.documentElement.clientWidth || document.body.clientWidth;
+        有些浏览器documentElement获取不到,那就使用后面的body
+    2.获取htmlDom元素
+        var docEl = doc.documentElement
+        let htmlDom=document.getElementByTagName('html')[0]
+    3.设置html样式
+        htmlDom.style.fontSize=htmlwidth/20+'px';
+        这里的20不是固定的 是把屏幕等分成20份
+        Chorme浏览器字体最小只能为12px，所以这里的最后结果（document.documentElement.offsetWidth / 20 = ？）最好别小于12。
+        (尝试让一个div不管在什么屏幕下都占据一半，这里使用20均分所以这里div宽度只需要定位10rem就可以在任何屏幕下都占据一半。)
+    dpr：window.devicePixelRatio pixel像素 ratio比率
+    等于物理像素 / dips。其实就是一个比例
+    iphone4开始，iphone就是dpr就等于2了。所以其实就是把UI图/2，就是你应该在css写多少px。
+    1.100%布局适配
+    2.rem做适配
+12.Flex基础概念，父级容器属性，子级容器属性
     布局的传统解决方案基于盒装模型依赖display属性+position属性+float属性
     flex:弹性盒布局，CSS3的新属性，用于方便布局，比如垂直居中
     基础概念：
@@ -176,7 +252,7 @@ CSS3
             该属性有三个快捷值：auto (1 1 auto) 和 none (0 0 auto)和 initial(0 1 auto)。
             建议优先使用这个属性，而不是单独写三个分离的属性，因为浏览器会推算相关值。
         6.align-self属性 允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。        
-11.使用CSS 让一个div不可视,visibility display opacity(可以设置过渡效果)区别
+13.使用CSS 让一个div不可视,visibility display opacity(可以设置过渡效果)区别
             rgba和opacity 0-1 完全透明-完全不透明
         1.display:none;
         2.  z-index:-10s;
@@ -188,8 +264,7 @@ CSS3
         1.visibility 设置 hidden 会隐藏元素，但是其位置还存在与页面文档流中，不会被删除，所以会触发浏览器渲染引擎的重绘
         2.display 设置了 none 属性会隐藏元素，且其位置也不会被保留下来，所以会触发浏览器渲染引擎的回流和重绘。
         3.opacity 会将元素设置为透明，但是其位置也在页面文档流中，不会被删除，所以会触发浏览器渲染引擎的重绘
-
-12.CSS中盒模型是什么，都由什么组成，有哪几种,转换方法是什么
+14.CSS中盒模型是什么，都由什么组成，有哪几种,转换方法是什么
     定义:网页中，每一个元素都占有一定的空间 无论是div h1-h6 还是p 都可以看成是盒子
     组成:content padding border margin
     1.W3C标准盒子/内容盒子/标准模式(content-box):盒子总宽度 = width+padding+border+margin
@@ -204,14 +279,13 @@ CSS3
         上下 左右
         上 左右 下
         上右下左
-13.z-index
-    1.没有开启定位的元素不可以使用z-index
-        该属性只有在设置了position定位之后才会生效
-    2.父元素的层级再高也不会盖住子元素
-        正常情况下即使设置了子元素的z-index为负值，依然无法实现这个效果，其实这里只要将a元素的z-index设置为auto，即可实现上述效果。
-    3.同级下，z-index的值越大，堆叠顺序越靠前，相同的z-index值的时候，后面的会在前面的层级之上。z-index的值是可以设置0和负数的。
-    4.z-index:0和z-index:auto的区别，当一个定位元素不设置z-index的时候，默认值就是auto
-14.CSS的三种定位方式
+15.position属性都有哪些特点
+    1.inhert：规定应该从父元素继承 position 属性的值。
+    2.static：默认值。没有定位，元素出现在正常的流中（忽略 top, bottom, left, right 或者 z-index 声明）。
+    3.relative:生成相对定位的元素，相对于元素本身正常位置进行定位。因此，"left:20" 会向元素的 LEFT 位置添加 20 像素。
+    4.absolute:生成绝对定位的元素，相对于 static 定位以外的第一个祖先元素进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
+    5.fixed:生成绝对定位的元素，相对于浏览器窗口进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
+16.CSS的三种定位方式
      1.相对定位：
         相对自己的初始位置定位，
         原有空间不释放
@@ -228,98 +302,73 @@ CSS3
         相对于浏览器窗口偏移
         原有空间释放
         会转化成行级块
-15.Formatting context 
-        定义：
-        是W3C CSS2.1规范中的一个概念，它是页面中的一块渲染区域，并且有一套渲染规则，它决定了其子元素将如何定位，以及和其他元素的关系和相互作用
-        包括：
-            BFC
-                BFC是一个独立的布局环境，其中的元素布局是不受外界的影响，并且在一个BFC中，块盒与行盒（行盒由一行中所有的内联元素所组成）都会垂直的沿着其父元素的边框排列。
-                BFC(Block formatting context)直译为"块级格式化上下文"。它是一个独立的渲染区域，只有Block-level box参与， 它规定了内部的Block-level Box如何布局，并且与这个区域外部毫不相干。
-                布局规则：
-                    1.内部的Box会在垂直方向，一个接一个地放置。
-                    2.Box垂直方向的距离由margin决定。属于同一个BFC的两个相邻Box的margin会发生重叠。
-                    3.每个盒子（块盒与行盒）的margin box的左边，与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
-                    4.BFC的区域不会与float box重叠。
-                    5.BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。
-                    6.计算BFC的高度时，浮动元素也参与计算。
-                如何创建：
-                    float的值不是none。
-                    position的值不是static或者relative。
-                    display的值是inline-block、table-cell、flex、table-caption或者inline-flex
-                    overflow的值不是visible
-                作用：利用BFC避免margin重叠
-            IFC(Inline Formatting Contexts)
-                内联格式化上下文
-            FFC
-            GFC
-16.什么是BFC，其形成条件和特性,BFC和IFC的区别，BFC会和float元素相互覆盖吗
-    BFC（Block Formatting Context）格式化上下文。
-    是 Web 页面中盒模型布局的 CSS 渲染模式，指一个独立的渲染区域或者说是一个隔离的独立容器。
-    BFC 是块级格式上下文，IFC 是行内格式上下文：
-    内部的 Box 会水平放置
-    水平的间距由 margin，padding，border 决定
-    。。。
-17.position属性都有哪些特点
-    1.inhert：规定应该从父元素继承 position 属性的值。
-    2.static：默认值。没有定位，元素出现在正常的流中（忽略 top, bottom, left, right 或者 z-index 声明）。
-    3.relative:生成相对定位的元素，相对于元素本身正常位置进行定位。因此，"left:20" 会向元素的 LEFT 位置添加 20 像素。
-    4.absolute:生成绝对定位的元素，相对于 static 定位以外的第一个祖先元素进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
-    5.fixed:生成绝对定位的元素，相对于浏览器窗口进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
-18.CSS三种基本定位机制 普通流 浮动 绝对定位
-19.CSS九宫格如何实现
-20.伪类和伪类选择器
-21.CSS常用布局
+17.z-index
+    1.没有开启定位的元素不可以使用z-index
+        该属性只有在设置了position定位之后才会生效
+    2.父元素的层级再高也不会盖住子元素
+        正常情况下即使设置了子元素的z-index为负值，依然无法实现这个效果，其实这里只要将a元素的z-index设置为auto，即可实现上述效果。
+    3.同级下，z-index的值越大，堆叠顺序越靠前，相同的z-index值的时候，后面的会在前面的层级之上。z-index的值是可以设置0和负数的。
+    4.z-index:0和z-index:auto的区别，当一个定位元素不设置z-index的时候，默认值就是auto
+18.CSS伪类 伪元素
+    伪类：
+        是添加到选择器的关键字，指定要选择的元素的特殊状态。 例如，:hover 可被用于在用户将鼠标悬停在按钮上时改变按钮的颜色。
+    存在意义：
+        为了通过选择器，格式化DOM树以外的信息以及不能被常规CSS选择器获取到的信息。
+    伪元素：
+        伪元素是一个附加至选择器末的关键词，允许你对被选择元素的特定部分修改样式。 下例中的 ::first-line 伪元素可改变段落首行文字的样式。
+    伪类和伪元素的作用：
+        伪类连同伪元素一起，他们允许你不仅仅是根据文档 DOM 树中的内容对元素应用样式，而且还允许你根据诸如像导航历史这样的外部因素来应用样式（例如 :visited），同样的，可以根据内容的状态（例如在一些表单元素上的 :checked），或者鼠标的位置（例如 :hover 让你知道是否鼠标在一个元素上悬浮）来应用样式。
+    分类：
+        伪类：
+            :active，将样式添加到被激活的元素。
+            :focus，将样式添加到被选中的元素。
+            :hover，当鼠标悬浮在元素上方是，向元素添加样式。
+            :link，将特殊的样式添加到未被访问过的链接。
+            :visited，将特殊的样式添加到被访问的链接。
+            :first-child，将特殊的样式添加到元素的第一个子元素。
+            :lang，允许创作者来定义指定的元素中使用的语言。
+        伪元素：
+            :first-letter，将特殊的样式添加到文本的首字母。
+            :first-line，将特殊的样式添加到文本的首行。
+            :before，在某元素之前插入某些内容。
+            :after，在某元素之后插入某些内容。
+    伪类(已有) 伪元素(创建)区别：(有没有创建一个文档树之外的元素)
+        伪类的操作对象是文档树中已有的元素
+        伪元素创建了一个文档数外的元素。
+        伪类与伪元素的区别在于：有没有创建一个文档树之外的元素。
+    总结：
+        伪类本质上是为了弥补常规CSS选择器的不足，以便获取到更多信息；
+        伪元素本质上是创建了一个有内容的虚拟容器；  
+        CSS3中伪类和伪元素的语法不同；
+        可以同时使用多个伪类，而只能同时使用一个伪元素；
+19.CSS三种基本定位机制 普通流 浮动 绝对定位
+20.CSS常用布局
     弹性布局 flex
     容器属性
     item属性
     网格布局 grid
     容器属性
     item属性
-22.visible和display的区别
-23.原生轮播图实现思路
-24.移动视窗内的元素大概有哪几种方法
-25.rem是怎么实现手机端适配的
-26.页面中的动哈 设置一个定时器 间隔一段时间 动一次 考虑性能 以及考虑整个页面的刷新时间 应该设置多长时间
-13.BFC(块级格式化上下文规则)和IFC(行级格式化上下文) BFC是什么 有哪几种实现方式 分别适用于哪些场景
-    BFC:
-        BFC(Block formatting context)直译为“块级格式化上下文”，它是一个独立的渲染区域，只有Block-level box参与 它规定了内部的Block-level Box如何布局 并且和这个区域外部毫不相干
-    Box：css布局基本单位
-        Box是CSS布局的对象和基本单位 直观点来说 一个页面是由很多个 Box 组成的。
-        元素的类型和 display 属性，决定了这个 Box 的类型。
-        不同类型的 Box， 会参与不同的 Formatting Context（一个决定如何渲染文档的容器）
-        因此Box内的元素会以不同的方式渲染。让我们看看有哪些盒子：
-            1.block-level box:display 属性为 block, list-item, table 的元素，会生成 block-level box。并且参与 block fomatting context；
-            2.inline-level box:display 属性为 inline, inline-block, inline-table 的元素，会生成 inline-level box。并且参与 inline formatting context；
-            3.run-in box: css3 中才有
-    Formatting Context：
-        是W3C CSS2.1规范中的一个概念 它是页面中的一块渲染区域 并且有一套渲染规则 它决定了其子元素将如何定位 以及和其他元素的关系和相互作用
-        最常见的Formatting Context有
-            1.Block Fromatting Context BFC
-                BFC是一个独立的布局环境，其中的元素布局是不受外界的影响，并且在一个BFC中，块盒与行盒（行盒由一行中所有的内联元素所组成）都会垂直的沿着其父元素的边框排列。
-            2.Inline Formatting Context IFC
-    BFC布局规则：
-        1.内部的Box会在垂直方向 一个接一个地放置
-        2.Box垂直方向的距离由margin决定 属于同一个BFC的两个相邻Box的margin会发生重叠
-        3.每个盒子（块盒与行盒）的margin box的左边，与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
-        4.BFC的区域不会与float box重叠。
-        5.BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。
-        6.计算BFC的高度时，浮动元素也参与计算。
-    如何创建BFC：
-        1.float的值不是none。
-        2.position的值不是static或者relative。
-        3.display的值是inline-block、table-cell、flex、table-caption或者inline-flex
-        4.overflow的值不是visible
-    BFC作用：
-        1.利用BFC避免margin重叠。
-            根据：属于同一个BFC的两个相邻的Box会发生margin重叠
-        2.自适应两栏布局
-            根据：
-                1.每个盒子的margin box的左边，与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
-                2.BFC的区域不会与float box重叠。
-                3.清除浮动……
-    总结：
-        BFC就是页面上的一个隔离的独立容器 容器里面的子元素不会影响到外面的元素 反之也是如此
 
-        因为BFC内部的元素和外部的元素绝对不会互相影响，因此， 当BFC外部存在浮动时，它不应该影响BFC内部Box的布局，BFC会通过变窄，而不与浮动有重叠。同样的，当BFC内部有浮动时，为了不影响外部元素的布局，BFC计算高度时会包括浮动的高度。避免margin重叠也是这样的一个道理。
 
-            当一个元素具备了触发新块格式化上下文的条件，并且挨着一个浮动元素时，它就会忽略自己的边界必须接触自己的包含块边界的规则此时这个元素会收缩到适当大小 不仅行盒子如此 所有盒子都如此
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
