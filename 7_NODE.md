@@ -7,7 +7,6 @@
     V8 会编译、执行 JavaScript 代码，
     并一样会管理内存、垃圾回收等。
     就是因为 V8 的高性能以及跨平台等特性，所以它也是 Node.js 的 JavaScript 引擎。
-
 2.什么是KOA
 2.为什么要使用node js？
     nodejs会让我们的编程工作变得简单，它主要包含如下几点几个好处:
@@ -48,3 +47,14 @@
     Nodejs是用来开发客户服务器类型应用的。
 15.解释一下nodejs中chaining.
     Chaining是指从一个数据流到另一个数据流的链接，从而实现多个流操作。
+16.
+        err ctx.status即是response.status
+            ctx被翻译成上下文context 
+        只是koa这个框架用到的一个名词 同时封装了request和response中这些属性
+        express框架中没有ctx这个概念
+           web开发中主要两个名词 request response
+        request 客户端浏览器向服务器端发送的请求 Request Headers
+        隐式 显式(传送的数据) 可以通过request.xxx 获得请求数据
+        做了一个简化
+        Response Body
+        隐式 显式 数据
