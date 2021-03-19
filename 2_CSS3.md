@@ -7,7 +7,8 @@ CSS CSS3是什么
     FC:(formatting context)
         格式化上下文
     BFC:
-        BFC(Block formatting context)直译为“块级格式化上下文”，它是一个独立的渲染区域。
+        BFC(Block formatting context)直译为“块级格式化上下文”，
+        它是一个独立的渲染区域。
         只有Block-level box参与 
         它规定了内部的Block-level Box如何布局 并且和这个区域外部毫不相干
     Box：css布局基本单位
@@ -39,7 +40,7 @@ CSS CSS3是什么
     如何创建BFC：
         1.float的值不是none。
         2.position的值不是static或者relative。
-        3.display的值是inline-block、table-cell、flex、table-caption或者inline-flex
+        3.display的值是inline-block、inline-flex flex table-cell、table-caption 或者
         4.overflow的值不是visible
     BFC作用：
         1.利用BFC避免margin重叠。
@@ -191,9 +192,10 @@ CSS CSS3是什么
             通配符
     权重相同，写在后面的覆盖前面的
     使用 !important 达到最大优先级，都使用 !important 时，权重大的优先级高
-9.px rem em vw vh
+9.px(相对于显示器屏幕分辨率) rem em vw vh
     1.px像素：相对长度单位，像素px是相对于显示器屏幕分辨率而言的
-            利用px设置字体大小及元素狂高等比较稳定和精确,px的缺点是其不能适应浏览器缩放时产生的变化，因此一般不用于响应式网站
+            利用px设置字体大小及元素狂高等比较稳定和精确,
+            px的缺点是其不能适应浏览器缩放时产生的变化，因此一般不用于响应式网站
     2.em：(font size of the element)相对长度单位，相对于当前对象的内文本的字体尺寸，如当前对行内字体尺寸未人为设置，则相对于浏览器的默认字体尺寸(一般16px)
         em除了可以用来指定font-size，还可以用来设置margin和padding大小
     3.rem：(font size of the root element)
