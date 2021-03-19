@@ -119,6 +119,16 @@
         使用addEventListener方法，该方法有三个参数：事件的类型、监听的函数、事件的冒泡和捕获控制（true/false）
         注：addEventListener方法的第三个参数默认值为false。
 13.常见事件
+    1.用户界面事件
+    2.焦点事件
+    3.鼠标事件
+    4.坐标事件
+    5.滚轮事件
+    6.文本事件
+    7.键盘事件
+    8.移动端小程序事件
+
+
     1.事件focus|blur(on)
     2.change事件就是用于表单的
     3.keydown keyup

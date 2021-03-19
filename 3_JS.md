@@ -1,4 +1,5 @@
  //数据精准度
+ //模板字符串
 JS
     JS是一种具有函数优先的轻量级 解释性 或即时编译型的编译语言 虽然它是作为Web页面的脚本语言而出名的 但是它也被用到很多非浏览器环境中 JavaScript基于原型编程多范式的动态脚本语言 并且支持面向对象命令式和声明式(如函数式编程)风格
     JavaScript基本语法借鉴C
@@ -429,6 +430,7 @@ JS
                 JSON通常用于与服务端交换数据
                 在接受服务器数据时一般是字符串
                 可以使用JSON.parse()方法将数据转换为JavaScript对象
+                JSON.parse()是Javascript中一个常用的 JSON 转换方法，JSON.parse()可以把JSON规则的字符串转换为JSONObject，JSON.parse()很方便，并且几乎支持所有浏览器。
             JSON.stringify()
                 将JavaScript值转换为JSON字符串
 21.JSON方法实现拷贝有什么问题
@@ -594,6 +596,10 @@ JS
     2.修复了一些导致JavaScript引擎难以执行优化的缺陷
         有时候相同的代码 严格模式可以比非严格模式下运行的更快
     3.严格模式禁用了在ECMAScript的未来版本中可能会定义的一些语法
+23.跨站脚本工具XXS
+    XSS又叫CSS(Cross site Scripting) 跨站脚本工具 常见的Web漏洞之一 在2013OWASP TOP10中排名第三
+    XSS是指攻击者在网页中嵌入客户端脚本 通常是JS恶意代码 当用户使用浏览器访问被嵌入恶意代码时 就会在用户浏览器上执行
+    反射性 存储型 DOM型
 
 
 
