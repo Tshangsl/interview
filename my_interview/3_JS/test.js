@@ -44,3 +44,8 @@
 // console.log(Object.prototype.toString.call(s1));
 
 // 深拷贝
+
+function Sub() {
+    console.log(this);
+}
+Sub();

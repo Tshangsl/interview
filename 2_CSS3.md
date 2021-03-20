@@ -105,12 +105,24 @@ CSS CSS3是什么
         第一类宽度已知
             1.左边浮动或者定位：右侧margin-left:宽度
             2.左右侧都浮动 左侧固定给宽度 右侧calc(100%-宽)
+
             3.table布局
         第二类宽度未知：
             1.BFC方法 左侧浮动 右侧overflow:hidden
+
             2.flex布局 父级display:flex 左侧flex:0 0 200px 右侧flex：1
             3.grid布局
-    三列布局
+    三列布局(左右两侧宽度固定 中间自适应)
+        1.左右浮动 中间100%
+            左右两边浮动
+            中间设置margin-left margin-right
+        2.绝对定位中间不给宽度
+            左右两侧使用绝对定位，中间设置margin值
+        3.flex
+            父元素设置为弹性盒子
+            左右两侧使用flex-basis设置元素本身大小
+            中间使用flex-grow设置占满剩余空间
+            
         1.基于float实现 使左右两个aside分别浮动到左右两侧
         2.基于position:absolute实现
         3.基于display:flex实现
@@ -225,23 +237,25 @@ CSS CSS3是什么
     iphone4开始，iphone就是dpr就等于2了。所以其实就是把UI图/2，就是你应该在css写多少px。
     1.100%布局适配
     2.rem做适配
-12.Flex基础概念，父级容器属性，子级容器属性
+12.Flex基础概念，父级容器属性(Flex容器)，子级容器属性(Flex项目)
     布局的传统解决方案基于盒装模型依赖display属性+position属性+float属性
     flex:弹性盒布局，CSS3的新属性，用于方便布局，比如垂直居中
-    基础概念：
+    基础概念：(Flex容器/项目|主轴 交叉轴|项目默认沿主轴排列)
         1.采用Flex布局的元素，称为Flex容器(flex container)简称容器，它的所有子元素自动成为容器成员，称为Flex项目(flex item)简称项目
         2.容器默认存在两根轴：水平的主轴(main axis)和垂直的交叉轴(cross axis)，主轴的开始位置(与边框的交叉点)叫做mian start 结束位置叫做mian end 交叉轴的开始位置叫cross start 结束位置叫 cross end
         3.项目默认沿主轴排列，单个项目占据的主轴空间叫main size 占据的交叉空间叫cross size
         总结：弹性布局由父级容器，子级容器构成，通过设置主轴和交叉轴来控制子元素的排序方式
-    父级容器属性:
+    父级容器属性:flex-flow(flex-direction flex-wraps)
+        (flex-direction子元素排列方向/flex-wrap换行/justify-content(主轴)/align-items(交叉轴)/align-content(多根轴线))
         1.flex-direction:row|row-reverse|column|column-reverse
-        该属性定义了子元素排列方向
+            该属性定义了子元素排列方向
         2.flex-wrap：**nowrap | wrap | wrap-reverse;  该属性称"轴线",该属性定义如果一条轴线排不下，如何换行。
         3.flex-flow： || ; flex-direction和flex-wrap的简写形式，默认值为row nowrap
         4.justify-content: flex-start | flex-end | center | space-between | space-around;  该属性定义了子元素在主轴上的对齐方式。
         5.align-items:  flex-start | flex-end | center | baseline | stretch;  定义项目在交叉轴上如何对齐。
         6.align-content: ** flex-start | flex-end | center | space-between | space-around | stretch; 属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用
-    子级容器属性：
+    子级容器属性：(flex flex-grow0 flex-shrink1s flex-basis)
+        (order子元素排列顺序 flex align-self )
         1.order属性 定义子元素或子容器的排列顺序，数值越小，排列越靠前，默认为0
         2.flex-grow属性 定义子元素或者子容器的放大比例，默认为0，即如果存在剩余空间也不放大
             如果所有项目flex-grow属性为1 它们将等分剩余空间(如果有的话)
@@ -256,14 +270,14 @@ CSS CSS3是什么
             该属性有三个快捷值：auto (1 1 auto) 和 none (0 0 auto)和 initial(0 1 auto)。
             建议优先使用这个属性，而不是单独写三个分离的属性，因为浏览器会推算相关值。
         6.align-self属性 允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。        
-13.使用CSS 让一个div不可视,visibility display opacity(可以设置过渡效果)区别
+13.使用CSS 让一个div不可视,visibility/hidden display/none opacity/0(可以设置过渡效果)区别
             rgba和opacity 0-1 完全透明-完全不透明
-        1.display:none;
+        1.display:none;(不在文档流)
         2.  z-index:-10s;
             position:relative;
-        3.opacity:0;
+        3.opacity:0;(在文档流)
         4.绝对定位移出可视区
-        5.visibility:hidden;
+        5.visibility:hidden;(在文档流)
 
         1.visibility 设置 hidden 会隐藏元素，但是其位置还存在与页面文档流中，不会被删除，所以会触发浏览器渲染引擎的重绘
         2.display 设置了 none 属性会隐藏元素，且其位置也不会被保留下来，所以会触发浏览器渲染引擎的回流和重绘。
@@ -315,6 +329,7 @@ CSS CSS3是什么
     4.z-index:0和z-index:auto的区别，当一个定位元素不设置z-index的时候，默认值就是auto
 18.CSS伪类 伪元素
     伪类：
+        (添加到选择器的关键字，指定要选择的元素的特殊状态 通过选择器，格式化DOM树以外的信息以及不能被常规CSS选择器获取到的信息。)
         是添加到选择器的关键字，指定要选择的元素的特殊状态。 例如，:hover 可被用于在用户将鼠标悬停在按钮上时改变按钮的颜色。
     存在意义：
         为了通过选择器，格式化DOM树以外的信息以及不能被常规CSS选择器获取到的信息。
@@ -340,7 +355,7 @@ CSS CSS3是什么
         伪类的操作对象是文档树中已有的元素
         伪元素创建了一个文档数外的元素。
         伪类与伪元素的区别在于：有没有创建一个文档树之外的元素。
-    总结：
+    总结：(弥补常规CSS选择器的不足/创建一个有内容的虚拟容器)
         伪类本质上是为了弥补常规CSS选择器的不足，以便获取到更多信息；
         伪元素本质上是创建了一个有内容的虚拟容器；  
         CSS3中伪类和伪元素的语法不同；
