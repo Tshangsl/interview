@@ -14,7 +14,7 @@ CSS CSS3是什么
     Box：css布局基本单位
         Box是CSS布局的对象和基本单位 直观点来说 一个页面是由很多个 Box 组成的。
         元素的类型和 display 属性，决定了这个 Box 的类型。
-        不同类型的 Box， 会参与不同的 Formatting Context(格式化上下文)（一个决定如何渲染文档的容器）
+        (不同类型的 Box， 会参与不同的 Formatting Context)(格式化上下文)（一个决定如何渲染文档的容器）
         因此Box内的元素会以不同的方式渲染。让我们看看有哪些盒子：
             1.block-level 
                 box:display 属性为 block, list-item, table 的元素，
@@ -33,10 +33,11 @@ CSS CSS3是什么
     BFC布局规则：(BFC的区域不会和float box重叠)
         1.内部的Box会在垂直方向 一个接一个地放置
         2.Box垂直方向的距离由margin决定 属于同一个BFC的两个相邻Box的margin会发生重叠
-        3.每个盒子（块盒与行盒）的margin box的左边，与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
-        4.BFC的区域不会与float box重叠。
+        3.每个盒子（块盒与行盒）的margin box的左边，
+            与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
+        4.BFC的区域不会与float box重叠，计算BFC的高度时，浮动元素也参与计算
+
         5.BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。
-        6.计算BFC的高度时，浮动元素也参与计算。
     如何创建BFC：
         1.float的值不是none。
         2.position的值不是static或者relative。
@@ -44,11 +45,11 @@ CSS CSS3是什么
         4.overflow的值不是visible
     BFC作用：
         1.利用BFC避免margin重叠。
-            根据：属于同一个BFC的两个相邻的Box会发生margin重叠
+            根据：属于同一个BFC的两个相邻的Box会发生 触发该容器生成一个新的BFC p外面包裹一层容器 overflow:hidden
         2.自适应两栏布局
             根据：
                 1.每个盒子的margin box的左边，与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
-                2.BFC的区域不会与float box重叠。
+                2.BFC的区域不会与float box重叠。overflow:hidden 触发main生成BFC
                 3.清除浮动……
     总结：
         BFC就是页面上的一个隔离的独立容器 容器里面的子元素不会影响到外面的元素 反之也是如此
@@ -113,15 +114,16 @@ CSS CSS3是什么
             2.flex布局 父级display:flex 左侧flex:0 0 200px 右侧flex：1
             3.grid布局
     三列布局(左右两侧宽度固定 中间自适应)
-        1.左右浮动 中间100%
+        1.浮动左右浮动 中间100%
             左右两边浮动
             中间设置margin-left margin-right
-        2.绝对定位中间不给宽度
-            左右两侧使用绝对定位，中间设置margin值
-        3.flex
+        2.定位绝对定位中间不给宽度
+            左右两侧使用绝对定位，
+            中间设置margin-left margin-right值
+        3.flex弹性盒模型
             父元素设置为弹性盒子
             左右两侧使用flex-basis设置元素本身大小
-            中间使用flex-grow设置占满剩余空间
+            中间使用flex-grow:1设置占满剩余空间
             
         1.基于float实现 使左右两个aside分别浮动到左右两侧
         2.基于position:absolute实现
@@ -129,6 +131,7 @@ CSS CSS3是什么
         4.基于display:table实现
         5.基于display:grid实现
 5.外边距塌陷及形成原因(由BFC决定)
+    父元素(由BFC决定 定义边框 内边距 overflow:hidden 使用BFC)
     定义：也称为外边距合并，是指两个在正常流中相邻（兄弟或父子关系）的块级元素的外边距
         组合在一起变成单个外边距，不过只有上下外边距才会有塌陷，左右外边距不会出现这种问题。
         1.当上下相邻的两个块级元素相遇，上面的元素有下边距margin-bottom，下面的元素有上边距margin-top，则它们之间的垂直距离取两个值中的较大者。
@@ -240,13 +243,13 @@ CSS CSS3是什么
 12.Flex基础概念，父级容器属性(Flex容器)，子级容器属性(Flex项目)
     布局的传统解决方案基于盒装模型依赖display属性+position属性+float属性
     flex:弹性盒布局，CSS3的新属性，用于方便布局，比如垂直居中
-    基础概念：(Flex容器/项目|主轴 交叉轴|项目默认沿主轴排列)
+    基础概念：(1.Flex容器/项目|主轴 交叉轴|项目默认沿主轴排列)
         1.采用Flex布局的元素，称为Flex容器(flex container)简称容器，它的所有子元素自动成为容器成员，称为Flex项目(flex item)简称项目
         2.容器默认存在两根轴：水平的主轴(main axis)和垂直的交叉轴(cross axis)，主轴的开始位置(与边框的交叉点)叫做mian start 结束位置叫做mian end 交叉轴的开始位置叫cross start 结束位置叫 cross end
         3.项目默认沿主轴排列，单个项目占据的主轴空间叫main size 占据的交叉空间叫cross size
         总结：弹性布局由父级容器，子级容器构成，通过设置主轴和交叉轴来控制子元素的排序方式
-    父级容器属性:flex-flow(flex-direction flex-wraps)
-        (flex-direction子元素排列方向/flex-wrap换行/justify-content(主轴)/align-items(交叉轴)/align-content(多根轴线))
+    父级容器属性:flex-flow(flex-direction flex-wrap)
+        (2.flex-direction子元素排列方向/flex-wrap换行/justify-content(主轴)/align-items(交叉轴)/align-content(多根轴线))
         1.flex-direction:row|row-reverse|column|column-reverse
             该属性定义了子元素排列方向
         2.flex-wrap：**nowrap | wrap | wrap-reverse;  该属性称"轴线",该属性定义如果一条轴线排不下，如何换行。
@@ -254,7 +257,7 @@ CSS CSS3是什么
         4.justify-content: flex-start | flex-end | center | space-between | space-around;  该属性定义了子元素在主轴上的对齐方式。
         5.align-items:  flex-start | flex-end | center | baseline | stretch;  定义项目在交叉轴上如何对齐。
         6.align-content: ** flex-start | flex-end | center | space-between | space-around | stretch; 属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用
-    子级容器属性：(flex flex-grow0 flex-shrink1s flex-basis)
+    子级容器属性：(3.flex flex-grow flex-shrink1s flex-basis)
         (order子元素排列顺序 flex align-self )
         1.order属性 定义子元素或子容器的排列顺序，数值越小，排列越靠前，默认为0
         2.flex-grow属性 定义子元素或者子容器的放大比例，默认为0，即如果存在剩余空间也不放大
@@ -304,19 +307,19 @@ CSS CSS3是什么
     4.absolute:生成绝对定位的元素，相对于 static 定位以外的第一个祖先元素进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
     5.fixed:生成绝对定位的元素，相对于浏览器窗口进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
 16.CSS的三种定位方式
-     1.相对定位：
+     1.相对定位：(不会改变元素性质)
         相对自己的初始位置定位，
         原有空间不释放
         相对定位不会改变元素的性质(块(行)元素仍是块(行)元素)
         position:relative;
         left:200px;
         top:30px;
-    2. 绝对定位:
+    2. 绝对定位:(会改变元素性质 行=>块)
         相对于最近已定位的祖先元素
         如果没有最近的定位的父元素 会相对于body
         原有空间释放
         绝对定位会改变元素的性质，行内元素会变成块级元素
-    3.固定定位:
+    3.固定定位:(会改变元素性质 转换成行级块)
         相对于浏览器窗口偏移
         原有空间释放
         会转化成行级块
@@ -355,7 +358,8 @@ CSS CSS3是什么
         伪类的操作对象是文档树中已有的元素
         伪元素创建了一个文档数外的元素。
         伪类与伪元素的区别在于：有没有创建一个文档树之外的元素。
-    总结：(弥补常规CSS选择器的不足/创建一个有内容的虚拟容器)
+    总结：(伪类：弥补常规CSS选择器的不足 可以使用多个 文档数中已有/
+            伪元素：创建一个有内容的虚拟容器 只能同时使用一个 文档数中新建)
         伪类本质上是为了弥补常规CSS选择器的不足，以便获取到更多信息；
         伪元素本质上是创建了一个有内容的虚拟容器；  
         CSS3中伪类和伪元素的语法不同；

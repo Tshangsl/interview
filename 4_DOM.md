@@ -189,7 +189,8 @@
     target也有兼容性问题 标准浏览器 IE浏览器
     var target = e.target||e.srcElement;
 17.dom中e.target和this的区别
-    e.target 返回的是触发事件的对象（元素）  this 返回的是绑定事件的对象（元素）
+    e.target 返回的是触发事件的对象（元素）  
+    this 返回的是绑定事件的对象（元素）
     区别 ： e.target 点击了那个元素，就返回那个元素 。this 那个元素绑定了这个点击事件，那么就返回谁
 17. 选项卡实现
     事件委托实现选项卡

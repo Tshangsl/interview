@@ -1,3 +1,6 @@
+1.(Array/Object/String/Set/Map 可迭代数据类型的迭代方法也是各式各样的)
+        (ES6所有可迭代对象的迭代器放在对象原型的Symbol.iterator属性下 拥有迭代器的对象都可以使用for of进行迭代)
+2.数组去重(indexOf()/indexOf()&splice/ES6Set+Array.from/ES6Set+... )
 JS
     JS是一种具有函数优先的轻量级 解释性 或即时编译型的编译语言 
     虽然它是作为Web页面的脚本语言而出名的 但是它也被用到很多非浏览器环境中 JavaScript基于原型编程多范式的动态脚本语言 并且支持面向对象命令式和声明式(如函数式编程)风格
@@ -10,7 +13,6 @@ JS
     2.支持嵌入变量和任意JS表达式 支持嵌套
 2.变量提升函数提升(函数声明优先于变量声明)
     JS引擎会在正式执行代码之前进行一次”预编译“，预编译简单理解就是在内存中开辟一些空间，存放一些变量和函数。具体步骤如下（browser）：
-
 1.JS有哪些数据类型，数据类型之间有哪些不同，判断数据类型的方法
     基本数据类型:String Number Boolean Undefined Null Symbol(ES6新增 表示独一无二的值) BigInt(ES2020即ES11新增)
         Symbol函数的参数只是表示当前Symbol值的描述 相同参数的Symbl函数依然是不同的
@@ -117,6 +119,12 @@ JS
         3.上下文对象函数调用，那个对象调用就指向那个对象
         4.使用 new 实例化对象，在构造函数中的this指向实例化对象。
         5.call/apply/bind方法显式调用函数时，函数内this 指向指定的对象（第一个参数）
+        (事件处理函数 绑定dom元素/定时器window/自定义函数window/对象该对象/类new出来的实例化对象)
+        1.事件处理函数中 this =>绑定事件的dom元素
+        2.定时器中 this=>window
+        3.自定义函数中 this=>window
+        4.自定义对象中 this=>该对象
+        5.自定义类中new一个对象 this=>new出来的实例化对象
     箭头函数中this(定义时确定)指向问题：
         1.箭头函数本身没有原型(prototype) 不存在this 箭头函数的this由它外层作用域的普通函数的this指向决定 否则就是window
         2.所以箭头函数的this指向在定义时就已经确定了，并且之后永远都不会改变
@@ -197,7 +205,7 @@ JS
     IIFE可以带多个参数
     总结：IIFE的目的是隔离作用域，防止污染全局命名空间
 9.什么是原型，原型链 prototype __proto__
-    原型 原型链
+    原型 原型链(由相互关联的原型组成的链状结构就是原型链)
         原型Person.prototype
             也是一个对象 也可以用_proto_获取它的原型(原型的原型)
                 person._proto === Person.prototype
@@ -224,7 +232,8 @@ JS
             2.作为一个构造函数 子类的原型对象是父类的原型对象的实例
                 C.prototype._proto_ === F.prototype
         __proto__(对象)：
-            每个JS对象一定对应一个原型对象，并从原型对象继承属性和方法
+            每个JS对象
+            一定对应一个原型对象，并从原型对象继承属性和方法
             对象_proto_属性的值就是它所对应的原型对象
         prototype(对象)：
             1.只有函数才有prototype属性
