@@ -13,6 +13,8 @@ JS
     2.支持嵌入变量和任意JS表达式 支持嵌套
 2.变量提升函数提升(函数声明优先于变量声明)
     JS引擎会在正式执行代码之前进行一次”预编译“，预编译简单理解就是在内存中开辟一些空间，存放一些变量和函数。具体步骤如下（browser）：
+    1.所有的声明都会提升到作用域的最顶上去。
+    2.函数声明的优先级高于变量声明的优先级，并且函数声明和函数定义的部分一起被提升。
 1.JS有哪些数据类型，数据类型之间有哪些不同，判断数据类型的方法
     基本数据类型:String Number Boolean Undefined Null Symbol(ES6新增 表示独一无二的值) BigInt(ES2020即ES11新增)
         Symbol函数的参数只是表示当前Symbol值的描述 相同参数的Symbl函数依然是不同的
@@ -305,7 +307,27 @@ JS
             1.执行上下文总是关键字this的值 是调用当前可执行代码的对象的引用
             2.作用域是函数定义的时候就确定好的 函数当中的变量适合函数所处的作用域有关，函数运行的作用域也是与该函数定义时的作用域有关
             3.上下文，主要是关键字this的值，这个是由函数运行时决定的，简单来说就是谁调用此函数，this就指向谁。
-16.JS中数组的几种创建方法(创建数组再赋值/直接实例化/字面隐式创建)
+15.数组操作
+    1.map【常用】: 遍历数组，返回回调返回值组成的新数组
+    2.forEach【常用】: 无法break，可以用try/catch中throw new Error来停止
+    3.filter【常用】: 过滤
+    4.some: 有一项返回true，则整体为true
+      every: 有一项返回false，则整体为false
+    5.join【常用】: 通过指定连接符生成字符串
+    6.push / pop: 末尾推入和弹出，改变原数组， push 返回数组长度, pop 返回原数组最后一项；
+    7.unshift / shift: 头部推入和弹出，改变原数组，unshift 返回数组长度，shift 返回原数组第一项 ；
+    8.sort(fn) / reverse【常用】: 排序与反转，改变原数组
+    9.concat【常用】: 连接数组，不影响原数组， 浅拷贝
+    10.slice(start, end): 返回截断后的新数组，不改变原数组
+    11.splice(start, number, value...)【常用】: 返回删除元素组成的数组，value 为插入项，改变原数组
+    12.indexOf / lastIndexOf(value, fromIndex): 查找数组项，返回对应的下标
+    13.reduce / reduceRight(fn(prev, cur)， defaultPrev): 两两执行，prev 为上次化简函数的return值，cur 为当前值
+    当传入 defaultPrev 时，从第一项开始；
+    当未传入时，则为第二项
+16.JS中数组的几种创建方法
+    (创建数组再赋值 new Array(); a[0]='a'
+    /直接实例化 new Array('as')
+    /字面隐式创建)  ['a']
     JS中数组 数组是一种特殊的对象 是对象的分类
     1.常规模式 创建数组给数组赋值
         var myCars = new Array();
@@ -315,6 +337,7 @@ JS
     3.字面隐式创建
         var myCars = ["Saab","Volvo","BMW"];
 17.JS中的类数组 把类数组转变成数组
+    (类数组=>真数组Array.prototype.slice.call()/Array.from())
     类数组：
         一种类似数组的对象 并提供了一种用于访问原始二进制数据的机制，但不是真正的数组
     JS中的类数组对象：
@@ -330,6 +353,10 @@ JS
             2.Array.from()
         4.可自定义其他属性
 18.数组遍历方法和操作
+    (keys/values/entries
+    forEach/filter/reduce/some&every/while
+    for of
+    )
     (map reduce filter过滤 forEach every&some不改变原数组)
     1.keys
     2.values
@@ -366,7 +393,9 @@ JS
         只有具有Enumerable(可枚举)属性的属性才能被for in 遍历 例如constructor便是最常见的不可枚举的属性之一
         2.如果使用for in循环遍历数组 可以用hasOwnProperty来检测属性是否来自原型链
     11.while
-17.数组去重(indexOf()/indexOf()&splice/ES6Set+Array.from/ES6Set+... )
+17.数组去重
+    (indexOf()/indexOf()&splice/splice
+    /ES6Set+Array.from/ES6Set+... )
     1.indexOf()
         1.新建一个空数组
         2.遍历原数组
@@ -664,9 +693,22 @@ JS
         2.解决浮点数计算精度
             1.可以把需要计算的数字升级（乘以10的n次幂）成计算机能够精确识别的整数，等计算完成后再进行降级（除以10的n次幂），这是大部分变成语言处理精度问题常用的方法。
             2.将浮点数toString后indexOf('.')
-
-
-
+30.JSON
+        数组或对象最后一个成员的后面，不能加逗号。
+        数组或对象之中的字符串必须使用双引号，不能使用单引号。
+        对象的成员名称必须使用双引号。
+        不能使用函数和日期对象
+        不能使用undefined
+        不能使用十六进制值
+        JSON.stringify方法还可以接受一个数组参数/函数参数/第三个参数，指定需要转成字符串的属性/用来更改默认的字符串化的行为/增加返回的JSON字符串可读性
+31.JS中数组和对象的关系
+    JS中所有的东西(除了undefined和null)都是对象(Object)。
+        1.包括字符串(String), 数值(Number), 数组(Array), 函数(function)等等.
+        2.数组(Array)是一种内建(built-in)的, 或者说是javascript自带的对象(Object). 
+        3.除此之外, 字符串(String), 数值(Number)等也是Javascript内建(built-in)的对象(Object).
+    特殊情况: 
+        undefined和null不是对象  虽然typeof null的结果是'object', 但是null仍然不是一个对象. 
+        任何变量可以被赋值为null, 但是用户不能给null添加任何property.
 
 
 
