@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字符串</title>
+</head>
+<body>
+    <script>
+        //1.反转字符串
+        const str = 'lixiaoli'
+        const res = str.split('').reverse().join('')
+        console.log(res);
+        //2.1判断一个字符串是否是回文字符串
+        function isPalindrome(str){
+           //先反转字符串
+           const reversedStr = str.split('').reverse().join('')
+            return reversedStr == str;
+        }
+        console.log(isPalindrome('aba'));
+        // 2.2判断一个字符串是否是回文字符串
+        function isPalindrome2(str){
+            const length = str.length;
+            for(var i = 0 ;i<length/2;i++){
+                if(str[i] != str[length-i-1]){
+                    return false;
+                }
+            }
+            return true;
+        }
+        console.log(isPalindrome2('aba'));
+        // 3.1最长回文字符串 ???
+        var longestPalindrome = function(s){
+            let len = s.length;
+            let result,i,j,L;
+            let dp = Array(len).fill(0).map(x=>Array(len).fill(0))
+            console.log(dp);
+            if(len<=1){
+                return s;
+            }
+            for(i = 0;i<len;i++){
+                dp[i][i] = 1;
+                result = s[i]
+            }  
+            for(L = 2;L<=len;L++){
+                // 从0开始 i+L-1< Len i<len-L+1
+                for(i = 0;i<len-L;i++){
+                    j = i+L-1;
+                    if(L == 2 && s[i] == s[j]){
+                        dp[i][j] = 1;
+                        result = s.slice(i,i+L);
+                    }else if(s[i] == s[j]&&dp[i+1][j-1] == 1){
+                        dp[i][j] = 1;
+                        result = s.slice(i,i+L);
+                    }
+                }
+            }   
+            return result;
+        }
+        console.log(longestPalindrome('addaddaadd'));
+        // 3.2最长回文字符串
+        var longestPalindrome2 = function(s){
+            let n = s.length;
+            let result = '';
+            for(let i = 0;i<n;i++){
+                for(let j = i+1;j<=n;j++){
+                    let str = s.slice(i,j);
+                    let f = str.split('').reverse().join('');
+                    if(str == f){
+                        result = str.length>result.length?str:result;
+                    }
+                }
+            }
+            return result;
+        }
+        console.log(longestPalindrome2('addaddaadd'));
+        // 4.1字符串数组最长公共前缀
+        var longestCommonPrefix = function(strs){
+            if(strs.length == 0){
+                return ''
+            }
+            let ans = strs[0];
+            for(let i = 1;i<strs.length;i++){
+                let j = 0;
+                for(;j<ans.length&&j<strs[i].length;j++){
+                    if(ans[j]!= strs[i][j]);
+                }
+                ans = ans.substr(0,j);
+                if(ans === ''){
+                    return ans;
+                }
+            }
+            return ans;
+        }
+        // 5.给定一个字符串 找出其中不含重复字符串的最长子串长度
+        /*
+            思路：
+                使用map存储当前已经遍历过的字符 key为字符 value为下标
+                使用i来标记无重复子串开始下标 j为当前遍历字符下标
+                遍历字符串 判断当前字符串是否已经在map中存在
+                存在则更新无重复子串开始下标i为相同字符的下一位置
+                此时从i到j为最新的无重复子串 更新max
+                将当前字符与下标放入map中
+                最后返回max
+        */
+        var lengthOfLongestSubstring = function(s){
+            let map = new Map(),max = 0;
+            for(let i = 0,j=0;j<s.length;j++){
+                if(map.has(s[j])){
+                    i = Math.max(map.get(s[j])+1,i);
+                }
+                max = Math.max(max,j-i+1);
+                map.set(s[j],j);
+            }
+            return max;
+        }
+        // 6.删除字符串中所有相邻重复项
+        /*
+            思路：
+                遍历字符串 依次入栈 入栈时判断与栈头元素是否一致
+                如果一致 即这两个元素相同相邻
+                则需要将栈头元素出栈 并且当前元素也无需入栈
+        */
+        var removeDuplicates = function(s){
+            let stack = []
+            for(c of S){
+                if(!stack.length){
+                    stack.push(c);
+                }else{
+                    let prev = stack.pop();
+                    if(!prev !== c){
+                        stack.push(prev);
+                        stack.push(c);
+                    }
+                }
+            }
+            return stack.join('');
+        }
+        // 7.版本号比较
+        var compareVersion = function(version1,version2){
+            const v1 = version1.split('.');
+            const v1_length = v1.length;
+            const v2 = version.split('.');
+            const v2_length = v2.length;
+            const max = Math.max(v1_length,v2_length);
+            for(let i = 0;i<max;i++){
+                const n1 = Number(v1[i]||0);
+                const n2 = Number(v2[i]||0);
+                if(n1<n2){
+                    return -1
+                }else if(n1>n2){
+                    return 1
+                }else{
+                    if(i===max-1){
+                        return 0
+                    }
+                }
+            }
+        }
+        // 8.如何将浮点数左边的数每三位添加一个逗号 12000000.11 转化为『12,000,000.11』
+            //有问题。。。
+            // 正则表达式
+        function format(number){
+            return number && number.replace(/(?!^)(?=(\d{3})+\.)/g,',');
+        }
+            // 
+        function format1(number){
+            return Int1.NumberFormat().format(number);
+        }
+        // console.log(format1(123333.22));
+            // toLocalString()方法可以把一个Number对象转换为本地格式的字符串
+        function format2(number){
+            return number.toLocalString('en');
+        }
+        // console.log(format2(123333.22));
+        // 9.大小写取反
+        let s = "adAD"
+        s = s.replace(/[a-zA-Z]/g,content=>{
+            console.log(content);
+            return content.toUpperCase() === content?content.toLowerCase:content.toUpperCase();
+        })
+        //10.实现一个字符串匹配算法 
+        /*
+            从长度为n的字符串S中 查找是否存在字符串T
+            T的长度是m 若存在返回所在位置
+            因为T的length是一定的 所以在循环S的时候
+            循环当前项i后面至少还有T.length个元素
+        */
+        const find = (S,T)=>{
+            if(S.length<T.length) return -1;
+            for(let i = 0;i<S.length-T.length;i++){
+                // substr() 方法可在字符串中抽取从 start 下标开始的指定数目的字符。
+                if(S.substr(i,T.length) === T) return i;
+            }
+            return -1;
+        }
+        console.log(find('ddsstr','st'));
+    </script>
+</body>
+</html>

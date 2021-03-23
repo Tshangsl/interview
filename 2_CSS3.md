@@ -372,10 +372,40 @@ CSS CSS3是什么
     网格布局 grid
     容器属性
     item属性
-
-
-
-
+21.clientHeight offsetHeight scrollHeight offsetTop scrollTop
+    1.网页可见区域高:document.body.clientHeight
+    2.网页正文全文高：document.body.scrollHeight
+    3.网页可见区域高(包括边线的高):document.body.offsetHeight
+    4.网页被卷去的高:document.body.scrollTop
+    5.屏幕分辨率高:window.screen.height
+    每个HTML元素都具有clientHeight offsetHeight scrollHeight offsetTop scrollTop这五个和元素高度 滚动 位置相关的属性
+    clientHeight和offsetHeight属性和元素的滚动，位置没有关系 它们代表元素的高度
+    clientHeight:
+        包括padding但不包括border 水品滚动条 margin的元素高度 
+        对于inline的元素这个属性一直是0 单位px 只读元素
+    offsetHeight：
+        包括padding border 水平滚动条 但不包括margin的元素的高度
+        对于inline的元素 这个属性一直是0 单位px 只读元素
+    scrollHeight 有滚动条的情况下 (包括可见和不可见)才有意义
+        (没有滚动条的情况下scrollHeighr == clientHeight恒成立)
+        scrollHeight>=clientHeight
+        当本元素的子元素比本元素高且overflow=scroll时 本元素会scroll 
+        单位px 只读元素
+    scrollTop 元素顶部被遮住部分的高度 
+        有滚动条时 滚动条向下滚动的距离 
+        没有滚动条的时候 scrollTop == 0恒成立 
+        单位px 可读可设置
+    offsetTop:当前元素顶部距离最近父元素顶部的距离 和有没有滚动条没有关系 单位px 只读元素        
+22.CSS响应式设计适配多种设备
+    1. <meta name="viewport" content="width=device-width, initial-scale=1" />
+    2. 不要使用绝对宽度
+    3. 字体大小和长宽边距属性不要用”px”,应该用相对大小的“rem”
+    4. 使用流动布局 - 如果宽度太小，放不下两个元素，后面的元素会自动滚动到前面元素的下方，不会在水平方向overflow（溢出），避免了水平滚动条的出现
+    5. link标签的media属性- <link rel="stylesheet" type="text/css" media="screen and (min-width: 600px) and (max-device-width: 980px)"  href="css600-980.css" />  
+    6. Media Query
+    7. 图片的自适应（自动缩放）
+        - img{max-width: 100%;}     
+        - 最好还是根据不同大小的屏幕，加载不同分辨率的图片
 
 
 
