@@ -3,9 +3,20 @@
 //slot
 //scope
 1.Vue核心 其中的一些属性
+    Vue中的$(内置的实例方法 属性)
+        挂载在this上的vue内部属性
+        内部api的命名空间
+        一个特殊标记 增强区分 说明这是内置的实例方法属性
     核心：
         数据驱动 组件系统
-    1.vm.$el 获取Vue实例关联的DOM元素
+    vm(Virtual Model)是Vue的一个实例
+    1.vm.$el(element缩写) 获取Vue实例关联的DOM元素
+            类型：string|HTMLElement|Function
+            提供一个在页面上已经存在的DOM元素作为Vue实例挂载目标 可以是CSS选择器 也可以是一个HTMLElement实例
+            实例挂载之后 元素可以用vm.$el访问
+            如果在实例化时存在这个选项 实例将立即进入编译过程 否则 需要显示调用vm.$mount()手动开启编译
+                1.提供的元素只能作为挂载点 不同于Vue1.x 所有的挂载元素会被Vue生成的DOM替换 因此。。。
+                2.。。。
     2.vm.$data 获取Vue实例的data选项(对象) 
     3.vm.$options 获取Vue实例的自定义属性
             (如vm.$options.methods获取Vue的自定义属性methods)
@@ -13,6 +24,7 @@
             (如vm.$ref.hello 获取页面中含有属性ref=‘hello’
             的DOM元素 如果有多个元素 那么只返回最后一个)
     5.vm.$set Vue.set的一个别名
+
 1.object.defineProperty(obj,prop,descriptor)
     参数:(三个参数都是必填)
         obj:要定义属性的对象
@@ -116,14 +128,31 @@
             2.修改某些Object方法的返回结果，让其变得更合理。
             3.让Object操作都变成函数行为。某些Object操作是命令式，比如name in obj和delete obj[name]，而Reflect.has(obj, name)和Reflect.deleteProperty(obj, name)让它们变成了函数行为。
             4.Reflect对象的方法与Proxy对象的方法一一对应，只要是Proxy对象的方法，就能在Reflect对象上找到对应的方法。这就让Proxy对象可以方便地调用对应的Reflect方法，完成默认行为，作为修改行为的基础。也就是说，不管Proxy怎么修改默认行为，你总可以在Reflect上获取默认行为。
+2.几种实现双向绑定的做法
+    目前几种主流的mvc(vm)框架都实现了单向数据绑定，而我所理解的双向数据绑定无非就是在单向绑定的基础上给可输入元素（input、textare等）添加了change(input)事件，来动态修改model和 view，并没有多高深。所以无需太过介怀是实现的单向或双向绑定。
+    1.发布者-订阅者模式(backbone.js)
+        一般通过sub, pub的方式实现数据和视图的绑定监听，更新数据方式通常做法是 vm.set('property', value)
+    2.脏值检查(angular.js)
+        angular.js 是通过脏值检测的方式比对数据是否有变更，来决定是否更新视图，最简单的方式就是通过 setInterval() 定时轮询检测数据变动，当然Google不会这么low，angular只有在指定的事件触发时进入脏值检测，大致如下：
+            1.DOM事件，譬如用户输入文本，点击按钮等。( ng-click )
+            2.XHR响应事件 ( $http )
+            3.浏览器Location变更事件 ( $location )
+            4.Timer事件( timeout ,interval )
+            5.执行 digest() 或apply()
+    3.数据劫持(vue.js)
+        vue.js 则是采用数据劫持(Object.defineProperty()来劫持)结合发布者-订阅者模式的方式.
+        通过Object.defineProperty()来劫持各个属性的setter，getter，在数据变动时发布消息给订阅者，触发相应的监听回调。
 3.Vue的双向绑定(数据<=>视图)数据的原理 Vue2.x Vue3.x双向绑定原理的不同
+    Vue2.x
+    (原理:通过Object对象的defineProperty属性 重写data的set和
+    get函数实现)
     (原理 数据劫持+发布者-订阅者模式 
     Object.defineProperty()劫持各个属性setter getter
     数据变动时发布消息给订阅者 
     触发相应监听回调
     )
-    Vue2.x Vue3.x
-    
+    Vue3.x
+    (Proxy)
     vue 实现数据双向绑定主要是：
         采用数据劫持结合发布者-订阅者模式的方式，通过 Object.defineProperty() 来劫持各个属性的 setter，getter，在数据变动时发布消息给订阅者，触发相应监听回调
     双向绑定:
@@ -547,7 +576,16 @@ MVP(Model View Presenter)
             2.v-for循环对象数组
             3.v-for循环对象
             4.v-for迭代数字
-10.
+10.Vue中的template
+    template标签内容天生不可见，设置了display：none；
+    要操作template标签内部的dom必须要用下面的方法–content属性：
+    三种写法：
+        1.字符串模板写法(直接写在vue构造器中)
+            这种写法比较直观,适用于html代码不多的场景,但是如果模板里html代码太多,不便于维护,不建议这么写.
+        2.写在template标签里,这种写法跟写html很像.
+        3.写在script标签里,这种写法官方推荐,vue官方推荐script中type属性加上"x-template"        
+10.Vue中的component
+11.
 $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
 $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
         $router(vue-router实例对象 包括路由跳转方法 钩子函数)
@@ -746,7 +784,7 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
                 例如服务端渲染只支持 beforCreate 和 created 两个钩子函数，这会导致一些外部扩展库需要特殊处理，才能在服务端渲染应用程序中运行；并且与可以部署在任何静态文件服务器上的完全静态单页面应用程序 SPA 不同，服务端渲染应用程序，需要处于 Node.js server 运行环境；
             2.更多服务器负载
                 在 Node.js  中渲染完整的应用程序，显然会比仅仅提供静态文件的  server 更加大量占用CPU 资源 (CPU-intensive - CPU 密集)，因此如果你预料在高流量环境 ( high traffic ) 下使用，请准备相应的服务器负载，并明智地采用缓存策略。
-27.你有对Vue项目进行过哪些优化
+29.Vue项目优化
         1.代码层面的优化 
             v-if 和 v-show 区分使用场景
             computed 和 watch区分使用场景
@@ -754,9 +792,12 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
             v-if长列表性能优化事件的销毁图片资源懒加载路由懒加载第三方插件的按需引入优化无限列表性能服务端渲染 SSR or 预渲染
         2.Webpack 层面的优化 Webpack 对图片进行压缩减少 ES6 转为 ES5 的冗余代码提取公共代码模板预编译提取组件的 CSS优化 SourceMap构建结果输出分析Vue 项目的编译优化
         3.基础的 Web 技术的优化  开启 gzip 压缩  浏览器缓存  CDN 的使用  使用 Chrome Performance 查找性能瓶颈
-30.delete和Vue.delete删除数组区别
+30.Vue数组中对象删除属性delete和Vue.delete删除数组区别
     delete只是被删除的元素变成了 empty/undefined 其他的元素的键值还是不变。
+        delete this.a[1]
+        this.$set(this.a)
     Vue.delete直接删除了数组 改变了数组的键值。
+        this.$delete(this.b, 1)
 30.Vue优点
     1.轻量级框架：只关注视图层，是一个构建数据的视图集合，大小只有几十kb；
     2.简单易学：国人开发，中文文档，不存在语言障碍 ，易于理解和学习；
@@ -765,17 +806,24 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
     4.视图，数据，结构分离：使数据的更改更为简单，不需要进行逻辑代码的修改，只需要操作数据就能完成相关操作；
     5.虚拟DOM：dom操作是非常耗费性能的，不再使用原生的dom操作节点，极大解放dom操作，但具体操作的还是dom不过是换了另一种方式；
     6.运行速度更快:相比较与react而言，同样是操作虚拟dom，就性能而言，vue存在很大的优势。
-31.Vue和React区别
-    1.数据流
-    2.监听数据的变化方式不同
-    3.应用场景
-    4.渲染方式
-        Vue：自动追踪组件依赖关系 不需要重新渲染整个组件
-        React：组件状态变化时 会以该组件为根重新计算整个组件
-32.对比 jQuery ，Vue 有什么不同
+31.Vue和React和jQuery区别
+    Vue和React：
+        1.数据流
+        2.监听数据的变化方式不同
+        3.应用场景
+        4.渲染方式
+            Vue：自动追踪组件依赖关系 不需要重新渲染整个组件
+            React：组件状态变化时 会以该组件为根重新计算整个组件
+    Vue(专注于数据层 通过数据双向绑定 最终表现在DOM层减少DOM操作)和jQuery(专注视图层 通过操作DOM实现页面的一些逻辑渲染)：
         jQuery 专注视图层，通过操作 DOM 去实现页面的一些逻辑渲染；
-        Vue 专注于数据层，通过数据的双向绑定，最终表现在 DOM 层面，减少了 DOM 操作Vue 使用了组件化思想，使得项目子集职责清晰，提高了开发效率，方便重复利用，便于协同开发
-33.Vue-Cli配置功能
+        Vue 专注于数据层，通过数据的双向绑定，最终表现在 DOM 层面，减少了 DOM 操作 Vue 使用了组件化思想，使得项目子集职责清晰，提高了开发效率，方便重复利用，便于协同开发
+33.vue-admin-template&Element UI
+    vue-admin-template:
+    一个极简的vue admin管理后台 只包含 Element UI &axios &iconfont&permission control &init 这些搭建后台必要的东西
+    目前版本 v4.0+ 基于Vue-Cli构建
+    Element UI:
+    基于Vue2.0的组件库
+34.Vue-Cli配置功能
     1.ES6代码转换成ES5代码
     2.scss/sass/less/stylus转css
     3..vue文件转换成js文件
@@ -786,7 +834,7 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
     8.每次构建代码清除之前生成的代码
     9.定义环境变量
     10.区分开发环境打包跟生产环境打包
-34.搭建Vue环境
+35.搭建Vue环境
     Webpack:模块打包机 可以分析你的项目依赖以及一些浏览器不能直接运行的语言 jsx vue 等转换成js css文件等 供浏览器使用
         注:JSX是一种JavaScript的语法扩展 适用于React框架中
     1.搭建Webpack基本环境
@@ -816,3 +864,4 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
             2.css-loader主要是解析 css 文件
             3.style-loader 主要是将 css 解析到 html页面 的 style 上
         2.修改webpack.config.js配置
+36.Vue 2.x Vue 3.x
