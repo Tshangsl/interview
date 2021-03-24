@@ -1,5 +1,109 @@
-1. 说一下Vue的双向绑定数据的原理
+1.object.defineProperty(obj,prop,descriptor)
+    参数:(三个参数都是必填)
+        obj:要定义属性的对象
+        prop:要定义或修改的属性的名称或Symbol
+        descriptor：要定义或修改的属性描述符
+    返回值:
+        被传递给函数的对象
+    备注：
+        ES6中 由于Symbol类型的特殊性 用Symbol类型的值来做对象的key与常规的定义或修改不同 
+        Object.defineProperty是定义key为Symbol的属性的方法之一
+    描述：
+        (默认情况下/使用object.defineProperty()添加的属性值是不可修改的)
+        该方法允许精确地添加或修改对象的属性
+        通过赋值操作添加的普通属性是可枚举地 在枚举对象属性时会被枚举到(for ..in object.keys)
+        可以修改这些属性的值 也可以删除这些属性
+        这个方法允许修改默认的额外选项/配置
+
+        对象里目前存在的属性描述符(descriptor)有两种主要形式(都是对象) 
+            (一个描述符只能是两者之一)
+            1.数据描述符
+                具有值的属性 该值可以是可写的 也可以是不可写的
+            2.存取描述符
+                由getter函数和setter函数所描述的属性
+            3.两种描述符都是对象 它们共享以下可选键值
+                (默认值是指在使用object.defineProperty()定义属性时的默认值)
+                1.共享可选键值：
+                    configurable:(不设置默认为false 第一次设置false后 第二次不可设置 会报错)
+                        (表示对象的属性是否可以被删除 除了value writable特性之外的其他特性是否可以被修改)
+                        (在非严格模式下，属性配置configurable:false后进行删除操作会发现属性仍然存在严格模式下会抛出错误：)
+                        当且仅当该属性的 configurable 键值为 true 时，该属性的描述符才能够被改变，同时该属性也能从对应的对象上被删除。
+                    enumerable:(默认为false)
+                        (定义对象的属性是否可以在for..in和Object.keys()中被枚举)
+                        当且仅当该属性的 enumerable 键值为 true 时，该属性才会出现在对象的枚举属性中。
+                2.数据描述符可选键值
+                    value:(默认undefined)
+                        该属性对应的值。可以是任何有效的 JavaScript 值（数值，对象，函数等）。
+                    writable:(默认为false时为只读)
+                        (在非严格模式下给name属性再次赋值会静默失败，不会抛出错误；而在严格模式下会抛出异常：)
+                        当且仅当该属性的 writable 键值为 true 时，属性的值，也就是上面的 value，才能被赋值运算符改变。
+                3.存取描述符可选键值get/set
+                    (get和set函数不是必须成对出现，可以只出现一个；两个函数如果不设置，则默认值为undefined。)
+                    (属性b赋值或取值时会分别触发set和get对应函数)
+                    get(属性的getter函数 如果没有getter 默认undefined)
+                        当访问该属性时，会调用此函数。执行时不传入任何参数，但是会传入 this 对象（由于继承关系，这里的this并不一定是定义该属性的对象）。该函数的返回值会被用作属性的值。
+                    set(属性的setter函数 如果没有setter默认undefined)
+                        当属性值被修改时，会调用此函数。该方法接受一个参数（也就是被赋予的新值），会传入赋值时的 this 对象。 
+                4.描述符默认值汇总
+                    1.拥有布尔值的键 configurable、enumerable 和 writable 的默认值都是 false。
+                        1.一旦使用Object.defineProperty给对象添加属性，如果不设置属性的特性，那么这些值都是false：
+                        2.点运算符给属性赋值时，则默认给三种描述符都赋值true：
+                    2.属性值和函数的键 value、get 和 set 字段的默认值为 undefined。
+                5.如果一个描述符 不具有value writable get set中任意一个键 它会被认为是一个数据描述符
+                一个描述符同时拥有 value 或 writable 和 get 或 set 键，则会产生一个异常。
+    直接在一个对象上定义一个新属性/修改一个对象的现有属性 并返回此对象
+    应当在Object构造器对象上调用此方法 而不是在任意一个Object类型的实例上调用
+2.Proxy与Object.defineProperty
+    1.Proxy
+        (原意代理 此处表示由它代理某些操作 可译为代理器)
+        在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。        
+    2.Object.defineProperty
+        (使用数据劫持 直接在一个对象上定义一个新属性或修改一个对象的现有属性 并返回此对象)
+        在访问或修改对象的某个属性时 通过一段代码拦截这个行为 进行额外的操作或修改返回结果 
+        数据劫持最典型的应用 双向的数据绑定 
+    3.比较
+        Proxy优点:
+            1.Proxy 可以直接监听对象而非属性；
+            2.Proxy 可以直接监听数组的变化；
+            3.Proxy 有多达 13 种拦截方法,不限于 apply、ownKeys、deleteProperty、has 等等是 Object.defineProperty 不具备的；
+            4.Proxy 返回的是一个新对象,我们可以只操作新的对象达到目的,而 Object.defineProperty 只能遍历对象属性直接修改；
+            5.Proxy 作为新标准将受到浏览器厂商重点持续的性能优化，也就是传说中的新标准的性能红利；
+        Object.defineProperty优点：
+            兼容性好，支持 IE9，而 Proxy 的存在浏览器兼容性问题,而且无法用 polyfill 磨平，因此 Vue 的作者才声明需要等到下个大版本( 3.0 )才能用 Proxy 重写。
+    4.Vue 2.x 
+        使用Object.defineProperty() 
+        把内部解耦为Observer Dep 使用Watcher相连
+            缺点:
+                (能劫持对象的属性但需对对象每一个属性进行遍历劫持 对象上新增属性 需对新增的属性再次劫持 如果属性是对象 还需深度遍历 Vue给对象新增属性 用$set 原理通过Object.defineProperty对新增属性再次劫持)
+            1.只能监听对象 无法检测到对象属性的添加和删除 不能监听数组的变化 无法触发push pop shift unshift splice sort reverse 需要进行数组方法的重写 无法检测数组的长度修改
+            2.必须遍历对象的每个属性
+            3.只能劫持当前对象属性 如果想深度劫持 必须深层遍历嵌套的对象
+    5. Vue 3.x
+        使用Proxy进行实现
+            1.可以直接监听对象而非属性
+            2.可以直接监听数组的变化
+            Proxy:
+                (相较于Object.defineProperty劫持某个属性，Proxy则更彻底，不在局限某个属性，而是直接对整个对象进行代理)
+                (在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写)
+                语法：
+                    1.var proxy = new Proxy(target, handler);
+                    2.Proxy本身是一个构造函数，通过new Proxy生成拦截的实例对象，让外界进行访问；构造函数中的target就是我们需要代理的目标对象，可以是对象或者数组；handler和Object.defineProperty中的descriptor描述符有些类似，也是一个对象，用来定制代理规则。
+                    3.Proxy可以直接代理target整个对象并返回一个新对象 通过监听代理对象上属性的变化来获取目标对象属性的变化
+                    4.Proxy不仅能够监听到属性的增加 还能监听属性的删除 比Object.defineProperty的功能更为强大。
+        Reflect：   
+            翻译过来是反射的意思，与Proxy对象一样，也是 ES6 为了操作对象而提供的新 API。有一下几个作用
+            1.将Object对象的一些明显属于语言内部的方法(如Object.defineProperty)放到Reflect对象上
+            2.修改某些Object方法的返回结果，让其变得更合理。
+            3.让Object操作都变成函数行为。某些Object操作是命令式，比如name in obj和delete obj[name]，而Reflect.has(obj, name)和Reflect.deleteProperty(obj, name)让它们变成了函数行为。
+            4.Reflect对象的方法与Proxy对象的方法一一对应，只要是Proxy对象的方法，就能在Reflect对象上找到对应的方法。这就让Proxy对象可以方便地调用对应的Reflect方法，完成默认行为，作为修改行为的基础。也就是说，不管Proxy怎么修改默认行为，你总可以在Reflect上获取默认行为。
+3.Vue的双向绑定(数据<=>视图)数据的原理 Vue2.x Vue3.x双向绑定原理的不同
+    (原理 数据劫持+发布者-订阅者模式 
+    Object.defineProperty()劫持各个属性setter getter
+    数据变动时发布消息给订阅者 
+    触发相应监听回调
+    )
     Vue2.x Vue3.x
+    
     vue 实现数据双向绑定主要是：
         采用数据劫持结合发布者-订阅者模式的方式，通过 Object.defineProperty() 来劫持各个属性的 setter，getter，在数据变动时发布消息给订阅者，触发相应监听回调
     双向绑定:
@@ -14,41 +118,64 @@
             Watcher 订阅者是 Observer 和 Compile 之间通信的桥梁 ，主要的任务是订阅 Observer 中的属性值变化的消息，当收到属性值变化的消息时，触发解析器 Compile 中对应的更新函数。
         4.实现一个订阅器Dep
             订阅器采用 发布-订阅 设计模式，用来收集订阅者 Watcher，对监听器 Observer 和 订阅者 Watcher 进行统一管理。
-2.Vue响应式原理
-    当一个Vue实例创建时，vue会遍历data选项的属性，用 Object.defineProperty 将它们转为 getter/setter并且在内部追踪相关依赖，在属性被访问和修改时通知变化。
-    每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher 重新计算，从而致使它关联的组件得以更新。
-
-2.Vue框架怎么实现对象和数组的监听
-        数据双向绑定中 Object.defineProperty() 只能对属性进行数据劫持，不能对整个对象进行劫持，同理无法对数组进行劫持
+4.Vue响应式原理
+    1.当一个Vue实例创建时，vue会遍历data选项的属性，用 Object.defineProperty 
+    2.将它们转为 getter/setter并且在内部追踪相关依赖，在属性被访问和修改时通知变化。
+    3.每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，
+    4.之后当依赖项的 setter 被调用时，会通知 watcher 重新计算，从而致使它关联的组件得以更新。
+5.Vue框架怎么实现对象和数组的监听
+        数据双向绑定中 Object.defineProperty() 
+        只能对属性进行数据劫持，不能对整个对象进行劫持，同理无法对数组进行劫持
         Vue 能检测到对象和数组（部分方法的操作）的变化
-        实现：
-            Vue 框架是通过遍历数组 和递归遍历对象，从而达到利用 Object.defineProperty() 也能对对象和数组（部分方法的操作）进行监听。
-3.Proxy 与 Object.defineProperty 优劣对比
-        Proxy优势:
-            1.Proxy 可以直接监听对象而非属性；
-            2.Proxy 可以直接监听数组的变化；
-            3.Proxy 有多达 13 种拦截方法,不限于 apply、ownKeys、deleteProperty、has 等等是 Object.defineProperty 不具备的；
-            4.Proxy 返回的是一个新对象,我们可以只操作新的对象达到目的,而 Object.defineProperty 只能遍历对象属性直接修改；
-            5.Proxy 作为新标准将受到浏览器厂商重点持续的性能优化，也就是传说中的新标准的性能红利；
-        Object.defineProperty优势：
-            兼容性好，支持 IE9，而 Proxy 的存在浏览器兼容性问题,而且无法用 polyfill 磨平，因此 Vue 的作者才声明需要等到下个大版本( 3.0 )才能用 Proxy 重写。
-4.Vue 怎么用 vm.$set() 解决对象新增属性不能响应的问题 ？
-        受现代 JavaScript 的限制 ，Vue 无法检测到对象属性的添加或删除。由于 Vue 会在初始化实例时对属性执行 getter/setter 转化，所以属性必须在 data 对象上存在才能让 Vue 将它转换为响应式的。但是 Vue 提供了 Vue.set (object, propertyName, value) / vm.$set (object, propertyName, value)  来实现为对象添加响应式属性，那框架本身是如何实现的呢？ 
+        对象和数组的监听：
+            通过遍历数组 和递归遍历对象
+            达到利用 Object.defineProperty() 也能对对象和数组（部分方法的操作）进行监听。        
+4.Vue 怎么用 vm.$set() 解决对象新增属性不能响应的问题 
+        受现代 JavaScript 的限制 ，Vue 无法检测到对象属性的添加或删除。
+        由于 Vue 会在初始化实例时对属性执行 getter/setter 转化，所以属性必须在 data 对象上存在才能让 Vue 将它转换为响应式的。
+        但是 Vue 提供了 Vue.set (object, propertyName, value) / vm.$set (object, propertyName, value) 
+         来实现为对象添加响应式属性，那框架本身是如何实现的呢？ 
         我们查看对应的 Vue 源码：vue/src/core/instance/index.js
         vm.$set实现原理:
             1.如果目标是数组，直接使用数组的 splice 方法触发相应式；  
             2.如果目标是对象，会先判读属性是否存在、对象是否是响应式，最终如果要对属性进行响应式处理，则是通过调用   defineReactive 方法进行响应式处理（ defineReactive 方法就是  Vue 在初始化对象时，给对象属性采用 Object.defineProperty 动态添加 getter 和 setter 的功能所调用的方法）
-2.怎样理解 Vue 的单向数据流？
+5.怎样理解 Vue 的单向数据流？
         1.所有的 prop 都使得其父子 prop 之间形成了一个单向下行绑定：父级 prop 的更新会向下流动到子组件中，但是反过来则不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流向难以理解。
-        2.额外的，每次父级组件发生更新时，子组件中所有的 prop 都将会刷新为最新的值。这意味着你不应该在一个子组件内部改变 prop。如果你这样做了，Vue 会在浏览器的控制台中发出警告。子组件想修改时，只能通过 $emit 派发一个自定义事件，父组件接收到后，由父组件修改。 有两种常见的试图改变一个 prop 的情形 : 
+        2.每次父级组件发生更新时，子组件中所有的 prop 都将会刷新为最新的值。这意味着你不应该在一个子组件内部改变 prop。如果你这样做了，Vue 会在浏览器的控制台中发出警告。子组件想修改时，只能通过 $emit 派发一个自定义事件，父组件接收到后，由父组件修改。 有两种常见的试图改变一个 prop 的情形 : 
         3.这个 prop 用来传递一个初始值；这个子组件接下来希望将其作为一个本地的 prop 数据来使用。 在这种情况下，最好定义一个本地的 data 属性并将这个 prop 用作其初始值：
         4.这个 prop 以一种原始的值传入且需要进行转换。 在这种情况下，最好使用这个 prop 的值来定义一个计算属性
-2. 解释单向数据流和双向数据绑定
+6.解释单向数据流和双向数据绑定
     单向数据流： 
-        顾名思义，数据流是单向的。数据流动方向可以跟踪，流动单一，追查问题的时候可以更快捷。缺点就是写起来不太方便。要使UI发生变更就必须创建各种 action 来维护对应的 state
+        顾名思义，数据流是单向的。数据流动方向可以跟踪，流动单一，追查问题的时候可以更快捷。
+        缺点就是写起来不太方便。要使UI发生变更就必须创建各种 action 来维护对应的 state
     双向数据绑定：
         数据之间是相通的，将数据变更的操作隐藏在框架内部。优点是在表单交互较多的场景下，会简化大量与业务无关的代码。缺点就是无法追踪局部状态的变化，增加了出错时 debug 的难度
-3. Vue 如何去除url中的 #
+7.Vue-rooter中的hash模式(浏览器环境) history模式 abstract模式(Nodejs环境)
+    1.url组成
+        协议部分、域名部分、端口部分、虚拟目录部分、文件名部分、参数部分、锚部分
+        url的锚部分是从“#”开始到最后，都是锚部分。锚部分不是url的必需部分。
+        url的参数部分是从“？”开始到“#”为止之间的部分。参数部分也不是url的必需部分。
+    1.前端路由
+        使用Vue+vue-router创建单页应用十分简单
+        vue-router提供的功能是将组件映射到路由, 然后渲染出来. 
+        Vue-router两个需求
+            1.记录当前页面的状态
+            2.可以使用浏览器的前进后退功能
+        Vue-router为了满足以上两个需求实现以下三个功能
+            1.改变URL且不让浏览器向服务器发出请求
+            2.检测URL的改变
+            3.截获URL地址, 并解析出需要的信息来匹配路由规则
+    2.hash模式(使用URL hash值来做路由 支持所有浏览器 包括不支持HTML5 History API的浏览器)
+        1.hash表示的是地址栏URL中#符号(也称作为锚点), hash虽然会出现在URL中, 但是不会被包含在Http请求中, 因此hash值改变不会重新加载页面.
+        2.由于hash值变化不会引起浏览器向服务器发出请求, 而且hash改变会触发hashchange事件, 浏览器的进后退也能对其进行控制, 所以在HTML5之前, 基本都是使用hash来实现前端路由.
+    3.history模式(依赖HTML5 History API和服务器配置)
+        1.利用了HTML5新增的pushState()和replaceState()两个api, 通过这两个api完成URL跳转不会重新加载页面
+        2.同时history模式解决了hash模式存在的问题. hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
+    4.abstract(支持所有JavaScript运行环境 如Node.js服务器端 如果发现没有浏览器的API 路由会强制进入这个模式)
+    5.SPA单页面应用路由
+    6.hash模式/history模式实现Vue-router跳转API区别
+
+7.Vue 如何去除url中的 #
     vue-router 默认使用 hash 模式，所以在路由加载的时候，项目中的 url 会自带 #。如果不想使用 #， 可以使用 vue-router 的另一种模式 history
 
     new Router({
@@ -150,7 +277,7 @@
     比如有父组件 Parent 和子组件 Child，如果父组件监听到子组件挂载 mounted 就做一些逻辑处理，可以通过以下写法实现：
     以上需要手动通过 $emit 触发父组件的事件，更简单的方式可以在父组件引用子组件时通过 @hook 来监听即可，如下所示：
     当然 @hook 方法不仅仅是可以监听 mounted，其它的生命周期事件，例如：created，updated 等都可以监听。
-7. 组件通信
+11. 组件通信
         父组件向子组件通信
             子组件通过 props 属性，绑定父组件数据，实现双方通信
         子组件向父组件通信
