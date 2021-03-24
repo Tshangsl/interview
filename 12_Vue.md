@@ -1,3 +1,7 @@
+//template
+//组件的定义 全局组件 局部组件
+//slot
+//scope
 1.Vue核心 其中的一些属性
     核心：
         数据驱动 组件系统
@@ -153,6 +157,15 @@
             通过遍历数组 和递归遍历对象
             达到利用 Object.defineProperty() 也能对对象和数组（部分方法的操作）进行监听。        
 6.Vue 怎么用 vm.$set() 解决对象新增属性不能响应的问题 
+vue实例已经创建好了，有时候需要再次给数据赋值时，并不能在视图中改变
+    如果在实例创建之后添加新的属性到实例上，它不会触发视图更新
+        Vue.set() 方法
+    参数1： 要修改的对象
+    参数2： 属性
+    参数3： 属性的值是啥
+    返回值：已经修改好的值
+    
+    有三种方法可以实现，分别是Vue.set, vm.$set, replace    
         受现代 JavaScript 的限制 ，Vue 无法检测到对象属性的添加或删除。
         由于 Vue 会在初始化实例时对属性执行 getter/setter 转化，所以属性必须在 data 对象上存在才能让 Vue 将它转换为响应式的。
         但是 Vue 提供了 Vue.set (object, propertyName, value) / vm.$set (object, propertyName, value) 
@@ -174,7 +187,24 @@
             写起来不太方便 要使UI发生变更就必须创建各种 action 来维护对应的 state
         双向数据绑定
             数据之间是相通的，将数据变更的操作隐藏在框架内部。优点是在表单交互较多的场景下，会简化大量与业务无关的代码。缺点就是无法追踪局部状态的变化，增加了出错时 debug 的难度
-7.Vue-rooter中的hash模式(浏览器环境) history模式 abstract模式(Nodejs环境)
+6.vue-router 路由实现 路由模式有几种
+        路由
+            用来跟后端服务器进行交互的一种方式，通过不同的路径，来请求不同的资源，请求不同的页面是路由的其中一种功能
+        三种路由模式hash history abstract
+            hash：
+                使用 URL hash 值来作路由。支持所有浏览器，包括不支持 HTML5 History Api 的浏览器；
+                实现原理:
+                    早期的前端路由的实现就是基于 location.hash 来实现的。其实现原理很简单，location.hash 的值就是 URL 中 # 后面的内容。比如下面这个网站，它的 location.hash 的值为 '#search'：
+            history：
+                依赖 HTML5 History API 和服务器配置。具体可以查看 HTML5 History 模式；
+                实现原理：
+                    
+            abstract:
+                支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式.
+7.Vue-rooter中的
+hash模式(浏览器环境) 
+history模式 
+abstract模式(Nodejs环境)
     1.url组成
         协议部分、域名部分、端口部分、虚拟目录部分、文件名部分、参数部分、锚部分
         url的锚部分是从“#”开始到最后，都是锚部分。锚部分不是url的必需部分。
@@ -230,17 +260,24 @@
             mode: 'history',
             routes: [ ]
         })    
-8.MVC(Model View Controller)、MVVM(ViewModel Model View) MVP 
+8.MVC(Model View Controller)
+MVVM(Model View ViewModel) 
+MVP(Model View Presenter) 
     MVC:(所有通信都是单向的)
-        1.通信方式：
+        1.通信方式：(单向View->Controller->Model->View)
             1.View(视图 用户页面) 传送指令到 Controller
             2.Controller(控制器 业务逻辑) 完成业务逻辑后，要求 Model 改变状态
             3.Model(模型 数据保存) 将新的数据发送到 View，用户得到反馈
-        2.互动模式：
+        2.互动模式：(1.View->Controller 2.Controller)
             接收用户指令时 MVC可以分成两种方式 
                 1.一种是通过View接受指令 传递给Controller
                 2.直接通过controller接受指令
         3.实例Backbone
+            (View->Model Controller->View 
+            Controller非常薄 路由 Backbone取消Controller 只保留一个router
+            View很厚 业务逻辑
+            Backbone.js JS的MVC应用框架
+            )
             实际项目往往采用更灵活的方式，以 Backbone.js 为例。
                 1. 用户可以向 View 发送指令（DOM 事件），再由 View 直接要求 Model 改变状态。
                 2. 用户也可以直接向 Controller 发送指令（改变 URL 触发 hashChange 事件），再由 Controller 发送给 View。
@@ -300,7 +337,7 @@
             applendChild
             replaceChild
             removeChild
-        给定任意两棵树 采用先序深度优先遍历的算法找到最少的转换步骤
+        给定任意两棵树 采用先序深度优先遍历的算法找到最少的转换步骤d
         DOM-diff比较两个虚拟DOM的区别 也就是在比较两个对象的区别
         作用：
             根据两个虚拟对象创建出补丁 描述改变的内容 将这个补丁用来更新DOM
@@ -368,6 +405,17 @@
             keep-alive专属 组件被激活时调用
         10.deactived() 
             keep-alive专属 组件被销毁时调用
+11.keep-alive 
+        keep-alive:
+            Vue 内置的一个组件，可以使被包含的组件保留状态，或避免重新渲染
+            特性:
+                一般结合路由和动态组件一起使用，用于缓存组件；提供 include 和 exclude 属性，两者都支持字符串或正则表达式， include 表示只有名称匹配的组件会被缓存，exclude 表示任何名称匹配的组件都不会被缓存 ，其中 exclude 的优先级比 include 高；对应两个钩子函数 activated 和 deactivated ，当组件被激活时，触发钩子函数 activated，当组件被移除时，触发钩子函数 deactivated。
+            <keep-alive>
+            <component>
+                <!-- 该组件将被缓存！ -->
+            </component>
+            </keep-alive>sf
+        可以使用API提供的props，实现组件的动态缓存
 7.Vue 的父组件和子组件生命周期钩子函数执行顺序？
             (加载渲染/子组件更新/父组件更新/销毁)
             1.加载渲染过程 
@@ -442,44 +490,66 @@
 
             /*触发事件*/
             event.$emit('eventName', 'this is a message.')
-8.vue-router 路由实现 路由模式有几种
-        路由
-            用来跟后端服务器进行交互的一种方式，通过不同的路径，来请求不同的资源，请求不同的页面是路由的其中一种功能
-        三种路由模式hash history abstract
-            hash：
-                使用 URL hash 值来作路由。支持所有浏览器，包括不支持 HTML5 History Api 的浏览器；
-                实现原理:
-                    早期的前端路由的实现就是基于 location.hash 来实现的。其实现原理很简单，location.hash 的值就是 URL 中 # 后面的内容。比如下面这个网站，它的 location.hash 的值为 '#search'：
-            history：
-                依赖 HTML5 History API 和服务器配置。具体可以查看 HTML5 History 模式；
-                实现原理：
-                    
-            abstract:
-                支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式.
+8.Vue中事件修饰符
+    为了更纯粹的数据逻辑，vue提供了很多事件修饰符，来代替处理一些 DOM 事件细节。
+        1 .stop：防止事件冒泡，等同于JavaScript中的event.stopPropagation()
+        2 .prevent：防止执行预设的行为，等同于JavaScript中的event.preventDefault()
+        3 .capture：捕获冒泡
+        4 .self：将事件绑定到自身，只有自身才能触发
+        5 .once：只触发一次
+        6 .passive：不阻止事件的默认行为
 9.Vue一些指令及具体作用
-        1.v-html
-        2.v-show
+        1.v-html/v-text(可简写为{{}}并支持逻辑运算)
+            v-html:
+                会以html的方式把内容载入页面中
+                浏览器会将其当作html标签解析后输出
+            v-text：(单向绑定 数据对象=>插值)
+                操作纯文本 浏览器不会再对其进行html解析
+                会把全部内容转化为字符串
+                注:vue中有个指令叫做 v-once 可以通过v-once与v-text结合，实现仅执行一次性的插值
+        2.v-show/v-if
+            v-show
             1.无论初始条件 元素总被渲染 只是简单基于CSS的display属性进行切换
             2.适用需要频繁切换条件的场景
             仅仅控制元素的显示方式，将 display 属性在 block 和 none 来回切换
             就简单得多——不管初始条件是什么，元素总是会被渲染，并且只是简单地基于 CSS 的 “display” 属性进行切换。
             v-show 则是不管值为 true 还是 false ，html 元素都会存在，只是 CSS 中的 display 显示或隐藏
-        3.v-if
+            v-if
             1.真正的条件渲染 惰性
             2.适用不需要频繁切换条件的场景
             会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建；
             如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块。
             控制这个 DOM 节点的存在与否。
             使用了 v-if 的时候，如果值为 false ，那么页面将不会有这个 html 标签生成。
-        4.v-for
-        5.v-model(本质 语法糖) 
-            原理:
-                vue 项目中主要使用 v-model 指令在表单 input、textarea、select 等元素上创建双向数据绑定，我们知道 v-model 本质上不过是语法糖，v-model 在内部为不同的输入元素使用不同的属性并抛出不同的事件：
+        3.v-on(@)/v-bind(:)/v-model
+            1.v-on(用于绑定HTML事件 缩写@) 
+                对象同时绑定多个事件时 不能用@代替v-on
+            2.v-bind(用于设置HTML属性 缩写:)
+                多标签的页面也可以使用is特性来切换不同的组件
+                主要用于属性绑定 如class/style/value/href等
+            3.v-model(表单控件元素上创建双向数据绑定 作用于表单控件外的标签没有用)
+                双向绑定(JS中Vue实例中data<=>其渲染DOM元素上内容)
+                原理：
+                    vue 项目中主要使用 v-model 指令在表单 input、textarea、select 等元素上创建双向数据绑定。v-model 本质上不过是语法糖，v-model 在内部为不同的输入元素使用不同的属性并抛出不同的事件：
                 1.text 和 textarea 元素使用 value 属性和 input 事件；下
                 2.checkbox 和 radio 使用 checked 属性和 change 事件；
-                3.select 字段将 value 作为 prop 并将 change 作为事件。            
-10.$route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
-    $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
+                3.select 字段将 value 作为 prop 并将 change 作为事件。
+            4.v-bind与v-model区别
+                1:v-bind动态绑定指令，默认情况下标签自带属性的值是固定的，在为了能够动态的给这些属性添加值，可以使用v-bind:你要动态变化的值="表达式"
+                2:v-bind用于绑定属性和数据 ，其缩写为“ : ” 也就是v-bind:id  === :id  
+                3:v-model用在表单控件上的，用于实现双向数据绑定，所以如果你用在除了表单控件以外的标签是没有任何效果的。
+        4.v-for
+            key的使用：
+                1.必须指定 
+                2.唯一的字符串string/数字number类型:key 值
+                3.必须使用v-bind属性绑定的形式指定key的值
+            1.v-for循环普通数组
+            2.v-for循环对象数组
+            3.v-for循环对象
+            4.v-for迭代数字
+10.
+$route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
+$router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
         $router(vue-router实例对象 包括路由跳转方法 钩子函数)
             为 VueRouter 实例，想要导航到不同 URL，则使用 $router.push
             是VueRouter的一个对象，通过Vue.use(VueRouter)和Vu构造函数得到一个router的实例对象，这个对象中是一个全局的对象，他包含了所有的路由，包含了许多关键的对象和属性。
@@ -495,17 +565,19 @@
             $route.matchd 数组，包含当前匹配的路径中所包含的所有片段所对象的配置参数对象
             $route.name 当前路由的名字，如果没有使用具体路径，则名字为空
 11.vue-router使用params与query传参区别
-        vue-router 可以通过 params 与 query 进行传参
-        传递
-        this.$router.push({path: './xxx', params: {xx:xxx}})
-        this.$router.push({path: './xxx', query: {xx:xxx}})
-        接收
-        this.$route.params
-        this.$route.query
-        1.params 是路由的一部分,必须要有。
-        query 是拼接在 url 后面的参数，没有也没关系
-        2.params 不设置的时候，刷新页面或者返回参数会丢，
-        query 则不会有这个问题
+        1.用法上(接收参数的时候，已经是$route而不是$router)
+            query要用path来引入，params要用name来引入
+            接收参数都是类似的，分别是
+            this.$route.query.name和
+            this.$route.params.name。
+            注：接收参数的时候，已经是$route而不是$router
+        2.展示上
+            query更加类似于我们ajax中get传参
+            params则类似于post，说的再简单一点，前者在浏览器地址栏中显示参数，后者则不显示
+        3.params是路由的一部分,必须要有。
+          query是拼接在url后面的参数，没有也没关系。
+            params一旦设置在路由，params就是路由的一部分，如果这个路由有params传参，但是在跳转的时候没有传这个参数，会导致跳转失败或者页面会没有内容。
+        4.params、query不设置也可以传参，params不设置的时候，刷新页面或者返回参数会丢失 query则不会有这个问题        
 11.NextTick 是做什么的 其原理
         $nextTick 是在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后使用 $nextTick，则可以在回调中获取更新后的 DOM
         JS运行机制
@@ -558,7 +630,6 @@
             当我们需要进行数值计算，并且依赖于其它数据时，应该使用 computed，因为可以利用 computed 的缓存特性，避免每次获取值时，都要重新计算；
             watch：s
             当我们需要在数据变化时执行异步或开销较大的操作时，应该使用 watch，使用 watch 选项允许我们执行异步操作 ( 访问一个 API )，限制我们执行该操作的频率，并在我们得到最终结果前，设置中间状态。这些都是计算属性无法做到的。
-
 15. Vue 中怎么自定义指令
         全局注册
             // 注册一个全局自定义指令 `v-focus`
@@ -586,16 +657,6 @@
             <!-- 'abc' => 'cba' -->
             <span v-text="message | reverse"></span>
         过滤器也同样接受全局注册和局部注册
-17.对 keep-alive 的了解
-        keep-alive 是 Vue 内置的一个组件，可以使被包含的组件保留状态，或避免重新渲染
-            特性:
-                一般结合路由和动态组件一起使用，用于缓存组件；提供 include 和 exclude 属性，两者都支持字符串或正则表达式， include 表示只有名称匹配的组件会被缓存，exclude 表示任何名称匹配的组件都不会被缓存 ，其中 exclude 的优先级比 include 高；对应两个钩子函数 activated 和 deactivated ，当组件被激活时，触发钩子函数 activated，当组件被移除时，触发钩子函数 deactivated。
-            <keep-alive>
-            <component>
-                <!-- 该组件将被缓存！ -->
-            </component>
-            </keep-alive>
-        可以使用API提供的props，实现组件的动态缓存
 18. Vue 中 key 的作用
         key 的特殊属性主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。
         如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试修复/再利用相同类型元素的算法。
@@ -628,11 +689,11 @@
             1.良好的交互体验
                 用户体验好、快，内容的改变不需要重新加载整个页面，避免了不必要的跳转和重复渲染；
             2.良好的前后端工作分离模式
-                前后端职责分离，架构清晰，前端进行交互逻辑，后端负责数据处理；
+                前后端职下·责分离，架构清晰，前端进行交互逻辑，后端负责数据处理；
             3.减轻服务器压力
                 基于上面一点，SPA 相对对服务器压力小；
         缺点：
-            4.SEO(搜索引擎优化)难度较高
+            4.SEO(Search Engine Optimization搜索引擎优化)难度较高
                 由于所有的内容都在一个页面中动态替换显示，所以在 SEO 上其有着天然的弱势。
             5.前进、后退管理 
                 由于单页应用在一个页面中显示所有的内容，所以不能使用浏览器的前进后退功能，所有的页面切换需要自己建立堆栈管理；
@@ -696,6 +757,14 @@
 30.delete和Vue.delete删除数组区别
     delete只是被删除的元素变成了 empty/undefined 其他的元素的键值还是不变。
     Vue.delete直接删除了数组 改变了数组的键值。
+30.Vue优点
+    1.轻量级框架：只关注视图层，是一个构建数据的视图集合，大小只有几十kb；
+    2.简单易学：国人开发，中文文档，不存在语言障碍 ，易于理解和学习；
+    3.双向数据绑定：保留了angular的特点，在数据操作方面更为简单；
+    组件化：保留了react的优点，实现了html的封装和重用，在构建单页面应用方面有着独特的优势；
+    4.视图，数据，结构分离：使数据的更改更为简单，不需要进行逻辑代码的修改，只需要操作数据就能完成相关操作；
+    5.虚拟DOM：dom操作是非常耗费性能的，不再使用原生的dom操作节点，极大解放dom操作，但具体操作的还是dom不过是换了另一种方式；
+    6.运行速度更快:相比较与react而言，同样是操作虚拟dom，就性能而言，vue存在很大的优势。
 31.Vue和React区别
     1.数据流
     2.监听数据的变化方式不同
@@ -706,3 +775,44 @@
 32.对比 jQuery ，Vue 有什么不同
         jQuery 专注视图层，通过操作 DOM 去实现页面的一些逻辑渲染；
         Vue 专注于数据层，通过数据的双向绑定，最终表现在 DOM 层面，减少了 DOM 操作Vue 使用了组件化思想，使得项目子集职责清晰，提高了开发效率，方便重复利用，便于协同开发
+33.Vue-Cli配置功能
+    1.ES6代码转换成ES5代码
+    2.scss/sass/less/stylus转css
+    3..vue文件转换成js文件
+    4.使用 jpg、png，font等资源文件
+    5.自动添加css各浏览器产商的前缀
+    6.代码热更新
+    7.资源预加载
+    8.每次构建代码清除之前生成的代码
+    9.定义环境变量
+    10.区分开发环境打包跟生产环境打包
+34.搭建Vue环境
+    Webpack:模块打包机 可以分析你的项目依赖以及一些浏览器不能直接运行的语言 jsx vue 等转换成js css文件等 供浏览器使用
+        注:JSX是一种JavaScript的语法扩展 适用于React框架中
+    1.搭建Webpack基本环境
+    1.2.配置功能
+        1.新建一个build文件夹 用来存放webpack配置相关的文件
+        2.在build文件夹下新建一个webpack.config.js配置webpack基本配置
+        3.修改webpack.config.js配置
+        4.修改package.json将之前添加的serve修改为
+            "serve": "webpack ./src/main.js --config ./build/webpack.config.js"
+    2.1配置ES6/7/8转ES5代码
+        1.安装相关依赖
+        2.修改webpack.config.js配置
+        3.在项目根目录添加一个babel.config.js文件
+        4.执行 npm run serve 命令，可以看到 ES6代码被转成了ES5代码
+    2.1.1 ES6/7/8 Api 转es5
+        babel-loader只会将 ES6/7/8语法转换为ES5语法，但是对新api并不会转换。
+        1.通过 babel-polyfill 对一些不支持新语法的客户端提供新语法的实现
+        2.修改webpack.config.js配置
+    2.1.2 按需引入polyfill
+        1.安装相关依赖
+        2.修改 babel-config.js
+    2.2 配置 scss 转 css
+        没配置 css 相关的 loader 时，引入scss、css相关文件打包的话，会报错
+        1.安装相关依赖
+        npm install sass-loader dart-sass css-loader style-loader -D
+            1.sass-loader, dart-sass主要是将 scss/sass 语法转为css
+            2.css-loader主要是解析 css 文件
+            3.style-loader 主要是将 css 解析到 html页面 的 style 上
+        2.修改webpack.config.js配置

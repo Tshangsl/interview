@@ -1,5 +1,6 @@
 1.Webpack原理 loader plugin做什么的
-webpack是一个模块打包器（module bundler），提供了一个核心，核心提供了很多开箱即用的功能，同时它可以用loader和plugin来扩展。webpack本身结构精巧，基于tapable的插件架构，扩展性强，众多的loader或者plugin让webpack稍显复杂。
+webpack是一个模块打包器（module bundler），提供了一个核心，核心提供了很多开箱即用的功能。
+同时它可以用loader和plugin来扩展。webpack本身结构精巧，基于tapable的插件架构，扩展性强，众多的loader或者plugin让webpack稍显复杂。
 
 webpack常用配置包括：devtool、entry、 output、module、resolve、plugins、externals等，本文主要介绍下webpack常用的loader和plugin
 
