@@ -2,7 +2,7 @@
 //组件的定义 全局组件 局部组件
 //slot
 //scope
-1.Vue核心 其中的一些属性
+1.Vue API 实例属性/实例方法(数据/事件/生命周期)
     Vue中的$(内置的实例方法 属性)
         挂载在this上的vue内部属性
         内部api的命名空间
@@ -10,21 +10,96 @@
     核心：
         数据驱动 组件系统
     vm(Virtual Model)是Vue的一个实例
-    1.vm.$el(element缩写) 获取Vue实例关联的DOM元素
+    实例属性/实例方法(数据/事件/生命周期)
+  全局配置：
+    Vue.config 是一个对象，包含 Vue 的全局配置。可以在启动应用之前修改下列 property：
+  全局API：
+    1.Vue.extend(options)
+        使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。
+        data 选项是特例，需要注意 - 在 Vue.extend() 中它必须是函数
+    2.Vue.nextTick([callback,context])
+        在下次 DOM 更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的 DOM。
+    3.Vue.set(target,propertyName/index,value)
+        返回值：设置的值。
+        用法：
+            向响应式对象中添加一个 property，并确保这个新 property 同样是响应式的，且触发视图更新。它必须用于向响应式对象上添加新 property，因为 Vue 无法探测普通的新增 property (比如 this.myObject.newProperty = 'hi')
+            对象不能是 Vue 实例，或者 Vue 实例的根数据对象。
+    4.Vue.delete(targets,propertyName/index)
+        删除对象的 property。如果对象是响应式的，确保删除能触发更新视图。这个方法主要用于避开 Vue 不能检测到 property 被删除的限制，但是你应该很少会使用它。
+  实例属性：
+    1.vm.$data 获取Vue实例的data选项(对象) 
+                Vue 实例观察的数据对象。Vue 实例代理了对其 data 对象 property 的访问。
+    2.vm.$props
+            当前组件接收到的 props 对象。Vue 实例代理了对其 props 对象 property 的访问。
+    3.vm.$el(element缩写) 获取Vue实例关联的DOM元素
             类型：string|HTMLElement|Function
             提供一个在页面上已经存在的DOM元素作为Vue实例挂载目标 可以是CSS选择器 也可以是一个HTMLElement实例
             实例挂载之后 元素可以用vm.$el访问
             如果在实例化时存在这个选项 实例将立即进入编译过程 否则 需要显示调用vm.$mount()手动开启编译
                 1.提供的元素只能作为挂载点 不同于Vue1.x 所有的挂载元素会被Vue生成的DOM替换 因此。。。
                 2.。。。
-    2.vm.$data 获取Vue实例的data选项(对象) 
-    3.vm.$options 获取Vue实例的自定义属性
+    4.vm.$options 获取Vue实例的自定义属性
             (如vm.$options.methods获取Vue的自定义属性methods)
-    4.vm.$refs 获取页面中所有含有ref属性的DOM元素
+            用于当前 Vue 实例的初始化选项。需要在选项中包含自定义 property 时会有用处：
+    5.vm.$parent 父实例，如果当前实例有的话。
+    6.vm.$root  当前组件树的根 Vue 实例。如果当前实例没有父实例，此实例将会是其自己。
+    7.vm.children 当前实例的直接子组件。需要注意 $children 并不保证顺序，也不是响应式的。如果你发现自己正在尝试使用 $children 来进行数据绑定，考虑使用一个数组配合 v-for 来生成子组件，并且使用 Array 作为真正的来源。
+    8.vm.$slot 用来访问被插槽分发的内容。每个具名插槽有其相应的 property (例如：v-slot:foo 中的内容将会在 vm.$slots.foo 中被找到)。default property 包括了所有没有被包含在具名插槽中的节点，或 v-slot:default 的内容。
+        请注意插槽不是响应性的。如果你需要一个组件可以在被传入的数据发生变化时重渲染，我们建议改变策略，依赖诸如 props 或 data 等响应性实例选项。
+    9.vm.$scopeSlots    
+        用来访问作用域插槽。对于包括 默认 slot 在内的每一个插槽，该对象都包含一个返回相应 VNode 的函数。
+        vm.$scopedSlots 在使用渲染函数开发一个组件时特别有用。
+    10.vm.$refs 获取页面中所有含有ref属性的DOM元素
             (如vm.$ref.hello 获取页面中含有属性ref=‘hello’
             的DOM元素 如果有多个元素 那么只返回最后一个)
-    5.vm.$set Vue.set的一个别名
-
+            一个对象，持有注册过 ref attribute 的所有 DOM 元素和组件实例。
+    11.vm.$isServer
+        当前 Vue 实例是否运行于服务器。
+    12.vm.$attrs
+        包含了父作用域中不作为 prop 被识别 (且获取) 的 attribute 绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind="$attrs" 传入内部组件——在创建高级别的组件时非常有用。
+    13.vm.$listener 包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on="$listeners" 传入内部组件——在创建更高层次的组件时非常有用。
+  实例方法/数据：
+    1.vm.$watch(expOrFn,callback,[options])
+        观察 Vue 实例上的一个表达式或者一个函数计算结果的变化。回调函数得到的参数为新值和旧值。表达式只接受简单的键路径。对于更复杂的表达式，用一个函数取代。
+        变更 (不是替换) 对象或数组时，旧值将与新值相同，因为它们的引用指向同一个对象/数组。Vue 不会保留变更之前值的副本。
+        vm.$watch 返回一个取消观察函数，用来停止触发回调：
+        选项deep:
+            为了发现对象内部值的变化，可以在选项参数中指定 deep: true。注意监听数组的变更不需要这么做。
+        选项immediate：
+            选项参数中指定 immediate: true 将立即以表达式的当前值触发回调：
+            在带有 immediate 选项时，你不能在第一次回调时取消侦听给定的 property。
+    2.vm.$set(target,propertyName/index,value)
+        返回值：设置的值。
+        全局Vue.set的一个别名
+    3.vm.$delete(target,propertyName/index)
+        这是全局 Vue.delete 的别名。
+  实例方法/事件：
+    1.vm.$on(event,callback)
+        监听当前实例上的自定义事件。事件可以由 vm.$emit 触发。回调函数会接收所有传入事件触发函数的额外参数。
+    2.vm.$once(event,callback)
+        监听一个自定义事件，但是只触发一次。一旦触发之后，监听器就会被移除。
+    3.vm.$off([event,callback])
+        移除自定义事件监听器。
+            如果没有提供参数，则移除所有的事件监听器；
+            如果只提供了事件，则移除该事件所有的监听器；
+            如果同时提供了事件与回调，则只移除这个回调的监听器。
+    4.vm.$emit(eventName,[...args])
+        触发当前实例上的事件。附加参数都会传给监听器回调。
+  实例方法/生命周期
+    1.vm.$mount([elementOrSelector])
+        返回值：vm - 实例自身
+        用法：
+            如果 Vue 实例在实例化时没有收到 el 选项，则它处于“未挂载”状态，没有关联的 DOM 元素。可以使用 vm.$mount() 手动地挂载一个未挂载的实例。
+            如果没有提供 elementOrSelector 参数，模板将被渲染为文档之外的的元素，并且你必须使用原生 DOM API 把它插入文档中。
+            这个方法返回实例自身，因而可以链式调用其它实例方法。
+    2.vm.$forceUpdate()
+        迫使 Vue 实例重新渲染。注意它仅仅影响实例本身和插入插槽内容的子组件，而不是所有子组件。
+    3.vm.$nextTick([callback])
+        将回调延迟到下次 DOM 更新循环之后执行。在修改数据之后立即使用它，然后等待 DOM 更新。它跟全局方法 Vue.nextTick 一样，不同的是回调的 this 自动绑定到调用它的实例上。
+    4.vm.$sdestory()
+        完全销毁一个实例。清理它与其它实例的连接，解绑它的全部指令及事件监听器。
+        触发 beforeDestroy 和 destroyed 的钩子。
+        在大多数场景中你不应该调用这个方法。最好使用 v-if 和 v-for 指令以数据驱动的方式控制子组件的生命周期。
 1.object.defineProperty(obj,prop,descriptor)
     参数:(三个参数都是必填)
         obj:要定义属性的对象
@@ -174,10 +249,38 @@
             2.当你修改数组的长度时，例如：vm.items.length = newLength
                 Vue提供解决方法：
 4.Vue响应式原理
-    1.当一个Vue实例创建时，vue会遍历data选项的属性，用 Object.defineProperty 
-    2.将它们转为 getter/setter并且在内部追踪相关依赖，在属性被访问和修改时通知变化。
-    3.每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，
-    4.之后当依赖项的 setter 被调用时，会通知 watcher 重新计算，从而致使它关联的组件得以更新。
+    1.当你把一个普通的 JavaScript 对象传入 Vue 实例作为 data 选项，vue会遍历data选项的属性，用 Object.defineProperty把这些 property 全部转为 getter/setter 内部让Vue追踪相关依赖，在property被访问和修改时通知变化。
+    2.每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把接触过的数据Proerty记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher 重新计算，从而致使它关联的组件得以更新。
+    3.检测变化的注意事项
+        由于 JavaScript 的限制，Vue 不能检测数组和对象的变化。尽管如此我们还是有一些办法来回避这些限制并保证它们的响应性。
+    4.对于对象
+        Vue 无法检测 property 的添加或移除。由于 Vue 会在初始化实例时对 property 执行 getter/setter 转化，所以 property 必须在 data 对象上存在才能让 Vue 将它转换为响应式的。
+        对于已经创建的实例，Vue 不允许动态添加根级别的响应式 property。但是，可以使用 Vue.set(object, propertyName, value) 方法向嵌套对象添加响应式 property。
+            Vue.set(vm.someObject, 'b', 2)
+        以使用 vm.$set 实例方法，这也是全局 Vue.set 方法的别名：
+            this.$set(this.someObject,'b',2)
+        有时你可能需要为已有对象赋值多个新 property，比如使用 Object.assign() 或 _.extend()。但是，这样添加到对象上的新 property 不会触发更新。在这种情况下，你应该用原对象与要混合进去的对象的 property 一起创建一个新的对象。
+            // 代替 `Object.assign(this.someObject, { a: 1, b: 2 })`
+            this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
+    5.对于数组
+        Vue 不能检测以下数组的变动：
+            1.当你利用索引直接设置一个数组项时，例如：vm.items[indexOfItem] = newValue
+            2.当你修改数组的长度时，例如：vm.items.length = newLength
+        第一类问题解决方法：
+            1.Vue.set
+            Vue.set(vm.items, indexOfItem, newValue)
+            vm.$set(vm.items, indexOfItem, newValue)
+
+            2.Array.prototype.splice
+            vm.items.splice(indexOfItem, 1, newValue)
+        第二类问题解决方法：
+            1.splice   
+            vm.items.splice(newLength)
+    6.声明响应式 property
+        由于 Vue 不允许动态添加根级响应式 property，所以你必须在初始化实例前声明所有根级响应式 property，哪怕只是一个空值：
+    7.异步更新队列
+        Vue 在更新 DOM 时是异步执行的。只要侦听到数据变化，Vue 将开启一个队列，并缓冲在同一事件循环中发生的所有数据变更。如果同一个 watcher 被多次触发，只会被推入到队列中一次。这种在缓冲时去除重复数据对于避免不必要的计算和 DOM 操作是非常重要的。然后，在下一个的事件循环“tick”中，Vue 刷新队列并执行实际 (已去重的) 工作。Vue 在内部对异步队列尝试使用原生的 Promise.then、MutationObserver 和 setImmediate，如果执行环境不支持，则会采用 setTimeout(fn, 0) 代替。
+        例如，当你设置 vm.someData = 'new value'，该组件不会立即重新渲染。当刷新队列时，组件会在下一个事件循环“tick”中更新。
 5.Vue框架怎么实现对象和数组的监听
         数据双向绑定中 Object.defineProperty() 
         只能对属性进行数据劫持，不能对整个对象进行劫持，同理无法对数组进行劫持
@@ -519,7 +622,9 @@ MVP(Model View Presenter)
 
             /*触发事件*/
             event.$emit('eventName', 'this is a message.')
-8.Vue中事件修饰符
+8.Vue中事件修饰符(modifier)
+    修饰符 (modifier) 
+        是以半角句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定。例如，.prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault()：
     为了更纯粹的数据逻辑，vue提供了很多事件修饰符，来代替处理一些 DOM 事件细节。
         1 .stop：防止事件冒泡，等同于JavaScript中的event.stopPropagation()
         2 .prevent：防止执行预设的行为，等同于JavaScript中的event.preventDefault()
@@ -527,7 +632,9 @@ MVP(Model View Presenter)
         4 .self：将事件绑定到自身，只有自身才能触发
         5 .once：只触发一次
         6 .passive：不阻止事件的默认行为
-9.Vue一些指令及具体作用
+9.Vue一些指令(directive)及具体作用
+        指令 (Directives)：
+            是带有 v- 前缀的特殊 attribute。指令 attribute 的值预期是单个 JavaScript 表达式 (v-for 是例外情况，稍后我们再讨论)。指令的职责是，当表达式的值改变时，将其产生的连带影响，响应式地作用于 DOM。
         1.v-html/v-text(可简写为{{}}并支持逻辑运算)
             v-html:
                 会以html的方式把内容载入页面中
@@ -568,6 +675,13 @@ MVP(Model View Presenter)
                 2:v-bind用于绑定属性和数据 ，其缩写为“ : ” 也就是v-bind:id  === :id  
                 3:v-model用在表单控件上的，用于实现双向数据绑定，所以如果你用在除了表单控件以外的标签是没有任何效果的。
         4.v-for
+            key作用：(主要用在 Vue 的虚拟 DOM 算法)
+                主要用在 Vue 的虚拟 DOM 算法 
+                新旧 nodes 对比时辨识 VNodes。
+                如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。
+                而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+                有相同父元素的子元素必须有独特的 key。重复的 key 会造成渲染错误。
+                最常见的用例是结合 v-for：
             key的使用：
                 1.必须指定 
                 2.唯一的字符串string/数字number类型:key 值
@@ -584,7 +698,39 @@ MVP(Model View Presenter)
             这种写法比较直观,适用于html代码不多的场景,但是如果模板里html代码太多,不便于维护,不建议这么写.
         2.写在template标签里,这种写法跟写html很像.
         3.写在script标签里,这种写法官方推荐,vue官方推荐script中type属性加上"x-template"        
-10.Vue中的component
+11.vue中的slot
+12.Vue中的component(el是根实例特有的选项)
+    组件是可复用的 Vue 实例，所以它们与 new Vue 接收相同的选项，例如 data、computed、watch、methods 以及生命周期钩子等。仅有的例外是像 el 这样根实例特有的选项。
+    每个组件都会各自独立维护它的 count。因为你每用一次组件，就会有一个它的新实例被创建。
+    组件命名规范：
+    W3C 规范中的自定义组件名 (字母全小写且必须包含一个连字符这会帮助你避免和当前以及未来的 HTML 元素相冲突。
+    全局注册
+        Vue.component 全局注册
+        Vue.component('my-component-name', {
+        // ... options ...
+        })
+        prop:
+            一个组件默认可以拥有任意数量的 prop，任何值都可以传递给任何 prop。在上述模板中，你会发现我们能够在组件实例中访问这个值，就像访问 data 中的值一样。
+        <input v-model="searchText">等价于
+        <input
+        v-bind:value="searchText"
+        v-on:input="searchText = $event.target.value"
+        >
+        在不同组件之间进行动态切换是非常有用的，
+        上述内容可以通过 Vue 的 <component> 元素加一个特殊的 is attribute 来实现：
+    单文件组件
+        全局注册遇到的问题:
+            全局定义 (Global definitions) 强制要求每个 component 中的命名不得重复
+            字符串模板 (String templates) 缺乏语法高亮，在 HTML 有多行的时候，需要用到丑陋的 \
+            不支持 CSS (No CSS support) 意味着当 HTML 和 JavaScript 组件化时，CSS 明显被遗漏
+            没有构建步骤 (No build step) 限制只能使用 HTML 和 ES5 JavaScript，而不能使用预处理器，如 Pug (formerly Jade) 和 Babel
+        文件扩展名为 .vue 的 single-file components (单文件组件) 为以上所有问题提供了解决方法，并且还可以使用 webpack 或 Browserify 等构建工具。     
+        获得：
+            完整语法高亮
+            CommonJS 模块
+            组件作用域的 CSS
+        Node Package Manager (NPM)：阅读 Getting Started guide 中关于如何从注册地 (registry) 获取包的章节。
+    局部注册
 11.
 $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
 $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
@@ -643,6 +789,8 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
             2.microtask 因为其高优先级特性，能确保队列中的微任务在一次事件循环前被执行完毕
             3.考虑兼容问题,vue 做了 microtask 向 macrotask 的降级方案
 12. Vue 组件 data 为什么必须是函数
+(每个实例可以维护一份被返回对象的独立的拷贝)
+(如果 Vue 没有这条规则，点击一个按钮就可能会像如下代码一样影响到其它所有实例：)
         JS本身的特性
         如果 data 是一个对象，那么由于对象本身属于引用类型，当我们修改其中的一个属性时，会影响到所有Vue实例的数据。
         如果将 data 作为一个函数返回一个对象，那么每一个实例的 data 属性都是独立的，不会相互影响了
@@ -658,8 +806,13 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)的区别
             我们可以将同一函数定义为一个 method 或者一个计算属性。对于最终的结果，两种方式是相同的
         不同点：
             computed: 计算属性是基于它们的依赖进行缓存的,只有在它的相关依赖发生改变时才会重新求值对于 method ，只要发生重新渲染，method 调用总会执行该函数
-14.computed 和 watch 的区别和运用的场景？
+14.computed(计算属性)和watch(侦听器/属性) 的区别和运用的场景？
         computed(计算属性/依赖其他属性值/有缓存/依赖值改变下一次获取)
+            (计算属性是基于它们的响应式依赖进行缓存的)
+            对于任何复杂逻辑，你都应当使用计算属性。
+            计算属性默认只有 getter，不过在需要时你也可以提供一个 setter：
+            声明了一个计算属性 reversedMessage。我们提供的函数将用作 property vm.reversedMessage 的 getter 函数：
+            可以通过在表达式中调用方法来达到同样的效果：
             是计算属性，依赖其它属性值，并且 computed 的值有缓存，只有它依赖的属性值发生改变，下一次获取 computed 的值时才会重新计算 computed  的值； 
         watch:(观察/类似某些数据监听回调/监听数据改变时触发回调)
             更多的是「观察」的作用，类似于某些数据的监听回调 ，每当监听的数据变化时都会执行回调进行后续操作；
