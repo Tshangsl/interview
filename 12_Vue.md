@@ -97,6 +97,17 @@ destoryed(
         10.deactived() 
             keep-alive专属 组件被销毁时调用
 2.keep-alive 
+    keep-alive是一个抽象组件：它自身不会渲染一个DOM元素，也不会出现在父组件链中；使用keep-alive包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们。
+其有三个参数
+
+include定义缓存白名单，会缓存的组件；
+exclude定义缓存黑名单，不会缓存的组件；
+以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"；
+匹配首先检查组件自身的 name 选项，如果 name 选项不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)。匿名组件不能被匹配；
+max最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉；
+不会在函数式组件中正常工作，因为它们没有缓存实例；
+当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
+
         keep-alive:
             Vue 内置的一个组件，可以使被包含的组件保留状态，或避免重新渲染
             特性:
@@ -150,6 +161,9 @@ destoryed(
     2.ssr(服务端渲染) 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
 
     2.在钩子函数 mounted 被调用前，Vue 已经将编译好的模板挂载到页面上，所以在 mounted 中可以访问操作 DOM。
+5.Vue在created和mounted这两个生命周期中请求数据有什么区别呢？
+    1.在created中，页面视图未出现，如果请求信息过多，页面会长时间处于白屏状态，DOM节点没出来，无法操作DOM节点。
+    2.在mounted不会这样，比较好。
 1.Vue API 实例属性/实例方法(数据/事件/生命周期)
     Vue中的$(内置的实例方法 属性)
         挂载在this上的vue内部属性
@@ -443,6 +457,59 @@ destoryed(
         对象和数组的监听：
             通过遍历数组 和递归遍历对象
             达到利用 Object.defineProperty() 也能对对象和数组（部分方法的操作）进行监听。
+6.Vue中操作data中数组的方法中哪些可以触发视图更新，哪些不可以，不可以的话有什么解决办法？
+    触发视图更新：
+    1.push()、pop()、shift()、unshift()、splice()、sort()、reverse()这些方法会改变被操作的数组；
+    2.filter()、concat()、slice()这些方法不会改变被操作的数组，返回一个新的数组；
+    不触发视图更新：
+        1.利用索引直接设置一个数组项，例：this.array[index] = newValue
+        2.直接修改数组的长度，例：this.array.length = newLength
+    解决方法：
+        1.this.$set(this.array,index,newValue)
+        this.array.splice(index,1,newValue)解决方法1
+        2.this.array.splice(newLength)解决方法2
+7.怎么对data中的对象进行属性的添加或删除可以触发视图更新
+    由于 JavaScript 的限制，Vue 不能检测对象属性的添加或删除，
+        vm.$set(this.a, e, {g:5});
+        this.a=Object.assign({},
+8.v-for和v-if能共同使用吗？
+    能，但是要看应用场景,举个例子
+    在处于同一节点上，因为v-for 的优先级比 v-if 更高，v-if 将分别重复运行于每个 v-for 循环中。
+    1.如果要实现渲染满足条件的li节点时，可以这样用
+        <ul>
+            <li v-for="item in items" v-if="item.show">{{item}}</li>
+        </ul>
+    2.要实现有条件地跳过循环的执行，应该这么做
+        <ul v-if="items.length">
+            <li v-for="item in items">{{item}}</li>
+        </ul>
+9.mixin混入
+    1.全局混入
+        1.在main.js中写入
+            import Vue from 'vue';
+            import mixins from './mixins';
+            Vue.mixin(mixins);
+            全局混入可以写在mixins文件夹中index.js中，全局混入会影响到每一个之后创建的 Vue 实例（组件）；
+    2.局部混入
+        1.局部混入的注册，在mixins文件中创建一个a_mixin.js文件，然后再a.vue文件中写入
+            <script>
+                import aMixin from 'mixins/a_mixin'
+                export default{
+                    mixins:[aMixin],
+                }
+            </script>
+        2.局部混入只会影响a.vue文件中创建的Vue实例，不会影响到其子组件创建的Vue实例；
+    3.组件的选项和混入的选项是怎么合并的
+        1.数据对象【data选项】，在内部进行递归合并，并在发生冲突时以组件数据优先；
+        2.同名钩子函数将合并为一个数组，因此都将被调用。另外，混入对象的钩子将在组件自身钩子之前调用；
+        3.watch对象合并时，相同的key合成一个对象，且混入监听在组件监听之前调用；
+        4.值为对象的选项【filters选项、computed选项、methods选项、components选项、directives选项】将被合并为同一个对象。两个对象键名冲突时，取组件对象的键值对。
+10.过滤器
+    1.一个插值可以连续使用两个过滤器吗?
+    可以，{{ message | filterA | filterB }}
+    2.过滤器除了在插值上使用，还可以用在那个地方？
+    还可以v-bind 表达式 上，如：<div :id="rawId | formatId"></div>
+
 7.Vue 的单向数据流 双向数据绑定
         单向数据流(数据流是单向的。数据流动方向可以跟踪，流动单一，追查问题的时候可以更快捷。)
         1.所有的 prop 都使得其父子 prop 之间形成了一个单向下行绑定：
@@ -1139,7 +1206,376 @@ MVP(Model View Presenter)
             }
         2.调用this.setNumber(10)相当调用this.$store.dispatch('SET_NUMBER',10)
     17.Vuex中action通常是异步的，那么如何知道action什么时候结束呢？
-        
+        1.在action函数中返回Promise，然后再提交时候用then处理
+        actions:{
+            SET_NUMBER_A({commit},data){
+                return new Promise((resolve,reject) =>{
+                    setTimeout(() =>{
+                        commit('SET_NUMBER',10);
+                        resolve();
+                    },2000)
+                })
+            }
+        }
+        this.$store.dispatch('SET_NUMBER_A').then(() => {
+        // ...
+        })
+    18.Vuex中有两个action，分别是actionA和actionB，其内都是异步操作，在actionB要提交actionA，需在actionA处理结束再处理其它操作，怎么实现？
+        1.利用ES6的async和await来实现。
+            actions:{
+                async actionA({commit}){
+                    //...
+                },
+                async actionB({dispatch}){
+                    await dispatch ('actionA')//等待actionA完成
+                    // ... 
+                }
+            }
+    19.有用过Vuex模块吗，为什么要使用，怎么使用。
+        使用单一状态树，应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store 对象就有可能变得相当臃肿。所以将 store 分割成模块（module）。每个模块拥有自己的 state、mutations、actions、getters，甚至是嵌套子模块，从上至下进行同样方式的分割。
+            1.在module文件新建moduleA.js和moduleB.js文件。在文件中写入
+                const state={
+                    //...
+                }
+                const getters={
+                    //...
+                }
+                const mutations={
+                    //...
+                }
+                const actions={
+                    //...
+                }
+                export default{
+                    state,
+                    getters,
+                    mutations,
+                    actions
+                }
+            2.index.js引入模块
+                import Vue from 'vue';
+                import Vuex from 'vuex';
+                Vue.use(Vuex);
+                import moduleA from './module/moduleA'
+                import moduleB from './module/moduleB'
+                const store = new Vuex.Store({
+                    modules:{
+                        moduleA,
+                        moduleB
+                    }
+                })
+                export default store
+    20.模块中，getter和mutation接收的第一个参数state，是模块的state，也就是局部的state。
+    21.模块中，getter和mutation和action中怎么访问全局的state和getter？
+        1.在getter中可以通过第三个参数rootState访问到全局的state,可以通过第四个参数rootGetters访问到全局的getter。
+        2.在mutation中不可以访问全局的satat和getter，只能访问到局部的state。
+        3.在action中第一个参数context中的context.rootState访问到全局的state，context.rootGetters访问到全局的getter。
+    22.在组件中怎么访问Vuex模块中的getter和state,怎么提交mutation和action？
+        1.直接通过this.$store.getters和this.$store.state来访问模块中的getter和state。
+        2.直接通过this.$store.commit('mutationA',data)提交模块中的mutation。
+        3.直接通过this.$store.dispatch('actionA,data')提交模块中的action。
+    23.用过Vuex模块的命名空间吗？为什么使用，怎么使用。
+        1.默认情况下，模块内部的action、mutation和getter是注册在全局命名空间，如果多个模块中action、mutation的命名是一样的，那么提交mutation、action时，将会触发所有模块中命名相同的mutation、action。
+        2.这样有太多的耦合，如果要使你的模块具有更高的封装度和复用性，你可以通过添加namespaced: true 的方式使其成为带命名空间的模块。
+            export default{
+                namespaced: true,
+                state,
+                getters,
+                mutations,
+                actions
+            }
+    24.怎么在带命名空间的模块内提交全局的mutation和action？
+        将 { root: true } 作为第三参数传给 dispatch 或 commit 即可。
+    this.$store.dispatch('actionA', null, { root: true })
+    this.$store.commit('mutationA', null, { root: true })
+    25.怎么在带命名空间的模块内注册全局的action？
+        actions: {
+            actionA: {
+                root: true,
+                handler (context, data) { ... }
+            }
+        }
+    26.组件中怎么提交modules中的带命名空间的moduleA中的mutationA？
+        this.$store.commit('moduleA/mutationA',data)
+    27.怎么使用mapState，mapGetters，mapActions和mapMutations这些函数来绑定带命名空间的模块？
+        首先使用createNamespacedHelpers创建基于某个命名空间辅助函数
+        import { createNamespacedHelpers } from 'vuex';
+        const { mapState, mapActions } = createNamespacedHelpers('moduleA');
+        export default {
+            computed: {
+                // 在 `module/moduleA` 中查找
+                ...mapState({
+                    a: state => state.a,
+                    b: state => state.b
+                })
+            },
+            methods: {
+                // 在 `module/moduleA` 中查找
+                ...mapActions([
+                    'actionA',
+                    'actionB'
+                ])
+            }
+        }
+    28.Vuex插件有用过吗？怎么用简单介绍一下？
+        Vuex插件就是一个函数，它接收 store 作为唯一参数。在Vuex.Store构造器选项plugins引入。 
+        1.在store/plugin.js文件中写入
+            export default function createPlugin(param){
+                return store =>{
+                    //...
+                }
+            }
+        2.然后在store/index.js文件中写入
+            import createPlugin from './plugin.js'
+            const myPlugin = createPlugin()
+            const store = new Vuex.Store({
+            // ...
+            plugins: [myPlugin]
+            })
+    29.Vuex插件中怎么监听组件中提交mutation和action？
+        1.用Vuex.Store的实例方法subscribe监听组件中提交mutation
+        2.用Vuex.Store的实例方法subscribeAction监听组件中提交action 在store/plugin.js文件中写入
+    30.在v-model上怎么用Vuex中state的值？
+        需要通过computed计算属性来转换。
+        <input v-model="message">
+            // ...
+            computed: {
+                message: {
+                    get () {
+                        return this.$store.state.message
+                    },
+                    set (value) {
+                        this.$store.commit('updateMessage', value)
+                    }
+                }
+            }
+    31.Vuex的严格模式是什么,有什么作用,怎么开启？
+        在严格模式下，无论何时发生了状态变更且不是由 mutation函数引起的，将会抛出错误。这能保证所有的状态变更都能被调试工具跟踪到。
+        在Vuex.Store 构造器选项中开启,如下
+        const store = new Vuex.Store({
+            strict:true,
+        })
+14.Vue-router
+    1.怎么重定向页面？
+        1.const router = new VueRouter({
+            routes: [
+                { path: '/a', redirect: '/b' }
+            ]
+        })
+        2.const router = new VueRouter({
+            routes: [
+                { path: '/a', redirect: { name: 'foo' }}
+            ]
+        })
+        3.const router = new VueRouter({
+            routes: [
+                { 
+                    path: '/a', 
+                    redirect: to =>{
+                        const { hash, params, query } = to
+                        if (query.to === 'foo') {
+                            return { path: '/foo', query: null }
+                        }else{
+                        return '/b' 
+                        }
+                    }
+                    
+                }
+            ]
+        })
+    2.怎么配置404页面？
+        const router = new VueRouter({
+            routes: [
+                {
+                    path: '*', redirect: {path: '/'}
+                }
+            ]
+        })
+    3.切换路由时，需要保存草稿的功能，怎么实现呢？
+        <keep-alive :include="include">
+            <router-view></router-view>
+        </keep-alive>
+        其中include可以是个数组，数组内容为路由的name选项的值。
+    4.路由有几种模式？说说它们的区别？
+        1.hash: 兼容所有浏览器，包括不支持 HTML5 History Api 的浏览器，例http://www.abc.com/#/index，hash值为#/index， hash的改变会触发hashchange事件，通过监听hashchange事件来完成操作实现前端路由。hash值变化不会让浏览器向服务器请求。// 监听hash变化，点击浏览器的前进后退会触发
+        window.addEventListener('hashchange', function(event){ 
+            let newURL = event.newURL; // hash 改变后的新 url
+            let oldURL = event.oldURL; // hash 改变前的旧 url
+        },false)
+        复制代码
+        2.history: 兼容能支持 HTML5 History Api 的浏览器，依赖HTML5 History API来实现前端路由。没有#，路由地址跟正常的url一样，但是初次访问或者刷新都会向服务器请求，如果没有请求到对应的资源就会返回404，所以路由地址匹配不到任何静态资源，则应该返回同一个index.html 页面，需要在nginx中配置。
+        3.abstract: 支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式。
+    5.讲一下完整的导航守卫流程？
+        导航被触发。
+        在失活的组件里调用离开守卫beforeRouteLeave(to,from,next)。
+        调用全局的beforeEach( (to,from,next) =>{} )守卫。
+        在重用的组件里调用 beforeRouteUpdate(to,from,next) 守卫。
+        在路由配置里调用beforeEnter(to,from,next)路由独享的守卫。
+        解析异步路由组件。
+        在被激活的组件里调用beforeRouteEnter(to,from,next)。
+        在所有组件内守卫和异步路由组件被解析之后调用全局的beforeResolve( (to,from,next) =>{} )解析守卫。
+        导航被确认。
+        调用全局的afterEach( (to,from) =>{} )钩子。
+        触发 DOM 更新。
+        用创建好的实例调用beforeRouteEnter守卫中传给 next 的回调函数
+        beforeRouteEnter(to, from, next) {
+            next(vm => {
+                //通过vm访问组件实例
+            })
+        },
+    6.路由导航守卫都是在Vue实例生命周期钩子函数之前执行的。
+    7.讲一下导航守卫的三个参数的含义？
+        to：即将要进入的目标 路由对象。
+        from：当前导航正要离开的路由对象。
+        next：函数，必须调用，不然路由跳转不过去。
+
+        next()：进入下一个路由。
+        next(false)：中断当前的导航。
+        next('/')或next({ path: '/' }) : 跳转到其他路由，当前导航被中断，进行新的一个导航。
+    8.在afterEach钩子中不可以使用next() 不接受next的参数。
+    9.全局导航守卫有哪些？怎么使用？
+        1.router.beforeEach：全局前置守卫。
+        2.router.beforeResolve：全局解析守卫。
+        3.router.afterEach：全局后置钩子。
+    10.什么是路由独享的守卫，怎么使用？
+        什么是路由独享的守卫，怎么使用？
+    11.在组件内使用的导航守卫有哪些？怎么使用？
+        beforeRouteLeave：在失活的组件里调用离开守卫。
+        beforeRouteUpdate：在重用的组件里调用,比如包含<router-view />的组件。
+        beforeRouteEnter：在进入对应路由的组件创建前调用。
+    12.在beforeRouteEnter导航守卫中不可以用this
+        为守卫在导航确认前被调用,因此即将登场的新组件还没被创建。
+        可以通过传一个回调给next来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数。
+        beforeRouteEnter(to, from, next) {
+            next(vm => {
+                console.log(vm)
+            })
+        }
+    13.router-link
+        <router-link>是Vue-Router的内置组件，在具有路由功能的应用中作为声明式的导航使用。
+        <router-link>有8个props，其作用是：
+            1.to：必填，表示目标路由的链接。当被点击后，内部会立刻把to的值传到router.push()，所以这个值可以是一个字符串或者是描述目标位置的对象。
+            注意path存在时params不起作用，只能用query
+            2.replace：默认值为false，若设置的话，当点击时，会调用router.replace()而不是router.push()，于是导航后不会留下 history 记录。
+            3.append：设置 append 属性后，则在当前 (相对) 路径前添加基路径。
+            4.tag：让<router-link>渲染成tag设置的标签，如tag:'li,渲染结果为<li>foo</li>。
+            5.active-class：默认值为router-link-active,设置链接激活时使用的 CSS 类名。默认值可以通过路由的构造选项 linkActiveClass 来全局配置。
+            6.exact-active-class：默认值为router-link-exact-active,设置链接被精确匹配的时候应该激活的 class。默认值可以通过路由构造函数选项 linkExactActiveClass 进行全局配置的。
+            7.exact：是否精确匹配，默认为false。
+            8.event：声明可以用来触发导航的事件。可以是一个字符串或是一个包含字符串的数组，默认是click。
+    14.怎么在组件中监听路由参数的变化？
+        有两种方法可以监听路由参数的变化，但是只能用在包含<router-view />的组件内。
+        1.watch: {
+                '$route'(to, from) {
+                    //这里监听
+                },
+            },
+        2.
+            beforeRouteUpdate (to, from, next) {
+                //这里监听
+            },
+    15.切换路由后，新页面要滚动到顶部或保持原先的滚动位置怎么做呢？
+        滚动顶部
+        const router = new Router({
+            mode: 'history',
+            base: process.env.BASE_URL,
+            routes,
+            scrollBehavior(to, from, savedPosition) {
+                if (savedPosition) {
+                    return savedPosition;
+                } else {
+                    return { x: 0, y: 0 };
+                }
+            }
+        });
+        滚动原先位置
+    16.在什么场景下会用到嵌套路由？
+        做个管理系统，顶部栏和左侧菜单栏是全局通用的，那就应该放在父路由，而右下的页面内容部分放在子路由。
+        。。。
+    17.什么是命名视图，举个例子说明一下？
+        。。。
+    18.如何获取路由传过来的参数？
+        路由有三种传参方式，获取方式各不相同。
+            1.meta：路由元信息，写在routes配置文件中。
+                {
+                    path: '/home',
+                    name: 'home',
+                    component: load('home'),
+                    meta: {
+                        title: '首页'
+                    },
+                },
+                获取方式this.$route.meta.title获取
+            2.query
+                this.$route.push({
+                    path:'/home',
+                    query:{
+                        userId:123
+                    }
+                })
+                浏览器地址：http://localhost:8036/home?userId=123 
+                获取方式：this.$route.query.userId
+            3.params：这种方式比较麻烦。
+                1.首先要在地址上做配置
+                    {
+                        path: '/home/:userId',
+                        name: 'home',
+                        component: load('home'),
+                        meta: {
+                            title: '首页'
+                        },
+                    },
+                2.访问传参
+                const userId = '123'
+                this.$router.push({ name: 'home', params: { userId } })
+                注：用params传参，只能用命名的路由（用name访问），如果用path，params不起作用。 this.$router.push({ path: '/home', params: { userId }})不生效。
+                浏览器地址：http://localhost:8036/home/123
+                获取方式：this.$route.params.userId
+    19.路由组件和路由为什么解耦，怎么解耦？
+        因为在组件中使用 $route 会使之与其对应路由形成高度耦合，从而使组件只能在某些特定的 URL 上使用，限制了其灵活性，所有要解耦。
+        耦合如以下代码所示。Home组件只有在http://localhost:8036/home/123URL上才能使用。
+        使用 props 来解耦
+        props为true，route.params将会被设置为组件属性。
+        props为对象，则按原样设置为组件属性。
+        props为函数，http://localhost:8036/home?id=123,会把123传给组件Home的props的id。
+    20.active-class是哪个组件的属性？
+        <router-link/>组件的属性，设置链接激活时使用的 CSS 类名。默认值可以通过路由的构造选项 linkActiveClass 来全局配置。
+    21.在vue组件中通过this.$route获取到当前的路由信息 
+    22.怎样动态加载路由？
+        使用Router的实例方法addRoutes来实现动态加载路由，一般用来实现菜单权限。
+        使用时要注意，静态路由文件中不能有404路由，而要通过addRoutes一起动态添加进去。
+    23.怎么实现路由懒加载呢？
+        function load(component) {
+            //return resolve => require([`views/${component}`], resolve);
+            return () => import(`views/${component}`);
+        }
+
+        const routes = [
+            {
+                path: '/home',
+                name: 'home',
+                component: load('home'),
+                meta: {
+                    title: '首页'
+                },
+            },
+        ]
+    24.路由之间是怎么跳转的？有哪些方式？
+        1.声明式  通过使用内置组件<router-link :to="/home">来跳转
+        2.编程式  通过调用router实例的push方法router.push({ path: '/home' })或replace方法router.replace({ path: '/home' })
+    25.如果vue-router使用history模式，部署时要注意什么？
+        要注意404的问题，因为在history模式下，只是动态的通过js操作window.history来改变浏览器地址栏里的路径，并没有发起http请求，当直接在浏览器里输入这个地址的时候，就一定要对服务器发起http请求，但是这个目标在服务器上又不存在，所以会返回404。
+        所以要在Ngnix中将所有请求都转发到index.html上就可以了。
+    26.Vue路由怎么跳转打开新窗口？
+        const obj = {
+            path: xxx,//路由地址
+            query: {
+            mid: data.id//可以带参数
+            }
+        };
+        const {href} = this.$router.resolve(obj);
+        window.open(href, '_blank');
+
 24.Vuex()
     定义：
         一个专为 Vue.js 应用程序开发的状态管理模式。
