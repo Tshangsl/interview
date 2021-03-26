@@ -315,15 +315,16 @@ JS
       every: 有一项返回false，则整体为false
     5.join【常用】: 通过指定连接符生成字符串
     6.push / pop: 末尾推入和弹出，改变原数组， push 返回数组长度, pop 返回原数组最后一项；
-    7.unshift / shift: 头部推入和弹出，改变原数组，unshift 返回数组长度，shift 返回原数组第一项 ；
+    7.unshift / shift: 头部推入添加一个或更多元素和弹出头部第一个元素，改变原数组，unshift 返回数组长度，shift 返回原数组第一项 ；
     8.sort(fn) / reverse【常用】: 排序与反转，改变原数组
     9.concat【常用】: 连接数组，不影响原数组， 浅拷贝
     10.slice(start, end): 返回截断后的新数组，不改变原数组
     11.splice(start, number, value...)【常用】: 返回删除元素组成的数组，value 为插入项，改变原数组
-    12.indexOf / lastIndexOf(value, fromIndex): 查找数组项，返回对应的下标
+    12.indexOf / lastIndexOf(value, fromIndex): 查找数组项首次/最后出现位置，返回对应的下标
     13.reduce / reduceRight(fn(prev, cur)， defaultPrev): 两两执行，prev 为上次化简函数的return值，cur 为当前值
     当传入 defaultPrev 时，从第一项开始；
     当未传入时，则为第二项
+    。。。。
 16.JS中数组的几种创建方法
     (创建数组再赋值 new Array(); a[0]='a'
     /直接实例化 new Array('as')
@@ -357,10 +358,27 @@ JS
     forEach/filter/reduce/some&every/while
     for of
     )
-    (map reduce filter过滤 forEach every&some不改变原数组)
-    1.keys
-    2.values
-    3.entries
+    (filter过滤 forEach reduce map every&some不改变原数组)
+    1.Object.keys
+        成员是参数对象自身的（不含继承的）所有可遍历（ enumerable ）属性的键名。
+        1.传入对象，返回属性名
+        2.传入字符串/数组，返回索引
+        3.构造函数 返回空数组或者属性名
+        4.常用技巧
+            Object.keys(person).map((key)=>{
+                console.log(person[key]);  
+                // 获取到属性对应的值，做一些处理
+            })
+    2.Object.values
+        方法返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（ enumerable ）属性的键值。
+        1.返回数组的成员顺序，与属性的遍历部分介绍的排列规则一致
+        2.属性名为数值的属性，是按照数值大小，从小到大遍历的，因此返回的顺序是b、c、a。
+        3.Object.values会过滤属性名为 Symbol 值的属性
+        4.如果参数不是对象，Object.values会先将其转为对象
+    3.Object.entries
+        Object.entries方法返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（ enumerable ）属性的键值对数组。
+        1.如果原对象的属性名是一个 Symbol 值，该属性会被省略
+        2.将对象转为真正的Map结构
     4.forEach(currentValue index arr) 当前元素 当前元素索引值 当前元素所属的数组对象
         (不改变原数组)
         遍历数组中的每一个元素，默认没有返回值 forEach方法不改变原数组
@@ -431,11 +449,47 @@ JS
         创建一个Object实例
     2.{}对象直接量
     new Object() 对象直接量 两种方式是创建对象的两种基本方式 他们的原型就是Object
-    3.Object.create()
+    3.Object.create(proto, [propertiesObject])
+        方法创建一个新对象，使用现有的对象来提供新创建的对象的proto。
+        1.proto : 必须。表示新建对象的原型对象，即该参数会被赋值到目标对象(即新对象，或说是最后返回的对象)的原型上。该参数可以是null， 对象， 函数的prototype属性 （创建空的对象时需传null , 否则会抛出TypeError异常）。
+        2.propertiesObject : 可选。 添加到新创建对象的可枚举属性（即其自身的属性，而不是原型链上的枚举属性）对象的属性描述符以及相应的属性名称。这些属性对应Object.defineProperties()的第二个参数。
+        3.返回值： 在指定原型对象上添加新属性后的对象。
         构造函数可以创建特定类型的对象，像Object,Array这样的原生构造函数，在运行时会自动出现在执行环境中。
-    4.new Constructor()
-    5.工厂模式 
-        工厂模式实际上就是借助函数，内部返回使用第一种方式（ new Object()）创建的对象。
+        4.Object.create()方法创建的对象时，属性是在原型下面的，也可以直接访问 b.rep // {rep: "apple"} ,
+        此时这个值不是吧b自身的，是它通过原型链proto来访问到b的值。
+        5.Object.create() 用第二个参数来创建非空对象的属性描述符默认是为false的 所以属性p是不可写,不可枚举,不可配置的
+        而构造函数或字面量方法创建的对象属性的描述符默认为true。
+        6.(new Object())构造函数或对象字面量方法创建空对象时，对象时有原型属性 (Object.create())有_proto_ Object.create()方法创建空对象时，对象是没有原型属性的。
+    4.new Constructor()构造函数模式
+        function Person() {
+            this.name = 'hanmeimei';
+            this.say = function() {
+                alert(this.name)
+            }
+            }
+            var person1 = new Person();
+        优点：
+        1.通过constructor或者instanceof可以识别对象实例的类别
+        2.可以通过new 关键字来创建对象实例，更像OO语言中创建对象实例
+        缺点：
+        1.多个实例的say方法都是实现一样的效果，但是却存储了很多次（两个对象实例的say方法是不同的，因为存放的地址不同）
+        PS:
+            1.构造函数模式隐试的在最后返回return this 所以在缺少new的情况下，会将属性和方法添加给全局对象，浏览器端就会添加给window对象。
+            2.也可以根据return this 的特性调用call或者apply指定this。这一点在后面的继承有很大帮助。
+    5.工厂模式(定义一个用于创建产品的接口，由子类决定生产什么产品。)
+        function Person(name) {
+            var o = new Object();
+            o.name = name;
+            o.say = function() {
+                alert(this.name);
+            }
+            return o;
+            }
+            var person1 = Person("yawei");
+    (工厂模式实际上就是借助函数，内部返回使用第一种方式（ new Object()）创建的对象。)
+    缺点：
+        1.对象无法识别，所有实例都指向一个原型；无法通过constructor识别对象，因为都是来自Object。
+        2.每次通过Person创建对象的时候，所有的say方法都是一样的，但是却存储了多次，浪费资源。
     构造函数和工厂模式的不同之处
         1.没有显式地创建对象
         2.直接将属性和方法赋值给this对象
@@ -448,10 +502,29 @@ JS
     构造函数的优点:
         以构造函数创建的对象 在其原型上都会有一个constructor属性
         这个属性指向构造函数Person而这个属性最初是用来标识数据类型的
-    6.原型模式
-        在prototype上面定义的所有属性都是在其原型对象上的 在原型对象上的属性和方法属于公有属性和公有方法 其所有实例都可以访问到
+    6.原型模式(将一个对象作为原型，通过对其进行复制而克隆出多个和原型类似的新实例。)
+        function Person() {}
+            Person.prototype.name = 'hanmeimei';
+            Person.prototype.say = function() {
+            alert(this.name);
+            }
+            Person.prototype.friends = ['lilei'];
+
+            var person1 = new Person();
+        在prototype上面定义的所有属性都是在其原型对象上的 
+        在原型对象上的属性和方法属于公有属性和公有方法 其所有实例都可以访问到
     7.组合使用构造函数模式和原型模式最常用
         对象在引用其属性时 会按照原型链去查找 直到查找到Object的原型
+        function Person(name) {
+            this.name = name
+            this.friends = ['lilei']
+            }
+            Person.prototype.say = function() {
+            console.log(this.name)
+            }
+
+            var person1 = new Person('hanmeimei')
+            person1.say() //hanmeimei
 19.对象遍历方法(for in/Object.keys())
         对象不可以用for of方法遍历 对象的原型中没有Symbol.iterator方法
     1.for in(可枚举属性 不含Symbol)

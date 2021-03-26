@@ -2,25 +2,190 @@
 //组件的定义 全局组件 局部组件
 //slot
 //scope
+1.Vue2.0兼容IE哪个版本以上
+    不支持ie8及以下，部分兼容ie9 ，完全兼容10以上，
+    因为vue的响应式原理是基于es5的Object.defineProperty()
+    而这个方法不支持ie8及以下。
+2.怎么缓存当前打开的路由组件，缓存后想更新当前组件怎么办呢？
+    用<keep-alive></keep-alive>内置组件包裹路由组件,在钩子函数activated中更新。
+3.跟keep-alive有关的生命周期是哪些？
+    1.activated钩子：keep-alive 组件激活时调用。
+    2.deactivated钩子：keep-alive 组件停用时调用。
+    3.以上钩子服务器端渲染期间不被调用。
+4.methods的方法/watch的属性使用箭头函数定义可以吗？
+    不可以。this会是undefind,因为箭头函数中的this指向的是定义时的this，而不是执行时的this，所以不会指向Vue实例的上下文。
+5.怎么在watch监听开始之后立即被调用？
+    在选项参数中指定immediate: true将立即以表达式的当前值触发回调。
+6.watch怎么深度监听对象变化？
+    在选项参数中指定deep: true
+7.怎么强制刷新组件？
+    1.this.$forceUpdate()。
+    2.组件上加上key，然后变化key的值。
+8.父组件中的自定义事件怎么接收子组件的多个参数？
+    this.$emit('eventName',data)
+    data可以是个对象，包含子组件的多个参数，然后传给父组件。
+9.给组件绑定自定义事件无效怎么解决？
+    加上修饰词.native。
+10.怎么访问子组件的实例或者子元素？
+    1.先用ref特性为子组件赋予一个ID引用<base-input ref="myInput"></<base-input>
+        比如子组件有个focus的方法，可以这样调用this.$refs.myInput.focus()；
+        比如子组件有个value的数据，可以这样使用this.$refs.myInput.value。
+    2.先用ref特性为普通的 DOM 元素赋予一个ID引用<ul ref="mydiv">
+        <ul ref="mydiv">
+            <li class="item">第一个li</li>
+            <li class="item">第一个li</li>
+        </ul>
+        console.log(this.$refs['mydiv'].getElementsByClassName('item')[0].innerHTML)//第一个li
+11.怎么在子组件中访问父组件的实例/怎么在组件中访问到根实例？
+    使用this.$parent来访问/this.$root
+12.组件会在什么时候下被销毁？
+    1.没有使用keep-alive时的路由切换；
+    2.v-if='false'；
+    3.执行vm.$destroy()；
+13.is这个特性你有用过吗？主要用在哪些方面？
+    动态组件
+        <component :is="componentName"></component>，
+        componentName可以是在本页面已经注册的局部组件名和全局组件名,也可以是一个组件的选项对象。
+        当控制componentName改变时就可以动态切换选择组件。
+    is的用法
+        1.有些HTML元素，诸如 <ul>、<ol>、<table>和<select>，对于哪些元素可以出现在其内部是有严格限制的。
+        2.而有些HTML元素，诸如 <li>、<tr> 和 <option>，只能出现在其它某些特定的元素内部。
+        3.所以上面<card-list></card-list>会被作为无效的内容提升到外部，并导致最终渲染结果出错。应该这么写：
+        <ul>
+            <li is="cardList"></li>
+        </ul>
+14.Vue组件之间的通信都有哪些？
+    1.props
+    2.this.$emit('input',data)
+    3.this.$root.$on('input',function(data){})和this.$root.$emit('emit',data)
+    4.this.$refs.tree
+    5.this.$parent
+    6.provide和inject
+    7.vueX
+15.prop验证的type类型有哪几种？
+    String、Number、Boolean、Array、Object、Date、Function、Symbol， 
+    此外还可以是一个自定义的构造函数Personnel，
+    并且通过 instanceof 来验证propwokrer的值是否是通过这个自定义的构造函数创建的。
+16.在Vue事件中是如何使用event对象的？
+    1.@click="handleOpen" 默认第一个参数传入event对象;
+    2.@click="handleOpen(0, $event)",如果自己需要传入参数和event对象，则需要使用$event来获取event对象并传入handleOpen。
+17.在Vue事件中传入$event，使用$event.target和$event.currentTarget有什么区别？
+    $event.currentTarget始终指向事件所绑定的元素，
+    而$event.target指向事件发生时的元素。
+18.表单修饰符和事件修饰符
+    事件修饰符(要注意顺序很重要，用@click.prevent.self会阻止所有的点击，而@click.self.prevent只会阻止对元素自身的点击。)
+        .stop：阻止事件传递；
+        .prevent： 阻止默认事件；
+        .capture ：在捕获的过程监听，没有capture修饰符时都是默认冒泡过程监听；
+        .self：当前绑定事件的元素才能触发；
+        .once：事件只会触发一次；
+        .passive：默认事件会立即触发，不要把.passive和.prevent一起使用，因为.prevent将不起作用。
+    表单修饰符
+        .number
+        .lazy 
+            input标签v-model用lazy修饰之后，并不会立即监听input的value的改变，会在input失去焦点之后，才会监听input的value的改变。
+        .trim
+19.Vue如何监听键盘事件？
+    使用按键修饰符 
+    <input @keyup.enter="submit">
+    按下回车键时候触发submit事件。
+    .enter
+    .tab
+    .delete (捕获“删除”和“退格”键)
+    .esc
+    .space
+    .up
+    .down
+    .left
+    .right
+20.v-once的使用场景有哪些？
+    其作用是只渲染元素和组件一次。
+    随后的重新渲染，元素/组件及其所有的子节点将被视为静态内容并跳过。
+    故当组件中有大量的静态的内容可以使用这个指令。
+21.v-show和v-if有什么区别？使用场景分别是什么？
+    v-show:
+        切换元素的display属性,来控制元素显示隐藏
+        初始化会渲染，
+        适用频繁显示隐藏的元素,
+        不能用在<template>上；
+        不支持 v-else
+    v-if:
+        通过销毁并重建组件，来控制组件显示隐藏，
+        初始化不会渲染，
+        不适用频繁显示隐藏的组件，
+        可以用在<template>上。
+        支持 v-else
+22.v-on可以绑定多个方法吗？
+    可以，v-on后面接一个对象，但是不支持事件修饰符。
+23.v-cloak和v-pre有什么作用
+    v-cloak：可以解决在页面渲染时把未编译的 Mustache 标签（{{value}}）给显示出来。
+    v-pre：跳过这个元素和它的子元素的编译过程。可以用来显示原始Mustache标签。跳过大量没有指令的节点会加快编译。 <span v-pre>{{ this will not be compiled }}</span>
+24..vue文件中style script 都不是必须的
+25.怎么使css样式只在当前组件中生效？
+    <style lang="less" scoped></style>
+26.在style上加scoped属性原理/需要注意哪些？
+    原理：
+        vue通过在DOM结构以及css样式上加上唯一的标记`data-v-xxxxxx`，保证唯一，达到样式私有化，不污染全局的作用。
+    注意：
+        如果在公共组件中使用，修改公共组件的样式需要用/deep/。
+27.Vue渲染模板时怎么保留模板中的HTML注释呢？
+    在组件中将comments选项设置为true
+    <template comments> ... <template>
+28.vm.$nextTick有什么作用？
+    vm.$nextTick(() =>{this.handleadd()}),
+    将handleadd回调延迟到下次 DOM 更新循环之后执行。
+29.Vue中怎么重置data？
+    Object.assign(this.$data,this.$options.data())
+30.手写一个过滤器(过滤器不可以用this)
+    filters:{
+        addUnit(val){
+            if(val){
+                return val+'元/米'
+            }else{
+                return ''
+            }
+        }
+    }
+    Vue.filter('addUnit',function(val){
+        if(val){
+            return val+'元/米'
+        }else{
+            return ''
+        }
+    })
+    new Vue({
+    // ...
+    })
+1.Vue在created和mounted这两个生命周期中请求数据有什么区别呢？
+    1.在created中，页面视图未出现，如果请求信息过多，页面会长时间处于白屏状态，DOM节点没出来，无法操作DOM节点。
+    2.在mounted不会这样，比较好。
+1.生命周期的实例方法有哪些，简单介绍一下
+    1.vm.$mount()，返回vm，可链式调用其它实例方法；(不常用)
+    2.vm.$forceUpdate()，强制Vue实例重新渲染，不是重新加载组件,会触发beforeUpdate和updated这两个钩子函数，不会触发其他的钩子函数。它仅仅影响实例本身和插入插槽内容的子组件，而不是所有子组件；
+    3.vm.$nextTick()，参数为callback，等待视图全部更新后执行，回调函数的this自动绑定到调用它的实例上；
+    4.vm.$destroy()，销毁一个实例。清理它与其它实例的连接，解绑全部指令及事件监听器,但不能清理实例的DOM和data，会触发beforeDestroy和destroyed两个钩子函数。
 1.vue初始化和生命周期钩子函数
 (初始化:开始创建、初始化数据、编译模板、挂载Dom、数据变化时更新DOM、卸载)
 (生命周期:Vue实例从创建到销毁的过程)
 (生命周期钩子函数
 beforeCreate(
-    实例初始化之后 创建之前 
+    实例初始化之后 创建之前被调用 
     数据data也没有 DOM也没生成。
     el  undefined
     data undefined
     meaasge undefined
 )
 created(
-    实例创建完成后
+    模板渲染成html前（vm.$el未定义）故数据初始化最好在这阶段完成；
+    实例创建后被调用 完成数据观测，属性和方法的运算
+    watch/event事件回调 
     能读取到数据data的值 DOM还没生成，挂载属性el还不存在。
     el  undefined
     data [Object Object]
     meaasge Vue生命周期
 )
 beforeMount(
+    $el挂载前被调用，相关的 render 函数首次被调用，期间将模块渲染成html,此时vm.$el还是未定义；
     将编译完成的html挂载到对应的虚拟DOM时触发的钩子
     此时页面并没有内容。
     即将挂载 
@@ -32,6 +197,7 @@ beforeMount(
     meaasge Vue生命周期
 ) 
 mounted(
+    $el挂载后被调用，此时vm.$el可以调用，不能保证所有的子组件都挂载，要等视图全部更新完毕用vm.$nextTick();
     编译好的html挂载到页面完成后所执行的事件钩子函数。
     挂载完毕阶段
     此时编译好的HTML已经挂载到了页面上，页面上已经渲染出了数据。一般会利用这个钩子函数做一些ajax请求获取数据进行数据初始化。
@@ -50,7 +216,8 @@ updated(
     2.应该避免在此期间更改状态，因为这可能会导致更新无限循环。
 )
 beforeDestory(
-    调用实例的destroy( )方法可以销毁当前的组件，在销毁前，
+    调用实例的destroy() 此时实例仍然完全可用；
+    方法可以销毁当前的组件，在销毁前，
     会触发beforeDestroy钩子。
 )
 destoryed(
@@ -97,17 +264,17 @@ destoryed(
         10.deactived() 
             keep-alive专属 组件被销毁时调用
 2.keep-alive 
-    keep-alive是一个抽象组件：它自身不会渲染一个DOM元素，也不会出现在父组件链中；使用keep-alive包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们。
-其有三个参数
-
-include定义缓存白名单，会缓存的组件；
-exclude定义缓存黑名单，不会缓存的组件；
-以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"；
-匹配首先检查组件自身的 name 选项，如果 name 选项不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)。匿名组件不能被匹配；
-max最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉；
-不会在函数式组件中正常工作，因为它们没有缓存实例；
-当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
-
+    keep-alive是一个抽象组件：
+        它自身不会渲染一个DOM元素，也不会出现在父组件链中；
+        使用keep-alive包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们。
+    其有三个参数
+        1.include定义缓存白名单，会缓存的组件；
+        2.exclude定义缓存黑名单，不会缓存的组件；
+        3.以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"；
+        4.匹配首先检查组件自身的 name 选项，如果 name 选项不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)。匿名组件不能被匹配；
+        5.max最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉；
+        6.不会在函数式组件中正常工作，因为它们没有缓存实例；
+        7.当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
         keep-alive:
             Vue 内置的一个组件，可以使被包含的组件保留状态，或避免重新渲染
             特性:
@@ -123,6 +290,53 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
                 </component>
                 </keep-alive>
                 可以使用API提供的props，实现组件的动态缓存
+3.v-if和v-for的优先级是什么？如果这两个同时出现时，那应该怎么优化才能得到更好的性能？
+    1.处于同一节点，v-for的优先级比v-if更高
+    这意味着v-if将分别重复运行于每个v-for循环中。
+    当你只想为部分项渲染节点时，这种优先级的机制会十分有用。
+    <ul>
+        <li v-for="item in items" v-if="item.show">{{item}}</li>
+    </ul>
+    2.如果你的目的是有条件地跳过循环的执行，那么可以将 v-if 置于外层元素 (或 <template>)上。
+    <ul v-if="items.length">
+        <li v-for="item in items">{{item}}</li>
+    </ul>
+4.使用v-for遍历对象时 按Object.keys()的顺序的遍历，转成数组保证顺序。
+5.在v-for中使用key，会提升性能吗，为什么？
+    主要看v-for渲染的是什么。
+    。。。
+6.key除了在v-for中使用，还有什么作用？
+    还可以强制替换元素/组件而不是重复使用它。在以下场景可以使用
+        1.完整地触发组件的生命周期钩子
+        2.触发过渡
+    <transition>
+    <span :key="text">{{ text }}</span>
+    </transition>
+    当 text 发生改变时，<span>会随时被更新，因此会触发过渡。
+7.使用key要什么要注意的吗？
+    1.不要使用对象或数组之类的非基本类型值作为key，请用字符串或数值类型的值；
+    2.不要使用数组的index作为key值，因为在删除数组某一项，index也会随之变化，导致key变化，渲染会出错。
+    例：在渲染[a,b,c]用 index 作为 key，那么在删除第二项的时候，index 就会从 0 1 2 变成 0 1（而不是 0 2)，随之第三项的key变成1了，就会误把第三项删除了。
+8.组件的命名规范
+    给组件命名有两种方式，一种是使用链式命名my-component，一种是使用大驼峰命名MyComponent
+    1.在字符串模板中<my-component></my-component> 和 <MyComponent></MyComponent>都可以使用，
+    2.在非字符串模板中最好使用<MyComponent></MyComponent>，因为要遵循W3C规范中的自定义组件名
+    (字母全小写且必须包含一个连字符)，避免和当前以及未来的 HTML 元素相冲突。
+9.为什么组件中data必须用函数返回一个对象？
+    对象为引用类型，
+    当重用组件时，由于数据对象都指向同一个data对象，
+    当在一个组件中修改data时，其他重用的组件中的data会同时被修改；
+    而使用返回对象的函数，由于每次返回的都是一个新对象（Object的实例），引用地址不同，则不会出现这个问题。
+10.Vue父子组件双向绑定的方法有哪些？
+    1.通过在父组件上自定义一个监听事件<myComponent @diy="handleDiy"></myComponent>,在子组件用this.$emit('diy',data)来触发这个diy事件，其中data为子组件向父组件通信的数据,在父组件中监听diy个事件时，可以通过$event访问data这个值。
+    2.通过在父组件上用修饰符.sync绑定一个数据<myComponent :show.sync="show"></myComponent>,在子组件用this.$emit('update:show',data)来改变父组件中show的值。
+    3.通过v-model。
+11.组件的name选项有什么作用？
+    1.递归组件时，组件调用自身使用；
+    2.用is特殊特性和component内置组件标签时使用；
+    3.keep-alive内置组件标签中include 和exclude属性中使用。
+12.什么是递归组件？举个例子说明下？
+    递归引用可以理解为组件调用自身，在开发多级菜单组件时就会用到，调用前要先设置组件的name选项， 注意一定要配合v-if使用，避免形成死循环，用element-vue组件库中NavMenu导航菜单组件开发多级菜单为例：
 3.Vue 的父组件和子组件生命周期钩子函数执行顺序/
 父组件可以监听到子组件的生命周期吗
             (加载渲染/子组件更新/父组件更新/销毁)
@@ -161,9 +375,6 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
     2.ssr(服务端渲染) 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
 
     2.在钩子函数 mounted 被调用前，Vue 已经将编译好的模板挂载到页面上，所以在 mounted 中可以访问操作 DOM。
-5.Vue在created和mounted这两个生命周期中请求数据有什么区别呢？
-    1.在created中，页面视图未出现，如果请求信息过多，页面会长时间处于白屏状态，DOM节点没出来，无法操作DOM节点。
-    2.在mounted不会这样，比较好。
 1.Vue API 实例属性/实例方法(数据/事件/生命周期)
     Vue中的$(内置的实例方法 属性)
         挂载在this上的vue内部属性
@@ -171,7 +382,11 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
         一个特殊标记 增强区分 说明这是内置的实例方法属性
     核心：
         数据驱动 组件系统
-    vm(Virtual Model)是Vue的一个实例
+    虽然没有完全遵循 MVVM 模型，但是 Vue 的设计也受到了它的启发。因此在文档中经常会使用 vm (ViewModel 的缩写) 这个变量名表示 Vue 实例。
+    所有的 Vue 组件都是 Vue 实例，并且接受相同的选项对象 (一些根实例特有的选项除外)。
+    生命周期钩子的 this 上下文指向调用它的 Vue 实例。
+    不要在选项 property 或回调上使用箭头函数
+    vm(ViewModel)是Vue的一个实例
     实例属性/实例方法(数据/事件/生命周期)
   全局配置：
     Vue.config 是一个对象，包含 Vue 的全局配置。可以在启动应用之前修改下列 property：
@@ -262,6 +477,10 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
         完全销毁一个实例。清理它与其它实例的连接，解绑它的全部指令及事件监听器。
         触发 beforeDestroy 和 destroyed 的钩子。
         在大多数场景中你不应该调用这个方法。最好使用 v-if 和 v-for 指令以数据驱动的方式控制子组件的生命周期。
+2.模板语法
+    1.Vue.js 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。所有 Vue.js 的模板都是合法的 HTML，所以能被遵循规范的浏览器和 HTML 解析器解析。
+    2.在底层的实现上，Vue 将模板编译成虚拟 DOM 渲染函数。结合响应系统，Vue 能够智能地计算出最少需要重新渲染多少组件，并把 DOM 操作次数减到最少。
+    3.如果你熟悉虚拟 DOM 并且偏爱 JavaScript 的原始力量，你也可以不用模板，直接写渲染 (render) 函数，使用可选的 JSX 语法。
 2.object.defineProperty(obj,prop,descriptor)
     参数:(三个参数都是必填)
         obj:要定义属性的对象
@@ -472,7 +691,7 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
     由于 JavaScript 的限制，Vue 不能检测对象属性的添加或删除，
         vm.$set(this.a, e, {g:5});
         this.a=Object.assign({},
-8.v-for和v-if能共同使用吗？
+8.v-for和v-if能共同使用吗？(v-for 的优先级比 v-if 更高)
     能，但是要看应用场景,举个例子
     在处于同一节点上，因为v-for 的优先级比 v-if 更高，v-if 将分别重复运行于每个 v-for 循环中。
     1.如果要实现渲染满足条件的li节点时，可以这样用
@@ -483,6 +702,11 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
         <ul v-if="items.length">
             <li v-for="item in items">{{item}}</li>
         </ul>
+    
+    你也可以用 of 替代 in 作为分隔符，因为它更接近 JavaScript 迭代器的语法：
+    <div v-for="item of items"></div>
+
+    使用v-for遍历对象时 按Object.keys()的顺序的遍历，转成数组保证顺序。
 9.mixin混入
     1.全局混入
         1.在main.js中写入
@@ -540,24 +764,28 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
             v-html:
                 会以html的方式把内容载入页面中
                 浏览器会将其当作html标签解析后输出
+                会有XSS攻击分析，不要用在用户提交内容上；
             v-text：(单向绑定 数据对象=>插值)
                 操作纯文本 浏览器不会再对其进行html解析
                 会把全部内容转化为字符串
                 注:vue中有个指令叫做 v-once 可以通过v-once与v-text结合，实现仅执行一次性的插值
-        2.v-show/v-if
+        2.v-show/v-if(v-else-if/v-else)
             v-show
             1.无论初始条件 元素总被渲染 只是简单基于CSS的display属性进行切换
             2.适用需要频繁切换条件的场景
+            不能用在<template>上；
             仅仅控制元素的显示方式，将 display 属性在 block 和 none 来回切换
             就简单得多——不管初始条件是什么，元素总是会被渲染，并且只是简单地基于 CSS 的 “display” 属性进行切换。
             v-show 则是不管值为 true 还是 false ，html 元素都会存在，只是 CSS 中的 display 显示或隐藏
             v-if
             1.真正的条件渲染 惰性
             2.适用不需要频繁切换条件的场景
+            可以用在<template>上；
             会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建；
             如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块。
             控制这个 DOM 节点的存在与否。
             使用了 v-if 的时候，如果值为 false ，那么页面将不会有这个 html 标签生成。
+            v-else-if/v-else:必须和v-if一起使用；
         3.v-on(@)/v-bind(:)/v-model
             1.v-on(用于绑定HTML事件 缩写@) 
                 对象同时绑定多个事件时 不能用@代替v-on
@@ -571,12 +799,16 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
                 1.text 和 textarea 元素使用 value 属性和 input 事件；下
                 2.checkbox 和 radio 使用 checked 属性和 change 事件；
                 3.select 字段将 value 作为 prop 并将 change 作为事件。
+                修饰符
+                    v-model.lazy懒监听、
+                    v-model.number将值转成有效的数字、v-model.trim过滤首尾空格；
             4.v-bind与v-model区别
                 1:v-bind动态绑定指令，默认情况下标签自带属性的值是固定的，在为了能够动态的给这些属性添加值，可以使用v-bind:你要动态变化的值="表达式"
                 2:v-bind用于绑定属性和数据 ，其缩写为“ : ” 也就是v-bind:id  === :id  
                 3:v-model用在表单控件上的，用于实现双向数据绑定，所以如果你用在除了表单控件以外的标签是没有任何效果的。
         4.v-for
-            key作用：(主要用在 Vue 的虚拟 DOM 算法)
+            key作用：key要为数据中每项特定值比如ID
+                (主要用在 Vue 的虚拟 DOM 算法)
                 主要用在 Vue 的虚拟 DOM 算法 
                 新旧 nodes 对比时辨识 VNodes。
                 如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。
@@ -591,6 +823,11 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
             2.v-for循环对象数组
             3.v-for循环对象
             4.v-for迭代数字
+        5.v-once
+            只渲染元素和组件一次。随后的重新渲染，元素/组件及其所有的子节点将被视为静态内容并跳过,用于优化更新性能;
+        6.v-per
+            跳过这个元素和它的子元素的编译过程。可以用来显示原始Mustache标签。跳过大量没有指令的节点会加快编译;
+        7.v-slot
 10.Vue中的template
     template标签内容天生不可见，设置了display：none；
     要操作template标签内部的dom必须要用下面的方法–content属性：
@@ -601,6 +838,7 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
         3.写在script标签里,这种写法官方推荐,vue官方推荐script中type属性加上"x-template"        
 11.vue中的slot
 12.Vue中的component(el是根实例特有的选项)
+    Vue 里，一个组件本质上是一个拥有预定义选项的一个 Vue 实例
     组件是可复用的 Vue 实例，所以它们与 new Vue 接收相同的选项，例如 data、computed、watch、methods 以及生命周期钩子等。仅有的例外是像 el 这样根实例特有的选项。
     每个组件都会各自独立维护它的 count。因为你每用一次组件，就会有一个它的新实例被创建。
     组件命名规范：
@@ -632,13 +870,6 @@ max最多可以缓存多少组件实例。一旦这个数字达到了，在新�
             组件作用域的 CSS
         Node Package Manager (NPM)：阅读 Getting Started guide 中关于如何从注册地 (registry) 获取包的章节。
     局部注册
-22.Class与Style如何动态绑定 ？?/
-        Class 可以通过对象语法和数组语法进行动态绑定：
-        对象语法
-        数组语法
-        Style 也可以通过对象语法和数组语法进行动态绑定：
-        对象语法
-        数组语法
 8.
 $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
 $router(vue-router实例对象 包括路由跳转方法 钩子函数)
@@ -842,11 +1073,13 @@ MVP(Model View Presenter)
         Model代表数据模型 数据和业务逻辑都在Model中定义
         View代表UI视图 负责数据的展示
         ViewModel负责监听Model中数据的改变并且控制视图更新 处理用户交互操作
-        Model和View并无直接关联 而是通过ViewModel来进行联系的 
+        MVVM架构下 Model和View并无直接关联 通过ViewModel来进行联系
         Model和ViewModel之间有着双向数据绑定的联系
         因此当Model中的数据改变时会触发View层刷新
         View中由于用户交互操作而改变的数据也会在Model中同步
-        这种模式实现了Model和View的数据自动同步 因此开发者只需要专注对数据的维护操作即可 而不需要自己操作DOM
+        这种模式实现了Model和View的数据自动同步 
+        因此开发者只需要专注对数据的维护操作即可 而不需要自己操作DOM
+        复杂的数据状态维护完全由 MVVM 来统一管理。
         唯一区别：
             它采用双向绑定（data-binding）：View的变动，自动反映在 ViewModel，反之亦然。Angular 和 Ember 都采用这种模式。
         1.各部分之间的通信，都是双向的
@@ -997,33 +1230,59 @@ MVP(Model View Presenter)
         JS本身的特性
         如果 data 是一个对象，那么由于对象本身属于引用类型，当我们修改其中的一个属性时，会影响到所有Vue实例的数据。
         如果将 data 作为一个函数返回一个对象，那么每一个实例的 data 属性都是独立的，不会相互影响了
+11.怎么动态绑定Class和Style
+    将test、active、active-click三个className,绑到div上，渲染成<div class="test active active-click"></div>其中test是固定的，active受data中actived控制，active-click受data中actived和clicked控制，请用4种写法实现。
+    4种方法
+    1.对象语法
+    <div class="test" :class="{
+  	active: actived ,
+  	'active-click': clicked && actived}">
+    </div>
+    2.数组语法
+    <div class="test" :class="[
+  	actived? activeClass : '', 
+  	clicked && actived ? activeClickClass : '']">
+    </div> 
+    3.对象和数组混合
+    <div :class="[
+  	testClass , 
+  	{active: actived} , 
+   	{'active-click': clicked && actived}
+  ]"></div>
+    4.对象和计算属性(推荐)
+10.data的属性名可以和methods中的属性名相同吗？
+    不能同名
+11.computed中的属性名和data中的属性名可以相同吗
+    (computed data props 都会被挂载在vm实例上，因此这三个都不能同名。)
+    不能同名，因为不管是computed属性名还是data数据名还是props数据名都会被挂载在vm实例上，因此这三个都不能同名。
+12.计算属性computed
+    为什么要使用：
+        避免在模板中放入太多的逻辑，导致模板过重且难以维护。
+    特性：
+        (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
+    计算属性默认只有 getter，不过在需要时你也可以提供一个 setter：
 13. computed 的实现原理
         computed 本质是一个惰性求值的观察者。
         computed 内部实现了一个惰性的 watcher,也就是 computed watcher,computed watcher 不会立刻求值,同时持有一个 dep 实例。
         其内部通过 this.dirty 属性标记计算属性是否需要重新求值。
         当 computed 的依赖状态发生改变时,就会通知这个惰性的 watcher
         computed watcher 通过 this.dep.subs.length 判断有没有订阅者
-        有的话,会重新计算,然后对比新旧值,如果变化了,会重新渲染。 (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)没有的话,仅仅把 this.dirty = true。 (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
-13.计算属性computed 和事件 methods 有什么区别
-        相同点:
-            我们可以将同一函数定义为一个 method 或者一个计算属性。对于最终的结果，两种方式是相同的
-        不同点：
-            computed: 计算属性是基于它们的依赖进行缓存的,只有在它的相关依赖发生改变时才会重新求值对于 method ，只要发生重新渲染，method 调用总会执行该函数
-14.computed(计算属性)和watch(侦听器/属性) 的区别和运用的场景？
-        computed(计算属性/依赖其他属性值/有缓存/依赖值改变下一次获取)
-            (计算属性是基于它们的响应式依赖进行缓存的)
-            对于任何复杂逻辑，你都应当使用计算属性。
-            计算属性默认只有 getter，不过在需要时你也可以提供一个 setter：
-            声明了一个计算属性 reversedMessage。我们提供的函数将用作 property vm.reversedMessage 的 getter 函数：
-            可以通过在表达式中调用方法来达到同样的效果：
-            是计算属性，依赖其它属性值，并且 computed 的值有缓存，只有它依赖的属性值发生改变，下一次获取 computed 的值时才会重新计算 computed  的值； 
-        watch:(观察/类似某些数据监听回调/监听数据改变时触发回调)
-            更多的是「观察」的作用，类似于某些数据的监听回调 ，每当监听的数据变化时都会执行回调进行后续操作；
-        运用场景：
-            computed：
-            当我们需要进行数值计算，并且依赖于其它数据时，应该使用 computed，因为可以利用 computed 的缓存特性，避免每次获取值时，都要重新计算；
-            watch：s
-            当我们需要在数据变化时执行异步或开销较大的操作时，应该使用 watch，使用 watch 选项允许我们执行异步操作 ( 访问一个 API )，限制我们执行该操作的频率，并在我们得到最终结果前，设置中间状态。这些都是计算属性无法做到的。
+        有的话,会重新计算,然后对比新旧值,
+        如果变化了,会重新渲染。 
+        (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)
+        没有的话,仅仅把 this.dirty = true。
+        (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
+13.
+1.
+计算属性computed
+(计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
+事件methods
+(只要发生重新渲染，method 调用总会执行该函数)
+2.
+computed
+(计算属性/依赖多个属性/缓存结果时每次都会重新创建变量/计算开销比较大(计算次数多或者异步处理)/通过return返回)
+和watch
+(侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return) 
 15. Vue 中怎么自定义指令
         全局注册
             // 注册一个全局自定义指令 `v-focus`
@@ -1051,30 +1310,25 @@ MVP(Model View Presenter)
             <!-- 'abc' => 'cba' -->
             <span v-text="message | reverse"></span>
         过滤器也同样接受全局注册和局部注册
-18. Vue 中 key 的作用
-        key 的特殊属性主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。
-        如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试修复/再利用相同类型元素的算法。
-        使用 key，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
-        有相同父元素的子元素必须有独特的 key。重复的 key 会造成渲染错误
-
-        key 是为 Vue 中 vnode 的唯一标记，通过这个 key，我们的 diff 操作可以更准确、更快速。
-        Vue 的 diff 过程可以概括为：
-            oldCh 和 newCh 各有两个头尾的变量
-            oldStartIndex、oldEndIndex 和 newStartIndex、newEndIndex，
-            它们会新节点和旧节点会进行两两对比，
-            即一共有4种比较方式：
-                newStartIndex 和oldStartIndex 、
-                newEndIndex 和  oldEndIndex 、
-                newStartIndex 和 oldEndIndex 、
-                newEndIndex 和 oldStartIndex，
-                如果以上 4 种比较都没匹配，如果设置了key，就会用 key 再进行比较
-                在比较的过程中，遍历会往中间靠，一旦 StartIdx > EndIdx 
-                表明 oldCh 和 newCh 至少有一个已经遍历完了，就会结束比较。
-                具体有无 key 的 diff 过程，可以查看作者写的另一篇详解虚拟 DOM 的文章《深入剖析：Vue核心之虚拟DOM》 所以 Vue 中 key 的作用是：key 是为 Vue 中 vnode 的唯一标记，通过这个 key，我们的 diff 操作可以更准确、更快速
-        更准确：
-            因为带 key 就不是就地复用了，在 sameNode 函数 a.key === b.key 对比中可以避免就地复用的情况。所以会更加准确。
-        更快速：
-            利用 key 的唯一性生成 map 对象来获取对应节点，比遍历方式更快
+18.Vue key
+    (Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes)
+       预期：number | string | boolean (2.4.2 新增) | symbol (2.5.12 新增)
+       key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。
+       如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。
+       而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+       有相同父元素的子元素必须有独特的 key。重复的 key 会造成渲染错误。
+       最常见的用例是结合 v-for：
+       <ul>
+        <li v-for="item in items" :key="item.id">...</li>
+        </ul>
+        用于强制替换元素/组件而不是重复使用它。当你遇到如下场景时它可能会很有用：
+            1.完整地触发组件的生命周期钩子
+            2.触发过渡
+19.Vue ref
+    预期：string
+    ref 被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的 $refs 对象上。如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向组件实例：
+    当 v-for 用于元素或组件的时候，引用信息将是包含 DOM 节点或组件实例的数组。
+    关于 ref 注册时间的重要说明：因为 ref 本身是作为渲染结果被创建的，在初始渲染的时候你不能访问它们 - 它们还不存在！$refs 也不是响应式的，因此你不应该试图用它在模板中做数据绑定。
 13.Vuex
     1.定义:
         一个专为 Vue.js 应用程序开发的状态管理插件。
@@ -1617,8 +1871,16 @@ MVP(Model View Presenter)
             v-if 和 v-show 区分使用场景
             computed 和 watch区分使用场景
             v-for 遍历必须为 item 添加 key，且避免同时使用 
-            v-if长列表性能优化事件的销毁图片资源懒加载路由懒加载第三方插件的按需引入优化无限列表性能服务端渲染 SSR or 预渲染
-        2.Webpack 层面的优化 Webpack 对图片进行压缩减少 ES6 转为 ES5 的冗余代码提取公共代码模板预编译提取组件的 CSS优化 SourceMap构建结果输出分析Vue 项目的编译优化
+            v-if
+            长列表性能优化事件的销毁图片
+            资源懒加载
+            路由懒加载
+            第三方插件的按需引入
+            优化无限列表性能服务端渲染 SSR or 预渲染
+        2.Webpack 层面的优化 
+            Webpack 对图片进行压缩减少 
+            ES6 转为 ES5 的冗余代码提取公共代码模板预编译提取组件的 
+            CSS优化 SourceMap构建结果输出分析Vue 项目的编译优化
         3.基础的 Web 技术的优化  开启 gzip 压缩  浏览器缓存  CDN 的使用  使用 Chrome Performance 查找性能瓶颈
 30.Vue优点
     1.轻量级框架：只关注视图层，是一个构建数据的视图集合，大小只有几十kb；
