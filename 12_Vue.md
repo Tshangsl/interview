@@ -1598,7 +1598,41 @@ computed
         复制代码
         2.history: 兼容能支持 HTML5 History Api 的浏览器，依赖HTML5 History API来实现前端路由。没有#，路由地址跟正常的url一样，但是初次访问或者刷新都会向服务器请求，如果没有请求到对应的资源就会返回404，所以路由地址匹配不到任何静态资源，则应该返回同一个index.html 页面，需要在nginx中配置。
         3.abstract: 支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式。
-    5.讲一下完整的导航守卫流程？
+23.导航守卫
+    定义：
+        导航守卫就是路由跳转过程中的一些钩子函数，再直白点路由跳转是一个大的过程，这个大的过程分为跳转前中后等等细小的过程，在每一个过程中都有一函数，这个函数能让你操作一些其他的事儿的时机，这就是导航守卫。
+    导航守卫全解析：
+        1.全局前置导航守卫 beforeEach
+        2.路由beforeEnter守卫
+        3.组件路由守卫 beforeRouteEnter 此时this并不指向该组件
+        4.全局解析守卫 beforeResolve
+        5.全局后置守卫 afterEach
+        6.组件生命周期beforeCreate
+        7.组件生命周期created
+        8.组件生命周期beforeMount
+        9.组件生命周期mounted
+        10.组件路由守卫beforeRouteEnter的next回调
+    分类：
+        全局的、
+            是指路由实例上直接操作的钩子函数，他的特点是所有路由配置的组件都会触发，直白点就是触发路由就会触发这些钩子函数，如下的写法。钩子函数按执行顺序包括beforeEach、beforeResolve（2.5+）、afterEach三个（以下的钩子函数都是按执行顺序讲解的）：
+            const router = new VueRouter({ ... })
+
+            router.beforeEach((to, from, next) => {
+            // ...
+            })
+            [beforeEach]：在路由跳转前触发，参数包括to,from,next（参数会单独介绍）三个，这个钩子作用主要是用于登录验证，也就是路由还没跳转提前告知，以免跳转了再通知就为时已晚。
+
+            [beforeResolve]（2.5+）：这个钩子和beforeEach类似，也是路由跳转前触发，参数也是to,from,next三个，和beforeEach区别官方解释为：
+
+            区别是在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，解析守卫就被调用。
+            即在 beforeEach 和 组件内beforeRouteEnter 之后，afterEach之前调用。
+
+            [afterEach]：和beforeEach相反，他是在路由跳转完成后触发，参数包括to,from没有了next（参数会单独介绍）,他发生在beforeEach和beforeResolve之后，beforeRouteEnter（组件内守卫，后讲）之前。
+        单个路由独享的、
+            是指在单个路由配置的时候也可以设置的钩子函数，其位置就是下面示例中的位置，也就是像Foo这样的组件都存在这样的钩子函数。目前他只有一个钩子函数beforeEnter：
+            
+        组件内
+    完整的导航守卫流程
         导航被触发。
         在失活的组件里调用离开守卫beforeRouteLeave(to,from,next)。
         调用全局的beforeEach( (to,from,next) =>{} )守卫。
