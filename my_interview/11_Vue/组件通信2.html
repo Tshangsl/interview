@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组件通信</title>
+</head>
+<body>
+    <div id="app">
+        <button @click="addFather(num)">父组件加</button>
+        {{count}}
+        <!-- 子组件操控父组件中的data变化 -->
+        <comp1 :msg="msg" @son="addFather(num)"></comp1> 
+    </div>
+
+    <template id = 'comp1'>
+        <div>
+            {{msg}}
+            <button @click="addSon()" >子组件加</button>
+        </div>
+    </template>
+
+    <script src="vue.js"></script>
+    <script>
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                msg:'父组件',
+                count:0
+            },
+            methods: {
+                addFather(num){
+                    this.count+=num;
+                }
+            },
+            components:{
+                'comp1':{
+                    template:'#comp1',
+                    // props中的数据格式是字符串
+                    props:['msg'],
+                    data(){
+                        return{
+                            num:2
+                        }
+                    },
+                    methods:{
+                        addSon(){
+                            this.$emit('son',this.num)
+                        }
+                    },
+                }
+            }
+        })
+    </script>
+</body>
+</html>

@@ -4,19 +4,59 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>组件通信</title>
 </head>
 <body>
-    <template>
+    <div id="app">
+        <button @click="add1">fatherAdd</button>
+        {{count}}
+        <!-- 实现子组件获取父组件data中的值 -->
+        <comp :message="msg" @son="add1"></comp>
+    </div>
+        <!-- 使用JavaScript 的模板字符串来让多行的模板更易读 -->
+        <!-- v-bind 来动态传递 prop  -->
+        <!-- 实现子组件修改父组件中的数值
+            1.在子组件的methods中定义一个方法add2
+            2.这个add2方法里面有this.$emit('son')函数
+            3.组件模板中调用该add2方法
+            4.组件中使用的时候@son="add1"
+        -->
+    <template id="comp1">
         <div>
-            <h1></h1>
-            <button></button>
+            <p>{{message}}</p>
+            <button @chick="add2">sonAdd</button>
         </div>
     </template>
-    <div id="app">
-        <p></p>
-        <button></button>
-        
-    </div>
+    <script src="vue.js"></script>
+    <script>
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                msg:'father',
+                count:0
+            },
+            methods: {
+                add1(){
+                    this.count++;
+                }
+            },
+            components:{
+                'comp':{
+                    template:'#comp1',
+                    props:['message','fn1'],
+                    data(){
+                        return{
+
+                        }
+                    },
+                    methods:{
+                        add2(){
+                            this.$emit('son')
+                        }
+                    }
+                }
+            }
+        })
+    </script>
 </body>
 </html>
