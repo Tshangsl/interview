@@ -1,3 +1,25 @@
+0.webpack.config.js
+    模式 mode
+        development production(上线 压缩) 默认production
+    入口 entry
+        entry: {
+            index:'./src/index.js',
+            main:'./src/main.js'
+        }
+    输出 output
+        output: {
+            path: path.resolve(__dirname,'dist'),
+            filename: "[name].js",
+            publicPath: "http://localhost:8081/"
+        },
+    loader(在module里面配置loader)
+    插件plugin
+        html-webpack-plugin插件
+        clean-webpack-plugin插件 解构的方式引入该插件
+        mini-css-extract-plugin插件
+    浏览器兼容性 browser compatibility
+    环境 environment
+        
 1.Webpack作用(模块打包/编译兼容/能力扩展)
     1.模块打包。
         可以将不同模块的文件打包整合在一起，并且保证它们之间的引用正确，执行有序。利用打包我们就可以在开发的时候根据我们自己的业务自由划分文件模块，保证项目结构的清晰和可读性。
@@ -15,13 +37,15 @@
                 对象是一个全局单例，他负责把控整个webpack打包的构建流程。
             compilation:
                 对象是每一次构建的上下文对象，它包含了当次构建所需要的所有信息，每次热更新和重新构建，compiler都会重新生成一个新的compilation对象，负责此次更新的构建过程。
-            而每个模块间的依赖关系，则依赖于AST语法树。每个模块文件在通过Loader解析完成之后，会通过acorn库生成模块代码的AST语法树，通过语法树就可以分析这个模块是否还有依赖的模块，进而继续循环执行下一个模块的编译解析。
+            而每个模块间的依赖关系，则依赖于AST语法树。
+            每个模块文件在通过Loader解析完成之后，会通过acorn库生成模块代码的AST语法树，通过语法树就可以分析这个模块是否还有依赖的模块，进而继续循环执行下一个模块的编译解析。
             最终Webpack打包出来的bundle文件是一个IIFE的执行函数。
         4、对不同文件类型的依赖模块文件使用对应的Loader进行编译，最终转为Javascript文件；
         5、整个过程中webpack会通过发布订阅模式，向外抛出一些hooks，而webpack的插件即可通过监听这些关键的事件节点，执行插件任务进而达到干预输出结果的目的。
     2.webpack4相比，webpack5打包出来的bundle做了相当的精简
         在上面的打包demo中，整个立即执行函数里边只有三个变量和一个函数方法，__webpack_modules__存放了编译后的各个文件模块的JS内容，__webpack_module_cache__ 用来做模块缓存，__webpack_require__是Webpack内部实现的一套依赖引入函数。最后一句则是代码运行的起点，从入口文件开始，启动整个项目。
         其中值得一提的是__webpack_require__模块引入函数，我们在模块化开发的时候，通常会使用ES Module或者CommonJS规范导出/引入依赖模块，webpack打包编译的时候，会统一替换成自己的__webpack_require__来实现模块的引入和导出，从而实现模块缓存机制，以及抹平不同模块规范之间的一些差异性。
+        AST(抽象语法树 Abstract Syntax Tree)
 1.Webpack原理 loader plugin做什么的
 webpack是一个模块打包器（module bundler），提供了一个核心，核心提供了很多开箱即用的功能。
 同时它可以用loader和plugin来扩展。webpack本身结构精巧，基于tapable的插件架构，扩展性强，众多的loader或者plugin让webpack稍显复杂。
@@ -67,11 +91,11 @@ url-loader：与 file-loader 类似，区别是用户可以设置一个阈值，
         speed-measure-webpack-plugin: 可以看到每个 Loader 和 Plugin 执行耗时 (整个打包耗时、每个 Plugin 和 Loader 耗时)
         webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
 3.Loader和Plugin的区别？
-        Loader：
+        Loader：(本质函数 让webpack拥有加载和解析非JavaScript文件的能力)
             1.本质是一个函数 在该函数中对接收到的内容进行转换 返回转换后的结果 因为Webpack只认识JavaScript 所以Loader就成了翻译官 对其他类型的资源进行转译的预处理工作
             直译为"加载器"。Webpack将一切文件视为模块，但是webpack原生是只能解析js文件，如果想将其他文件也打包的话，就会用到loader。 所以Loader的作用是让webpack拥有了加载和解析非JavaScript文件的能力。
             2.在modules.rules中配置 作为模块的解析规则 类型为数组 每一项都是一个Object 里面描述了对于什么类型的文件（test），使用什么加载(loader)和使用的参数（options）
-        Plugin:
+        Plugin:(扩展Webpack功能)
             1.插件 基于事件流框架Tapable Plugin可以扩展Webpack功能 在Webpack运行的生命周期中会广播出许多事件 Plugin可以监听这些事件 在合适的实际通过Webpack提供的API改变输出结果
             2.在plugins中单独配置 类型为数组 每一项是一个plugin的实例 参数都通过构造函数传入
 4.Webpack构建流程
@@ -123,7 +147,7 @@ url-loader：与 file-loader 类似，区别是用户可以设置一个阈值，
 10.如何对bundle体积进行监控和分析？
         1.VSCode 中有一个插件 Import Cost 可以帮助我们对引入模块的大小进行实时监测，还可以使用 webpack-bundle-analyzer 生成 bundle 的模块组成图，显示所占体积。
         2.bundlesize 工具包可以进行自动化资源体积监控。
-11.文件指纹是什么？怎么用？
+11.文件指纹是什么？怎么用？(打包后输出文件的后缀)
         文件指纹是打包后输出的文件名的后缀
             1.Hash：和整个项目的构建相关，只要项目文件有修改，整个项目构建的 hash 值就会更改
             2.Chunkhash：和 Webpack 打包的 chunk 有关，不同的 entry 会生出不同的 chunkhash
@@ -157,7 +181,8 @@ url-loader：与 file-loader 类似，区别是用户可以设置一个阈值，
         10.Scope hoisting
         11.动态Polyfill
 14.代码分割，那代码分割的本质是什么？有什么意义呢？
-        代码分割的本质其实就是在源代码直接上线和打包成唯一脚本main.bundle.js这两种极端方案之间的一种更适合实际场景的中间状态。
+        代码分割的本质其实就是在源代码直接上线和打包成唯一脚本
+        main.bundle.js这两种极端方案之间的一种更适合实际场景的中间状态。
         「用可接受的服务器性能压力增加来换取更好的用户体验。」
             源代码直接上线：虽然过程可控，但是http请求多，性能开销大。
             打包成唯一脚本：一把梭完自己爽，服务器压力小，但是页面空白期长，用户体验不好。
