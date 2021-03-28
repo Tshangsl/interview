@@ -47,7 +47,7 @@
     7.vueX
     子组件中访问父组件的实例/组件中访问到根实例？
     this.$parent/this.$root
-39.组件通信
+组件通信
         1.props / $emit 适用 父子组件通信
         2.ref 与 $parent / $children 适用 父子组件通信
             ref：
@@ -1002,10 +1002,13 @@ params(name引入 接参 this.$route.params.name 类似post传参 参数地址�
         4.params、query不设置也可以传参，params不设置的时候，刷新页面或者返回参数会丢失 query则不会有这个问题        
 36.
 Vue-router(SPA single page application的路径管理器 WebApp的链接路径管理系统)
+
 hash模式(浏览器环境) 
 history模式 
 abstract模式(Nodejs环境)
-SPA(Vue的单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来)
+
+SPA
+(Vue的单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来)
 (SPA核心之一 更新视图而不重新请求页面)
 (SPA加载页面时，不会加载整个页面，而是只更新某个指定的容器中内容)
 (传统的页面应用 超链接实现页面切换跳转
@@ -1138,7 +1141,8 @@ Vue路由有三种模式 比SPA多了一个abstract)
             1.将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
             2.在配置 路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
             3.加一个首屏 loading 图，提升用户体验；
-38.MVC(Model View Controller)
+38.
+MVC(Model View Controller)
 MVVM(Model View ViewModel) 
 MVP(Model View Presenter) 
     MVC:(所有通信都是单向的)
@@ -1378,7 +1382,6 @@ computed
         });
         2.在组件中使用this.$store.commit提交mutation，改变number
             this.$store.commit('SET_NUMBER',10)
-    13.Vuex中使用mutation需注意必须时同步函数
     14.在组件中多次提交同一个mutation，怎么写使用更方便。
         1.使用mapMutations辅助函数,在组件中这么使用
         import { mapMutations } from 'vuex'
@@ -1882,3 +1885,13 @@ computed
     10.区分开发环境打包跟生产环境打包
 56.shim()
     shim是一个小型库，可透明地截取API，更改传递的参数，处理操作本身，或将操作重定向到别处。垫片通常在API的行为发生变化时出现，从而导致仍依赖旧功能的旧应用程序出现兼容性问题。在这些情况下，较新的代码之上的较薄的兼容层仍然可以支持较旧的API。垫片也可以用于在不同的软件平台上运行程序，而不是开发它们。
+57.Vue中的模板语法
+    Vue.js使用了基于HTML的模板语法 
+    允许开发者声明式的将DOM绑定至底层Vue实例的数据
+    所有Vue.js的模板都是合法的HTML 
+    所以能被遵循规范的浏览器和HTML解析器解析
+
+    在底层的实现上
+    Vue将模板编译成虚拟DOM渲染函数
+    结合响应系统 
+    Vue能智能计算出最少需要重新渲染多少组件
