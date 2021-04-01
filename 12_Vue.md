@@ -866,7 +866,7 @@ destoryed(
     template标签内容天生不可见，设置了display：none；
     要操作template标签内部的dom必须要用下面的方法–content属性：
     三种写法：
-        1.字符串模板写法(直接写在vue构造器中)
+        1.字符串模板写法(直接写在vue 构造器中)
             这种写法比较直观,适用于html代码不多的场景,但是如果模板里html代码太多,不便于维护,不建议这么写.
         2.写在template标签里,这种写法跟写html很像.
         3.写在script标签里,这种写法官方推荐,vue官方推荐script中type属性加上"x-template"        
