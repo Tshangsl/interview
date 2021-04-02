@@ -120,3 +120,21 @@ HTML5
     4. <meta> => 网页关键词 网页描述 作者 网页编码 自动跳转等说明性标签 包含广泛的内容标签
     5. <base> => 网页默认打开方式声明标签
     6. <script> => 标签用于定义客户端脚本，比如 JavaScript。script 元素既可以包含脚本语句，也可以通过 src 属性指向外部脚本文件。
+8.HTML中title属性和alt属性的区别
+    1.<img src="#" alt="alt信息" />
+        当图片不输出信息的时候，会显示alt信息 鼠标放上去没有信息，当图片正常读取，不会出现alt信息
+    2.<img src="#" alt="alt信息" title="title信息" />
+        当图片不输出信息的时候，会显示alt信息 鼠标放上去会出现title信息
+        当图片正常输出的时候，不会出现alt信息，鼠标放上去会出现title信息
+    1.title属性可以用在除了base，basefont，head，html，meta，param，script和title之外的所有标签
+    2.title属性的功能是提示。额外的说明信息和非本质的信息请使用title属性。title属性值可以比alt属性值设置的更长
+    3.title属性有一个很好的用途，即为链接添加描述性文字，特别是当连接本身并不是十分清楚的表达了链接的目
+
+
+
+
+
+
+
+
+    

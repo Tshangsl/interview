@@ -200,6 +200,118 @@ NextTick 是做什么的 其原理
             1.vue 用异步队列的方式来控制 DOM 更新和 nextTick 回调先后执行
             2.microtask 因为其高优先级特性，能确保队列中的微任务在一次事件循环前被执行完毕
             3.考虑兼容问题,vue 做了 microtask 向 macrotask 的降级方案
+12.Vue render函数(用来生成VDOM)
+    1.Vue整体流程
+        1.模板通过编译生成AST树
+        2.AST生成Vue的render渲染函数
+        3.render渲染函数结合数据生成VNODE(Virtual DOM Node)树
+        4.diff和patch后生成新的UI界面(真实DOM渲染)
+        概念解释：
+        模板：
+            Vue模板是纯HTML 基于Vue的模板语法 可以比较方便地处理数据和UI界面
+        AST：(Abstract Synax Tree)
+            Vue将HTML模板解析为AST 并对AST进行一些优化的标记处理 提取最大的静态树 以使VDOM直接跳过后面的diff
+        render渲染函数
+            用来生成VDOM Vue推荐使用模板构建应用程序
+            底层实现中Vue最终还是会将模板编译成渲染函数
+            若我们想要得到更好的控制 可以直接写渲染函数
+        Watcher：
+            每一个Vue组件都有一个对应的watcher 它会在组件render时收集组件所依赖的数据 并在依赖有更新时 触发组件重新渲染 Vue会自动优化并更新需要更新的DOM
+        render函数可以作为一条分割线
+            1.render函数左边可以称为编译期 将Vue模板转换成渲染函数
+            2.render函数右边可以称为运行时 将渲染函数生成的VDOM树 进行diff和patch
+    2.render
+        Vue推荐绝大多数情况下 使用模板创建HTML 
+        一些场景中 真正需要JS的完全编程能力
+        可以用渲染函数 它比模板更接近编译器
+    3.虚拟DOM
+        1.Vue编译器在编译模板后 会将这些模板编译成渲染函数render 当渲染函数render被调用时 会返回一个虚拟DOM树
+        2.在Vue底层实现上 Vue将模板编译成虚拟DOM渲染函数 结合Vue自带的响应系统 在相应状态改变时 Vue能智能计算出重新渲染组件的最小代价并映射到DOM操作上
+        3.Vue支持我们通过data参数传递一个JavaScript对象作为组件数据, Vue将遍历data对象属性, 使用Object.defineProperty方法设置描述对象, 通过gett/setter函数来拦截对该属性的读取和修改.
+        4.Vue创建了一层Watcher层, 在组件渲染的过程中把属性记录为依赖, 当依赖项的setter被调用时, 会通知Watcher重新计算, 从而使它关联的组件得以更新.
+    4.Vue渲染机制
+        两个概念
+            1.独立构建
+                包含模板编译器
+                渲染过程 HTML字符串=>render函数=>VNODE=>真实DOM
+            2.运行时构建
+                不包含模板编译器 
+                渲染过程 render函数=>VNODE=>真实DOM
+            3.运行时构建的包 比独立构建少一个模板编译器(因此运行速度上会更快)在$mount函数上也不同 $mount方法是整个渲染过程中的起始点
+        渲染过程提供三种模板：(这三种模式最终都要得到render函数)
+            1.自定义render函数
+            2.template
+            3.el
+        Vue渲染
+            1.new Vue 执行初始化
+            2.挂载$mount 通过自定义render方法template el等生成render渲染函数
+            3.通过Watcher监听数据的变化
+            4.当数据变化时 render函数执行生成VNODE对象
+            5.通过DOM diff算法 对比新旧VNode对象 通过patch算法 添加/修改/删除真正的DOM元素
+    5.理解使用render函数
+        1.createElement
+            第1个参数: {String | Object | Function }, 必传
+            第2个参数: { Object }, 可选
+            第3个参数: { String | Array }, 可选
+    6.使用render函数替代模板功能
+        使用Vue模板时 可在模板中灵活的使用v-if、v-for、v-model和<slot>等模板语法。但在render函数中是没有提供专用的API。如果在render使用这些，需要使用原生的JavaScript来实现。
+13.虚拟DOM/VDOM
+    1.真实DOM 浏览器解析流程
+        webkit渲染引擎工作流程
+        所有浏览器渲染引擎工作流程大致分为5步
+            1.创建DOM树
+                用HTML分析器分析HTML元素 构建一颗DOM树
+            2.创建Style Rules
+                用CSS分析器分析CSS文件和元素上的inline样式 生成页面样式表
+            3.构建Render树
+                将DOM和样式表关联起来 构建一棵Render树 (Attachment)
+                每个DOM节点都有attach方法 接受样式信息 返回一个render对象(又名renderer)这些render对象最终会被构建成以可Render树
+            4.布局Layout
+                确定节点坐标 根据Render树结构 为每个Render树上的节点确定一个在显示屏上出现的精确坐标
+            5.绘制Painting
+                根据Render树和节点显示坐标 然后调用每个节点的paint方法 将它们绘制出来
+        注意：
+            1.DOM 树的构建不是文档加载完成开始的
+                构建 DOM 树是一个渐进过程，为达到更好的用户体验，渲染引擎会尽快将内容显示在屏幕上，它不必等到整个 HTML 文档解析完成之后才开始构建 render 树和布局。
+            2.Render树/DOM树/CSS样式表
+                实际进行的时候并不是完全独立的，而是会有交叉，会一边加载，一边解析，以及一边渲染。
+            3.CSS 的解析注意点
+                CSS的解析式从右向左逆向解析的 嵌套标签越多 解析越慢
+            4.JS操作真实DOM代价
+                用我们传统的开发模式，原生 JS 或 JQ 操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程。在一次操作中，我需要更新 10 个 DOM 节点，浏览器收到第一个 DOM 请求后并不知道还有 9 次更新操作，因此会马上执行流程，最终执行10 次。例如，第一次计算完，紧接着下一个 DOM 更新请求，这个节点的坐标值就变了，前一次计算为无用功。计算 DOM 节点坐标值等都是白白浪费的性能。即使计算机硬件一直在迭代更新，操作 DOM 的代价仍旧是昂贵的，频繁操作还是会出现页面卡顿，影响用户体验
+    2.虚拟DOM(Virtual-DOM)--JS对象模拟DOM
+        存在意义/实现方式：
+        为了解决浏览器性能设计出来
+        页面的更新可以先全部反映在JS对象(虚拟DOM)上 操作内存中的JS对象的速度显然更快 等更新完成后 将最终的JS对象映射成真实的DOM 交由浏览器绘制
+        用JS对象模拟DOM树：
+            1.JS对象来表示DOM节点 使用对象的属性记录节点的类型/属性/子节点
+            2.渲染用JS表示的DOM对象
+            3.比较两棵虚拟DOM树的差异-diff算法
+                diff算法：
+                    比较两棵VDOM树的差异 
+                    1.如需完全比较 O(n^3)
+                    2.由于前端很少会跨级移动DOM元素 
+                    VDOM只会对同一个层级的元素进行比较
+                    O(n)
+            4.diff算法具体实现
+                1.深度优先遍历 记录差异
+                    每个节点有一个唯一的标记 每遍历到一个节点 把该节点和新的树进行对比 如果有差异就记录到一个对象中
+                2.差异类型(元素节点1/属性节点2/文本节点3)
+                    1.节点替换 如将div换成h1
+                    2.顺序互换 移动/删除/新增子节点
+                    3.属性更改
+                    4.文本改变
+                3.列表对比算法
+                4.实例输出
+             5.将两个虚拟DOM对象的差异应用到真正的DOM树(patch.js)
+                1.深度优先遍历DOM树
+                2.对原有DOM树进行DOM操作     
+                    根据不同类型数据 对当前节点进行不同的DOM操作
+                3.DOM结构改变  
+    3.总结VDOM算法主要实现三步骤
+        1.用JS对象模拟DOM树(VNode定义)
+        2.比较两棵虚拟DOM树的差异 diff.js
+        3.将两个虚拟DOM对象的差异应用到真正的DOM树 patch.js
 14.虚拟DOM&DOM-diff
     虚拟DOM存在意义：
         虚拟DOM就是为了解决浏览器性能问题而被设计出来的。
@@ -252,6 +364,10 @@ NextTick 是做什么的 其原理
             applendChild
             replaceChild
             removeChild
+        DOM diff算法主要做三件事
+            创建节点
+            删除节点
+            更新节点
         给定任意两棵树 采用先序深度优先遍历的算法找到最少的转换步骤d
         DOM-diff比较两个虚拟DOM的区别 也就是在比较两个对象的区别
         作用：
@@ -306,6 +422,7 @@ mounted(
     el  [Object HTMLDivElement]
     data [Object Object]
     meaasge Vue生命周期
+    此阶段中DOM渲染完成
 ) 
 beforeUpadate(
     修改vue实例的data时，vue就会自动帮我们更新渲染视图
@@ -1866,6 +1983,34 @@ computed
     Vue(专注于数据层 通过数据双向绑定 最终表现在DOM层减少DOM操作)和jQuery(专注视图层 通过操作DOM实现页面的一些逻辑渲染)：
         jQuery 专注视图层，通过操作 DOM 去实现页面的一些逻辑渲染；
         Vue 专注于数据层，通过数据的双向绑定，最终表现在 DOM 层面，减少了 DOM 操作 Vue 使用了组件化思想，使得项目子集职责清晰，提高了开发效率，方便重复利用，便于协同开发
+54.Vue与Angular区别
+    x
+    2.Vue的双向绑定基于ES5中的getter/setter实现
+    Angular由自己实现一套模板编译规则 需要进行所谓脏值检查
+    Vue则不需要 因此Vue在性能上更高效 代价是对于IE9以下的浏览器无法支持
+    3.Vue需要提供一个el对象进行实例化 后续的所有作用范围也是在el对象之下 Angular是整个HTML页面 一个页面可以有多个Vue实例 而Angular不是
+55.Vue/Angular/React区别
+    Vue/Angular
+        相同点：
+            1.都支持指令 内置指令和自定义指令
+            2.都支持过滤器 内置过滤器和自定义过滤器
+            3.都支持双向数据绑定
+            4.都不支持低端浏览器
+        不同点：
+            1.Angular学习成本高 比如增加Dependency Injection特性 Vue.js本身实现的API都比较简单直观
+            2.性能上Angular依赖对数据做脏检查 Watcher越多越慢 Vue使用基于依赖追踪的观察并使用异步队列更新 所有数据独立触发
+    Vue/React
+        相同点:
+            1.React采用特殊的JSX语法 Vue在组件开发中也推荐编写.vue特殊文件格式 对文件内容都有一些约定 两者都需要编译后使用
+            2.中心思想相同：一切都是组件 组件实例之间可以嵌套
+            3.都提供合理的钩子函数 可以让开发者定制化去处理需求
+            4.都不内置列数AJAX Route等功能到核心包 而是以插件方式加载
+            5.组件开发中都支持mixins的特性
+        不同点:
+            1.React依赖Vitrual DOM Vue.js使用的是DOM模板
+            React采用的VDOM会对渲染出来的结果做脏值检查
+            2.Vue在模板中提供了指令 过滤器 可以非常方便快捷操作DOM
+
 54.vue-admin-template&Element UI
     vue-admin-template:
     一个极简的vue admin管理后台 只包含 Element UI &axios &iconfont&permission control &init 这些搭建后台必要的东西
@@ -1895,3 +2040,17 @@ computed
     Vue将模板编译成虚拟DOM渲染函数
     结合响应系统 
     Vue能智能计算出最少需要重新渲染多少组件
+58.嵌套路由
+59.Vue中template编译的理解
+    先转化成AST树 将得到的render函数返回VNode(Vue的虚拟DOM节点)
+    1.首先通过compile编译器把template编译成AST语法树
+    (abstract syntax tree 源代码的抽象语法结构的树状表现形式)
+    complie是createCompiler的返回值 createCompiler是用以创建编译器的 另外compiler还负责合并option
+    2.AST经过generate(将AST语法树转化成render function字符串的过程)得到render函数 render的返回值是VNode VNode是Vue的虚拟DOM节点 里面有(标签名/子节点/文本等)
+
+
+
+
+
+
+
