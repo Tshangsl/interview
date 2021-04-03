@@ -444,6 +444,13 @@ JS
     2.将空对象链接到原型中
     3.绑定this
     4.返回新对象
+    var a = new myFunction("Li","Cherry");  
+    new myFunction{
+        var obj = {};
+        obj.__proto__ = myFunction.prototype;
+        var result = myFunction.call(obj,"Li","Cherry");
+        return typeof result === 'obj'? result : obj;
+    }
 18.创建对象(new Object()/对象直接量/构造函数/工厂模式/原型模式/组合使用构造函数模式和原型模式)有哪几种方法
     1.new Object()
         创建一个Object实例

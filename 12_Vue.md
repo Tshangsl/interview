@@ -1,3 +1,22 @@
+1.Vue事件驱动
+    1.数据驱动
+        数据发生改变时 视图也会进行更新 数据驱动视图
+    2.响应式原理
+        数据模型仅仅是普通的JS对象 修改它们的时候视图会进行更新
+    3.双向数据绑定原理
+        使用v-model指令绑定表单元素时 
+        可以在视图直接获得数据
+        视图改变时 数据也会进行更新
+    以上三者都是应用了一个底层原理
+    该底层原理由ES5的Object.defineProperty
+    Vue中底层原理的实现主要依赖存储器(getter/setter)
+    
+    数据劫持+发布订阅者模式实现双向数据绑定
+    1.data中数据 Vue会通过观察者对象(Observer)将data选项中的所有key经过Object.defineProperty的getter和setter设置
+    2.v-model指令
+    绑定元素时 自动触发getter getter会返回一个初始值 这样就能在视图中看到数据
+    视图中内容改变时 触发setter setter会通知Vue视图已经进行了更新 Vue会重新生成虚拟DOM 继而通过新旧虚拟DOM对比生成patch对象 再将patch对应渲染到视图中
+
 1.强制刷新组件
     1.this.$forceUpdate()。
     2.组件上加上key，然后变化key的值。
@@ -151,14 +170,35 @@
     <template comments> ... <template>
 12.Vue中怎么重置data
     Object.assign(this.$data,this.$options.data())
-13.Vue中Dom异步 nextTick
-Dom异步：
+13.Vue中Dom异步更新&nextTick
+Dom异步更新：
     Vue 异步执行 DOM 更新。
     只要观察到数据变化，Vue 将开启一个队列，并缓冲在同一事件循环中发生的所有数据改变。
     如果同一个 watcher 被多次触发，只会被推入到队列中一次。这种在缓冲时去除重复数据对于避免不必要的计算和 DOM 操作上非常重要。
     然后，在下一个的事件循环“tick”中，Vue 刷新队列并执行实际 (已去重的) 工作。
     Vue 在内部尝试对异步队列使用原生的 Promise.then 和MessageChannel，如果执行环境不支持，会采用 setTimeout(fn, 0)代替。
     为了在数据变化之后等待 Vue 完成更新 DOM ，可以在数据变化之后立即使用Vue.nextTick(callback) 。这样回调函数在 DOM 更新完成后就会调用。
+Vue中nextTick机制
+    定义watch监听msg
+    实际上会被Vue这样调用
+    vm.$watch(keyOrFn,handler,options)
+    $watch是初始化时 为vm绑定的一个函数 用于创建Watcher对象
+
+    下次DOM更新循环结束之后执行延迟回调
+    修改数据之后立即使用这个方法 获取更新后的DOM
+
+    在vue中created钩子函数执行时 
+    DOM其实并未进行任何渲染
+    所以需要放在nextTick中去获取DOM 
+    与其对应的生命周期钩子函数是mounted
+
+    Vue 中for渲染DOM 就算是中mounted调用nextTick也不能获取到具体的DOM
+
+    Vue整个nextTick作用
+    主线程更新前-->遇到宏任务/微任务-->放入栈-->主线程执行完成-->更新完成-->执行栈-->获取更新后的DOM
+
+    nextTick主要应用场景及原因
+        在Vue生命周期的created()钩子函数进行的DOM操作一定要放在Vue.nextTick()的回调函数中
 nextTick：
     作用：
         Vue.nextTick用于延迟执行一段代码，它接受2个参数（回调函数和执行回调函数的上下文环境），如果没有提供回调函数，那么将返回promise对象。
@@ -168,12 +208,15 @@ nextTick：
 
         vm.$nextTick(() =>{this.handleadd()}),
         将handleadd回调延迟到下次 DOM 更新循环之后执行。
-    应用场景:
+    应用场景:(什么时候需要使用Vue.nextTick()函数)
+        (Vue.nextTick：在DOM更新后做点什么 参数回调函数DOM更新完调用)
         1.在Vue生命周期的created()钩子函数进行的DOM操作一定要放在Vue.nextTick()的回调函数中
             在created()钩子函数执行的时候DOM 
             其实并未进行任何渲染，而此时进行DOM操作无异于徒劳，所以此处一定要将DOM操作的js代码放进Vue.nextTick()的回调函数中。
             与之对应的就是mounted()钩子函数，因为该钩子函数执行时所有的DOM挂载和渲染都已完成，此时在该钩子函数中进行任何DOM操作都不会有问题 。
         2.在数据变化后要执行的某个操作，而这个操作需要使用随数据改变而改变的DOM结构的时候，这个操作都应该放进Vue.nextTick()的回调函数中。
+
+        为了在数据变化之后等待Vue完成更新DOM 可以在数据变化之后立即使用Vue.nextTick(callback)这样回调函数在DOM更新完成后就会调用
 NextTick 是做什么的 其原理
         $nextTick 是在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后使用 $nextTick，则可以在回调中获取更新后的 DOM
         JS运行机制
