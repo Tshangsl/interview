@@ -15,6 +15,26 @@ JS
     JS引擎会在正式执行代码之前进行一次”预编译“，预编译简单理解就是在内存中开辟一些空间，存放一些变量和函数。具体步骤如下（browser）：
     1.所有的声明都会提升到作用域的最顶上去。
     2.函数声明的优先级高于变量声明的优先级，并且函数声明和函数定义的部分一起被提升。
+1.JS内部类
+    JS本身提供一些可以直接使用的类 这种类就是内部类
+    主要有8个内部类
+        Object/Array/Math/Boolean/String/RegExp/Date/Number
+    使用方式上把JS内部类分为两类
+        动态类  如Date/String/Array
+            使用 var 对象 = new 动态类() 对象.属性|方法
+        静态类  如Math
+            使用 类名.属性|方法 
+2.JS内置对象
+    JS中内置了17个对象 
+    常用的是Array对象 Date对象 正则表达式对象 String对象 Global对象
+3.JS内置函数
+    浏览器内核自带 不用任何函数库引入就可直接使用的函数
+    JS内置函数一共可分为五类
+        1.常规函数
+        2.数组函数
+        3.日期函数
+        4.数学函数
+        5.字符串函数
 1.JS有哪些数据类型，数据类型之间有哪些不同，判断数据类型的方法
     基本数据类型:String Number Boolean Undefined Null Symbol(ES6新增 表示独一无二的值) BigInt(ES2020即ES11新增)
         Symbol函数的参数只是表示当前Symbol值的描述 相同参数的Symbl函数依然是不同的
@@ -36,6 +56,22 @@ JS
         2.A instanceof B(引用数据类型)可以用来判断A是否为B的实例，但它不能检测 null 和 undefined；
         3.B.constructor == A可以判断A是否为B的原型，但constructor检测 Object与instanceof不一样，还可以处理基本数据类型的检测。
         4.Object.prototype.toString.call() 是最准确最常用的方式。
+    判断引用数据类型是数组还是对象
+        typeOf无法判断 返回都是Object
+        1.constructor
+            constructor属性返回对创建此对象的数组函数的引用
+            原本就是用来进行对象类型判断
+            每一个对象实例都可以通过constructor对象访问它的构造函数
+            打印出来一个是Array()一个是Object()
+        2.instanceof
+            根据返回的boolean值判断
+            A原型链上有没有B原型
+            obj instanceOf Object =>true
+            obj instanceOf Array =>false
+        3.toString()
+            Object.prototype下的toString方法
+            Object.prototype.toString.call([]) [Object Array]
+            Object.prototype.toString.call({}) [ObjectObject]
 2.JS基本包装类
     (调用方法的过程是在后台偷偷进行的)
     (引用数据类型/基本包装类型区别 生命周期不同)
@@ -535,58 +571,6 @@ JS
 
             var person1 = new Person('hanmeimei')
             person1.say() //hanmeimei
-19.对象遍历方法(for in/Object.keys())
-        对象不可以用for of方法遍历 对象的原型中没有Symbol.iterator方法
-    1.for in(可枚举属性 不含Symbol)
-        循环遍历对象自身的和继承的可枚举属性(不含Symbol属性)
-    2.Object.keys(obj):(可枚举对象 不含Symbol 和继承)
-        返回一个数组 包含对象自身的所有可枚举属性(不含继承和Symbol属性)
-    3.Object.getOwnPropertyNames(obj):返回一个数组 包含对象自身的所有属性(不含Symbol属性 包含不可枚举属性)
-    4.Object.getOwnPropertySymbols(obj)：返回一个数组，包含对象自身的所有 Symbol 属性。
-    5.Reflect.ownKeys(obj)：返回一个数组，包含对象自身的所有属性（不含继承的）。
-20.浅拷贝和深拷贝都是什么含义，有什么不同，如何实现
-    1.浅拷贝只复制指向某个对象的指针，而不复制对象本身。
-        （1）Object.assign() 
-            需注意的是目标对象只有一层的时候，是深拷贝；
-            由于null undefined 无法转换成对象 它们作为首参数会报错 非首参数会跳过
-        （2）扩展运算符；
-    2.深拷贝就是在拷贝数据的时候，将数据的所有引用结构都拷贝一份。
-         (1) 手写遍历递归赋值；
-        （2）结合使用JSON.parse()和JSON.stringify()方法。
-            JSON.parse()
-                JSON通常用于与服务端交换数据
-                在接受服务器数据时一般是字符串
-                可以使用JSON.parse()方法将数据转换为JavaScript对象
-                JSON.parse()是Javascript中一个常用的 JSON 转换方法，JSON.parse()可以把JSON规则的字符串转换为JSONObject，JSON.parse()很方便，并且几乎支持所有浏览器。
-            JSON.stringify()
-                将JavaScript值转换为JSON字符串
-21.JSON方法实现拷贝有什么问题 
-    json.parse(json.stringfy())
-    json.stringfy()将javascript的值转换为json字符串
-    json.parse()把json规则的字符串转换为jsonObject
-
-    JS中的变量在内存中存储分为值类型和引用类型
-    值类型：(保存和复制的是值本身)
-        1.占用空间固定，保存在栈(stack)中
-        2.保存和复制的是值本身
-        3.基本类型数据是值类型(String Number Boolean Undefined Null Symbol bigInt)
-    引用类型：(保存和复制的是指向对象的一个指针)
-        1.占用空间不固定，保存在堆(heap)中
-        2.保存和复制的是指向对象的一个指针
-        3.使用new()方法构造出来的对象是引用型
-    最简单的深拷贝方式:
-        使用JSON.stringify()
-        var obj1=JSON.parse(JSON.stringify(obj));
-    问题：(undefined/任意函数/symbol值 序列化过程中会被忽略)
-            (NaN和Infinity格式数据及null都会被当作null)
-            (仅会序列化可枚举对象)
-            (对包含循环引用的对象(对象相互引用 无限循环)抛出错误)
-        1.undefined、任意的函数以及 symbol 值，在序列化过程中会被忽略
-        2.Date 日期调用了 toJSON() 将其转换为了 string 字符串（Date.toISOString()），因此会被当做字符串处理。
-        3.NaN 和 Infinity 格式的数值及 null 都会被当做 null。
-        4.其他类型的对象，包括 Map/Set/WeakMap/WeakSet，仅会序列化可枚举的属性。
-        5.对包含循环引用的对象（对象之间相互引用，形成无限循环）执行此方法，会抛出错误。
-    当我们克隆的对象中还有引用类型时，我们只能采用递归的方法进行遍历
 20.ES5/ES6继承有什么区别
     1.ES5继承通过prototype或构造函数机制实现
     实质上是先创建子类的实例对象 然后再将父类的方法添加到this上
@@ -644,6 +628,58 @@ JS
     3.手写函数（浅拷贝实现）
     4.手写函数（实现深拷贝）
     5.最后介绍最后一种办法Lodash's中的merge( )方法。Lodash's是node中的库。它也是一种深拷贝的办法。
+19.对象遍历方法(for in/Object.keys())
+        对象不可以用for of方法遍历 对象的原型中没有Symbol.iterator方法
+    1.for in(可枚举属性 不含Symbol)
+        循环遍历对象自身的和继承的可枚举属性(不含Symbol属性)
+    2.Object.keys(obj):(可枚举对象 不含Symbol 和继承)
+        返回一个数组 包含对象自身的所有可枚举属性(不含继承和Symbol属性)
+    3.Object.getOwnPropertyNames(obj):返回一个数组 包含对象自身的所有属性(不含Symbol属性 包含不可枚举属性)
+    4.Object.getOwnPropertySymbols(obj)：返回一个数组，包含对象自身的所有 Symbol 属性。
+    5.Reflect.ownKeys(obj)：返回一个数组，包含对象自身的所有属性（不含继承的）。
+20.浅拷贝和深拷贝都是什么含义，有什么不同，如何实现
+    1.浅拷贝只复制指向某个对象的指针，而不复制对象本身。
+        （1）Object.assign() 
+            需注意的是目标对象只有一层的时候，是深拷贝；
+            由于null undefined 无法转换成对象 它们作为首参数会报错 非首参数会跳过
+        （2）扩展运算符；
+    2.深拷贝就是在拷贝数据的时候，将数据的所有引用结构都拷贝一份。
+         (1) 手写遍历递归赋值；
+        （2）结合使用JSON.parse()和JSON.stringify()方法。
+            JSON.parse()
+                JSON通常用于与服务端交换数据
+                在接受服务器数据时一般是字符串
+                可以使用JSON.parse()方法将数据转换为JavaScript对象
+                JSON.parse()是Javascript中一个常用的 JSON 转换方法，JSON.parse()可以把JSON规则的字符串转换为JSONObject，JSON.parse()很方便，并且几乎支持所有浏览器。
+            JSON.stringify()
+                将JavaScript值转换为JSON字符串
+21.JSON方法实现拷贝有什么问题 
+    json.parse(json.stringfy())
+    json.stringfy()将javascript的值转换为json字符串
+    json.parse()把json规则的字符串转换为jsonObject
+
+    JS中的变量在内存中存储分为值类型和引用类型
+    值类型：(保存和复制的是值本身)
+        1.占用空间固定，保存在栈(stack)中
+        2.保存和复制的是值本身
+        3.基本类型数据是值类型(String Number Boolean Undefined Null Symbol bigInt)
+    引用类型：(保存和复制的是指向对象的一个指针)
+        1.占用空间不固定，保存在堆(heap)中
+        2.保存和复制的是指向对象的一个指针
+        3.使用new()方法构造出来的对象是引用型
+    最简单的深拷贝方式:
+        使用JSON.stringify()
+        var obj1=JSON.parse(JSON.stringify(obj));
+    问题：(undefined/任意函数/symbol值 序列化过程中会被忽略)
+            (NaN和Infinity格式数据及null都会被当作null)
+            (仅会序列化可枚举对象)
+            (对包含循环引用的对象(对象相互引用 无限循环)抛出错误)
+        1.undefined、任意的函数以及 symbol 值，在序列化过程中会被忽略
+        2.Date 日期调用了 toJSON() 将其转换为了 string 字符串（Date.toISOString()），因此会被当做字符串处理。
+        3.NaN 和 Infinity 格式的数值及 null 都会被当做 null。
+        4.其他类型的对象，包括 Map/Set/WeakMap/WeakSet，仅会序列化可枚举的属性。
+        5.对包含循环引用的对象（对象之间相互引用，形成无限循环）执行此方法，会抛出错误。
+    当我们克隆的对象中还有引用类型时，我们只能采用递归的方法进行遍历
 20.JS哪些操作会造成内存泄露,以及避免内存泄漏
     内存泄漏是指一块被分配的内存既不能使用，也不能回收，直到浏览器进程结束。 
     GC(Garbage Collection System)垃圾回收系统
@@ -687,10 +723,6 @@ JS
     Js中有两种定时器：
         setInterval：间歇执行，
         setTimeout：延迟执行  
-31.offsetWidth、clientWidth、scrollTop的区别
-    offsetWidth：占位宽，包含 内容宽+左右padding+左右border
-    clientWidth：可视宽，包含 内容宽+左右padding
-    scrollTop：页面被卷去的高
 33.事件绑定和普通事件有什么区别。
     标签.事件：如果给同一个元素添加同一个事件，后面的会覆盖前面
     事件绑定：可以给同一个元素添加同一个事件，不会被覆盖

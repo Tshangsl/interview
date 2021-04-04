@@ -372,7 +372,15 @@ CSS CSS3是什么
     网格布局 grid
     容器属性
     item属性
-21.clientHeight offsetHeight scrollHeight offsetTop scrollTop
+21.
+Height
+    clientHeight content+padding
+    offsetHeight content+padding+border
+    scrollHeight 有滚动条有意义 clientHieght+scrollTop
+Top
+    offsetTop 当前元素顶部距离最近父元素顶部距离
+    scrollTop 有滚动条有意义 元素顶部被遮住部分高度
+
     1.网页可见区域高:document.body.clientHeight
     2.网页正文全文高：document.body.scrollHeight
     3.网页可见区域高(包括边线的高):document.body.offsetHeight
@@ -387,7 +395,7 @@ CSS CSS3是什么
         包括padding border 水平滚动条 但不包括margin的元素的高度
         对于inline的元素 这个属性一直是0 单位px 只读元素
     scrollHeight 有滚动条的情况下 (包括可见和不可见)才有意义
-        (没有滚动条的情况下scrollHeighr == clientHeight恒成立)
+        (没有滚动条的情况下scrollHeigh == clientHeight恒成立)
         scrollHeight>=clientHeight
         当本元素的子元素比本元素高且overflow=scroll时 本元素会scroll 
         单位px 只读元素

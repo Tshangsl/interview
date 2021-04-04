@@ -158,6 +158,43 @@ function throttle(fn,delay){
         },delay)
     }
 }
+// 11.图片懒加载
+// 没进入可视区域时 不给<img>标签赋src属性 浏览器不发送请求
+// 可视区域的判断 元素到各个边距的距离
+// document.documentElement.clientHeight 屏幕可视区域高度
+// element.offsetTop 元素相对于文档顶部高度
+// document.documentElement.scrollTop   滚动条滚动的距离
+// offsetTop-scrollTop<clientHeight 图片进入可视区域 被请求
+function lazyLoad(){
+    const imgs = document.getElementsByTagName('img');
+    const viewHeight = document.documentElement.clientHeight;
+    const scrollTop = document.documentElement.scrollTop;
+    for(let i =0;i<imgs.length;i++){
+        const offsetTop = imgs[i].offsetTop;
+        if(offsetTop-scrollTop<viewHeight){
+            imgs[i].src = imgs[i].dataset.src;
+        }
+    }
+}
+// 12.深度优先实现深拷贝
+function clone(obj){
+    if(typeOf(obj)!='Object') return;
+    var o = obj.constructor==Array?[]:{}
+    for(let p in obj){
+        if(typeof obj[p] === 'object'){
+            o[p] = clone(o[p]);
+        }else{
+            o[p] =obj[p];
+        }
+    }
+    return o
+}
+
+
+
+
+
+
 
 
 
