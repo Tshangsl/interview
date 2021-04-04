@@ -33,3 +33,40 @@ for(var i =0 ;i<animals.length;i++){
         this.print();
     }).call(animals[i],i) 
 }
+
+// 实现一个call fn.call(obj,args1,args2,...)
+// 括号里原本的对象改成call()前面的对象
+/*
+call方法接收一个参数是obj
+让this指向这个obj
+把fn用属性方式加入这个obj中
+执行call操作之后delete这个新增属性
+*/
+Function.prototype.myCallOne = function(ctx){
+    ctx = ctx||window;
+    // Symbol属性确定fn唯一 
+    var fn = Symbol();
+    var args = [...arguments].slice(1);
+    ctx[fn] = this;
+    var result = ctx[fn](...args);
+    delete ctx[fn];
+    return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+s
+

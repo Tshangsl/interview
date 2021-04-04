@@ -350,7 +350,10 @@ JS
         1.拥有length属性 可以使用数组下标方式访问对象
         2.不能使用数组原型方法 使用instanceof操作不属于Array
         3.可以被转换为真数组
+            ES5写法
             1.Array.prototype.slice.call()
+                /[].slice.call(Array)
+            ES6写法
             2.Array.from()
         4.可自定义其他属性
 18.数组遍历方法和操作
