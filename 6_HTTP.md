@@ -453,6 +453,9 @@ HTTP常见请求方式区别用途
                   第二步：当用户点击授权并登陆后，授权服务器将生成一个用户凭证（code）。这个用户凭证会附加在重定向的地址redirect_uri的后面；
                   第三步：用户再去请求时携带用户凭证（code），验证服务器返回一个访问令牌（Access Token）；
                   第四步：再去拿着令牌请求资源时，就会得到受保护的资源信息。
+7.JSON和JSONP
+    JSON(JavaScript Object Notation)是一种轻量级的数据交换格式
+    JSONP(JavaScript With Padding) 一个非官方的协议 它允许在服务器端集成Scripttags返回至客户端 通过JavaScript callback形式实现跨域访问
 8.跨域相关
     (JSONP CORS Node中间件代理 nginx反向代理 postMessage)
     1.为什么会出现跨域问题？

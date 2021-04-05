@@ -176,7 +176,7 @@ function lazyLoad(){
         }
     }
 }
-// 12.深度优先实现深拷贝
+// 12.深度优先实现深拷贝 待完善几种方式
 function clone(obj){
     if(typeOf(obj)!='Object') return;
     var o = obj.constructor==Array?[]:{}
@@ -189,6 +189,158 @@ function clone(obj){
     }
     return o
 }
+// call不固定参数 apply数组 bind
+// 13.call 使用一个指定的this值和一个/多个参数来调用一个函数
+/*
+实现要点
+    this可能传入null
+    传入不固定个数的参数
+    函数可能有返回值
+*/
+// JS中执行上下文 context
+// this 函数的上下文对象
+/*
+实现步骤
+    1.将函数设为对象的属性
+    2.执行该函数
+    3.删除该函数
+*/
+// Function.prototype.call = function(context){
+//     if(typeof this!=='function'){
+//         throw new TypeError('error');
+//     }
+//     // this参数可以传null 传null时默认指向window
+//     context = context||window;
+//     // 将函数设为对象的属性 
+//     // 用this获取调用call的函数 this永远指向最后调用它的对象
+//     context.fn = this;
+//     // 可传参
+//     let args = [...arguments].slice(1);
+//     // 带参执行fn获得返回值
+//     let res = context.fn(...args);
+//     // 删除作为对象属性的该函数
+//     delete context.fn;
+//     // call函数具有返回值 
+//     return res;
+// }
+Function.prototype.call = function(context){
+    // this是执行上下文的一部分 
+    if(typeof this !=='Function'){
+        throw new TypeError('error');
+    }
+    context = context||window;
+    context.fn = this;
+    let args = [...arguments].slice(1);
+    let res = context.fn(...args);
+    delete context.fn;
+    return res;
+}
+// apply
+Function.prototype.apply = function(context){
+    if(typeof this !=='function'){
+        return new TypeError('error');
+    }
+    context = context||window;
+    context.fn = this;
+    let res;
+    let args = arguments[1];
+    if(args){
+        res = context.fn(...args);
+    }else{
+        res = context.fn();
+    }
+    delete context.fn;
+    return res;
+}
+// bind
+Function.prototype.bind = function(context){
+    if(typeof this !== 'function'){
+        throw new TypeError('error');
+    }
+    // 获取调用bind函数的函数
+    let that = this;
+    // 获取除obj外bind函数中传过来的其他参数
+    let args = [...arguments].slice(1);
+    // bind不会立即执行会返回一个函数 调用该函数执行
+    return function F(){
+        // bind函数会创建一个新绑定函数(bound function BF)
+        // 绑定函数也可以使用new运算符构造 提供的this值会被忽略
+        // 前置参数仍会提供给模拟函数
+        if(this instanceof F){
+            // ???
+            return new that(...args,...arguments);
+        }
+        // 这里使用context是可以的吗 不取出arguments[0]
+        return that.apply(context,args.concat([...arguments]));
+    }
+}
+// 函数柯里化 currying 减少代码冗余 增加代码可读性
+/* 将使用多个参数的函数转换成一系列使用一个参数的函数
+ 使函数从一次调用传入多个参数编程多次调用每次传一个参数
+ 只传递给函数一部分参数来调用它 让它返回一个函数去处理剩下的参数
+    优点
+        1.参数复用 
+            如让第一个参数复用
+        2.提前确认
+        3.延迟运行
+            JS中经常使用的bind 实现机制就是Currying
+ */
+function curry(fn,curryArgs){
+    return function(){
+        let args = [].slice.call(arguments);
+        // 首次调用时 若未提供最后一个参数currArgs 则不用进行args拼接
+        if(currArgs!==undefined){
+            args = args.concat(curryArgs);
+        }
+        // 递归调用
+        if(args.length<fn.length){
+            return curry(fn,args);
+        }
+        // 递归出口
+        return fn.apply(null,args);
+    }
+}
+
+let currying = function (fun, arr = []) {
+	// 取出执行时参数，首次执行截掉function
+	let args = Array.prototype.slice.call(arguments,1) || arr
+	// 闭包 保存结果
+	return function () {
+		// 再次调用时的参数
+		let _args = Array.prototype.slice.call(arguments)
+		// 如果参数不存在，执行函数，反之继续递归执行
+		if (_args.length == 0){
+			return fun.apply(this,args.concat(_args))
+		}else {
+			return currying.call(this,fun,...args.concat(_args))
+		}
+	}
+}
+function curry(fn) {
+    let judge = (...args) => {
+        if (args.length == fn.length) return fn(...args)
+        return (...arg) => judge(...args, ...arg)
+    }
+    return judge
+}
+
+// 偏函数
+// 将一个n参的函数转换成固定x参的函数 剩余参数(n-x)将在下次调用全部转入
+function partial(fn,...args){
+    return(...arg)=>{
+        return fn(...args,arg);
+    }
+}
+
+// JSONP
+// AJAX
+
+
+
+
+
+
+
 
 
 
