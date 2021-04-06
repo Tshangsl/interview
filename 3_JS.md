@@ -671,6 +671,13 @@ JS
     3.Object.getOwnPropertyNames(obj):返回一个数组 包含对象自身的所有属性(不含Symbol属性 包含不可枚举属性)
     4.Object.getOwnPropertySymbols(obj)：返回一个数组，包含对象自身的所有 Symbol 属性。
     5.Reflect.ownKeys(obj)：返回一个数组，包含对象自身的所有属性（不含继承的）。
+19.Object.assign
+    常见用途
+        1.为对象添加属性
+        2.为对象添加方法
+        3.克隆对象
+        4.合并多个对象
+        5.为属性指定默认值
 20.浅拷贝和深拷贝都是什么含义，有什么不同，如何实现
     1.浅拷贝只复制指向某个对象的指针，而不复制对象本身。
         （1）Object.assign() 
