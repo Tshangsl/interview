@@ -460,7 +460,25 @@ Object.create = function (proto, propertyObject = undefined) {
 // 由于undefined和null无法转成对象，所以如果它们作为参数，就会报错。
 // 如果非对象参数出现在源对象的位置（即非首参数），那么处理规则有所不同。首先，这些参数都会转成对象，如果无法转成对象，就会跳过。这意味着，如果undefined和null不在首参数，就不会报错
 // Object.assign可以用来处理数组，但是会把数组视为对象。
-
+// hasOwnProperty()方法返回一个布尔值 指示对象自身属性中是否具有指定属性(也就是 是否有指定的键)
+Object.assign = function(target,...source){
+    if(target === null||target === undefined){
+        throw new TypeError('target is null or undefined');
+    }
+    // 将target转化为对象
+    let ret = Object(target);
+    source.forEach(obj=>{
+        if(obj!=null){
+            for(let key in obj){
+                // 为什么要在此处进行判断 已经是key in obj
+                if(obj.hasOwnProperty(key)){
+                    ret[key] = obj[key];
+                }
+            }
+        }
+    })
+    return ret;
+}
 
 
 // 数组原型方法
