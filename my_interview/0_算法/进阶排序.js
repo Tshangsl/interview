@@ -24,14 +24,16 @@
 // 重复(递归/回溯) 有去有回(回溯)
 
 // 归并排序实现上依托的就是递归思想
-// function mergeSort(arr){
-//     const len = arr.length;
-//     if(len<=1){
-//         return arr;
-//     }
-//     const mid = Math.floor(len/2);
-//     const leftArr = 
-// }
+function mergeSort(arr){
+    const len = arr.length;
+    if(len<=1){
+        return arr;
+    }
+    const mid = Math.floor(len/2);
+    const leftArr = mergeSort(arr.slice(mid,len));
+    arr = mergeArr(leftArr,rightArr)
+    return arr;
+}
 
 
 // 归并排序时间复杂度O(nlog(n))
