@@ -126,14 +126,63 @@ console.log(postOrderTraversal(root));
 // 必须先定位到最左的叶子结点
 // 定位过程中 必然会途径目标结点的父结点、爷爷结点和各种辈分的祖宗结点：
 // 途径过的每一个结点，我们都要及时地把它入栈。这样当最左的叶子结点出栈时，第一个回溯到的就是它的父结点：
+const inorderTraversal = function(root) {
+    // 定义结果数组
+    const res = []  
+    // 初始化栈结构
+    const stack = []   
+    // 用一个 cur 结点充当游标
+    let cur = root  
+    // 当 cur 不为空、或者 stack 不为空时，重复以下逻辑
+    // stack.length stack存储的是没有被推入结果数组res的待遍历元素
+    // 只要stack不空 就意味着遍历没有结束 遍历动作需要继续重复
+    while(cur || stack.length) {
+        // 这个 while 的作用是把寻找最左叶子结点的过程中，途径的所有结点都记录下来 
+        // 寻找最左子节点过程中 把沿途所有结点记录到stack中
+        // 记录工作完成后 才会走到外层while的剩余逻辑中
+        // 这部分逻辑 从最左叶子结点开始
+        // 一层层回溯遍历左孩子的父节点和右侧兄弟结点 
+        while(cur) {
+            // 将途径的结点入栈
+            stack.push(cur)  
+            // 继续搜索当前结点的左孩子
+            cur = cur.left  
+        }
+        // 取出栈顶元素
+        cur = stack.pop()  
+        // 将栈顶元素入栈
+        res.push(cur.val)  
+        // 尝试读取 cur 结点的右孩子
+        cur = cur.right
+    }
+    // 返回结果数组
+    return res
+  };
+
+// 层序遍历衍生问题
+// BFS+队列
+// 变体 BFS过程中围绕结果数组内容
+
+// 对二叉树进行层序遍历时
+// 每一次while循环都对应着二叉树的某一层
+
+// ...
+
+// 翻转二叉树
+// 每一棵子树 重复 递归
+
+// 思路
+// 以递归的方式 遍历树种每一个结点 
+// 并将每一个结点的左右孩子进行交换
 
 
-
-
-
-
-
-
-
-
-
+const invertTree = function(root){
+    if(!root){
+        return
+    }
+    let left = invertTree(root.left);
+    let right = invertTree(root.right);
+    root.left = right;
+    root.right = left;
+    return root;
+}
