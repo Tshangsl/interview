@@ -24,7 +24,8 @@ post提交数据|参数无长度限制|数据放在http请求体|formData|不会
          Token 是令牌，访问资源接口（API）时所需要的资源凭证。Token 使服务端无状态化，不会存储会话信息。)
          (JWT:存放在cookie中 存放在localStorage中)
          (服务端验证客户端发来的token信息要进行数据的查询操作；JWT验证客户端发来的token信息就不用， 在服务端使用密钥校验就可以，不用数据库的查询。)
-5.localStorage(Document源对象 本地存储 除非手动清除否则一直有效)和 
+5.localStorage
+    (Document源对象 本地存储 除非手动清除否则一直有效)和 
     sessionStorage(session Storage对象 会话存储 会话结束时清除 浏览器关闭前有效)---解决了cookie存储空间不足问题 与cookie对比
     (5M|同源策略跨域无法访问|仅存储在客户端|以key和value形式存储数据)
     cookie(在浏览器和服务器间来回传递) sessionStorage localStorage(不会自动把数据发给服务器，仅在本地保存)对比
@@ -459,10 +460,10 @@ HTTP常见请求方式区别用途
                   第二步：当用户点击授权并登陆后，授权服务器将生成一个用户凭证（code）。这个用户凭证会附加在重定向的地址redirect_uri的后面；
                   第三步：用户再去请求时携带用户凭证（code），验证服务器返回一个访问令牌（Access Token）；
                   第四步：再去拿着令牌请求资源时，就会得到受保护的资源信息。
-7.JSON和JSONP
+8.JSON和JSONP
     JSON(JavaScript Object Notation)是一种轻量级的数据交换格式
     JSONP(JavaScript With Padding) 一个非官方的协议 它允许在服务器端集成Scripttags返回至客户端 通过JavaScript callback形式实现跨域访问
-8.跨域相关
+9.跨域相关
     (JSONP CORS Node中间件代理 nginx反向代理 postMessage)
     1.为什么会出现跨域问题？
         出于浏览器的同源策略限制，浏览器会拒绝跨域请求。
@@ -568,7 +569,7 @@ HTTP常见请求方式区别用途
         6.Web Sockets
             原理：
                 JS创建了web socket之后，会有一个HTTP请求发送到浏览器以发起连接。取得服务器响应后，建立的连接会使用HTTP升级从HTTP协议交换为web sockt协议。
-9.计算机网络体系结构
+10.计算机网络体系结构
     OSI(Open System Interconnection 开放式系统互连)七层协议
         应用层：允许访问OSI环境的手段
     　　表示层：对数据进行翻译、加密和压缩
@@ -588,7 +589,7 @@ HTTP常见请求方式区别用途
         网络层
         数据链路层
         物理层
-10.TCP和UDP(传输层)是什么 区别 应用场景TCP三次握手四次挥手
+11.TCP和UDP(传输层)是什么 区别 应用场景TCP三次握手四次挥手
     (TCP:面向连接 可靠 打电话 大部分情况下|UDP:面向非连接 不可靠 广播 实时性要求高)
     (TCP三次握手 建立可靠通信信道 确认双方发送接收机能正常)
     (TCP三次握手：
@@ -679,7 +680,7 @@ HTTP常见请求方式区别用途
             客户端没有收到ACK确认，会重新发送FIN请求。
         客户端TIME_WAIT状态的意义是什么？
             第四次挥手时，客户端发送给服务器的ACK有可能丢失，TIME_WAIT状态就是用来重发可能丢失的ACK报文。如果Server没有收到ACK，就会重发FIN，如果Client在2*MSL的时间内收到了FIN，就会重新发送ACK并再次等待2MSL，防止Server没有收到ACK而不断重发FIN。 MSL(Maximum Segment Lifetime)，指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。
-11.WebSocket Socket HTTP HTTPS
+12.WebSocket Socket HTTP HTTPS
     WebSocket
         通常应用层协议都是完全基于网络层协议TCP/UDP实现 例如HTTP SMTP POP3 
         而WebSocket是同时基于HTTP与TCP实现
@@ -741,7 +742,7 @@ HTTP常见请求方式区别用途
         为什么不直接使用Socket编程，基于TCP直接保持长连接，实现即时通讯？
 
         Socket编程针对C/S模式的，而浏览器是B/S模式，浏览器没法发起Socket请求，正因如此， W3C最后还是给出了浏览器的Socket----Websocket。
-18.WebSocket
+13.WebSocket
     WebSocket协议本质上是一个基于TCP的协议
     WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。
     使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。
@@ -750,7 +751,7 @@ HTTP常见请求方式区别用途
     长轮询和短轮询，WebSocket 是长轮询。
         具体比如在一个电商场景，商品的库存可能会变化，所以需要及时反映给用户，所以客户端会不停的发请求，然后服务器端会不停的去查变化，不管变不变，都返回，这个是短轮询。
         而长轮询则表现为如果没有变，就不返回，而是等待变或者超时（一般是十几秒）才返回，如果没有返回，客户端也不需要一直发请求，所以减少了双方的压力。
-19.WebSocket与Ajax的区别
+14.WebSocket与Ajax的区别
     本质不同
         Ajax（Asynchronous Javascript And XML） 即异步 JavaScript 和 XML。是一种创建交互式网页的应用的网页开发技术
         websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
@@ -763,9 +764,18 @@ HTTP常见请求方式区别用途
     发起人：
         AJAX 客户端发起 
         WebSocket 服务器端和客户端相互推送
+15.什么是AJAX，如何实现 ajax请求时，如何解释json数据
+    ajax是一种能够实现局部网页刷新的技术，可以使网页异步刷新。
+        ajax的实现主要包括四个步骤：
+            （1）创建核心对象XMLhttpRequest；
+            （2）利用open方法打开与服务器的连接；
+            （3）利用send方法发送请求；（"POST"请求时，还需额外设置请求头）
+            （4）监听服务器响应，接收返回值。
+    ajax请求时，如何解释json数据
+    如果是字符串形式的json：eval("("+ajax.response+")")
+    如果是本地的json文件：JSON.parse(data)
 
-
-11.TCP 如何保证有效传输及拥塞控制原理。
+16.TCP 如何保证有效传输及拥塞控制原理。
     (TCP拥塞控制 慢启动阈值 + 拥塞避免 快速重传 快速回复)
     tcp 是面向连接的、可靠的、传输层通信协议
     可靠体现在：
@@ -785,7 +795,7 @@ HTTP常见请求方式区别用途
                 。。。。
             3.快速回复
                 。。。
-12.TCP三次握手和四次挥手，为什么不是2/4次
+17.TCP三次握手和四次挥手，为什么不是2/4次
     三次握手
         1.一开始双方处于 CLOSED 状态，然后服务端开始监听某个端口进入 LISTEN 状态
         2.然后客户端主动发起连接，发送 SYN，然后自己变为 SYN-SENT，seq = x
@@ -804,18 +814,8 @@ HTTP常见请求方式区别用途
         服务端收到之后进入 CLOSED 状态
     客户端这个时候还需要等待两次 MSL 之后，如果没有收到服务端的重发请求，就表明 ACK 成功到达，挥手结束，客户端变为 CLOSED 状态，否则进行 ACK 重发
     。。。。
-13.什么是AJAX，如何实现 ajax请求时，如何解释json数据
-    ajax是一种能够实现局部网页刷新的技术，可以使网页异步刷新。
-        ajax的实现主要包括四个步骤：
-            （1）创建核心对象XMLhttpRequest；
-            （2）利用open方法打开与服务器的连接；
-            （3）利用send方法发送请求；（"POST"请求时，还需额外设置请求头）
-            （4）监听服务器响应，接收返回值。
-    ajax请求时，如何解释json数据
-    如果是字符串形式的json：eval("("+ajax.response+")")
-    如果是本地的json文件：JSON.parse(data)
 
-13.SSL有几次握手，具体过程|HTTPS握手过程
+18.SSL有几次握手，具体过程|HTTPS握手过程
     1.客户端先生成一个随机数，然后传输到服务端，并且会带上客户端这边支持的所有加密套件
     2.服务端拿到这个随机数之后先存的，服务端也生成一个随机数，这个随机数会伴随着服务端的证书，也就是我们之前说到的公钥，一起传输给客户端
     3.客户端拿到了服务端的随机数之后也先存着，通过服务端传给他的公钥生成一个预主秘钥，生成过程当中会产生一个新的随机数，所以总共是有三个随机数，客户端生成的这个随机数用公钥加密后传输给服务器这边，这个过程就是没有办法被中间人解析的一个过程，因为它使用的是公钥进行加密，只有服务端这边的私钥可以对其解密
@@ -823,7 +823,7 @@ HTTP常见请求方式区别用途
     5.最终服务端会选择一个客户端这边支持的加密套件，然后两边确定同时使用这同一个加密套件，对这三个随机数进行一个算法的操作，生成一个主秘钥，因为最后一个随机数只有客户端和服务端知道，中间人根本拿不到，所以他们生成的这个主秘钥也是中间人根本没有办法破解的，后期传输的数据就全部是通过这个主秘钥进行加密的，因为两边主秘钥是一样的，所以两边都能够对数据加密之后进行解密，中间人因为没有办法知道这个主秘钥，所以他没有办法对数据进行解密，所以这中间的数据传输就变成了安全的传输
 
     总体来说TLS握手就是通过交换三个随机数，然后计算出主会话密钥；由于安全性，会继续扩展出更多的临时密钥。保证通讯过程的绝对安全。
-14.axios是什么
+19.axios是什么
         是一个基于promise的HTTP库 可以用在浏览器和node.js中
         特点：
             1.从浏览器中创建XMLHttpRequests
@@ -837,7 +837,7 @@ HTTP常见请求方式区别用途
         安装：
             使用npm
                 npm install axios
-13.HTTP缓存
+20.HTTP缓存
     1.强缓存
     2.协商缓存
 
@@ -846,25 +846,42 @@ HTTP常见请求方式区别用途
 
         若资源更新，那么返回资源和 200 状态码
         如果资源未更新，那么告诉浏览器直接使用缓存获取资源
-17.在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
+21.在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
+    keep-alive标签的原理 有什么功能
     在 HTTP 中响应体的 Connection 字段指定为 keep-alive
-18.TCP 滑动窗口(发送窗口 接收窗口)
+22.TCP 滑动窗口(发送窗口 接收窗口)
     在 TCP 链接中，对于发送端和接收端而言，TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。
     而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。
     如果对方的接收缓存区满了，就不能再继续发送了。而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口。
     TCP 滑动窗口分为两种: 发送窗口和接收窗口。
-21.HTTP 如何实现长连接？在什么时候会超时？
+23.HTTP 如何实现长连接？在什么时候会超时？
     通过在头部（请求和响应头）设置 Connection: keep-alive，HTTP1.0协议支持，但是默认关闭，从HTTP1.1协议以后，连接默认都是长连接
         。。。
     实际上 HTTP 没有长短链接，只有 TCP 有，TCP 长连接可以复用一个 TCP 链接来发起多次 HTTP 请求，这样可以减少资源消耗，比如一次请求 HTML，可能还需要请求后续的 JS/CSS/图片等
-22.Fetch API与传统Request的区别
+24.Fetch API与传统Request的区别
     1.fetch 符合关注点分离，使用 Promise，API 更加丰富，支持 Async/Await 
     2.语意简单，更加语意化
     3.可以使用 isomorphic-fetch ，同构方便
+    传统AJAX时代 进行API等网络请求都是通过XMLHttpRequest或者封装后的框架进行网络请求 然而配置和调用方式混乱 对新手不友好
+    Fetch优点
+        1.语法简介 更加语义化 业务逻辑更清晰
+        2.基于标准Promise实现 支持async/await
+        3.同构方便 使用isomorphic-fetch
+    Promise简介
+        Fetch API是基于Promise设计的
+    fetch方法返回一个Promise对象 根据Promise API特性 
+        Fetch可以方便地使用then方法将各个处理逻辑串起来
+        使用Promise.resolve()/Promise.reject()方法
+        将分别返回肯定结果的Promise或否定结果地Promise
+        从而调用下一个then/catch 一旦then中的语句出现错误
+        也将跳到catch中
+    fetch请求常见数据格式
+        1.fetch请求本地文本数据
+        2.fetch请求本地JSON数据
+        3.fetch请求网络接口
 25.OPTION是干啥的？举个用到OPTION的例子？
     1.旨在发送一种探测请求，以确定针对某个目标地址的请求必须具有怎么样的约束，然后根据约束发送真正的请求。
     2.比如针对跨域资源的预检，就是采用 HTTP 的 OPTIONS 方法先发送的。用来处理跨域请求
-30.keep-alive标签的原理 有什么功能
 12.JWT Session Cookie
     1.jwttoken是无状态的 不在服务器端做任何存储
     2.jwt 适合做多端登录 session 可以做单点登录
@@ -985,6 +1002,42 @@ HTTP常见请求方式区别用途
         WebSocket与SSE区别：    
             WebSocket 是一个全双工的协议，也就是通信双方是平等的，可以相互发送消息
             而 SSE 的方式是单向通信的，只能由服务器端向客户端推送信息，如果客户端需要发送信息就是属于下一个 http 请求了。
+19.queryString&formData&json
+    (前端向后端发送HTTP请求时三种数据交换格式 )
+    Get请求参数是被存放在QueryString中的(可以通过request.getParameter()获取请求参数)
+    Post请求参数的存放位置与Content-Type有关
+        1.表单提交和Jquery异步请求
+            POST请求参数被存放在Form Data中(可以通过request.getParameter()获取请求参数)
+        2.JS原生异步请求XMLHttpRequedt
+            默认Content-Type:text/plain;charset=UTF-8参数Request PayLoad(无法通过request.getParameter()请求获取参数)        
+        3.文件上传
+            默认的Content-Type:multipart/form-data 参数存放在Request Payload
+        4.指定参数格式为JSON的POST请求
+            默认的Content-Type:application/json 参数存放在Request PayLoad(无法通过request.getParameter()获取请求参数)
+        基本的POST请求就是上述四种情况
+        最常用的就是表单的POST请求&Jquery的post异步请求
+        这种POST请求默认的
+        Content-Type:application/x-www-form-urlencoded也就是键值对的提交方式
+        剩下的三种方式都无法通过requedt.getParamter()/框架字段映射获取参数(这三种方式的Content-Type都不为application/x-www-form-urlencoded)
+        原因：
+            只有不是文件上传且Content-Type:'application/x-www-form-urlencoded'时
+            我们会将参数存放在Map中 
+            request.getParameter正是从此Map中取值            
+        如何接受上述2 3 4方式传参
+            1.文件上传我们需要框架的支持
+            2.可以设置Content-Type"application/x-www-form-urlencoded" (通用)
+            3.ContentType为"application/json" 是以Json格式传输数据,我们后台可以使用@RequestBody 注解接受
+            4.ContentType为"text/plain" 的,我们可以使用流进行读取
+        总结：
+            HTTP POST表单请求提交时：Content-Typeapplication/x-www-form-urlencoded，而使用原生AJAX的POST请求如果不指定请求头RequestHeader，默认使用的Content-Type是text/plain;charset=UTF-8。
+
+            表单提交数据是名值对的方式，而文件上传服务器需要特殊处理，普通的post请求数据格式不固定，不一定是名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。jquery在执行post请求时，会设置Content-Type为application/x-www-form-urlencoded，所以服务器能够正确解析，而使用原生ajax请求时，如果不显示的设置Content-Type，那么默认是text/plain，这时不能用request.getParameter(name)的形式获取，所以才只能通过获取原始数据流的方式来进行解析请求数据。
+
+
+
+
+
+
 
 
 

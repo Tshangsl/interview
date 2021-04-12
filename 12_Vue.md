@@ -1,22 +1,21 @@
 1.Vue事件驱动
-    1.数据驱动
+    1.数据驱动(数据改变->视图改变)
         数据发生改变时 视图也会进行更新 数据驱动视图
     2.响应式原理
         数据模型仅仅是普通的JS对象 修改它们的时候视图会进行更新
-    3.双向数据绑定原理
+    3.双向数据绑定原理(数据改变->视图改变 视图改变->数据改变)
         使用v-model指令绑定表单元素时 
         可以在视图直接获得数据
         视图改变时 数据也会进行更新
-    以上三者都是应用了一个底层原理
-    该底层原理由ES5的Object.defineProperty
-    Vue中底层原理的实现主要依赖存储器(getter/setter)
-    
-    数据劫持+发布订阅者模式实现双向数据绑定
+    以上三者底层原理 ES5的Object.defineProperty/数据劫持(setter&getter)+发布订阅观察者模式
+
     1.data中数据 Vue会通过观察者对象(Observer)将data选项中的所有key经过Object.defineProperty的getter和setter设置
     2.v-model指令
     绑定元素时 自动触发getter getter会返回一个初始值 这样就能在视图中看到数据
     视图中内容改变时 触发setter setter会通知Vue视图已经进行了更新 Vue会重新生成虚拟DOM 继而通过新旧虚拟DOM对比生成patch对象 再将patch对应渲染到视图中
 2.Vue
+(核心功能是一个视图模板引擎 在此基础上+组件系统components/客户端路由Vue-route/大规模状态管理Vuex->一个完整的框架)
+(Vue.js只提供Vue-cli生态中最核心 组件系统+双向数据绑定/数据驱动)
     Vue.js是一套用于构建用户界面的渐进式框架
     渐进式:
         Vue核心功能是一个视图模板引擎
@@ -36,8 +35,11 @@
     Vue.js两个核心
         组件系统
         数据驱动/双向数据绑定
-    双向数据绑定原理实现
-        1.实现一个Compile
+    双向数据绑定原理
+    概括：
+        ES5的Object.defineProperty/数据劫持(setter&getter)+发布订阅观察者模式
+    具体实现:(Compiler->Observer->Watcher)
+        1.实现一个Compiler
             对指令进行解析 初始化视图 订阅数据变更 绑定更新函数
         2.实现一个Observer 
             对数据进行劫持 通知数据的变化
@@ -70,9 +72,14 @@
 4.访问子组件的实例或者子元素
     在Vue中，我们不用获取dom节点，元素绑定ref之后，直接通过this.$refs即可调用，这样可以减少获取dom节点的消耗。
     ref特性就是为元素或子组件赋予一个ID引用,通过this.$refs.refName来访问元素或子组件的实例
-    ref被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的 $refs对象上。如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向该子组件实例
-    this.$refs是一个对象，持有当前组件中注册过 ref特性的所有 DOM 元素和子组件实例
-    $refs只有在组件渲染完成后才填充，在初始渲染的时候不能访问它们，并且它是非响应式的，因此不能用它在模板中做数据绑定
+    ref被用来给元素或子组件注册引用信息。
+    引用信息将会注册在父组件的 $refs对象上。
+    如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；
+    如果用在子组件上，引用就指向该子组件实例
+    this.$refs是一个对象，
+    持有当前组件中注册过ref特性的所有 DOM 元素和子组件实例
+    $refs只有在组件渲染完成后才填充，
+    初始渲染的时候不能访问它们，它是非响应式的，不能用它在模板中做数据绑定
     当ref和v-for一起使用时，获取到的引用将会是一个数组，包含循环数组源
     1.用ref特性为子组件赋予一个ID引用
         <base-input ref="myInput"></<base-input>
@@ -85,21 +92,23 @@
         </ul>
         console.log(this.$refs['mydiv'].getElementsByClassName('item')[0].innerHTML)//第一个li
     三种用法：
+        (普通元素 this.$ref.name 获取DOM元素)
+        (子组件   this.$ref.name 获取组件实例 可以使用组件所有方法)
+        (v-for&ref 用于元素/组件 引用信息 包含DOM节点/组件实例数组)
+        (ref本身是作为渲染结果被创建的 初始渲染时 不能访问/不是响应式 不应做数据绑定)
         1.ref加在普通的元素上 用this.$ref.name获取到的是dom元素
         2.ref加在子组件上 用this.$ref.name获取到的是组件实例 可以使用组件的所有方法
         3.如何利用v-for和ref获取一组数组或dom节点
-        当v-for用于元素或组件的时候 引用信息将是包含DOM节点或组件实例的数组
+        当v-for用于元素或组件的时候 
+        引用信息将是包含DOM节点或组件实例的数组
         PS:关于ref注册时间的重要说明 因为ref本身是作为渲染结果被创建的 在初始渲染的时候 你不能访问它们 它们还不存在 $ref也不是响应式的 不应该试图用它在模板中做数据绑定
         注意：
             1.ref需要在dom渲染完成后才会有 在使用的时候确保dom已经被渲染完成 比如在生命周期mounted(){}钩子中调用 或者在this.$nextTic(()=>{})中调用
             2.如果ref是循环出来的 有多个重名 那么ref的值会是一个数组 此时要拿到单个的ref只需要循环就可以
     预期：string
-    ref 被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的 $refs 对象上。如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向组件实例：
-    当 v-for 用于元素或组件的时候，引用信息将是包含 DOM 节点或组件实例的数组。
-    关于 ref 注册时间的重要说明：因为 ref 本身是作为渲染结果被创建的，在初始渲染的时候你不能访问它们 - 它们还不存在！$refs 也不是响应式的，因此你不应该试图用它在模板中做数据绑定。
 4.Vue组件之间的通信都有哪些？
-    1.props
-    2.this.$emit('input',data)
+    1.props 父组件->子组件
+    2.this.$emit('input',data) 子组件->父组件
     3.this.$root.$on('input',function(data){})和this.$root.$emit('emit',data)
     4.this.$refs.tree
     5.this.$parent
@@ -108,6 +117,21 @@
     子组件中访问父组件的实例/组件中访问到根实例？
     this.$parent/this.$root
 组件通信
+        (1.props/$emit  父子组件通信
+         2.ref $parent/$children 父子组件通信
+         3.$attrs/$listeners 隔代组件通信
+         4.provide/inject 隔代组件通信 
+         5.EventBus($emit/$on) 父子/兄弟/隔代组件通信
+         6.Vuex 父子/兄弟/隔代转组件通信
+        )
+        为什么需要组件通信
+            组件是Vue.js最强大的功能之一 
+            组件实例的作用域是相互独立的
+            意味着不同组件之间的数据无法相互引用
+        组件间几种关系
+            父子
+            隔代
+            兄弟        
         1.props / $emit 适用 父子组件通信
         2.ref 与 $parent / $children 适用 父子组件通信
             ref：
@@ -147,7 +171,11 @@
     String、Number、Boolean、Array、Object、Date、Function、Symbol， 
     此外还可以是一个自定义的构造函数Personnel，
     并且通过 instanceof 来验证propwokrer的值是否是通过这个自定义的构造函数创建的。
-6.is
+6.is(动态组件 is用法 
+        有些HTML元素对于哪些元素出现在其内部是有严格限制的
+        有些HTML元素只能出现在其他某些特定元素的内部
+        会被作为无效内容提升到外部 并导致最终渲染结果出错
+    )
     动态组件
         <component :is="componentName"></component>，
         componentName可以是在本页面已经注册的局部组件名和全局组件名,也可以是一个组件的选项对象。
@@ -160,12 +188,19 @@
             <li is="cardList"></li>
         </ul>
 7.在Vue事件中使用event对象
+    ($event.currentTarget 始终指向事件所绑定的元素)
+    ($event.target        始终指向事件发生时元素)
+
     1.@click="handleOpen" 默认第一个参数传入event对象;
     2.@click="handleOpen(0, $event)",如果自己需要传入参数和event对象，则需要使用$event来获取event对象并传入handleOpen。
 
     $event.currentTarget始终指向事件所绑定的元素，
-    而$event.target指向事件发生时的元素。
+    $event.target指向事件发生时的元素。
 8.表单修饰符和事件修饰符
+    (修饰符：以半角句号.指明的特殊后缀 用于指出一个指令应该以特殊方式绑定
+    为了更纯粹数据逻辑 Vue提供很多事件修饰符 来代替处理一些DOM事件细节
+    PS:事件修饰符顺序很重要
+    )
     修饰符 (modifier) 
         是以半角句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定。例如，.prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault()：
     为了更纯粹的数据逻辑，vue提供了很多事件修饰符，来代替处理一些 DOM 事件细节。
@@ -175,7 +210,6 @@
         4 .self：将事件绑定到自身，只有自身才能触发
         5 .once：只触发一次
         6 .passive：不阻止事件的默认行为
-
     事件修饰符(要注意顺序很重要，用@click.prevent.self会阻止所有的点击，而@click.self.prevent只会阻止对元素自身的点击。)
         .stop：阻止事件传递；
         .prevent： 阻止默认事件；
@@ -202,8 +236,19 @@
     .left
     .right
 10.在style上加scoped属性原理/需要注意哪些？
+    (Vue通过在DOM结构以及CSS样式上机上唯一标志 保证唯一 达到样式私有化 不污染全局)
+    (在公共组件中使用 修改公共组件样式需要用/deep/)
     原理：
         vue通过在DOM结构以及css样式上加上唯一的标记`data-v-xxxxxx`，保证唯一，达到样式私有化，不污染全局的作用。
+        如果一个项目所有style标签都加上了scoped属性
+        相当于实现了样式的模块化
+    scoped穿透(样式穿透)
+        (deep是>>>别名)
+        深度作用选择器(>>> /deep/)
+        希望scoped样式中的一个选择器能作用得更深
+        例如影响子组件 可以使用>>>操作符
+        有些像SASS之类的预处理器无法正确解析>>>
+        这种情况下可以用/deep/操作符取而代之
     注意：
         如果在公共组件中使用，修改公共组件的样式需要用/deep/。
 11.Vue渲染模板如何保留模板中的HTML注释
@@ -215,15 +260,28 @@
 Dom异步更新：
     Vue 异步执行 DOM 更新。
     只要观察到数据变化，Vue 将开启一个队列，并缓冲在同一事件循环中发生的所有数据改变。
-    如果同一个 watcher 被多次触发，只会被推入到队列中一次。这种在缓冲时去除重复数据对于避免不必要的计算和 DOM 操作上非常重要。
-    然后，在下一个的事件循环“tick”中，Vue 刷新队列并执行实际 (已去重的) 工作。
-    Vue 在内部尝试对异步队列使用原生的 Promise.then 和MessageChannel，如果执行环境不支持，会采用 setTimeout(fn, 0)代替。
-    为了在数据变化之后等待 Vue 完成更新 DOM ，可以在数据变化之后立即使用Vue.nextTick(callback) 。这样回调函数在 DOM 更新完成后就会调用。
+    如果同一个 watcher 被多次触发，只会被推入到队列中一次。
+    在缓冲时去除重复数据对于避免不必要的计算和 DOM 操作上非常重要。
+    下一个的事件循环“tick”中，Vue 刷新队列并执行实际 (已去重的) 工作。
+    Vue 在内部尝试对异步队列使用原生的 Promise.then 和MessageChannel，
+    如果执行环境不支持，会采用 setTimeout(fn, 0)代替。
+    为了在数据变化之后等待 Vue 完成更新 DOM ，
+    可以在数据变化之后立即使用Vue.nextTick(callback) 。
+    这样回调函数在 DOM 更新完成后就会调用。
 Vue中nextTick机制
+    (下次DOM更新循环结束后执行延迟回调
+    修改数据后立即使用这个方法
+    获取更新后的DOM)
+    (Vue中Created钩子函数执行时
+    DOM其实未进行任何渲染
+    所以需要放在nextTick中去获取DOM
+    与其对应的生命周期钩子函数是mounted)
+
     定义watch监听msg
     实际上会被Vue这样调用
     vm.$watch(keyOrFn,handler,options)
-    $watch是初始化时 为vm绑定的一个函数 用于创建Watcher对象
+    $watch是初始化时 为vm绑定的一个函数 
+    用于创建Watcher对象
 
     下次DOM更新循环结束之后执行延迟回调
     修改数据之后立即使用这个方法 获取更新后的DOM
@@ -251,6 +309,9 @@ nextTick：
         将handleadd回调延迟到下次 DOM 更新循环之后执行。
     应用场景:(什么时候需要使用Vue.nextTick()函数)
         (Vue.nextTick：在DOM更新后做点什么 参数回调函数DOM更新完调用)
+        (Vue.nextTick  在DOM更新后做点什么 参数回调函数DOM更新完调用)
+        (数据变化后要执行某个操作 这个操作需要使用随数据改变而改变DOM结构 这个操作应该放进Vue.$nextTick()的回调函数中)
+        (为了在数据变化之后等待Vue完成更新DOM 可以在数据变化之后立即使用Vue.nextTick(callback)这样回调函数在DOM更新完后就会调用)
         1.在Vue生命周期的created()钩子函数进行的DOM操作一定要放在Vue.nextTick()的回调函数中
             在created()钩子函数执行的时候DOM 
             其实并未进行任何渲染，而此时进行DOM操作无异于徒劳，所以此处一定要将DOM操作的js代码放进Vue.nextTick()的回调函数中。
@@ -266,8 +327,9 @@ NextTick 是做什么的 其原理
                 2.主线程之外，还存在一个"任务队列"（task queue）。只要异步任务有了运行结果，就在"任务队列"之中放置一个事件。
                 3.一旦"执行栈"中的所有同步任务执行完毕，系统就会读取"任务队列"，看看里面有哪些事件。那些对应的异步任务，于是结束等待状态，进入执行栈.
                 4.开始执行。主线程不断重复上面的第三步。
-        主线程的执行过程就是一个 tick，而所有的异步结果都是通过 “任务队列” 来调度。 消
-        息队列中存放的是一个个的任务（task）。
+        (主线程的执行过程就是一个tick 而所有的异步操作都是通过任务队列来调度)
+        主线程的执行过程就是一个 tick，而所有的异步结果都是通过 “任务队列” 来调度。 
+        消息队列中存放的是一个个的任务（task）。
         规范中规定 task 分为两大类，分别是 macro task(宏任务) 和 micro task(微任务).
         并且每个 macro task 结束后，都要清空所有的 micro task。
         浏览器中常见宏任务
@@ -286,22 +348,36 @@ NextTick 是做什么的 其原理
             3.考虑兼容问题,vue 做了 microtask 向 macrotask 的降级方案
 12.Vue render函数(用来生成VDOM)
     1.Vue整体流程
-        1.模板通过编译生成AST树
+        1.模板通过编译Compiler生成AST(Abstract Synax Tree)抽象语法树
         2.AST生成Vue的render渲染函数
         3.render渲染函数结合数据生成VNODE(Virtual DOM Node)树
         4.diff和patch后生成新的UI界面(真实DOM渲染)
         概念解释：
         模板：
-            Vue模板是纯HTML 基于Vue的模板语法 可以比较方便地处理数据和UI界面
+            Vue模板是纯HTML 
+            基于Vue的模板语法 可以比较方便地处理数据和UI界面
         AST：(Abstract Synax Tree)
-            Vue将HTML模板解析为AST 并对AST进行一些优化的标记处理 提取最大的静态树 以使VDOM直接跳过后面的diff
+            Vue将HTML模板解析为AST 
+            并对AST进行一些优化的标记处理 
+            提取最大的静态树 
+            以使VDOM直接跳过后面的diff
         render渲染函数
-            用来生成VDOM Vue推荐使用模板构建应用程序
+            (Vue推荐使用模板构建应用程序 底层实现中Vue最终还是会将模板编译成render渲染函数 若想得到更好的控制 可以直接写渲染函数)
+            用来生成VDOM 
+            Vue推荐使用模板构建应用程序
             底层实现中Vue最终还是会将模板编译成渲染函数
             若我们想要得到更好的控制 可以直接写渲染函数
         Watcher：
-            每一个Vue组件都有一个对应的watcher 它会在组件render时收集组件所依赖的数据 并在依赖有更新时 触发组件重新渲染 Vue会自动优化并更新需要更新的DOM
+            (每一个Vue组件都有一个对应的watcher 它会在组件render时收集组件所依赖的数据
+            并在依赖更新时触发组件重新渲染 Vue会自动优化并更新需要更新的DOM)
+            每一个Vue组件都有一个对应的watcher 
+            它会在组件render时收集组件所依赖的数据 
+            并在依赖有更新时 
+            触发组件重新渲染 
+            Vue会自动优化并更新需要更新的DOM
         render函数可以作为一条分割线
+            (render函数左边编译期 将Vue模板转换成渲染函数)
+            (render函数右边运行时 将渲染函数生成的VDOM树 进行diff和patch)
             1.render函数左边可以称为编译期 将Vue模板转换成渲染函数
             2.render函数右边可以称为运行时 将渲染函数生成的VDOM树 进行diff和patch
     2.render
@@ -314,6 +390,18 @@ NextTick 是做什么的 其原理
         3.Vue支持我们通过data参数传递一个JavaScript对象作为组件数据, Vue将遍历data对象属性, 使用Object.defineProperty方法设置描述对象, 通过gett/setter函数来拦截对该属性的读取和修改.
         4.Vue创建了一层Watcher层, 在组件渲染的过程中把属性记录为依赖, 当依赖项的setter被调用时, 会通知Watcher重新计算, 从而使它关联的组件得以更新.
     4.Vue渲染机制
+        (独立构建   包含模板编译器   渲染过程 HTML字符串->render函数->VNODE->真实DOM)
+        (运行时构建 不包含模板编译器 渲染过程 render函数->VNODE->真实DOM)
+        (运行时构建的包 比独立构建少一个模板编译器(因此速度上会更快))
+        (渲染过程提供三种模板(自定义render/template/el) 这三种模板最终都要得到render函数 )
+        (渲染具体过程
+            1.new Vue执行初始化
+            2.挂载$mount 通过自定义render方法 template el 等生成render渲染函数
+            3.通过Watcher监听数据的变化
+            4.数据变化时 render函数执行生成VNODE虚拟NODE对象
+            5.DOM diff算法 对比新旧VNode对象 
+                通过patch算法 添加/修改/删除真正的DOM元素
+        )
         两个概念
             1.独立构建
                 包含模板编译器
@@ -338,11 +426,13 @@ NextTick 是做什么的 其原理
             第2个参数: { Object }, 可选
             第3个参数: { String | Array }, 可选
     6.使用render函数替代模板功能
-        使用Vue模板时 可在模板中灵活的使用v-if、v-for、v-model和<slot>等模板语法。但在render函数中是没有提供专用的API。如果在render使用这些，需要使用原生的JavaScript来实现。
+        使用Vue模板时 可在模板中灵活的使用v-if、v-for、v-model和<slot>等模板语法。
+        但在render函数中是没有提供专用的API。如果在render使用这些，需要使用原生的JavaScript来实现。
 13.虚拟DOM/VDOM
-    1.真实DOM 浏览器解析流程
+    1.真实DOM 浏览器解析流程 真实DOM在浏览器渲染时遇到的问题引出虚拟DOM
         webkit渲染引擎工作流程
         所有浏览器渲染引擎工作流程大致分为5步
+            (DOM树 CSSOM树 Render树 Layout布局 Painting绘制 实际进行时不是独立的会有交叉)
             1.创建DOM树
                 用HTML分析器分析HTML元素 构建一颗DOM树
             2.创建Style Rules
@@ -362,11 +452,17 @@ NextTick 是做什么的 其原理
             3.CSS 的解析注意点
                 CSS的解析式从右向左逆向解析的 嵌套标签越多 解析越慢
             4.JS操作真实DOM代价
-                用我们传统的开发模式，原生 JS 或 JQ 操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程。在一次操作中，我需要更新 10 个 DOM 节点，浏览器收到第一个 DOM 请求后并不知道还有 9 次更新操作，因此会马上执行流程，最终执行10 次。例如，第一次计算完，紧接着下一个 DOM 更新请求，这个节点的坐标值就变了，前一次计算为无用功。计算 DOM 节点坐标值等都是白白浪费的性能。即使计算机硬件一直在迭代更新，操作 DOM 的代价仍旧是昂贵的，频繁操作还是会出现页面卡顿，影响用户体验
-    2.虚拟DOM(Virtual-DOM)--JS对象模拟DOM
+                用我们传统的开发模式，原生 JS 或 JQ 操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程。
+                在一次操作中，我需要更新 10 个 DOM 节点，浏览器收到第一个 DOM 请求后并不知道还有 9 次更新操作，因此会马上执行流程，最终执行10 次。例如，第一次计算完，紧接着下一个 DOM 更新请求，这个节点的坐标值就变了，前一次计算为无用功。
+                计算 DOM 节点坐标值等都是白白浪费的性能。即使计算机硬件一直在迭代更新，操作 DOM 的代价仍旧是昂贵的，频繁操作还是会出现页面卡顿，影响用户体验
+    2.虚拟DOM(Virtual-DOM)--使用JS对象模拟
         存在意义/实现方式：
         为了解决浏览器性能设计出来
-        页面的更新可以先全部反映在JS对象(虚拟DOM)上 操作内存中的JS对象的速度显然更快 等更新完成后 将最终的JS对象映射成真实的DOM 交由浏览器绘制
+        页面的更新可以先全部反映在JS对象(虚拟DOM)上 
+        操作内存中的JS对象的速度显然更快 
+        等更新完成后 
+        将最终的JS对象映射成真实的DOM 
+        交由浏览器绘制
         用JS对象模拟DOM树：
             1.JS对象来表示DOM节点 使用对象的属性记录节点的类型/属性/子节点
             2.渲染用JS表示的DOM对象
@@ -396,6 +492,10 @@ NextTick 是做什么的 其原理
         1.用JS对象模拟DOM树(VNode定义)
         2.比较两棵虚拟DOM树的差异 diff.js
         3.将两个虚拟DOM对象的差异应用到真正的DOM树 patch.js
+
+        1.用JS对象模拟DOM树(VNode定义)
+        2.比较两棵虚拟DOM树差异 diff.js
+        3.将两个虚拟DOM对象的差异应用到真正的DOM patch.js
 14.虚拟DOM&DOM-diff
     虚拟DOM存在意义：
         虚拟DOM就是为了解决浏览器性能问题而被设计出来的。
@@ -404,17 +504,23 @@ NextTick 是做什么的 其原理
     虚拟DOM/VDOM：
         1.用JS去按照DOM结构来实现树状结构对象/可叫DOM对象
         2.是仅存在内存中的DOM 因还未展示到页面中 所以称作VDOM
-        3.Virtual DOM其实就是一棵以JavaScript对象(VNode节点)为基础的树 用对象属性来描述节点 实际上它只是对一层真实DOM的抽象 最终可以通过一系列操作使这棵树映射到真实环境上。
+        3.Virtual DOM其实就是一棵以JavaScript对象(VNode节点)为基础的树 
+            用对象属性来描述节点 实际上它只是对一层真实DOM的抽象 最终可以通过一系列操作使这棵树映射到真实环境上。
         4.JS中虚拟DOM表现为一个Object对象 并且最少包含标签名(tag)属性(attrs)和子元素对象(children)三个属性 不同框架对这三个属性的命名可能会有差异
-        5.，Virtual DOM 对象的节点跟 DOM Tree 每个位置的属性一一对应的，因为人们创造出虚拟 DOM 就是为了更好地将虚拟节点渲染到视图上，也就是把虚拟DOM变成真实的 DOM 节点，提高视图的渲染性能。
+        5.Virtual DOM 对象的节点跟 DOM Tree 每个位置的属性一一对应的，因为人们创造出虚拟 DOM 就是为了更好地将虚拟节点渲染到视图上，也就是把虚拟DOM变成真实的 DOM 节点，提高视图的渲染性能。
     优点：
         1.减少DOM操作
             两个虚拟DOM对比用到的算法就是DOM diff
             JS层面上 DOM操作并不慢 慢在浏览器渲染的过程里，改变一行数据就要全部重新渲染
-            虚拟 DOM 比 DOM 快，是因为需要更新的 DOM 节点要比原生 DOM 操作更新的节点少，浏览器重绘的时间更短
-            虚拟 DOM 的优势不在于单次的操作，用对比的算法，它可以将多次操作合并成一次操作，在大量、频繁的数据更新下，能够对视图进行合理、高效的更新。
+            虚拟 DOM 比 DOM 快，
+            因为需要更新的 DOM 节点要比原生 DOM 操作更新的节点少，浏览器重绘的时间更短
+            虚拟 DOM 的优势不在于单次的操作，
+            用对比的算法，它可以将多次操作合并成一次操作，
+            在大量、频繁的数据更新下，能够对视图进行合理、高效的更新。
         2.跨平台
-            虚拟DOM是以JS对象作为基础 本质就是一个JS对象 并不依赖真实平台环境 使它具有跨平台能力 在浏览器上可以变成DOM 其他平台可以变成相应渲染对象
+            虚拟DOM是以JS对象作为基础 本质就是一个JS对象 并不依赖真实平台环境 使它具有跨平台能力 
+            在浏览器上可以变成DOM 
+            其他平台可以变成相应渲染对象
     优点:
             保证性能下限
             无需手动操作DOM
@@ -452,7 +558,7 @@ NextTick 是做什么的 其原理
             创建节点
             删除节点
             更新节点
-        给定任意两棵树 采用先序深度优先遍历的算法找到最少的转换步骤d
+        给定任意两棵树 采用先序深度优先遍历的算法找到最少的转换步骤
         DOM-diff比较两个虚拟DOM的区别 也就是在比较两个对象的区别
         作用：
             根据两个虚拟对象创建出补丁 描述改变的内容 将这个补丁用来更新DOM
@@ -462,36 +568,56 @@ NextTick 是做什么的 其原理
             3.如果有事件发生修改了虚拟DOM 比较两棵虚拟DOM树的差异 得到差异对象diff
             4.把差异对象应用到真正的DOM树上(patch)
 15.生命周期的实例方法
-    1.vm.$mount()，返回vm，可链式调用其它实例方法；(不常用)
-    2.vm.$forceUpdate()，强制Vue实例重新渲染，不是重新加载组件,会触发beforeUpdate和updated这两个钩子函数，不会触发其他的钩子函数。它仅仅影响实例本身和插入插槽内容的子组件，而不是所有子组件；
-    3.vm.$nextTick()，参数为callback，等待视图全部更新后执行，回调函数的this自动绑定到调用它的实例上；
-    4.vm.$destroy()，销毁一个实例。清理它与其它实例的连接，解绑全部指令及事件监听器,但不能清理实例的DOM和data，会触发beforeDestroy和destroyed两个钩子函数。
+    1.vm.$mount()
+        返回vm，可链式调用其它实例方法；(不常用)
+    2.vm.$forceUpdate()
+        强制Vue实例重新渲染，不是重新加载组件
+        会触发beforeUpdate和updated这两个钩子函数
+        不会触发其他的钩子函数
+        仅仅影响实例本身和插入插槽内容的子组件，
+        而不是所有子组件；
+    3.vm.$nextTick()
+        参数为callback，等待视图全部更新后执行，回调函数的this自动绑定到调用它的实例上；
+    4.vm.$destroy()
+        销毁一个实例。
+        清理它与其它实例的连接，解绑全部指令及事件监听器,
+        不能清理实例的DOM和data，
+        会触发beforeDestroy和destroyed两个钩子函数。
 16.vue初始化和生命周期钩子函数
 (初始化:开始创建、初始化数据、编译模板、挂载Dom、数据变化时更新DOM、卸载)
 (生命周期:Vue实例从创建到销毁的过程)
 (生命周期钩子函数
 beforeCreate(
-    实例初始化之后 创建之前被调用 
-    数据data也没有 DOM也没生成。
+    实例初始化之后 
+    创建之前被调用 
+    数据data没有 
+    DOM没生成。
     el  undefined
     data undefined
     meaasge undefined
 )
 created(
-    模板渲染成html前（vm.$el未定义）故数据初始化最好在这阶段完成；
+    模板渲染成html前（vm.$el未定义）
+    故数据初始化最好在这阶段完成；
     实例创建后被调用 完成数据观测，属性和方法的运算
     watch/event事件回调 
-    能读取到数据data的值 DOM还没生成，挂载属性el还不存在。
+    能读取到数据data的值 
+    DOM还没生成
+    挂载属性el还不存在。
     el  undefined
     data [Object Object]
     meaasge Vue生命周期
 )
 beforeMount(
-    $el挂载前被调用，相关的 render 函数首次被调用，期间将模块渲染成html,此时vm.$el还是未定义；
+    $el挂载前被调用
+    相关的 render 函数首次被调用
+    期间将模块渲染成html
+    此时vm.$el还是未定义；
     将编译完成的html挂载到对应的虚拟DOM时触发的钩子
     此时页面并没有内容。
     即将挂载 
-    此时的el不再是undefined,成功关联到我们指定的dom节点
+    此时的el不再是undefined
+    成功关联到我们指定的dom节点
     此时的{{test}}还没有成功渲染成data中的数据，页面没有内容。
     相关的render函数首次被调用。
     el  [Object HTMLDivElement]
@@ -499,7 +625,11 @@ beforeMount(
     meaasge Vue生命周期
 ) 
 mounted(
-    $el挂载后被调用，此时vm.$el可以调用，不能保证所有的子组件都挂载，要等视图全部更新完毕用vm.$nextTick();
+    编译好的HTML挂载到页面完成后所执行的事件钩子函数
+    $el挂载后被调用
+    此时vm.$el可以调用
+    不能保证所有的子组件都挂载
+    要等视图全部更新完毕用vm.$nextTick();
     编译好的html挂载到页面完成后所执行的事件钩子函数。
     挂载完毕阶段
     此时编译好的HTML已经挂载到了页面上，页面上已经渲染出了数据。一般会利用这个钩子函数做一些ajax请求获取数据进行数据初始化。
@@ -509,22 +639,31 @@ mounted(
     此阶段中DOM渲染完成
 ) 
 beforeUpadate(
-    修改vue实例的data时，vue就会自动帮我们更新渲染视图
-    检测到我们要修改数据 更新渲染视图之前触发
+    检测到修改数据
+    更新渲染视图之前触发
+
+    修改vue实例的data时
+    vue就会自动帮我们更新渲染视图
+    检测到我们要修改数据 
+    更新渲染视图之前触发
 )
 updated(
-    此阶段为更新渲染视图之后，此时再读取视图上的内容，已经是最新的内容。
+    此阶段为更新渲染视图之后触发
+    此时再读取视图上的内容，已经是最新的内容。
     PS:
     1.该钩子在服务器端渲染期间不被调用。
-    2.应该避免在此期间更改状态，因为这可能会导致更新无限循环。
+    2.应该避免在此期间更改状态，
+    因为这可能会导致更新无限循环。
 )
 beforeDestory(
-    调用实例的destroy() 此时实例仍然完全可用；
+    实例销毁前触发
+    调用实例的destroy() 
+    此时实例仍然完全可用；
     方法可以销毁当前的组件，在销毁前，
     会触发beforeDestroy钩子。
 )
 destoryed(
-    成功销毁之后，会触发destroyed钩子，
+    实例销毁后触发
     此时该实例与其他实例的关联已经被清除，
     Vue实例指示的所有东西都会解绑定，
     所有的事件监听器会被移除，
@@ -559,6 +698,7 @@ destoryed(
             keep-alive专属 组件被销毁时调用
         8. 一般结合路由和动态组件一起使用，
 18.Vue中的key
+    (VDOM DOM diff 新旧VDOM对比做辨识用)
     注意：
         1.不要使用对象或数组之类的非基本类型值作为key，请用字符串或数值类型的值；
         2.不要使用数组的index作为key值，因为在删除数组某一项，index也会随之变化，导致key变化，渲染会出错。
@@ -610,10 +750,13 @@ destoryed(
                 子 beforeDestroy -> 
                 子 destroyed -> 
                 父 destroyed
-    比如有父组件 Parent 和子组件 Child，如果父组件监听到子组件挂载 mounted 就做一些逻辑处理，可以通过以下写法实现：
-    以上需要手动通过 $emit 触发父组件的事件，更简单的方式可以在父组件引用子组件时通过 @hook 来监听即可，如下所示：
+    比如有父组件 Parent 和子组件 Child
+    如果父组件监听到子组件挂载 mounted 就做一些逻辑处理
+    可以通过以下写法实现：
+
+    以上需要手动通过 $emit 触发父组件的事件，更简单的方式可以在父组件引用子组件时通过 @hook 来监听即可如下所示：
     当然 @hook 方法不仅仅是可以监听 mounted，其它的生命周期事件，例如：created，updated 等都可以监听。
-20.在哪个生命周期内调用异步请求/什么阶段才能访问操作DOM？
+20.在哪个生命周期内调用异步请求(created)/什么阶段才能访问操作DOM(mounted)？
     1.(created beforeMounted mounted)
     这三个钩子函数中data 已创建
     可将服务端端返回的数据进行赋值。
@@ -726,8 +869,11 @@ destoryed(
         触发 beforeDestroy 和 destroyed 的钩子。
         在大多数场景中你不应该调用这个方法。最好使用 v-if 和 v-for 指令以数据驱动的方式控制子组件的生命周期。
 22.模板语法
-    1.Vue.js 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。所有 Vue.js 的模板都是合法的 HTML，所以能被遵循规范的浏览器和 HTML 解析器解析。
-    2.在底层的实现上，Vue 将模板编译成虚拟 DOM 渲染函数。结合响应系统，Vue 能够智能地计算出最少需要重新渲染多少组件，并把 DOM 操作次数减到最少。
+    1.Vue.js 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。
+        所有 Vue.js 的模板都是合法的 HTML，所以能被遵循规范的浏览器和 HTML 解析器解析。
+    2.在底层的实现上，
+        Vue 将模板编译成虚拟 DOM 渲染render函数。
+        结合响应系统，Vue 能够智能地计算出最少需要重新渲染多少组件，并把 DOM 操作次数减到最少。
     3.如果你熟悉虚拟 DOM 并且偏爱 JavaScript 的原始力量，你也可以不用模板，直接写渲染 (render) 函数，使用可选的 JSX 语法。
 23.object.defineProperty(obj,prop,descriptor)
     参数:(三个参数都是必填)
