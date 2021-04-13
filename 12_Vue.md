@@ -106,17 +106,16 @@
             1.ref需要在dom渲染完成后才会有 在使用的时候确保dom已经被渲染完成 比如在生命周期mounted(){}钩子中调用 或者在this.$nextTic(()=>{})中调用
             2.如果ref是循环出来的 有多个重名 那么ref的值会是一个数组 此时要拿到单个的ref只需要循环就可以
     预期：string
-4.Vue组件之间的通信都有哪些？
-    1.props 父组件->子组件
-    2.this.$emit('input',data) 子组件->父组件
-    3.this.$root.$on('input',function(data){})和this.$root.$emit('emit',data)
-    4.this.$refs.tree
-    5.this.$parent
-    6.provide和inject
-    7.vueX
-    子组件中访问父组件的实例/组件中访问到根实例？
-    this.$parent/this.$root
-组件通信
+4.Vue组件通信
+    为什么需要组件通信
+            组件是Vue.js最强大的功能之一 
+            组件实例的作用域是相互独立的
+            意味着不同组件之间的数据无法相互引用
+    组件间几种关系
+            父子
+            隔代
+            兄弟        
+    组件通信几种实现方式
         (1.props/$emit  父子组件通信
          2.ref $parent/$children 父子组件通信
          3.$attrs/$listeners 隔代组件通信
@@ -124,14 +123,6 @@
          5.EventBus($emit/$on) 父子/兄弟/隔代组件通信
          6.Vuex 父子/兄弟/隔代转组件通信
         )
-        为什么需要组件通信
-            组件是Vue.js最强大的功能之一 
-            组件实例的作用域是相互独立的
-            意味着不同组件之间的数据无法相互引用
-        组件间几种关系
-            父子
-            隔代
-            兄弟        
         1.props / $emit 适用 父子组件通信
         2.ref 与 $parent / $children 适用 父子组件通信
             ref：
@@ -308,8 +299,8 @@ nextTick：
         vm.$nextTick(() =>{this.handleadd()}),
         将handleadd回调延迟到下次 DOM 更新循环之后执行。
     应用场景:(什么时候需要使用Vue.nextTick()函数)
-        (Vue.nextTick：在DOM更新后做点什么 参数回调函数DOM更新完调用)
-        (Vue.nextTick  在DOM更新后做点什么 参数回调函数DOM更新完调用)
+        (Vue.nextTick：在DOM更新后做点什么 参数回调函数 DOM更新完调用)
+        (Vue.nextTick  在DOM更新后做点什么 参数回调函数 DOM更新完调用)
         (数据变化后要执行某个操作 这个操作需要使用随数据改变而改变DOM结构 这个操作应该放进Vue.$nextTick()的回调函数中)
         (为了在数据变化之后等待Vue完成更新DOM 可以在数据变化之后立即使用Vue.nextTick(callback)这样回调函数在DOM更新完后就会调用)
         1.在Vue生命周期的created()钩子函数进行的DOM操作一定要放在Vue.nextTick()的回调函数中
@@ -347,6 +338,7 @@ NextTick 是做什么的 其原理
             2.microtask 因为其高优先级特性，能确保队列中的微任务在一次事件循环前被执行完毕
             3.考虑兼容问题,vue 做了 microtask 向 macrotask 的降级方案
 12.Vue render函数(用来生成VDOM)
+    Vue渲染/render函数用来生成VDOM/虚拟DOM
     1.Vue整体流程
         1.模板通过编译Compiler生成AST(Abstract Synax Tree)抽象语法树
         2.AST生成Vue的render渲染函数
@@ -532,7 +524,7 @@ NextTick 是做什么的 其原理
             2.diff 算法 — 比较两棵虚拟 DOM 树的差异；
             3.pach 算法 — 将两个虚拟 DOM 对象的差异应用到真正的 DOM 树。
     DOM-diff：(比较两颗虚拟DOM树用到的算法)
-        DIFF算法：
+        DIFF算法：(层级比较/组件比较/元素比较)
             1.diff算法仅在两个树的同级的虚拟节点之间做比较，递归地进行比较，最终实现整个 DOM 树的更新。
             2.是React框架采用的方法 也就是判断DOM是否发生了变化 然后找到这个变化 这样我们才能实现差量更新
         三个步骤：
@@ -588,40 +580,48 @@ NextTick 是做什么的 其原理
 (生命周期:Vue实例从创建到销毁的过程)
 (生命周期钩子函数
 beforeCreate(
-    实例初始化之后 
-    创建之前被调用 
-    数据data没有 
-    DOM没生成。
+    实例el初始化之后 创建之前
+    被调用 
+    Data 不能读取
+    DOM 未生成
+
     el  undefined
     data undefined
+    DOM 未生成
     meaasge undefined
 )
 created(
-    模板渲染成html前（vm.$el未定义）
-    故数据初始化最好在这阶段完成；
-    实例创建后被调用 完成数据观测，属性和方法的运算
-    watch/event事件回调 
-    能读取到数据data的值 
-    DOM还没生成
+    模板渲染成html前（vm.$el未定义）数据初始化最好在此阶段完成
+    实例创建后被调用 完成数据观测，属性和方法的运算watch/event事件回调 
+
     挂载属性el还不存在。
+    能读取到数据data的值 
+    DOM未生成(模板渲染成HTML之前)
+
     el  undefined
     data [Object Object]
+    DOM未生成
     meaasge Vue生命周期
 )
 beforeMount(
+    $el挂在前 相关Render函数首次被调用 将模块渲染成HTML
     $el挂载前被调用
     相关的 render 函数首次被调用
     期间将模块渲染成html
     此时vm.$el还是未定义；
+
     将编译完成的html挂载到对应的虚拟DOM时触发的钩子
+
     此时页面并没有内容。
     即将挂载 
     此时的el不再是undefined
     成功关联到我们指定的dom节点
     此时的{{test}}还没有成功渲染成data中的数据，页面没有内容。
     相关的render函数首次被调用。
+
     el  [Object HTMLDivElement]
     data [Object Object]
+    DOM 相关render函数首次被调用 将模块渲染成HTML
     meaasge Vue生命周期
 ) 
 mounted(
