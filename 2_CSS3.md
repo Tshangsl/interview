@@ -483,6 +483,15 @@ Top
     优先级
         1，默认样式<标签选择器 <类选择器 <id选择器 <行内样式 <！important
         0 1 10 100 1000 1000以上
+25.CSS7阶层叠水平
+    层叠顺序 Stack Order
+    1.层叠上下文 background/border
+    2.负z-index
+    3.block块状水平盒子
+    4.float浮动盒子
+    5.inline/inline-block水平盒子
+    6.z-index:auto/z-index:0
+    7.正z-index
 
 
 
