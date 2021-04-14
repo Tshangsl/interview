@@ -616,13 +616,20 @@ application/www-form-urlencoded区别
             序列化后的JSON字符串
             客户端：
                 发送JSON格式字符串'{"test":"I'm Client"}'
-        application/x-www-form-urlencoded
+            服务端:
+                1.用file_get_contents拿到post数据 $_POST['test']取不到数据
+                2.然后使用json_decode解码 
+                3. php中json访问方式 $json->test。php中没有{test:"I'm Client"}这种格式的，$json = {test:"I'm Client"}会报错。
+                4. 返回数据时将数组json_encode编码。php中json格式没有，用数组代替。
+                使用json格式，php头部需要加上如下代码，否则会报错。
+                header('Access-Control-Allow-Headers:x-requested-with,content-type');
+        5.application/x-www-form-urlencoded
             窗体数据被编码为名称/值对 标准的编码格式
         multipart/form-data
             窗体数据被编码为一条信息 页面上每个控件对应消息的一个部分
         text/plain
             窗体数据以纯文本形式进行编码 其中不包含任何控件或格式字符
-
+        6.
         form的enctype属性为编码方式
             常用有两种：application/x-www-form-urlencoded
                         multipart/form-data
@@ -636,6 +643,78 @@ application/www-form-urlencoded区别
         如果有type=file
             用到multipart/form-data 浏览器会把整个表单以控件为单位分割 并为每个部分都加上Content-Disposition
             (form-data/file) Content-Type(默认为text/plain) name(控件name)等信息 并加上分隔符(boundary)
+        7.application/x-www-form-urlencoded与multipart/form-data区别(提交数据时编码格式)
+            1.form元素的enctype属性指定了表单数据向服务器提交时所采用的编码类型 默认缺省值是application/x-www-form-urlencoded
+            2.向服务器发送大量文本 包含非ASCII字符的文本/二进制数据时这种编码方式效率很低
+            3.文件上载时 所使用的编码类型 应当 是 multipart/form-data 它既可以发送文本数据yy也支持二进制数据上传
+            4.Browser端<form>表单的ENCTYPE属性值为multipart/form-data 它告诉我们传输的数据要用到多媒体传输协议 由于多媒体传输的都是大量数据 所以规定上传文件必须是post方法<input>的type属性必须是file
+
+            在Form元素的语法中 EncType表明提交数据的格式用Enctype属性指定将数据回发到服务器时浏览器使用的编码类型
+            下面是说明:
+                application/x-www-form-urlencoded
+                    窗体数据被编码成名称/值对 这是标准的编码格式
+                multipart/form-data
+                    窗体数据以纯文本形式机型编码 其中不含任何控件或格式字符
+                text/plain：
+                    窗口数据以纯文本形式进行编码 其中不含任何控件或格式字符
+            补充:
+                form的ENCTYPE属性为编码方式 
+                常用的有两种         
+                    application/x-www-form-urlencoded(默认)
+                    multipart/form-data
+                当action为get时
+                    浏览器用x-www-form-urlencoded编码方式把form数据转化成一个字符串(name1=value1&name2=value2&name3=value3)然后把这个字符串append到url后面 用?分割加载这个新的url
+                当action为post时
+                    浏览器把form数据封装到http body中 然后发送到server 
+                        1.如果没有type=file的控件 用默认的的application/x-www-form-urlencoded即可
+                        2.如果有type=file 要用到multipart/form-data浏览器会把整个表单以控件为单位分割 并为每个部分加上Content-Disposition(form-data/file)Content-Type(默认为text/plain)name(控件name)等信息 并加上分割符(boundary)
+10.四种常见的POST提交数据方式
+    HTTP/1.1协议 规定的HTTP请求方法有OPTIONS GET HEAD POST PUT DELETE TRACE CONNECT 这几种
+    其中POST一般用来向服务端提交数据
+
+    HTTP协议是以ASCII码传输 建立在TCP/IP协议之上的应用层规范
+    规范把HTTP请求分为三部分
+        1.状态行    <method><request-URL><version>
+        2.请求头    <header>
+        3.消息主体  <entity-body>
+    
+    协议规定POST提交数据必须放在消息主体(entity-body)中
+    但协议并没有规定数据必须使用什么编码格式
+    实际上开发者完全可以自己决定消息主体的格式 只要最后发送的HTTP请求满足上面格式即可
+
+    数据发送出去还要服务端解析成功才有意义
+    一般服务器语言如php python等 以及它们的framework都内置了自动解析常见数据格式的功能
+    服务器端通常是根据请求头(headers)中Content-Type字段来获知请求中的消息主体是用何种方式编码 再对主体进行解析
+    
+    所以说到POST提交数据方案 包含Content-Type和消息主题编码方式两部分
+
+    具体介绍
+        1.application/x-www-form-urlencoded
+            最常见的post提交数据方式
+            浏览器原生form表单 不设置ENCTYPE属性最终会以application/x-www-form-urlencoded方式提交数据
+                很多时候 我们用AJAX提交数据时也是使用这种方式
+            例如JQuery和QWrap的Ajax Content-Type默认值都是
+            application/x-www-form-urlencoded
+        2.multipart/form-data
+            一个常见的POST数据提交方式
+            使用表单上传文件时 必须让form的ENCTYPE等于这个值
+            这种方式一般用来上传文件 各大服务端语言对它也有良好的支持
+        PS:上面提到的这两种post数据的方式 都是浏览器原生支持的 而且现阶段原生form表单也只支持这两种方式 
+        但是随着越来越多的Web站点 尤其是WebApp全部使用AJAX进行数据交互之后 我们完全可以定义新的数据提交方式 
+        3.application/json
+            把它当作请求头 用来告诉服务端消息主体是序列化后的JSON字符串 由于JSON规范的流行 除了低版本IE之外的各大浏览器都原生支持JSON.stringfy 服务端语言也都有处理JSON的函数使用JSON不会遇上什么麻烦
+            JSON格式支持比键值对复杂得多的结构化数据   
+        4.text/xml
+            XML-RPC(XML Remote Procedure Call)
+            它是一种使用HTTP作为传输协议
+            XML作为编码方式的远程调用规范
+            XML-RPC协议简单 功能够用 各种语言的实现都有 它的使用也很广泛
+            如WordPress的XML-RPC API 搜索引擎的ping服务等
+            JS中 也有现成的库支持这种方式进行数据交互 能很好的支持已有的XML-RPC服务
+            个人觉得XML结构还是过于臃肿 一般场景用JSON会更灵活方便  
+11.GET提交数据方式
+    GET请求比较简单 请求参数为[key=value]通过&连接起来 一般被称为查询字符串(Query String)
+    只需要看/get?name=strive即查询参数 
 10.计算机网络体系结构
     OSI(Open System Interconnection 开放式系统互连)七层协议
         应用层：允许访问OSI环境的手段
