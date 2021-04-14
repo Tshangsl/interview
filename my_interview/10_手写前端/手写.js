@@ -133,7 +133,7 @@ function flatten1(arr) {
 }
 console.log(flatten1([1, [1, 2, [1, 2, 3]]]));
 // 9.函数防抖 
-// 短时间大量触发同一事件 只会执行一次
+// 短时间大量触发同一事件 只会执行最后一次
 // setTimeOut方法返回值唯一确定该setTimeOut
 function debounce(fn, delay) {
     let timer = null;
@@ -186,7 +186,7 @@ function clone(obj) {
         } else {
             o[p] = obj[p];
         }
-    }
+    } 
     return o
 }
 // call不固定参数 apply数组 bind

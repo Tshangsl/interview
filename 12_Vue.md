@@ -1167,8 +1167,8 @@ destoryed(
                 3:v-model用在表单控件上的，用于实现双向数据绑定，所以如果你用在除了表单控件以外的标签是没有任何效果的。
         4.v-for
             key作用：key要为数据中每项特定值比如ID
-                (主要用在 Vue 的虚拟 DOM 算法)
-                主要用在 Vue 的虚拟 DOM 算法 
+                (主要用在 Vue 的虚拟 DOM diff算法)
+                主要用在 Vue 的虚拟 DOM diff算法 
                 新旧 nodes 对比时辨识 VNodes。
                 如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。
                 而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
@@ -1317,11 +1317,13 @@ $route(路由信息对象 包括path params hash query fullPath matched name等�
 $router(vue-router实例对象 包括路由跳转方法 钩子函数)
 的区别
         $router(vue-router实例对象 包括路由跳转方法 钩子函数)
+        $router(vue-router实例对象 包括路由跳转方法 钩子函数)
             为 VueRouter 实例，想要导航到不同 URL，则使用 $router.push
             是VueRouter的一个对象，通过Vue.use(VueRouter)和Vu构造函数得到一个router的实例对象，这个对象中是一个全局的对象，他包含了所有的路由，包含了许多关键的对象和属性。
             以history对象来举例：
             $router.push({path:'home'})，本质是向history栈中添加一个路由，在我们看来是切换路由，但本质是在添加一个history记录 
         $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
+        $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数)
             $route是一个跳转的路由对象，每一个路由都会有一个$route对象，是一个局部的对象，可以获取对应的name，path，params，query等 
             为当前 router 跳转对象里面可以获取 name 、 path 、 query 、 params 等
             $route.path 字符串，等于当前路由对象的路径，会被解析为绝对路径，如/home/ews
@@ -1368,7 +1370,7 @@ vue-router单页面应用 路径之间的切换 即组件的切换)
         3.Hash模式通过锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。hash 模式的原理是 onhashchange 事件(监测hash值变化)，可以在 window 对象上监听这个事件。)
     History模式(依赖HTML5 History API和服务器配置
         1.这种模式充分利用了html5 history interface 中新增的 pushState() 和 replaceState() 方法。这两个方法应用于浏览器记录栈，在当前已有的 back、forward、go 基础之上，它们提供了对历史记录修改的功能。只是当它们执行修改时，虽然改变了当前的 URL ，但浏览器不会立即向后端发送请求。
-        2.需要后台配置支持 要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面，这个页面就是你 app 依赖的页面。
+        2.需要后台配置支持 要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html  app 依赖的页面。
         3.解决了hash模式存在的问题. hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
     )
 )
@@ -1399,8 +1401,8 @@ Vue路由有三种模式 比SPA多了一个abstract)
         协议部分、域名部分、端口部分、虚拟目录部分、文件名部分、参数部分、锚部分
         url的锚部分是从“#”开始到最后，都是锚部分。锚部分不是url的必需部分。
         url的参数部分是从“？”开始到“#”为止之间的部分。参数部分也不是url的必需部分。
-    1.前端路由(vue-rooter)
-        vue-rooter 此处的路由不是指我们平时所说的硬件路由器 是SPA（单页应用）的路径管理器
+    1.前端路由(vue-router)
+        vue-router 此处的路由不是指我们平时所说的硬件路由器 是SPA（单页应用）的路径管理器
         WebApp的链接路径管理系统。
         使用Vue+vue-router创建单页应用SPA十分简单
         router是Vue.js官方的路由插件，它和vue.js是深度集成的，适合用于构建单页面应用。
@@ -1413,7 +1415,8 @@ Vue路由有三种模式 比SPA多了一个abstract)
             2.检测URL的改变
             3.截获URL地址, 并解析出需要的信息来匹配路由规则)
     2.hash模式(使用URL hash值来做路由 支持所有浏览器 包括不支持HTML5 History API的浏览器)
-        使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载。 hash（#）是URL 的锚点，代表的是网页中的一个位置，单单改变#后的部分，浏览器只会滚动到相应位置，不会重新加载网页，也就是说hash 出现在 URL 中，但不会被包含在 http 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面；同时每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用”后退”按钮，就可以回到上一个位置；所以说Hash模式通过锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。hash 模式的原理是 onhashchange 事件(监测hash值变化)，可以在 window 对象上监听这个事件。
+        使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载。 
+        hash（#）是URL 的锚点，代表的是网页中的一个位置，单单改变#后的部分，浏览器只会滚动到相应位置，不会重新加载网页，也就是说hash 出现在 URL 中，但不会被包含在 http 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面；同时每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用”后退”按钮，就可以回到上一个位置；所以说Hash模式通过锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。hash 模式的原理是 onhashchange 事件(监测hash值变化)，可以在 window 对象上监听这个事件。
 
         0.Location接口的hash属性返回一个USVString其中包含 #和后面URL片段标识符被称为hash
         特点：
@@ -1490,8 +1493,18 @@ Vue路由有三种模式 比SPA多了一个abstract)
             3.加一个首屏 loading 图，提升用户体验；
 38.
 MVC(Model View Controller)
-MVVM(Model View ViewModel) 
+    View->Controller->Model->View 单向通信
 MVP(Model View Presenter) 
+    View Model不发生联系 通过Presenter传递 双向通信
+    View很薄 不部署任何业务逻辑 称为被动视图
+    Presenter很厚 所有业务逻辑都部署于此
+MVVM(Model View ViewModel) 
+    将Presenter改为ViewModel 其他基本与MVP一致
+    View Model不发生联系 通过Presenter传递 双向通信
+    Model数据模型 数据和业务逻辑在此应用
+    View UI视图 负责数据展示
+    ViewModel负责监听Model中数据的改变并且控制视图更新 处理用户交互操作
+
     MVC:(所有通信都是单向的)
         1.通信方式：(单向View->Controller->Model->View)
             1.View(视图 用户页面) 传送指令到 Controller
@@ -1537,7 +1550,7 @@ MVP(Model View Presenter)
     Vue.delete直接删除了数组 改变了数组的键值。
         this.$delete(this.b, 1)
 40.Vue 组件 data是函数(每个实例可以维护一份被返回对象的独立的拷贝)
-41.怎么动态绑定Class和Style
+41.怎么动态绑定Class和Style(对象语法/数组语法/对象和数组混合/对象和计算属性)
     将test、active、active-click三个className,绑到div上，渲染成<div class="test active active-click"></div>其中test是固定的，active受data中actived控制，active-click受data中actived和clicked控制，请用4种写法实现。
     4种方法
     1.对象语法

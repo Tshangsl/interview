@@ -1,4 +1,8 @@
-1.1xx中间状态|2xx请求成功|3xx重定位重新请求|4xx请求报文错误|5xx服务器端错误
+1.1xx中间状态|
+2xx请求成功|
+3xx重定位重新请求|
+4xx请求报文错误|
+5xx服务器端错误
 (H5一种新协议 实现浏览器和服务器全双工通信 一开始握手需借助HTTP请求完成)
         WebSocket protocol(应用层协议)是HTML5一种新的协议。它实现了浏览器与服务器全双工通信(full-duplex)。
         一开始的握手需要借助HTTP(非持久化单向)请求完成，单独建立一条TCP的通信信道进行数据传送 被用作即时通信代替轮询。
@@ -146,7 +150,8 @@ HTTP常见请求方式区别用途
             多路信道复用
             Server Push
     HTTP与HTTPS区别：
-    (HTTP 无CA证书 明文传输 默认80端口 |HTTPS(SSLs 身份验证|加密|完整) 有CA证书 有SSL加密传输协议 默认443端口)
+    (HTTP 无CA证书 明文传输 默认80端口 |
+    HTTPS(SSLs 身份验证|加密|完整) 有CA证书 有SSL加密传输协议 默认443端口)
     HTTPS = HTTP + SSL/TLS(Secure Socket Layer安全套接层)
         TLS(Transport Layer Security 继任者传输层安全)
             TLS和SSL在传输层对网络连接进行加密
@@ -475,8 +480,10 @@ HTTP常见请求方式区别用途
                   第三步：用户再去请求时携带用户凭证（code），验证服务器返回一个访问令牌（Access Token）；
                   第四步：再去拿着令牌请求资源时，就会得到受保护的资源信息。
 8.JSON和JSONP
-    JSON(JavaScript Object Notation)是一种轻量级的数据交换格式
-    JSONP(JavaScript With Padding) 一个非官方的协议 它允许在服务器端集成Scripttags返回至客户端 通过JavaScript callback形式实现跨域访问
+    JSON(JavaScript Object Notation)
+        一种轻量级的数据交换格式
+    JSONP(JavaScript With Padding) 
+        一个非官方的协议 它允许在服务器端集成Scripttags返回至客户端 通过JavaScript callback形式实现跨域访问
 9.跨域相关
     (JSONP CORS Node中间件代理 nginx反向代理 postMessage)
     1.为什么会出现跨域问题？
@@ -513,9 +520,13 @@ HTTP常见请求方式区别用途
                 1.JSONP只支持GET请求；
                 2.XMLHttpRequest相对于JSONP有着更好的错误处理机制       
                 3.容易受到XSS(跨站脚本)攻击 
-        2.CORS(主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)  
-            Cross-origin resource sharing 跨域资源共享 (需要浏览器和后端同时支持)
-            (异步请求 简单请求 非简单请求会先发送一次预检请求)
+        2.CORS Cross-origin resource sharing 跨域资源共享
+        (主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)  
+            (异步请求 
+                前端分：
+                    简单请求 
+                    非简单请求
+                        会先发送一次预检请求)
             1.浏览器会自动进行 CORS 通信，实现 CORS 通信的关键是后端。只要后端实现了 CORS，就实现了跨域。
             2.服务端设置 Access-Control-Allow-Origin 就可以开启 CORS。
             3.该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。
@@ -583,6 +594,48 @@ HTTP常见请求方式区别用途
         6.Web Sockets
             原理：
                 JS创建了web socket之后，会有一个HTTP请求发送到浏览器以发起连接。取得服务器响应后，建立的连接会使用HTTP升级从HTTP协议交换为web sockt协议。
+        
+
+9.multipart/form-data&
+application/json&
+application/www-form-urlencoded区别
+        1.application/json
+        application/x-www-form-urlencoded
+        都是表单数据发送时的编码类型
+        2.EncType
+            EncType属性规定在发送到服务器之前应该如何对表单数据进行编码
+            默认的 表单数据会编码为"application/www-form-urlencoded"即发送到服务器之前 所有字符都会进行编码
+        3.application/x-www-form-urlencoded编码类型的发送和接收
+            窗体数据编码为名称/值对
+            客户端：
+                发送"test=I'm Egret"浏览器按F12 NetWork中查看发送数据   
+            服务端：
+                接收test数据
+                echo $_POST["test"]
+        4.application/json的发送和接收
+            序列化后的JSON字符串
+            客户端：
+                发送JSON格式字符串'{"test":"I'm Client"}'
+        application/x-www-form-urlencoded
+            窗体数据被编码为名称/值对 标准的编码格式
+        multipart/form-data
+            窗体数据被编码为一条信息 页面上每个控件对应消息的一个部分
+        text/plain
+            窗体数据以纯文本形式进行编码 其中不包含任何控件或格式字符
+
+        form的enctype属性为编码方式
+            常用有两种：application/x-www-form-urlencoded
+                        multipart/form-data
+                   默认为application/x-www-form-urlencoded
+        当action为get时
+            浏览器用x-www-form-urlencoded编码方式把form数据转换成一个字符串(name1=value&name2=value2)然后把这个字串 append到url后面 用?分割 加载这个新的url
+        当action为post时
+            浏览器把form数据封装到http body中 然后发送到server
+        如果没有type=file的控价 
+            用默认的application/x-www-form-urlencoded即可
+        如果有type=file
+            用到multipart/form-data 浏览器会把整个表单以控件为单位分割 并为每个部分都加上Content-Disposition
+            (form-data/file) Content-Type(默认为text/plain) name(控件name)等信息 并加上分隔符(boundary)
 10.计算机网络体系结构
     OSI(Open System Interconnection 开放式系统互连)七层协议
         应用层：允许访问OSI环境的手段
