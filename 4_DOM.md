@@ -28,7 +28,7 @@
     2.使用deleteRow(行数)传入第几行
     3.使用jQuery得到这个结点 使用remove() detach()删除该节点
     4.使用css样式 display:none; 隐藏这一行
-7.
+7.获取DOM元素方式 获取元素标签名
     1.getElementById:通过元素的id获取该元素对象 oBtn一个此对象 
         任何浏览器无兼容性问题
         此只有用document. 因为id文档中是唯一的
@@ -41,6 +41,7 @@
     4.querySelector css选择器就是selector 查询出来一个元素
         是元素 不是数组 只能找到第一个
     5.querySelectorAll
+    6.获取元素标签名 element.tagName
 8.
     1.oH1.nextSibling ie8及ie8之前都不支持
     2.oH1.nextElementSibling
@@ -207,6 +208,12 @@
             口坐标），
     放大镜
         。。。
-
+20.简述document.write和innerHTML区别
+    1.document.write会重绘整个页面
+    innerHTML可以指定重绘页面中的指定DOM元素的一部分
+    2.document.write是直接写入页面的内容流中
+    如果在写之前没有显示调用document.open方法
+    浏览器会自动调用document.open方法来打开内容流
+    每次写完关闭之后重新调用该函数来打开内容流 会导致页面被重写
 
 

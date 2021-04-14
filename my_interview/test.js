@@ -1,18 +1,18 @@
-function get(obj,){
-    if(!obj){
-        return
-    }
-    let len = obj.length;
-    // obj作为第一个参数传入 
-    // 首先判断obj是否为空
-    // 为空直接返回
-    // 如果不为空 对obj内部数据类型进行判断
+// this指针指向的题目 Promise同步异步 需要练习
+// 算法 需要复习 扩展
+// 前端手写函数复习
+
+var length = 10;
+function fn(){
+    return this.length+1;
 }
-const obj = {
-    selector:{
-        to:{toutiao:'FE coder'},
-        target:[1,2,{name:'byted'}]
+var obj = {
+    length:5,
+    test1:function(){
+        return fn()
     }
 }
-// 运行代码
-get(obj,'selector to toutiao','target[0]','target[2].name')
+obj.test2 = fn;
+console.log(obj.test1());//6
+console.log(fn()===obj.test2())//false
+

@@ -235,7 +235,7 @@
     3.rem：(font size of the root element)
         CSS3新增的一个相对单位(root em 根em)
         与em区别在于使用rem为字体设定大小时，仍然是相对大小，但相对的只是HTML根元素
-    4.vh vw
+    4.vh(1vh=1%) vw
         根据窗口的宽高 分成100等份 100vh代表满高
         vh 和 vw与百分比的区别
             百分比是基于父元素的设置而言的，如果父元素为100px，那么子元素100%也就是100px。而 vh 和 vw 始终是针对窗口的宽高。
@@ -291,7 +291,15 @@
         5.flex属性 是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
             该属性有三个快捷值：auto (1 1 auto) 和 none (0 0 auto)和 initial(0 1 auto)。
             建议优先使用这个属性，而不是单独写三个分离的属性，因为浏览器会推算相关值。
-        6.align-self属性 允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。        
+        6.align-self属性 允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
+
+        1.flex:1 
+            让所有弹性盒模型对象子元素都有相同长度 且忽略它们内部内容
+        2.默认flex:0,1,auto
+            {flex-grow flex-shrink flex-basic}
+        3.flex:auto flex:(1 1 auto)
+        4.flex:none flex:(0 0 auto)
+        5.flex:initial flex:(0 1 auto)
 13.使用CSS 让一个div不可视,visibility/hidden display/none opacity/0(可以设置过渡效果)区别
             rgba和opacity 0-1 完全透明-完全不透明
         1.display:none;(不在文档流)
@@ -492,12 +500,30 @@ Top
     5.inline/inline-block水平盒子
     6.z-index:auto/z-index:0
     7.正z-index
-
-
-
-
-
-
+26.CSS实现三角形
+    CSS可以实现各种各样三角形
+    减少了切图加载图片
+    原理：
+        盒子宽和高都是0时 边框显示为三角形
+        如想实现倒三角 
+        只设置最上面的边有颜色 其他边为transparent
+        同理可以实现各种三角形
+    以下是各种三角形实现方式
+    1.倒三角的实现
+    2.向上三角的实现(只需保留下面的边)
+    3.向右三角的实现(保留左面的边)
+    4.向左三角的实现(保留右边的边)
+    5.保留上边和右边组成三角形
+    6.开发中可以利用伪类 定位实现
+    不改变DOM结构 简洁优雅 
+    content:''提供给三角形的位置
+    这个属性不能少
+    7.三角线箭头
+    设置两个伪类 前一个伪类覆盖至另一个伪类 留出一些线
+27.CSS link @ import 加载顺序
+    1.link无论放在那里都是优先加载 import受代码顺序影响
+    2.代码引用文件都是在文档加载完成以后才开始加载的
+    3.link支持使用JS控制DOM去改变样式 @import不支持
 
 
 

@@ -118,9 +118,13 @@
     组件通信几种实现方式
         (1.props/$emit  父子组件通信
          2.ref $parent/$children 父子组件通信
+
          3.$attrs/$listeners 隔代组件通信
+
          4.provide/inject 隔代组件通信 
+
          5.EventBus($emit/$on) 父子/兄弟/隔代组件通信
+         
          6.Vuex 父子/兄弟/隔代转组件通信
         )
         1.props / $emit 适用 父子组件通信
@@ -756,6 +760,23 @@ destoryed(
 
     以上需要手动通过 $emit 触发父组件的事件，更简单的方式可以在父组件引用子组件时通过 @hook 来监听即可如下所示：
     当然 @hook 方法不仅仅是可以监听 mounted，其它的生命周期事件，例如：created，updated 等都可以监听。
+19.provide inject
+    provide和inject是成对出现的
+    作用：
+        父组件向子孙组件传递数据
+    使用方法：
+        provide在父组件中返回要传给下级的数据
+        inject在需要使用这个数据的子辈组件或孙辈等下级组件中注入数据
+    使用场景：
+        由于Vue有$parent属性可以让子组件访问父组件
+        但孙组件想要访问祖先组件就比较困难
+        通过provide/inject可以轻松实现跨级访问父组件数据
+    另外一种理解：
+        provide/inject 
+            简单来说就是在父组件中通过provide来提供变量
+            然后在子组件中通过inject来注入变量
+        PS：这里不论子组件有多深 只要调用inject则可以注入provider中的数据 而不是局限于只能从当前父组件的prop属性来获取数据
+        只要在父组件中调用了 在这个父组件生效的生命周期内 所有子组件都可以调用inject来注入父组件的值
 20.在哪个生命周期内调用异步请求(created)/什么阶段才能访问操作DOM(mounted)？
     1.(created beforeMounted mounted)
     这三个钩子函数中data 已创建
