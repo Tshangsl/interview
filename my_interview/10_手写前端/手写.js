@@ -145,6 +145,7 @@ function debounce(fn, delay) {
     }
 }
 // 10.节流
+// 每执行一次会冷却一段时间
 function throttle(fn, delay) {
     let valid = true;
     return function () {
@@ -178,7 +179,7 @@ function lazyLoad() {
 }
 // 12.深度优先实现深拷贝 待完善几种方式
 function clone(obj) {
-    if (typeOf(obj) != 'Object') return;
+    if (typeof(obj) != 'Object') return;
     var o = obj.constructor == Array ? [] : {}
     for (let p in obj) {
         if (typeof obj[p] === 'object') {
@@ -285,6 +286,8 @@ Function.prototype.bind = function (context) {
         3.延迟运行
             JS中经常使用的bind 实现机制就是Currying
  */
+// Array.prototype.slice.call(arguments)
+//类数组 转化为真实数组 可以理解为让arguments转换成一个数组对象 让arguments具有slice方法
 function curry(fn, curryArgs) {
     return function () {
         let args = [].slice.call(arguments);
