@@ -1,6 +1,7 @@
 0.CSS CSS3是什么
     CSS: 
-        层叠样式表 Cascading Style Sheets 一种用来表现HTML或XML等文件样式的计算机语言
+        层叠样式表 Cascading Style Sheets 
+        一种用来表现HTML或XML等文件样式的计算机语言
     CSS3:
         最新的CSS标准
 1.BFC(块级格式化上下文规则)和IFC(行级格式化上下文) BFC是什么 有哪几种实现方式 分别适用于哪些场景
@@ -89,7 +90,6 @@
         ul width:100% display:flex flex-wrap:wrap
         li calc(calc(100%/3)-10px) box-sizing:border-box 将content-box转化成border-box
             设置height margin border
-    
 3.CSS3清除浮动方式
 目的：为了解决，父元素因为子元素浮动引起的内部高度为0的问题
         解决方法：
@@ -137,7 +137,10 @@
         2.定位 左右两侧绝对定位 中间设置margin-left margin-right值
             左右两侧使用绝对定位，
             中间设置margin-left margin-right值
-        3.flex弹性盒模型 父元素容器设置display：子级项目 flex/左右两侧 flex-basis 元素本身大小/中间flex-grow 占满剩余空间
+        3.flex弹性盒模型 
+            父元素容器设置display：
+            子级项目 flex/左右两侧 flex-basis 元素本身大小/中间flex-grow 占满剩余空间
+            
             父元素设置为弹性盒子
             左右两侧使用flex-basis设置元素本身大小
             中间使用flex-grow:1设置占满剩余空间
@@ -291,7 +294,8 @@
         5.flex属性 是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
             该属性有三个快捷值：auto (1 1 auto) 和 none (0 0 auto)和 initial(0 1 auto)。
             建议优先使用这个属性，而不是单独写三个分离的属性，因为浏览器会推算相关值。
-        6.align-self属性 允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
+        6.align-self属性 
+            允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
 
         1.flex:1 
             让所有弹性盒模型对象子元素都有相同长度 且忽略它们内部内容
@@ -361,7 +365,10 @@
     3.同级下，z-index的值越大，堆叠顺序越靠前，相同的z-index值的时候，后面的会在前面的层级之上。
         z-index值可以设置0和负数的。
     4.z-index:0和z-index:auto的区别，当一个定位元素不设置z-index的时候，默认值就是auto
-18.CSS伪类 伪元素(区别:有没有创建一个文档流外的元素)
+18.CSS伪类(没创建)伪元素(创建)
+(区别:有没有创建一个文档流外的元素)
+(伪类：弥补常规CSS选择器的不足 可以使用多个 文档树中已有 :focus)
+(伪元素：创建一个有内容的虚拟容器 同时使用一个 文档树中新建 :before :after)
     伪类：
         (添加到选择器的关键字，指定要选择的元素的特殊状态 通过选择器，格式化DOM树以外的信息以及不能被常规CSS选择器获取到的信息。)
         是添加到选择器的关键字，指定要选择的元素的特殊状态。 例如，:hover 可被用于在用户将鼠标悬停在按钮上时改变按钮的颜色。
@@ -474,11 +481,11 @@ Top
             图片太大 一次请求获取数据量大
             拿到这个大图需要的时间长
             降低网页整体体验
-24.CSS三大特性
+24.CSS三大特性(层叠性/继承性/优先级)
     层叠性
         1.给一个标签设置的样式发生冲突的时候即样式的覆盖
         2.浏览器的渲染机制是从上到下的，当有冲突的时候就采用最后的那个样式
-    继承性
+    继承性(与文字有关的属性 都可以实现继承)
         1，发生的前提是：标签之间属于一种嵌套关系
         2，文字颜色可以之间继承
         3，字体大小可以继承
@@ -557,14 +564,14 @@ Top
         使用场景:
         单行文字截断
         2.-webkit-line-clamp实现
-             div {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
+            div {
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            }
         
-。。。。
+
 
 
 

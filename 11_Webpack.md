@@ -18,8 +18,7 @@
         clean-webpack-plugin插件 解构的方式引入该插件
         mini-css-extract-plugin插件
     浏览器兼容性 browser compatibility
-    环境 environment
-        
+    环境 environment        
 1.Webpack作用(模块打包/编译兼容/能力扩展)
     (模块打包/编译兼容/能力扩展)
     1.模块打包。
@@ -50,12 +49,10 @@
 1.Webpack原理 loader plugin做什么的
 webpack是一个模块打包器（module bundler），提供了一个核心，核心提供了很多开箱即用的功能。
 同时它可以用loader和plugin来扩展。webpack本身结构精巧，基于tapable的插件架构，扩展性强，众多的loader或者plugin让webpack稍显复杂。
-
 webpack常用配置包括：devtool、entry、 output、module、resolve、plugins、externals等，本文主要介绍下webpack常用的loader和plugin
-
 webpack允许我们使用loader来处理文件，loader是一个导出为function的node模块。可以将匹配到的文件进行一次转换，同时loader可以链式传递。
 1.有哪些常见的Loader？你用过哪些Loader？
-    raw-loader：加载文件原始内容（utf-8）
+raw-loader：加载文件原始内容（utf-8）
 file-loader：把文件输出到一个文件夹中，在代码中通过相对 URL 去引用输出的文件 (处理图片和字体)
 url-loader：与 file-loader 类似，区别是用户可以设置一个阈值，大于阈值会交给 file-loader 处理，小于阈值时返回文件 base64 形式编码 (处理图片和字体)
         source-map-loader：加载额外的 Source Map 文件，以方便断点调试
@@ -91,7 +88,7 @@ url-loader：与 file-loader 类似，区别是用户可以设置一个阈值，
         ModuleConcatenationPlugin: 开启 Scope Hoisting
         speed-measure-webpack-plugin: 可以看到每个 Loader 和 Plugin 执行耗时 (整个打包耗时、每个 Plugin 和 Loader 耗时)
         webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
-3.Loader和Plugin的区别？
+3.Loader和Plugin的区别(Loader让Webpack拥有加载和解析非JS文件的能力/Plugin扩展Webpack功能)
         Loader：(本质函数 让webpack拥有加载和解析非JavaScript文件的能力)
             1.本质是一个函数 在该函数中对接收到的内容进行转换 返回转换后的结果 因为Webpack只认识JavaScript 所以Loader就成了翻译官 对其他类型的资源进行转译的预处理工作
             直译为"加载器"。Webpack将一切文件视为模块，但是webpack原生是只能解析js文件，如果想将其他文件也打包的话，就会用到loader。 所以Loader的作用是让webpack拥有了加载和解析非JavaScript文件的能力。
