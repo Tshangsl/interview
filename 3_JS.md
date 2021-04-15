@@ -647,8 +647,24 @@ JS
         return typeof result === 'obj'? result : obj;
     }
 
-    JS创建对象&对象继承
-
+    JS如何判断一个对象是否为空
+    1.for-in遍历+hasOwnProperty方法 
+      确认是否存在
+      某个key这种方法不能够被遍历到enurable为false属性
+    2.keys方法
+      使用Object静态方法keys然后判断length即可
+      keys返回的是自身可枚举属性
+      因此同样不可遍历到enurable为false的属性
+    3.JSON方法
+      使用JSON.stringfy()方法将对象转为字符串
+      与字符串'{}'对比 该方法同样无法获取不可遍历睡醒
+    4.getOwnPropertyNames方法
+       使用Object的getOwnPropertyNames方法 获取所有属性名
+       这样即使是不可枚举属性仍然能够获取到
+    5.Reflect.ownKeys(object)方法
+       返回对象自身所有属性 
+       无论是否可枚举
+       无论是否包含Symbol
 18.创建对象(new Object()/对象直接量/构造函数/工厂模式/原型模式/组合使用构造函数模式和原型模式)有哪几种方法
     1.new Object()
         创建一个Object实例
@@ -1432,6 +1448,42 @@ JS
         JSX是一种JS语法扩展 JSX=Javascript+XML
         即在JavaScript中写XML
         因为JSX
+57.Slice&Splice
+1.Slice方法
+1.可以用来从数组提取特定元素
+该方法不会改变元素数组
+而是将截取到的元素封装到一个新的数组中返回
+2.语法
+arr.slice(start,end);
+3.参数
+1.截取开始的位置的索引 包含开始索引
+2.截取结束的位置的索引 不包含结束索引
+(第二个参数可以省略不写 
+此时会截取从开始索引往后的所有元素)
+4.索引可以传递一个负值 如果传递一个负值 则从后往前计算
+-1倒数第一个
+-2倒数第二个
+3.Splice()方法
+1.可以用来删除数组中的指定元素
+2.使用splice()会影响到原数组
+会将指定元素从原数组删除
+并将被删除的元素作为返回值返回
+3.参数
+第一个 表示开始位置的索引
+第二个 表示删除的数量
+第三个及以后 传递一些新元素 这些元素会自动插入到开始位置索引前边
+4.splice()方法是一个多功能的方法
+可以删除/替换元素
+在数组指定位置插入元素
+
+
+
+
+
+
+
+
+
 
 
 
