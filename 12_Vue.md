@@ -1417,7 +1417,7 @@ params(name引入 接参 this.$route.params.name 类似post传参 参数地址�
           query是拼接在url后面的参数，没有也没关系。
             params一旦设置在路由，params就是路由的一部分，如果这个路由有params传参，但是在跳转的时候没有传这个参数，会导致跳转失败或者页面会没有内容。
         4.params、query不设置也可以传参，params不设置的时候，刷新页面或者返回参数会丢失 query则不会有这个问题        
-36.
+38.
 Vue-router(SPA single page application的路径管理器 WebApp的链接路径管理系统)
 
 hash模式(浏览器环境) 
@@ -1537,7 +1537,7 @@ Vue路由有三种模式 比SPA多了一个abstract)
         })    
     9.为啥不能用a标签
         用Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，这里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。
-37.SPA 单页面的理解 优缺点 优化首屏加载速度慢的问题
+39.SPA 单页面的理解 优缺点 优化首屏加载速度慢的问题
         SPA（ single-page application ）
             仅在 Web 页面初始化时加载相应的 HTML、JavaScript 和 CSS。一旦页面加载完成，SPA 不会因为用户的操作而进行页面的重新加载或跳转；
             取而代之的是利用路由机制实现 HTML 内容的变换，UI 与用户的交互，避免页面的重新加载。
@@ -1559,7 +1559,7 @@ Vue路由有三种模式 比SPA多了一个abstract)
             1.将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
             2.在配置 路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
             3.加一个首屏 loading 图，提升用户体验；
-38.
+40.
 MVC(Model View Controller)
     View->Controller->Model->View 单向通信
 MVP(Model View Presenter) 
@@ -1611,14 +1611,14 @@ MVVM(Model View ViewModel)
             它采用双向绑定（data-binding）：View的变动，自动反映在 ViewModel，反之亦然。Angular 和 Ember 都采用这种模式。
         1.各部分之间的通信，都是双向的
         2.采用双向绑定：View 的变动，自动反映在 ViewModel，反之亦然
-39.Vue数组中对象删除属性delete和Vue.delete删除数组区别
+41.Vue数组中对象删除属性delete和Vue.delete删除数组区别
     delete只是被删除的元素变成了 empty/undefined 其他的元素的键值还是不变。
         delete this.a[1]
         this.$set(this.a)
     Vue.delete直接删除了数组 改变了数组的键值。
         this.$delete(this.b, 1)
-40.Vue 组件 data是函数(每个实例可以维护一份被返回对象的独立的拷贝)
-41.怎么动态绑定Class和Style(对象语法/数组语法/对象和数组混合/对象和计算属性)
+42.Vue 组件 data是函数(每个实例可以维护一份被返回对象的独立的拷贝)
+43.动态绑定Class和Style(对象语法/数组语法/对象和数组混合/对象和计算属性)
     将test、active、active-click三个className,绑到div上，渲染成<div class="test active active-click"></div>其中test是固定的，active受data中actived控制，active-click受data中actived和clicked控制，请用4种写法实现。
     4种方法
     1.对象语法
@@ -1638,11 +1638,27 @@ MVVM(Model View ViewModel)
    	{'active-click': clicked && actived}
   ]"></div>
     4.对象和计算属性(推荐)
-42.(computed data props methods 都会被挂载在vm实例上，因此这三个都不能同名。)
-43.created和mounted
+44.computed/methods/watch
+    1.
+    计算属性computed
+    (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
+    事件methods
+    (只要发生重新渲染，method 调用总会执行该函数)
+    methods方法 watch属性 不能用this
+    this会是undefind,
+    因为箭头函数中的this指向的是定义时的this，而不是执行时的this，所以不会指向Vue实例的上下文。
+    2.
+    computed
+    (计算属性/依赖多个属性/缓存结果时每次都会重新创建变量/计算开销比较大(计算次数多或者异步处理)/通过return返回)
+    和watch
+    (侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return) 
+    在选项参数中指定deep: true 可深度监听
+    在选项参数中指定immediate: true将立即以表达式的当前值触发回调。监听后立即调用
+44.(computed data props methods 都会被挂载在vm实例上，因此这三个都不能同名。)
+45.created和mounted
     1.在created中，页面视图未出现，如果请求信息过多，页面会长时间处于白屏状态，DOM节点没出来，无法操作DOM节点。
     2.在mounted不会这样，比较好。
-44.计算属性computed(避免在模板中放入太多的逻辑，导致模板过重且难以维护。)
+46.计算属性computed(避免在模板中放入太多的逻辑，导致模板过重且难以维护。)
     特性：
         (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
     计算属性默认只有 getter，不过在需要时你也可以提供一个 setter：
@@ -1658,41 +1674,6 @@ MVVM(Model View ViewModel)
         (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)
         没有的话,仅仅把 this.dirty = true。
         (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
-45.
-1.
-计算属性computed
-(计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
-事件methods
-(只要发生重新渲染，method 调用总会执行该函数)
-methods方法 watch属性 不能用this
-this会是undefind,
-因为箭头函数中的this指向的是定义时的this，而不是执行时的this，所以不会指向Vue实例的上下文。
-2.
-computed
-(计算属性/依赖多个属性/缓存结果时每次都会重新创建变量/计算开销比较大(计算次数多或者异步处理)/通过return返回)
-和watch
-(侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return) 
-在选项参数中指定deep: true 可深度监听
-在选项参数中指定immediate: true将立即以表达式的当前值触发回调。监听后立即调用
-46. Vue 中自定义指令
-        全局注册
-            // 注册一个全局自定义指令 `v-focus`
-            Vue.directive('focus', {
-            // 当被绑定的元素插入到 DOM 中时……
-            inserted: function (el) {
-                // 聚焦元素
-                el.focus()
-            }
-            })
-        局部注册
-            directives: {
-                focus: {
-                    // 指令的定义
-                    inserted: function (el) {
-                    el.focus()
-                    }
-                }
-                }
 47.Vuex(State Getters Mutations Actions Module)
     1.定义:
         一个专为 Vue.js 应用程序开发的状态管理插件。
