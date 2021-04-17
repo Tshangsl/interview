@@ -4,9 +4,9 @@
 // 一个环形链表 能够让遍历它的游标回到原点
 // 从flag出发 回到flag 说明正在遍历一个环形链表
 
-function ListNode(val=undefined,next=null){
+function ListNode(val){
     this.val = val;
-    this.next = next;
+    this.next = null;
 }
 
 // 入参是头结点

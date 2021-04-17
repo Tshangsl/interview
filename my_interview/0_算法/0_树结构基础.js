@@ -102,6 +102,8 @@ console.log(postorder(root));
 
 // 迭代实现
 // 先序遍历
+// 合理安排出栈入栈时机
+// 使出栈序列符合二叉树的前序遍历规则
 const preorderTraversal = function(root){
     if(!root){
         return
@@ -124,30 +126,64 @@ const preorderTraversal = function(root){
 console.log('迭代实现先序遍历');
 console.log(preorderTraversal(root));
 
-
-
-const preorderTraversal1 = function(root){
+// 迭代实现后序遍历
+// 左 右 根 
+// 相对于迭代实现前序遍历
+// 最明显的变化就是根节点位置从第一个变成最后一个
+// 对比于从stack结构入手 从res结果数组上入手
+// 把pop出来的当前结点unshift进res的头部
+const postorderTraversal = function(root){
+    const res = [];
     if(!root){
-        return
+        return res;
     }
-    let res = [];
-    let stack = [];
+    const stack = [];
     stack.push(root);
     while(stack.length){
         let cur = stack.pop();
-        res.push(cur.val);
-        if(cur.right){
-            stack.push(cur.right);
-        }
+        res.unshift(cur.val);
         if(cur.left){
             stack.push(cur.left);
+        }
+        if(cur.right){
+            stack.push(cur.right);
         }
     }
     return res;
 }
-console.log('迭代实现先序遍历');
-console.log(preorderTraversal1(root));
 
+// 迭代实现中序遍历
+// 先/后序遍历使用一套代码框架实现 
+// 本质 两者出栈入栈逻辑差别不大 先处理根元素 再处理子节点
+// 不用res解决 stack解决
+
+// 左根右 
+// 途径父节点 爷爷结点 各种辈分祖宗结点
+// 途径每一个结点 都要即时入栈
+
+const inorderTraversal = function(root){
+    const res = [];
+    const stack = [];
+    // 用一个cur1结点充当游标
+    let cur = root;
+    // 当cur不为空/stack不为空 重复以下逻辑
+    while(cur||stack.length){
+        // 把寻找最左叶子结点过程中 途径所有结点都记录下来
+        while(cur){
+            // 将途径结点入栈
+            stack.push(cur);
+            // 继续搜索当前结点的左孩子
+            cur = cur.left;
+        }
+        // 取出栈顶元素
+        cur = stack.pop();
+        // 将栈顶元素入结果队列
+        res.push(cur.val);
+        // 尝试读取cur结点的右孩子
+        cur = cur.right;
+    }
+    return res;
+}
 
 
 

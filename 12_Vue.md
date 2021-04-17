@@ -1432,14 +1432,34 @@ SPA
 vue-router单页面应用 路径之间的切换 即组件的切换)
 (路由模块的本质 就是建立起url和页面之间的映射关系。)
 (vue-router实现单页面前端路由 提供两种方式(mode参数决定)：
+(Hash模式 Vue-router模式/
+History模式 依赖H5 History API&服务器配置)
+(abstract 支持所有JS运行环境 如Node.js服务器端 如果发现没有浏览器API 路由会强制进入这个模式)
+(Vue在实现单页面前端路由时 提供两种方式 hash/history)
+(Vue-router比SPA多一个模式 abstract)
+(Hash模式
+1.URL的hash模拟一个完整的URL URL改变时 页面不重新加载 hash(#)是URL的锚点 代表网页中一个位置 改变#后面的部分 浏览器只会滚动到相应位置 不会重新加载页面
+2.Hash出现在URL中 但不会被包含在http请求中 对后端没有影响 因此改变hash不会重新加载页面/会在浏览器访问历史中增加一个记录 使用后退按钮 回到上一个位置
+3.Hash通过锚点值的改变 根据不同的值 渲染指定DOM位置不同数据 Hash模式原理是onhashchange事件 可以在window对象上监听这个事件)
+(History模式
+1.利用HTML5 History Interface中新增pushState()和replaceState()方法
+    方法用于浏览器记录栈 
+    当前已有的back() forward() go()基础上
+    提供了对历史记录修改的功能
+2.需要后端配置支持 要在服务器添加一个覆盖所有情况的候选资源 URL匹配不到静态资源 则应返回一个index.html页面
+
+)
     Hash模式(vue-router默认 
         1.使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载 hash（#）是URL 的锚点，代表的是网页中的一个位置，单单改变#后的部分，浏览器只会滚动到相应位置，不会重新加载网页
         2.hash 出现在 URL 中，但不会被包含在 http 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面；同时每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用”后退”按钮，就可以回到上一个位置；
         3.Hash模式通过锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。hash 模式的原理是 onhashchange 事件(监测hash值变化)，可以在 window 对象上监听这个事件。)
     History模式(依赖HTML5 History API和服务器配置
-        1.这种模式充分利用了html5 history interface 中新增的 pushState() 和 replaceState() 方法。这两个方法应用于浏览器记录栈，在当前已有的 back、forward、go 基础之上，它们提供了对历史记录修改的功能。只是当它们执行修改时，虽然改变了当前的 URL ，但浏览器不会立即向后端发送请求。
-        2.需要后台配置支持 要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html  app 依赖的页面。
-        3.解决了hash模式存在的问题. hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
+        1.这种模式充分利用了html5 history interface 中新增的 pushState() 和 replaceState() 方法。
+            这两个方法应用于浏览器记录栈，在当前已有的 back、forward、go 基础之上，它们提供了对历史记录修改的功能。只是当它们执行修改时，虽然改变了当前的 URL ，但浏览器不会立即向后端发送请求。
+        2.需要后台配置支持 要在服务端增加一个覆盖所有情况的候选资源：
+            如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html  app 依赖的页面。
+        3.解决了hash模式存在的问题. 
+            hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
     )
 )
 (vue-router使用路由模块来实现页面跳转的方式

@@ -212,8 +212,21 @@ Child4.prototype = new F();
           直接实例化一个临时副本实现相同的原型继承
           (即子类的原型指向父类副本的实例从而实现原型共享)
         */
-
-
+// 6.class实现继承
+class Person6{
+  constructor(name){
+    this.name = name;
+  }
+  getName(){
+    return this.name;
+  }
+}
+class Child extends Person6{
+  constructor(name,age){
+    super(name);
+    this.age = age;
+  }
+}
 
 
 

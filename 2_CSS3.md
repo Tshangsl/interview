@@ -551,26 +551,95 @@ Top
         后期开发的版本支持和兼容早期开发的版本
 29.CSS文字溢出ellipsis
     将文本溢出部分进行隐藏/用省略号代替
-        1.单行文本截断 text-overflow
+        1.单行文本截断 
+            text-overflow:ellipsis(需加width属性兼容部分浏览)
              div {
                  white-space: nowrap;
                  overflow: hidden;
                  text-overflow: ellipsis;
                  }
         优点:
-        属性浏览器原生支持 各大浏览器兼容性好
+            属性浏览器原生支持 各大浏览器兼容性好
         缺点：
-        只支持单行文本阶段 不支持多行文本截取
-        使用场景:
-        单行文字截断
+            只支持单行文本阶段 不支持多行文本截取
+        适用场景:
+            单行文字截断
         2.-webkit-line-clamp实现
             div {
-            display: -webkit-box;
-            overflow: hidden;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+                display: -webkit-box;
+                overflow: hidden;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
             }
-        
+            需要和display -webkit-box-orient和overflow结合适用
+                display:-webkit-box;
+                    必须结合的属性
+                    将对象作为弹性伸缩盒子模型显示
+                -webkit-box-orient;
+                    必须结合的属性
+                    设置/检索
+                    伸缩盒对象的子元素排列方式
+                text-overflow:ellipsis;
+                    可选属性
+                    可以用来多行文本下
+                    省略号...隐藏超出范围文本
+            优点:
+                1.响应式截断 根据不同的宽度做出调整
+                2.文本超出范围才显示省略号 否则不显示省略号
+                3.浏览器原生实现 省略号位置显示刚好
+            缺点：
+                1.-webkit-line-clamp是一个不规范的属性
+                    没有出现在CSS规范草案中
+                    只有webkit内核的浏览器才支持这个属性
+                    如Firefox IE浏览器都不支持这个属性
+                    浏览器兼容性不好
+            使用场景：
+                多用于移动端页面 
+                因为移动端设备浏览器更多是基于webkit内核
+                除兼容性问题外 实现截断效果不错
+        3.定位元素实现多行文本截断
+                设置相对定位的容器高度
+                用包含省略号(...)的元素模拟实现
+                p{
+                    position:relative;
+                    line-height:18px;
+                    height:36px;
+                    overflow:hidden;
+                }
+                p::after{
+                    content:"...";
+                    font-weight:bold;
+                    position:absolute;
+                    bottom:0;
+                    right:0;
+                    padding:0 20px 1px45px;                    
+                }
+                优点:
+                    1.兼容性好 对各大主流浏览器有好的支持
+                    2.响应式截断 根据不同宽度做出调整
+                缺点:
+                    1.无法识别文字长短 即文本超出范围会显示省略号 否则不显示省略号 
+                    2.人为在文字末尾添加一个省略号效果 会导致它跟文字没有贴合很紧密 
+                    (遇到这种情况可以通过添加word-break:break-all;
+                    使一个单词能能够在换行时进行拆分)
+                适合场景：
+                    文字内容较多
+                    确定文字内容一定会超过容器
+        4.float特性实现多行文本截断
+                希望CSS能够有一种属性
+                    文字溢出时显示省略号
+                    不溢出时不显示省略号
+                优点：
+                    1.兼容性好 对各大主流浏览器有好的支持
+                    2.响应式截断 根据不同宽度做出调整
+                    3.文本超出范围才显示省略号 否则不显示省略号
+                缺点：
+                    模拟省略号 显示位置有时不能刚刚好
+                    解决:
+                        1.加一个渐变效果 贴合文字 
+                        2.添加word-break:break-all;
+                        使一个单词能够在换行时进行拆分 
+                        文字和省略号贴合效果更佳
 
 
 
@@ -578,5 +647,10 @@ Top
 
 
 
-****
+
+
+
+
+
+
 

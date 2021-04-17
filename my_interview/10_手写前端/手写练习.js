@@ -97,7 +97,23 @@ Function.prototype.bind = function (context) {
 }
 // 8.函数柯里化
 // 将使用多个参数的函数转换成一系列使用一个参数的函数
-
+function flatten(arr) {
+    let result = [];
+    for (let i = 0, len = arr.length; i < len; i++) {
+        if (Array.isArray(arr[i])) {
+            result = result.concat(flatten(arr[i]));
+        } else {
+            result.pushs(arr[i]);
+        }
+    }
+    return result;
+}
+function flatten1(arr) {
+    while (arr.some(item => Array.isArray(item))) {
+        arr = [].concat(...arr);
+    }
+    return arr;
+}
 // 9.偏函数
 // 将一个n参的函数转换为固定x参的函数 剩余参数(n-x)将在下次调用全部转入
 
@@ -127,18 +143,76 @@ function instance_of(L, R) {
 // 14.数组原型方法forEach
 // 15.素组原型方法map
 
+// 16.深度优先实现深拷贝 
+// function clone(obj) {
+//     if (typeof obj != 'Object') return;
+//     var o = obj.constructor == Array ? [] : {}
+//     for (let p in obj) {
+//         if (typeof obj[p] === 'object') {
+//             o[p] = clone(o[p]);
+//         } else {
+//             o[p] = obj[p]
+//         }
+//     }
+//     return o;
+// }
 
+function clone(obj){
+    if(typeof obj!='Object'){
+        return
+    }
+    let o = obj.constructor == Array?[]:{};
+    for(let p in obj){
+        if(typeof obj[p] === 'object'){
+            o[p] = clone(o[p]);
+        }else{
+            o[p] = obj[p];
+        }
+    }
+    return o;
+}
 
-
-
-
-
-
-
-
-
-
-
+// 17.数据类型判断
+function typeOf(obj){
+    let res = Object.prototype.toString.call().split(' ')[1];
+    res = res.substring(0,res.length-1);
+    return res;
+}
+// 18.数组去重 ES5 filter实现
+function unique(arr){
+    let res = arr.filter((item,index,array)=>{
+        return arr.indexOf(item) === index;
+    })
+    return res;
+}
+// 19.数组去重 ES6实现
+function unique1(arr){
+    return [...new Set(arr)];
+}
+// 20.防抖
+function debounce(fn,delay){
+    let timer = null;
+    return function(){
+        if(timer){
+            clearInterval(timer);
+        }
+        timer = setTimeout(fn,delay);
+    }
+}
+// 21.节流
+function throttle(fn,delay){
+    let valid = true;
+    return function(){
+        if(!valid){
+            return
+        }
+        valid = false;
+        setTimeout(()=>{
+            fn();
+            valid = true;
+        },delay)
+    }
+}
 
 
 
