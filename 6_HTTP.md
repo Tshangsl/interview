@@ -874,9 +874,9 @@ application/www-form-urlencoded区别
     (TCP两次握手 无法确认客户端的接收能力
     |TCP四次握手 可以 会降低传输效率)
     (TCP四次挥手 传输层协议断开连接的过程 确定数据全部传输完毕)
-    (可靠性体现在
+    (可靠性(有状态 可控制)
     有状态 TCP会确认发送了哪些报文/接收方收到了哪些报文保证数据包按序到达 不允许有差错/
-    可控制 如出现丢包/网络状态不佳 则会跳转自己的行为 减少发送的速度或重发
+    可控制(流量控制) 如出现丢包/网络状态不佳 则会跳转自己的行为 减少发送的速度或重发
     )
     TCP（Transmission Control Protocol，传输控制协议）
         TCP/IP即传输控制/网络协议，是面向连接的协议，发送数据前要先建立连接(发送方和接收方的成对的两个之间必须建 立连接)，TCP提供可靠的服务，也就是说，通过TCP连接传输的数据不会丢失，没有重复，并且按顺序到达 一个TCP连接需要三次挥手才能建立起来
@@ -925,38 +925,97 @@ application/www-form-urlencoded区别
             DHCP（Dynamic Host Configuration Protocol，动态主机配置协议），动态配置IP地址。
             ARP（Address Resolution Protocol，地址解析协议），用于动态解析以太网硬件的地址。
                 完成了IP地址与物理地址的映射。
+    
+    TCP协议比较复杂 TCP协议报文头图片内容非常丰富
+        概念:
+            六个状态位(置1有效)(URG/ACK/PSH/RST/SYN/FIN)
+            三个状态位(ACK/SYN/FIN)
+            ACK 表示ack Acknowledge Number字段有效
+                用于对收到的数据进行确认 所确认的数据由确认序列号表示
+            SYN 用作建立连接时的同步信号 建立TCP连接时使用
+            FIN 表示后面没有数据发送 关闭TCP连接时使用
+            seq Sequence Number 发送数据包中的第一个字节的序列号 32位
+            ack Acknowledgement Number 确认序列 32位
+
+            RST 表示复位 用来异常的关闭连接
+    RST攻击:
+        A和服务器B之间建立TCP连接
+        此时C伪造一个TCP包发给B
+        使B异常断开与A之间TCP连接
+        如何伪装:
+            源端口号+序列号
+        TCP连接：
+            源IP+源端口+目的IP+目的端口号 唯一确定一个TCP连接
     TCP三次握手 
-        (建立可靠通信信道 确认双方发送接收机能正常)
+        (建立可靠通信信道 确认双方发送接收机能正常
+        防止出现请求超时导致脏连接)
         TCP建立连接的过程，我们称为三次握手。
-            1.第一次握手(客户端向服务器端发送SYN)
+            起初两端都处于CLOSED关闭状态
+            1.第一次握手(客户端向服务器端发送SYN) 
+                (SYN=1 seq=x 
+                Client为SYN_SENT状态)
                 Client将SYN置1
                 随机产生一个初始序列号Seq发送给Server
                 客户端进入SYN_SENT状态
             2.第二次握手(服务器端返回SYN+ACK)
-                Server收到Client的SYN报文段 对该SYN报文段进行确认 设置ACK(Ackonwledge Number)为x+1(Sequence Number+1) 
+                (SYN=1 ACK=1 ack=x+1 seq=y
+                Server为SYN_RECD)
+                Server收到Client的SYN报文段 
+                由标志为SYN=1得知Client请求建立连接
+                设置ACK(Ackonwledge Number)为x+1(Sequence Number+1) 
                 发送SYN请求信息 SYN=k 
                 服务器端将上述所有信息放到一个报文段
                 (即SYN+ACK报文段) 一并发送给客户端 
                 服务器进入SYN_RECV状态
+                此时操作系统为TCP连接分配TCP缓存和变量
             3.第三次握手(客户端发送ACK)
-                客户端收到服务器的SYN+ACK报文段 
-                将ACK(Ackowledgement Number)设置为k+1 
-                向服务器发送ACK报文段 
-                该报文段发送完毕后 
-                客户端服务器进入ESTABLISHED状态 
-                完成TCP三次握手
+                (seq=x+1 ACK=1 ack=y+1
+                Client&Server ESTABLISHED) 
+                Client收到确认后 检查ack是否为x+1 ACK是否为1
+                如果正确 则将标志位ACK置为1 ack=y+1
+                此时操作系统为该TCP连接分配TCP缓存和变量
+                并将数据包发送给Server
+                Server检查ack是否为y+1 ACK是否为1 
+                如果正确则连接建立成功
+                Client和Server进入EATABLISHED状态
+                完成三次握手 
+                Client与Server开始传输数据
     TCP为什么不能两次握手
         不能确认客户端接收能力
+        防止已失效的连接请求报文段突然传送到Server 
+        因而产生错误
     TCP可以四次握手吗
         可以 但是会降低传输效率。
+    Server端易受到SYN攻击
+        服务端资源分配是在二次握手时分配的
+        客户端资源是在完成三次握手时分配的
+        所以Server容易受到SYN洪泛攻击
+        SYN攻击概念：
+            Client短时间内伪造大量不存在的IP地址
+            并向Server不断发送SYN包
+            Server回复确认包 等待Client确认
+            由于源地址不存在 
+            因此Server需要不断重发至超时
+            这些伪造的SYN包将长时间占用未连接队列
+            导致正常的SYN请求因为队列满而被丢弃
+            从而引起网络拥塞甚至系统瘫痪
+        防范SYN攻击措施
+            降低主机的等待事件使主机尽快的释放半连接的引用
+            短时间受到某IP的重复SYN则丢弃后放弃后续请求
     第三次握手中，如果客户端的ACK未送达服务器，会怎样？
         Server端：
-            由于Server没有收到ACK确认，因此会每隔 3秒 重发之前的SYN+ACK（默认重发五次，之后自动关闭连接进入CLOSED状态）Client收到后会重新传ACK给Server。
+            由于Server没有收到ACK确认
+            会每隔 3秒 重发之前的SYN+ACK
+            （默认重发五次，之后自动关闭连接进入CLOSED状态）
+            Client收到后会重新传ACK给Server。
         Client端两种情况
             1.在Server进行超时重发的过程中
-                Client向服务器发送数据，数据头部的ACK是为1的，所以服务器收到数据之后会读取 ACK number，进入 establish 状态
+                Client向服务器发送数据，数据头部的ACK是为1的
+                服务器收到数据之后会读取 ACK number
+                进入 ESTABLISHED 状态
             2.在Server进入CLOSED状态之后
-                如果Client向服务器发送数据，服务器会以RST包应答。
+                如果Client向服务器发送数据
+                服务器会以RST包应答。
     已经建立了连接 客户端出现了故障如何处理
         服务器每收到一次客户端的请求后重新复位一个计时器
         时间通常是设置为2小时
@@ -967,17 +1026,29 @@ application/www-form-urlencoded区别
         (传输层协议断开连接的过程 目的确定数据全部传输完毕)
         四次挥手：
             1.第一次挥手
+                (FIN=1 seq=u
+                Client为FIN_WAIT_1)
                 Client将FIN置为1，发送一个序列号SEQ给Server
                 Client进入FIN_WAIT_1状态 表明Client已经没有数据要发送给Server了
             2.第二次挥手
+                (ACK=1,ack=u+1,seq=v
+                Server为CLOSE_WAIT)
                 Server收到FIN之后，发送一个ACK=1，acknowledge number=收到的序列号+1
                 Server进入CLOSE_WAIT状态
                 此时客户端已经没有要发送的数据了，但仍可以接受服务器发来的数据。
             3.第三次挥手
+                (FIN=1 ACK=1 seq=w ack=u+1
+                Client为FIN_WAIT_2
+                Server为LAST_ACK)
                 Server将FIN置1，发送一个序列号给Client
                 Server进入LAST_ACK状态；
             4.第四次挥手
-                Client收到服务器的FIN后，进入TIME_WAIT状态；接着将ACK置1，发送一个ACKacknowledge number=序列号+1给服务器；
+                (ACK=1 seq=u+1 ack=w+1
+                Client为TIME_WAIT
+                Server为CLOSED
+                Client等待2*MSL CLOSED)
+                Client收到服务器的FIN后，进入TIME_WAIT状态
+                接着将ACK置1，发送一个ACKacknowledge number=序列号+1给服务器；
                 服务器收到后 确认acknowledge number后，变为CLOSED状态，不再向客户端发送数据。
                 客户端等待2*MSL（报文段最长寿命）时间后，也进入CLOSED状态。完成四次挥手。
         TCP服务器最大并发连接数
@@ -989,13 +1060,37 @@ application/www-form-urlencoded区别
         如果第二次挥手时服务器的ACK没有送达客户端，会怎样？
             客户端没有收到ACK确认，会重新发送FIN请求。
         客户端TIME_WAIT状态的意义是什么
+            1.保证Client发送最后一个ACK报文段能到达Server
+            2.防止已失效的连接请求报文段出现在本连接中
             第四次挥手时，客户端发送给服务器的ACK有可能丢失，TIME_WAIT状态就是用来重发可能丢失的ACK报文
             如果Server没有收到ACK，就会重发FIN，
             如果Client在2*MSL的时间内收到了FIN，就会重新发送ACK并再次等待2MSL，防止Server没有收到ACK而不断重发FIN。
+        为什么TIME_WAIT状态需要2MSL(最大报文生存时间)才能返回到CLOSED状态
+            虽然按道理 四个报文都发送完毕 可以直接进入CLOSE状态
+            必须假想网络是不可靠的 有可能最后一个ACK丢失
+            TIME_WAIT状态就是用来重发可能丢失的ACK
+        优化 可以通过修改系统参数优化服务器
+            tcp_tw_reuse: 是否重用处于TIME_WAIT状态的TCP链接 （设为true）
+            tcp_max_tw_buckets: 处于TIME_WAIT状态的SOCKET最大数目 （调大，这个参数千万不要调小了）
+            tcp_fin_timeout: 处于FIN_WAIT_2的时间 （调小）
         TIME_WAIT状态还需要等2MSL后才能返回到CLOSED状态会有什么问题
             通信双方建立TCP连接后，主动关闭连接的一方就会进入TIME_WAIT状态，TIME_WAIT状态维持时间是两个MSL时间长度，也就是在1-4分钟，Windows操作系统就是4分钟。进入TIME_WAIT状态的一般情况下是客户端，一个TIME_WAIT状态的连接就占用了一个本地端口。一台机器上端口号数量的上限是65536个，如果在同一台机器上进行压力测试模拟上万的客户请求，并且循环与服务端进行短连接通信，那么这台机器将产生4000个左右的TIME_WAIT Socket，后续的短连接就会产生address already in use : connect的异常，如果使用Nginx作为方向代理也需要考虑TIME_WAIT状态，发现系统存在大量TIME_WAIT状态的连接，通过调整内核参数解决。
         MSL(Maximum Segment Lifetime)
             指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。
+        为什么连接是三次握手 关闭却是四次握手
+            1.连接时
+                Server收到Client端的SYN请求报文后
+                可以直接发送SYN+ACK报文
+                ACK用来应答
+                SYN用来同步
+            2.关闭时
+                Server端收到FIN报文时
+                很可能不会立即关闭SOCKET 
+                所以只能先回复一个ACK报文
+                告诉Client端 你发的FIN报文我收到了
+                只有Server端所有报文都发送完毕
+                Server才能发送FIN报文
+                因此不能一起发送 故需要四次握手
         TCP
             序列号 Sequence Number
                 TCP会话的每一端都包含一个32位(bit)的序列号
@@ -1010,6 +1105,118 @@ application/www-form-urlencoded区别
                 ACK 确认收到的连接
         关于TCP/IP与HTTP协议关系
             我们在传输数据时 可以只使用(传输层)TCP/IP协议 但如果没有应用层 便无法是被数据内容 如想要使传输的数据有意义 则必须使用应用层协议
+        滑动窗口协议：
+            针对发送端和接收端一种流量控制策略
+            某些情况下 
+            接收端处理数据能力比发送端发送数据能力低很多
+            或发送端数据太多
+            会造成接收端队列塞满
+            因此有了滑动窗口 接收端告诉发送端一次最多可以发送多少数据
+            已发送未收到ACK+未发送(接收端有空间)=滑动窗口
+            TCP头部中有一个Window Size
+            这个就是接收方告诉发送方 
+            我现在可接受容量大小
+            发送数据流大小必须小于我这个容量
+            1.TCP协议的使用
+            2.维持发送方/接收方缓冲区 
+                缓冲区是用来解决网络之间数据不可靠的问题
+                例如丢包 重复包 出错 乱序
+            TCP协议中
+            发送方和接收方通过各自维护自己的缓存区
+            通过商定包的重传机制等一系列操作
+            解决不可靠问题
+            为了增加网络吞吐量 想将数据包一起发送过去
+            有了滑动窗口这个概念
+                解决其中出现的一些问题 
+                如丢包 超时重传
+                这个ACK要按顺序 保证滑动窗口顺序
+            用来加速数据传输 
+            TCP要保证可靠
+            需要对一个数据包进行ack确认表示接受端收到
+            有了滑动窗口
+            接收端可以等收到许多包后
+            只发一个ack包
+            确认之前已经收到过的多个数据包
+            有了滑动窗口
+            发送端在发送完一个数据包后不用等待它的ack
+            在滑动窗口大小内可以继续发送其他数据包
+        流量控制/拥塞控制/滑动窗口
+            流量控制
+                概念:
+                    发送者发送数据过快 接收方来不及接收 
+                    会有分组丢失 为避免分组丢失
+                    控制发送者的发送速度 使得接收者来得及接收
+                    这就是流量控制 
+                    根本目的 防止分组丢失
+                    是构成TCP可靠性一部分
+                实现:
+                    由滑动窗口协议(连续ARQ协议)实现
+                    滑动窗口协议保证
+                    分组无差错 有序接收
+                    实现流量控制
+                    主要方式:
+                        接收方返回的ACK中会包含自己的接收窗口大小
+                        并利用大小控制发送方的数据发送
+            拥塞控制(作用于网络 防止过多数据注入到网络)
+                作用于网络 防止过多数据注入到网络
+                避免出现网络负荷过大的情况
+                常用算法：
+                    慢开始
+                        发送方维持一个叫做拥塞窗口cwnd的状态变量
+                        拥塞窗口的大小取决于网络的拥塞程度 并且在动态地变化
+                        发送方让自己的发送窗口等于拥塞窗口
+                        考虑到接收方的接收能力
+                        发送窗口可能小于拥塞窗口
+                        思路
+                            不要一开始就发送大量数据
+                            先检测一下网络拥塞程度
+                            即从小到大逐渐增加拥塞窗口大小
+                        一个传输轮次所经历的时间其实就是往返时间RTT 每经过一个传输轮次(transmission round)拥塞窗口cwnd就加倍
+                        防止cwnd增长过大引起网络拥塞 
+                        还需要设置一个
+                        慢开始门限ssthresh状态变量
+                        慢开始门限ssthresh用法:
+                            cwnd<ssthresh 慢开始算法
+                            cwnd>ssthresh 拥塞避免算法
+                            cwnd=ssthresh 慢开始算法 拥塞避免算法任意
+                        慢不是cwnd增长速率慢
+                        指TCP开始发送报文段时先设置cwnd=1
+                        然后逐渐增大 比按照大的cwnd一下子把许多报文段突然注入到网络中要慢得多
+                    拥塞避免
+                        让拥塞窗口缓慢增长
+                        每经过一个往返时间RTT就把发送方的拥塞窗口cwnd加1 而不是加倍
+                        这样拥塞窗口 按线性规律缓慢增长
+                        无论满开始/拥塞避免阶段
+                        只要发送方判断网络出现堵塞
+                        (根据就是没有按时收到确认
+                        虽然没有收到确认可能是其他原因的分组丢失 但是因为无法判断 都当作拥塞来处理)
+                        就把慢开始门限ssthresh设置为拥塞时发送窗口大小的一般(但不能小于2)
+                        把拥塞窗口cwdn重置为1 执行慢开始算法
+                        目的 迅速减少主机发送到网络中得分组数
+                        使得发生拥塞得路由器有足够时间把队列中
+                        积压的分组处理完毕
+                        乘法减小和加法增大常合起来成为AIMD算法
+                        拥塞避免并非能完全避免阻塞 而是使网络比较不容易出现拥塞
+                    快重传
+                        要求接收方收到一个失序报文段就发出重复确认(为了使发送及早知道有报文没有到达对方 可提高网络吞吐量约20%)而不需要等到自己发送数据时捎带确认
+                        快重传算法规定:
+                            发送方只要一连收到三个重复确认就应当立即重传对方尚未收到的报文段 而不必继续等待设置的重传计时器时间到期
+                    快恢复
+                        快重传配合快恢复算法
+                        当发送方连续收到三个重复确认时 就执行乘法减小算法 把ssthresh门限减半(为预防网络发生阻塞)
+                        但是接下来并不执行慢开始算法
+                        考虑到如果网络发生拥塞的话 
+                        就不会收到好几个重复的确认
+                        所以发送方现在认为网络可能没有出现拥塞
+                        此时不执行慢开始算法
+                        将cwnd设置为ssthresh减半后的值
+                        然后执行拥塞避免算法 使得cwnd缓慢增大
+                PS:在采用快恢复算法时
+                    慢开始算法只在TCP连接建立时
+                    和网络出现超时时才使用
+            流量控制(作用于接收者)
+                控制发送者的发送速度从而使接收者来得及接收
+                防止分组丢失
 12.WebSocket Socket(套接字) HTTP HTTPS
     WebSocket
         通常应用层协议都是完全基于网络层协议TCP/UDP实现 例如HTTP SMTP POP3 
