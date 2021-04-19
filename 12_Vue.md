@@ -1,3 +1,4 @@
+原生实现select
 响应式原理Vue文档解释
     Vue最独特的特性之一 是其非侵入式的响应式系统
     数据模型仅仅是简单的JS对象
@@ -29,7 +30,14 @@
     (数据驱动/响应式原理/双向数据绑定 底层原理 
     ES5的Object.defineProperty/数据劫持(setter&getter)+发布订阅观察者模式)
     (通过getter进行依赖收集 
-    每个setter方法就是一个观察者 数据变更时 通知订阅者更新视图)
+     每个setter方法就是一个观察者 
+     数据变更时 
+     通知Watcher 从而使它关联的组件重新渲染
+     通知订阅者更新视图
+     Vue重新生成VDOM
+     新旧VDOM对比使用DOM-diff算法
+     DOM-patch算法
+     把patch对象渲染到视图中)
     (数据=>视图 绑定元素时 触发getter getter返回一个初始值 能在视图中看到数据)
     (视图=>数据 视图中内容改变时 触发setter(观察者)通知Vue视图已更新
                 Vue重新生成虚拟DOM/VDOM 通过新旧DO对比生成patch对象
@@ -42,20 +50,21 @@
             做到数据更新时派发更新 
             getter中收集依赖 
             setter中触发依赖       
-            属性发生变化时 会循环依赖列表 
-            把所有的Watcher都通知一遍
+            数据变更时
+            通知Watcher 从而使它关联的组件重新渲染
         3.数据变化时 自动通知需要更新的视图 
         并进行更新--发布订阅模式subscribe&publish
     )
     (双向数据绑定实现
-        发布者：发布消息
-        订阅者：接收消息
-        主题对象:记录所有订阅该消息的人 
+        发布者Publish：发布消息
+        订阅者Describer：接收消息
+        主题对象Dep:记录所有订阅该消息的人 
             负责把发布的消息通知给订阅消息的人
         每当new一个Vue 主要做两件事
+        (监听属性observer/编译HTML nodeToFragment)
             1.监听数据 observe(data)
                 监听数据过程中 
-                为data中每一个属性生成一个主题对象dep
+                为data中每一个属性生成一个主题对象Dep
             2.编译HTML nodeToFragment(id)
                 为每一个与数据绑定相关的节点生成一个订阅者watcher
                 watcher会将自己添加到相应属性的dep中
@@ -64,7 +73,8 @@
         1.数据劫持 ES5 Object.defineProperties()
             (设置对象属性的setter/getter方法监听数据变化/
             getter进行依赖收集/
-            setter方法是一个观察者 数据变更时通知订阅者更新视图/
+            setter方法是一个观察者 
+            数据变更时通知Watcher订阅者更新视图/
             无法监听/
             对象属性的添加删除
                 单个property
@@ -91,7 +101,8 @@
     )
     1.data中数据 
         (通过getter进行依赖收集 
-        每个setter方法就是一个观察者 数据变更时 通知订阅者更新视图)
+        每个setter方法就是一个观察者 
+        数据变更时 通知订阅者Watcher更新视图)
         Vue会通过观察者对象(Observer)
         将data选项中的所有key
         经过Object.defineProperty的getter和setter设置
@@ -104,6 +115,7 @@
         (视图=>数据 视图中内容改变时 触发setter(观察者)通知Vue视图已更新
                     Vue重新生成虚拟DOM/VDOM 通过新旧DO对比生成patch对象
                     将patch对象渲染到视图中 )
+        (绑定元素时 自动触发getter/视图中内容改变时 自动触发setter)
         1.绑定元素时 
             自动触发getter 
             getter会返回一个初始值 能在视图中看到数据
@@ -114,7 +126,8 @@
             通过新旧虚拟DOM对比生成patch对象 
             将patch对象渲染到视图中
 2.Vue
-(核心功能是一个视图模板引擎 在此基础上+组件系统components/客户端路由Vue-route/大规模状态管理Vuex->一个完整的框架)
+(核心功能是一个视图模板引擎 
+在此基础上+组件系统components/客户端路由Vue-route/大规模状态管理Vuex->一个完整的框架)
 (Vue.js只提供Vue-cli生态中最核心 组件系统+双向数据绑定/数据驱动)
     Vue.js是一套用于构建用户界面的渐进式框架
     渐进式:
@@ -139,11 +152,11 @@
     概括：
         ES5的Object.defineProperty/数据劫持(setter&getter)+发布订阅观察者模式
     具体实现:(Compiler->Observer->Watcher)
-        1.实现一个Compiler
+        1.实现一个Compiler(解析指令/初始化视图/订阅数据变更/绑定更新函数)
             对指令进行解析 初始化视图 订阅数据变更 绑定更新函数
-        2.实现一个Observer 
+        2.实现一个Observer(对数据进行劫持 通知数据变化)
             对数据进行劫持 通知数据的变化
-        3.实现一个Watcher
+        3.实现一个Watcher(以上两者的一个中介点 接收数据变更同时 让Dep添加当前watcher 并即时通知视图进行update)
             将其作为以上两者的一个中介点
             在接受数据变更的同时 让Dep添加当前Watcher
             并及时通知视图进行update
@@ -152,8 +165,8 @@
     数据劫持Observer
     观察者Watcher(订阅者)
         创建Watcher观察者
-        新/旧数值进行对比 如发生变化 
-        调用更新方法 进行视图更新
+        新/旧数值进行对比 DOM diff 如发生变化 
+        调用更新方法 DOM patch 进行视图更新
         一个数据变化 模板中使用这个数据的值都发生了变化
     PS：发布订阅模式/观察者模式(Publish/Subscribe)
         定义一种一对多的关系 
@@ -189,15 +202,17 @@
         </ul>
         console.log(this.$refs['mydiv'].getElementsByClassName('item')[0].innerHTML)//第一个li
     三种用法：
+        (普通元素DOM元素/子组件组件实例/v-for&ref 用于元素/组件 引用信息 包含DOM节点/组件实例数组)
+        (ref需要在DOM渲染完成后才有 使用时确保DOM已经被渲染完成)
         (普通元素 this.$ref.name 获取DOM元素)
         (子组件   this.$ref.name 获取组件实例 可以使用组件所有方法)
         (v-for&ref 用于元素/组件 引用信息 包含DOM节点/组件实例数组)
         (ref本身是作为渲染结果被创建的 初始渲染时 不能访问/不是响应式 不应做数据绑定)
         PS:ref需要在dom渲染完成后才会有 使用时确保dom已经被渲染完成 
-            比如在生命周期mounted(){}钩子中调用 或者在this.$nextTick(()=>{})中调用
+           如在生命周期mounted(){}钩子中调用 或者在this.$nextTick(()=>{})中调用
            如果ref是循环出来的 有多个重名 那么ref的值会是一个数组 此时要拿到单个的ref只需要循环就可以
 4.Vue组件通信
-    为什么需要组件通信
+    需求(组件实例间作用域相互独立/不同组件之间数据无法相互引用)
             组件是Vue.js最强大的功能之一 
             组件实例的作用域是相互独立的
             意味着不同组件之间的数据无法相互引用
@@ -271,7 +286,7 @@
     $event.currentTarget始终指向事件所绑定的元素，
     $event.target指向事件发生时的元素。
 8.修饰符(表单/事件)
-    (修饰符：
+    (修饰符：Vue提供很多事件修饰符 代替处理一些DOM事件细节 事件修饰符顺序很重要
         以半角句号.指明的特殊后缀 
         用于指出一个指令应该以特殊方式绑定
         为了更纯粹数据逻辑 
@@ -279,7 +294,6 @@
         来代替处理一些DOM事件细节
         PS:事件修饰符顺序很重要
     )
-    (代替一些DOM事件细节 顺序很重要)
     修饰符 (modifier) 
         是以半角句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定
         如.prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault()：
@@ -316,10 +330,11 @@
     .left
     .right
 10.在style上加scoped属性原理/需要注意哪些？
-    (Vue通过在DOM结构以及CSS样式上机上唯一标志 保证唯一 达到样式私有化 不污染全局)
+    (Vue通过在DOM结构以及CSS样式上加上唯一标志 保证唯一 达到样式私有化 不污染全局)
     (如果一个项目所有style标签都加上scoped属性 相当于实现了样式的模块化)
     (在公共组件中使用 修改公共组件样式需要用/deep/)
-    (样式穿透 deep 深度作用选择器 >>>别名 一个选择器能影响子组件 像SASS之类预处理器无法正确解析>>> 使用/deep/操作符代替)
+    (样式穿透 deep 深度作用选择器 >>>别名 
+    一个选择器能影响子组件 像SASS之类预处理器无法正确解析>>> 使用/deep/操作符代替)
 11.Vue渲染模板保留模板中的HTML注释
     组件中将comments选项设置为true
     <template comments> ... <template>
@@ -390,13 +405,30 @@ Vue中nextTick机制
                     那些对应的异步任务，于是结束等待状态，进入执行栈.
                 4.开始执行。主线程不断重复上面的第三步。
         (主线程的执行过程就是一个tick 而所有的异步操作都是通过任务队列来调度)
+        (消息队列中存放的是一个个任务task
+            task分
+                宏任务macro
+                    setTimeout setInterval
+                微任务micro
+                    Promise.then Promise.catch
+        事件轮询：
+            决定如何执行宏任务macro微任务micro的机制
+        )
         消息队列中存放的是一个个的任务（task）。
         规范中规定 task 分为两大类，分别是 macro task(宏任务) 和 micro task(微任务).
         并且每个 macro task 结束后，都要清空所有的 micro task。
         浏览器中常见宏任务
              setTimeout、MessageChannel、postMessage、setImmediate
+        宏任务优先级
+            主代码>setImmediate>MessageChanel>setTimeout/setInterval
+            大部分浏览器会把DOM事件回调优先处理
+            因为要提升用户体验 给用户反馈
+            其次是network IO操作的调用
+            再然后是UIrender
         浏览器中常见微任务
             MutationObsever 和 Promise.then
+        微任务优先级
+            process.nextTick>Promise=MutationObserver
         异步更新队列：
             Vue在更新DOM时是异步执行的 只要监听到数据变化 Vue将开启一个队列 并缓冲在同一事件循环中发生的所有数据变更。
             如果同一个 watcher 被多次触发，只会被推入到队列中一次。
@@ -426,19 +458,19 @@ Vue中nextTick机制
             提取最大的静态树 
             以使VDOM直接跳过后面的diff
         render渲染函数
-            (Vue推荐使用模板构建应用程序 底层实现中Vue最终还是会将模板编译成render渲染函数 若想得到更好的控制 可以直接写渲染函数)
+            (Vue推荐使用模板构建应用程序 
+            底层实现中Vue最终还是会将模板编译成render渲染函数 
+            若想得到更好的控制 
+            可以直接写渲染函数)
             用来生成VDOM 
             Vue推荐使用模板构建应用程序
             底层实现中Vue最终还是会将模板编译成渲染函数
             若我们想要得到更好的控制 可以直接写渲染函数
         Watcher：
-            (每一个Vue组件都有一个对应的watcher 它会在组件render时收集组件所依赖的数据
-            并在依赖更新时触发组件重新渲染 Vue会自动优化并更新需要更新的DOM)
-            每一个Vue组件都有一个对应的watcher 
-            它会在组件render时收集组件所依赖的数据 
-            并在依赖有更新时 
-            触发组件重新渲染 
-            Vue会自动优化并更新需要更新的DOM
+            (每一个Vue组件都有一个对应的watcher 
+            它会在组件render时收集组件所依赖的数据
+            并在依赖更新时触发组件重新渲染 
+            Vue会自动优化并更新需要更新的DOM)
         render函数可以作为一条分割线
             (render函数左边编译期 将Vue模板转换成渲染函数)
             (render函数右边运行时 将渲染函数生成的VDOM树 进行diff和patch)
@@ -607,6 +639,9 @@ Vue中nextTick机制
             2.当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树进行比较，记录两棵树的差异
             3.最后把所记录的差异应用到所构建的真正的DOM树上，视图更新
         比较时分为三个层级:
+            层级比较 Tree Diff
+            组件比较 Component Diff
+            元素比较 Element Diff
             1.Tree Diff（层级比较）
                 1.先进行树结构的层级比较，对同一个父节点下的所有子节点进行比较；
                 2.接着看节点是什么类型的，是组件就做 Component Diff;
@@ -654,7 +689,7 @@ Vue中nextTick机制
 (初始化:开始创建、初始化数据、编译模板、挂载Dom、数据变化时更新DOM、卸载)
 (生命周期:Vue实例从创建到销毁的过程)
 (Vue实例有一个完整的生命周期 指一个实例从开始创建到销毁这个过程)
-(生命周期钩子自动绑定this到实例上 可以通过this1操作访问到数据和方法)
+(生命周期钩子自动绑定this到实例上 可以通过this操作访问到数据和方法)
 (生命周期钩子函数
 beforeCreate(
     实例el创建之前初始化之后
@@ -750,6 +785,10 @@ destoryed(
 keep-alive实现
 被切换到的组件都有自己的名字)
 两个属性(字符串或者正则表达式匹配的组件name)
+(include定义缓存白名单即会缓存的组件
+exclude定义缓存黑名单即不会缓存的组件)
+(activted() keep-alive专属 组件激活时调用 可更新组件
+deactived() keep-alive专属 组件被销毁时调用)
     1.include定义缓存白名单，会缓存的组件；
     2.exclude定义缓存黑名单，不会缓存的组件；
     3.以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"；
@@ -785,7 +824,8 @@ keep-alive实现
             </transition>
     (Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes)
        预期：number | string | boolean (2.4.2 新增) | symbol (2.5.12 新增)
-       key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。
+       key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法
+       新旧 nodes 对比时辨识 VNodes。
        如果不使用 key，
        Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。
        而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
@@ -840,7 +880,8 @@ keep-alive实现
         一个特殊标记 增强区分 说明这是内置的实例方法属性
     核心：
         数据驱动 组件系统
-    虽然没有完全遵循 MVVM 模型，但是 Vue 的设计也受到了它的启发。因此在文档中经常会使用 vm (ViewModel 的缩写) 这个变量名表示 Vue 实例。
+    虽然没有完全遵循 MVVM 模型，但是 Vue 的设计也受到了它的启发。
+    因此在文档中经常会使用 vm (ViewModel 的缩写) 这个变量名表示 Vue 实例。
     所有的 Vue 组件都是 Vue 实例，并且接受相同的选项对象 (一些根实例特有的选项除外)。
     生命周期钩子的 this 上下文指向调用它的 Vue 实例。
     不要在选项 property 或回调上使用箭头函数
@@ -853,11 +894,14 @@ keep-alive实现
         使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。
         data 选项是特例，需要注意 - 在 Vue.extend() 中它必须是函数
     2.Vue.nextTick([callback,context])
-        在下次 DOM 更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的 DOM。
+        在下次 DOM 更新循环结束之后执行延迟回调
+        在修改数据之后立即使用这个方法，获取更新后的 DOM。
     3.Vue.set(target,propertyName/index,value)
         返回值：设置的值。
         用法：
-            向响应式对象中添加一个 property，并确保这个新 property 同样是响应式的，且触发视图更新。它必须用于向响应式对象上添加新 property，因为 Vue 无法探测普通的新增 property (比如 this.myObject.newProperty = 'hi')
+            向响应式对象中添加一个 property，并确保这个新 property 同样是响应式的，且触发视图更新。
+            它必须用于向响应式对象上添加新 property，因为 Vue 无法探测普通的新增 property 
+            (比如 this.myObject.newProperty = 'hi')
             对象不能是 Vue 实例，或者 Vue 实例的根数据对象。
     4.Vue.delete(targets,propertyName/index)
         删除对象的 property。如果对象是响应式的，确保删除能触发更新视图。这个方法主要用于避开 Vue 不能检测到 property 被删除的限制，但是你应该很少会使用它。
@@ -953,7 +997,8 @@ keep-alive实现
     备注：
         ES6中 由于Symbol类型的特殊性
         用Symbol类型的值来做对象的key与常规的定义或修改不同 
-        Object.defineProperty是定义key为Symbol的属性的方法之一
+        Object.defineProperty
+        是定义key为Symbol的属性的方法之一
     描述：
         (默认情况下/使用object.defineProperty()添加的属性值是不可修改的)
         该方法允许精确地添加或修改对象的属性
@@ -964,9 +1009,9 @@ keep-alive实现
 
         对象里目前存在的属性描述符(descriptor)有两种主要形式(都是对象) 
             (一个描述符只能是两者之一)
-            1.数据描述符
+            1.数据描述符(具有值的属性/该值可写/可不写)
                 具有值的属性 该值可以是可写的 也可以是不可写的
-            2.存取描述符
+            2.存取描述符(由getter/setter函数所描述的属性)
                 由getter函数和setter函数所描述的属性
             3.两种描述符都是对象 它们共享以下可选键值
                 (默认值是指在使用object.defineProperty()定义属性时的默认值)
@@ -1002,7 +1047,7 @@ keep-alive实现
     直接在一个对象上定义一个新属性/修改一个对象的现有属性 并返回此对象
     应当在Object构造器对象上调用此方法 而不是在任意一个Object类型的实例上调用
 26.Proxy与Object.defineProperty
-    1.Proxy
+    1.Proxy(代理器 目标对象之前架设一层拦截 外界对该对象的访问 都必须先通过这层拦截)
         (原意代理 此处表示由它代理某些操作 可译为代理器)
         在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，
         因此提供了一种机制，可以对外界的访问进行过滤和改写。        
@@ -1018,7 +1063,8 @@ keep-alive实现
             4.Proxy 返回的是一个新对象,我们可以只操作新的对象达到目的,而 Object.defineProperty 只能遍历对象属性直接修改；
             5.Proxy 作为新标准将受到浏览器厂商重点持续的性能优化，也就是传说中的新标准的性能红利；
         Object.defineProperty优点：
-            兼容性好，支持 IE9，而 Proxy 的存在浏览器兼容性问题,而且无法用 polyfill 磨平，因此 Vue 的作者才声明需要等到下个大版本( 3.0 )才能用 Proxy 重写。
+            兼容性好，支持 IE9，而 Proxy 的存在浏览器兼容性问题,而且无法用 polyfill 磨平
+            因此 Vue 的作者才声明需要等到下个大版本( 3.0 )才能用 Proxy 重写。
     4.Vue 2.x 
         使用Object.defineProperty() 
         把内部解耦为Observer Dep 使用Watcher相连
@@ -1077,7 +1123,7 @@ keep-alive实现
             )
             步骤：
                 1.实现一个监听器Observer:
-                对数据对象进行遍历，包括子属性对象的属性，利用 Object.defineProperty() 对属性都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。
+                    对数据对象进行遍历，包括子属性对象的属性，利用 Object.defineProperty() 对属性都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。
                 2.实现一个解析器Compile
                     解析 Vue 模板指令，将模板中的变量都替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加监听数据的订阅者，一旦数据有变动，收到通知，调用更新函数进行数据更新。
                 3.实现一个订阅者Watcher
@@ -1167,7 +1213,9 @@ keep-alive实现
         3.watch对象合并时，相同的key合成一个对象，且混入监听在组件监听之前调用；
         4.值为对象的选项【filters选项、computed选项、methods选项、components选项、directives选项】将被合并为同一个对象。两个对象键名冲突时，取组件对象的键值对。
 30.过滤器
-    Vue.js 允许你自定义过滤器，可被用于一些常见的文本格式化。过滤器可以用在两个地方：双花括号插值和 v-bind 表达式 (后者从 2.1.0+ 开始支持)。过滤器应该被添加在 JavaScript 表达式的尾部，由“管道”符号指示：
+    Vue.js 允许你自定义过滤器，可被用于一些常见的文本格式化。
+    过滤器可以用在两个地方：双花括号插值和 v-bind 表达式 (后者从 2.1.0+ 开始支持)
+    过滤器应该被添加在 JavaScript 表达式的尾部，由“管道”符号指示：
     1.一个插值可以连续使用两个过滤器吗?
     可以，{{ message | filterA | filterB }}
     2.过滤器除了在插值上使用，还可以用在那个地方？
@@ -1181,7 +1229,9 @@ keep-alive实现
             <span v-text="message | reverse"></span>
         过滤器也同样接受全局注册和局部注册
 31.Vue单向数据流
-        单向数据流(数据流是单向的。数据流动方向可以跟踪，流动单一，追查问题的时候可以更快捷。)
+        单向数据流
+        (数据流是单向的/数据流动方向可以跟踪/流动单一/追查问题时可以更快捷)
+        (每次父组件发生更新 子组件中所有prop都会刷新为最新的值)
         1.所有的 prop 都使得其父子 prop 之间形成了一个单向下行绑定：
             父级 prop 的更新会向下流动到子组件中，但是反过来则不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流向难以理解。
         2.每次父级组件发生更新时，子组件中所有的 prop 都将会刷新为最新的值。
@@ -1193,7 +1243,9 @@ keep-alive实现
             写起来不太方便 要使UI发生变更就必须创建各种 action 来维护对应的 state
 32.Vue一些指令(directive)及具体作用
         指令 (Directives)：
-            是带有 v- 前缀的特殊 attribute。指令 attribute 的值预期是单个 JavaScript 表达式 (v-for 是例外情况，稍后我们再讨论)。指令的职责是，当表达式的值改变时，将其产生的连带影响，响应式地作用于 DOM。
+            是带有 v- 前缀的特殊 attribute。
+            指令 attribute 的值预期是单个 JavaScript 表达式 (v-for 是例外情况，稍后我们再讨论)。
+            指令的职责是，当表达式的值改变时，将其产生的连带影响，响应式地作用于 DOM。
         1.v-html/v-text(可简写为{{}}并支持逻辑运算)
             v-html:
                 会以html的方式把内容载入页面中
@@ -1284,12 +1336,15 @@ keep-alive实现
     template的作用是模板占位符，可帮助我们包裹元素，但在循环过程当中，template不会被渲染到页面上
     template标签内容天生不可见，设置了display：none；
     要操作template标签内部的dom必须要用下面的方法–content属性：
-    三种写法：
+    三种写法：(字符串模板/template标签/script标签)
         1.字符串模板写法(直接写在vue 构造器中)
             这种写法比较直观,适用于html代码不多的场景,但是如果模板里html代码太多,不便于维护,不建议这么写.
         2.写在template标签里,这种写法跟写html很像.
         3.写在script标签里,这种写法官方推荐,vue官方推荐script中type属性加上"x-template"        
 34.vue中的slot
+    插槽使用在子组件中
+    目的：将父组件中的子组件模板数据正常显示
+    (单个插槽|默认插槽|匿名插槽/具名插槽/作用域插槽(子组件给父组件传参 父组件决定如何展示))
     1.单个插槽|默认插槽|匿名插槽
         (不用设置name属性)
         单个插槽可以放置在组件的任意位置 
@@ -1317,7 +1372,7 @@ keep-alive实现
     2.使用 PascalCase(首字母大写命名)
         <my-component-name> 和 <MyComponentName> 
         都是可接受的
-        直接在 DOM (即非字符串的模板) 中使用时只有 kebab-case 是有效的
+        直接在 DOM (即非字符串的模板) 中使用时只有 kebab-case(短横线分隔命名) 是有效的
     name作用：
         1.递归组件时，组件调用自身使用；
         2.用is特殊特性和component内置组件标签时使用；
@@ -1386,7 +1441,7 @@ prop:
     局部注册
 36.
 $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
-$router(vue-router实例对象 包括路由跳转方法 钩子函数)
+$router(vue-router实例对象 包括路由跳转方法/钩子函数)
 的区别
         $router(vue-router实例对象 包括路由跳转方法 钩子函数)
         $router(vue-router实例对象 包括路由跳转方法 钩子函数)
@@ -1406,7 +1461,7 @@ $router(vue-router实例对象 包括路由跳转方法 钩子函数)
             $route.name 当前路由的名字，如果没有使用具体路径，则名字为空
 37.vue-router使用
 query(path引入 接参 this.$route.query.name 类似get传参 参数地址栏显示 拼接在url后面的参数，没有也没关系 不设置 没关系)
-params(name引入 接参 this.$route.params.name 类似post传参 参数地址栏不显示 是路由的一部分,必须要有 不设置 刷新页面或者返回参数会丢失)
+params(name引入 接参 this.$route.params.name 类似post传参 参数地址栏不显示 是路由的一部分 必须要有 不设置 刷新页面或者返回参数会丢失)
 传参区别
         1.用法上(接收参数的时候，已经是$route而不是$router)
             query要用path来引入，params要用name来引入
@@ -1428,7 +1483,7 @@ hash模式(浏览器环境)
 history模式 
 abstract模式(Nodejs环境)
 
-SPA
+SPA(hash模式/history模式)
 (Vue的单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来)
 (SPA核心之一 更新视图而不重新请求页面)
 (SPA加载页面时，不会加载整个页面，而是只更新某个指定的容器中内容)
@@ -1438,20 +1493,25 @@ vue-router单页面应用 路径之间的切换 即组件的切换)
 (vue-router实现单页面前端路由 提供两种方式(mode参数决定)：
 (Hash模式 Vue-router模式/
 History模式 依赖H5 History API&服务器配置)
+
 (abstract 支持所有JS运行环境 如Node.js服务器端 如果发现没有浏览器API 路由会强制进入这个模式)
 (Vue在实现单页面前端路由时 提供两种方式 hash/history)
 (Vue-router比SPA多一个模式 abstract)
-(Hash模式
-1.URL的hash模拟一个完整的URL URL改变时 页面不重新加载 hash(#)是URL的锚点 代表网页中一个位置 改变#后面的部分 浏览器只会滚动到相应位置 不会重新加载页面
-2.Hash出现在URL中 但不会被包含在http请求中 对后端没有影响 因此改变hash不会重新加载页面/会在浏览器访问历史中增加一个记录 使用后退按钮 回到上一个位置
-3.Hash通过锚点值的改变 根据不同的值 渲染指定DOM位置不同数据 Hash模式原理是onhashchange事件 可以在window对象上监听这个事件)
-(History模式
+
+(Hash模式 原理onhashchange事件 可以在window对象上监听这个事件
+1.URL的hash模拟一个完整的URL URL改变时 页面不重新加载 
+hash(#)是URL的锚点 代表网页中一个位置 
+改变#后面的部分 浏览器只会滚动到相应位置 不会重新加载页面
+2.Hash出现在URL中 但不会被包含在http请求中 对后端没有影响 
+因此改变hash不会重新加载页面/会在浏览器访问历史中增加一个记录 使用后退按钮 回到上一个位置
+3.Hash通过锚点值的改变 根据不同的值 渲染指定DOM位置不同数据 
+Hash模式原理是onhashchange事件 可以在window对象上监听这个事件)
+(History模式 利用了H5 API新增的pushState()方法和replaceState方法 提供对历史记录修改功能
 1.利用HTML5 History Interface中新增pushState()和replaceState()方法
     方法用于浏览器记录栈 
     当前已有的back() forward() go()基础上
     提供了对历史记录修改的功能
 2.需要后端配置支持 要在服务器添加一个覆盖所有情况的候选资源 URL匹配不到静态资源 则应返回一个index.html页面
-
 )
     Hash模式(vue-router默认 
         1.使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载 hash（#）是URL 的锚点，代表的是网页中的一个位置，单单改变#后的部分，浏览器只会滚动到相应位置，不会重新加载网页
@@ -1563,25 +1623,32 @@ Vue路由有三种模式 比SPA多了一个abstract)
         用Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，这里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。
 39.SPA 单页面的理解 优缺点 优化首屏加载速度慢的问题
         SPA（ single-page application ）
-            仅在 Web 页面初始化时加载相应的 HTML、JavaScript 和 CSS。一旦页面加载完成，SPA 不会因为用户的操作而进行页面的重新加载或跳转；
+            (仅在Web页面初始化时加载/页面加载完成后/利用路由机制实现HTML内容变换)
+            仅在 Web 页面初始化时加载相应的 HTML、JavaScript 和 CSS。
+            一旦页面加载完成，SPA 不会因为用户的操作而进行页面的重新加载或跳转；
             取而代之的是利用路由机制实现 HTML 内容的变换，UI 与用户的交互，避免页面的重新加载。
-        优点：
+        优点：(良好的用户体验/良好的前后端工作分离模式/减轻服务器压力)
             1.良好的交互体验
                 用户体验好、快，内容的改变不需要重新加载整个页面，避免了不必要的跳转和重复渲染；
             2.良好的前后端工作分离模式
                 前后端职下·责分离，架构清晰，前端进行交互逻辑，后端负责数据处理；
             3.减轻服务器压力
                 基于上面一点，SPA 相对对服务器压力小；
-        缺点：
+        缺点：(SEO难度较高/前进后退管理/初次加载耗时多)
             4.SEO(Search Engine Optimization搜索引擎优化)难度较高
                 由于所有的内容都在一个页面中动态替换显示，所以在 SEO 上其有着天然的弱势。
             5.前进、后退管理 
-                由于单页应用在一个页面中显示所有的内容，所以不能使用浏览器的前进后退功能，所有的页面切换需要自己建立堆栈管理；
+                由于单页应用在一个页面中显示所有的内容
+                所以不能使用浏览器的前进后退功能
+                所有的页面切换需要自己建立堆栈管理；
             6.初次加载耗时多 
                 为实现单页 Web 应用功能及显示效果，需要在加载页面的时候将 JavaScript、CSS 统一加载，部分页面按需加载；
-        优化：
+        优化：(减少app.bundle大小
+                (将公用的JS库通过script标签引入/
+                配置路由时页面和组件使用懒加载方式引入)
+              /加一个首屏loading图提升用户体验)
             1.将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
-            2.在配置 路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
+            2.在配置路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
             3.加一个首屏 loading 图，提升用户体验；
 40.
 MVC(Model View Controller)
@@ -1593,6 +1660,7 @@ MVP(Model View Presenter)
 MVVM(Model View ViewModel) 
     将Presenter改为ViewModel 其他基本与MVP一致
     View Model不发生联系 通过Presenter传递 双向通信
+    (Model数据业务逻辑/View UI数据展示/ViewModel监听Model中数据的改变并控制视图更新处理用户交互操作)
     Model数据模型 数据和业务逻辑在此应用
     View UI视图 负责数据展示
     ViewModel负责监听Model中数据的改变并且控制视图更新 处理用户交互操作
@@ -1672,9 +1740,9 @@ MVVM(Model View ViewModel)
     this会是undefind,
     因为箭头函数中的this指向的是定义时的this，而不是执行时的this，所以不会指向Vue实例的上下文。
     2.
-    computed
+    computed(缓存结果每次都会重新创建变量/通过return返回)
     (计算属性/依赖多个属性/缓存结果时每次都会重新创建变量/计算开销比较大(计算次数多或者异步处理)/通过return返回)
-    和watch
+    和watch(直接计算不会创建变量保存结果/不需要return)
     (侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return) 
     在选项参数中指定deep: true 可深度监听
     在选项参数中指定immediate: true将立即以表达式的当前值触发回调。监听后立即调用
