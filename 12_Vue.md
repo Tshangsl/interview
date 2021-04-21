@@ -1725,6 +1725,7 @@ MVVM(Model View ViewModel)
     1.
     计算属性computed
     (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
+    (不支持异步 当computed内有异步操作时无效 无法监听数据变化)
     事件methods
     (只要发生重新渲染，method 调用总会执行该函数)
     methods方法 watch属性 不能用this
@@ -1733,10 +1734,28 @@ MVVM(Model View ViewModel)
     2.
     computed(缓存结果每次都会重新创建变量/通过return返回)
     (计算属性/依赖多个属性/缓存结果时每次都会重新创建变量/计算开销比较大(计算次数多或者异步处理)/通过return返回)
-    和watch(直接计算不会创建变量保存结果/不需要return)
+    watch(直接计算不会创建变量保存结果/不需要return)
     (侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return) 
     在选项参数中指定deep: true 可深度监听
     在选项参数中指定immediate: true将立即以表达式的当前值触发回调。监听后立即调用
+    3.computed&watch
+    computed(支持缓存/不支持异步)
+        1.支持缓存 只有依赖数据发生变化 才会重新进行计算
+        2.不支持异步 当computed内有异步操作时无效 无法监听数据变化
+        3.computed属性值默认走缓存 计算属性基于它们响应式依赖进行缓存 即基于data中声明过或者父组件传递的props中的数据通过计算得到的值
+        4.一个属性由其他属性计算出来 该属性依赖其他属性 是一个多对一/一对多 一般用computed
+        5.如果computed属性属性值是函数 则默认会走get方法 函数的返回值就是属性的属性值 在computed中 属性都有一个get和set方法 数据变化时 调用set方法
+    watch侦听属性(不支持缓存/支持异步)
+        1.不支持缓存 数据变化 会触发相应操作
+        2.watch支持异步
+        3.监听的函数接收两个参数 第一个参数是最新的值 第二个参数是输入之前的值
+        4.当一个属性发生变化时 需要执行对应的操作 一对多
+        5.监听数据必须是data中声明过或者父组件传递过来的props中的数据 当数据变化时 触发其他操作 函数有两个参数
+            immediate：组件加载立即触发回调函数执行
+            deep:深度监听 为了发现对象内部值的变化 复杂类型的数据时使用
+                PS：监听数组变动不需要这么做 
+                    deep无法监听到数组的变动和对象的新增
+                    参考Vue数组 只有以响应式方式触发才会被监听到
 44.(computed data props methods 都会被挂载在vm实例上，因此这三个都不能同名。)
 45.created和mounted
     1.在created中，页面视图未出现，如果请求信息过多，页面会长时间处于白屏状态，DOM节点没出来，无法操作DOM节点。
@@ -2052,7 +2071,7 @@ MVVM(Model View ViewModel)
             strict:true,
         })
 48.Vue-router
-    1.怎么重定向页面？
+    1.重定向页面
         1.const router = new VueRouter({
             routes: [
                 { path: '/a', redirect: '/b' }
@@ -2079,7 +2098,7 @@ MVVM(Model View ViewModel)
                 }
             ]
         })
-    2.怎么配置404页面？
+    2.配置404页面
         const router = new VueRouter({
             routes: [
                 {
@@ -2087,20 +2106,54 @@ MVVM(Model View ViewModel)
                 }
             ]
         })
-    3.切换路由时，需要保存草稿的功能，怎么实现呢？
+    3.切换路由时 实现保存草稿的功能
         <keep-alive :include="include">
             <router-view></router-view>
         </keep-alive>
-        其中include可以是个数组，数组内容为路由的name选项的值。
-    4.路由有几种模式？说说它们的区别？
-        1.hash: 兼容所有浏览器，包括不支持 HTML5 History Api 的浏览器，例http://www.abc.com/#/index，hash值为#/index， hash的改变会触发hashchange事件，通过监听hashchange事件来完成操作实现前端路由。hash值变化不会让浏览器向服务器请求。// 监听hash变化，点击浏览器的前进后退会触发
+        include可以是个数组，数组内容为路由的name选项的值。
+    4.路由有几种模式&区别
+        1.hash: 
+            兼容所有浏览器，包括不支持 HTML5 History Api 的浏览器，例http://www.abc.com/#/index，hash值为#/index， hash的改变会触发hashchange事件，通过监听hashchange事件来完成操作实现前端路由。hash值变化不会让浏览器向服务器请求
+            监听hash变化，点击浏览器的前进后退会触发
         window.addEventListener('hashchange', function(event){ 
             let newURL = event.newURL; // hash 改变后的新 url
             let oldURL = event.oldURL; // hash 改变前的旧 url
         },false)
         复制代码
-        2.history: 兼容能支持 HTML5 History Api 的浏览器，依赖HTML5 History API来实现前端路由。没有#，路由地址跟正常的url一样，但是初次访问或者刷新都会向服务器请求，如果没有请求到对应的资源就会返回404，所以路由地址匹配不到任何静态资源，则应该返回同一个index.html 页面，需要在nginx中配置。
-        3.abstract: 支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式。
+        2.history: 
+            兼容能支持 HTML5 History Api 的浏览器，依赖HTML5 History API来实现前端路由。没有#，路由地址跟正常的url一样，但是初次访问或者刷新都会向服务器请求，如果没有请求到对应的资源就会返回404，所以路由地址匹配不到任何静态资源，则应该返回同一个index.html 页面，需要在nginx中配置。
+        3.abstract: 
+            支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式。
+48.location.href与Vue-router路由跳转区别
+    1.vue-router使用pushState进行路由更新 静态跳转 页面不会重新加载 location.href会触发浏览器 页面重新加载一次
+    (使用router跳转和使用history.pushState()没有差别
+    vue-router用了history.pushState()尤其是在history模式下)
+    2.vue-router使用diff算法 实现按需加载 减少DOM操作
+    3.vue-router是路由跳转或同一个页面跳转 location.href是不同页面间跳转
+    4.vue-router是异步加载this.$nextTick(()=>{获取URL}) location.href是同步加载
+
+    Location href属性
+        href属性是一个可读可写的字符串 
+        可设置或返回当前显示的文档的完整URL
+    语法
+        location.href
+    兼容性
+        所有主要浏览器都支持href属性
+    location.href几种用法
+        1.当前页面打开URL
+            1.self.location.href
+            2.window.location.href
+            3.this.location.href
+            4.location.href
+        2.父页面打开新页面
+            parent.location.href
+        3.顶层页面打开新页面
+            top.location.href
+
+        1.使用location.href实现页面div块的快速定位
+        2.location.href可直接获取当前路径
+        3.parent.location.href跳转到上一层页面
+        4.top.location.href跳转到最外层页面
 49.导航守卫
     定义：
         导航守卫就是路由跳转过程中的一些钩子函数，再直白点路由跳转是一个大的过程，这个大的过程分为跳转前中后等等细小的过程，在每一个过程中都有一函数，这个函数能让你操作一些其他的事儿的时机，这就是导航守卫。

@@ -86,16 +86,34 @@ JS
             基本数据类型存储在栈中。
             引用数据类型在栈中存储了指针，该指针指向的数据实体存储在堆中。
     判断一个变量是基本数据类型还是引用数据类型方法：
-        1.typeof运算符判断类型
-        typeof(null) Object;
-        typeof(NaN) Number
-        null == undefined  返回true，因为undefined派生自null;
-        null === undefined  返回false。
-        2.A instanceof B(引用数据类型)可以用来判断A是否为B的实例，但它不能检测 null 和 undefined；
-        3.B.constructor == A可以判断A(B)是否为B(A)的原型
-        但constructor检测 
-        Object与instanceof不一样，还可以处理基本数据类型的检测。
-        4.Object.prototype.toString.call() 是最准确最常用的方式。
+        1.typeof运算符判断类型(基本数据类型)
+            typeof(null) Object;
+            typeof(NaN) Number
+            null == undefined  返回true，因为undefined派生自null;
+            null === undefined  返回false
+                typeof方法判断null/array/object/函数实例(new+函数)时得到的都是object
+        2.A instanceof B(引用数据类型)
+            判断一个对象是否为一个类的实例
+            用来判断对象 可以区分对象和数组
+            可以用来判断A是否为B的实例，但它不能检测 null 和 undefined；
+            obj2必须为对象 否则会报错 返回值是布尔值
+            可以对不同的对象实例进行判断
+            判断方法是根据对象的原型链依次向下查询
+            如果B的原型属性存在在A的原型链上
+            值为true
+        3.B.constructor == A(基本/引用数据类型)
+            可以判断A(B)是否为B(A)的原型
+            但constructor检测 
+            可以区分对象和数组
+            Object与instanceof不一样
+            还可以处理基本数据类型的检测。
+        4.Object.prototype.toString.call() 
+            最准确最常用的方式
+            原理
+                当调用时 取值内部的[[Class]]属性值
+                拼接成'[object'+[[Class]]+']'
+                这样的字符串并返回
+                使用call方法获取任何值的数据类型
     判断引用数据类型是数组还是对象
         typeOf无法判断 返回都是Object
         1.constructor
@@ -112,6 +130,24 @@ JS
             Object.prototype下的toString方法
             Object.prototype.toString.call([]) [Object Array]
             Object.prototype.toString.call({}) [ObjectObject]
+    JS底层如何存储数据的类型信息/
+    一个JS变量 在其底层实现中 它的类型信息是如何实现的
+        JS在底层存储变量时 
+        会在变量的机器码的低位1-3存储其类型信息
+            000 对象
+            010 浮点数
+            100 字符串
+            110 布尔
+            1   整数 
+        null&undefined这两个值信息存储有点特殊
+            null 所有机器码均为0
+            undefined 用-2^30整数表示
+        所以 typeof判断null时出现问题
+            由于null的所有机器码均为0
+            因此被当作对象看待
+        instanceof判断null
+            null直接被判断为不是object
+            这也是JS历史遗留bug   
     Symbol(符号)
         一种原始数据类型 
         一个确保不会和其他符号冲突的唯一令牌
@@ -1542,32 +1578,98 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
         即在JavaScript中写XML
         因为JSX
 57.Slice&Splice
-1.Slice方法
-1.可以用来从数组提取特定元素
-该方法不会改变元素数组
-而是将截取到的元素封装到一个新的数组中返回
-2.语法
-arr.slice(start,end);
-3.参数
-1.截取开始的位置的索引 包含开始索引
-2.截取结束的位置的索引 不包含结束索引
-(第二个参数可以省略不写 
-此时会截取从开始索引往后的所有元素)
-4.索引可以传递一个负值 如果传递一个负值 则从后往前计算
--1倒数第一个
--2倒数第二个
-3.Splice()方法
-1.可以用来删除数组中的指定元素
-2.使用splice()会影响到原数组
-会将指定元素从原数组删除
-并将被删除的元素作为返回值返回
-3.参数
-第一个 表示开始位置的索引
-第二个 表示删除的数量
-第三个及以后 传递一些新元素 这些元素会自动插入到开始位置索引前边
-4.splice()方法是一个多功能的方法
-可以删除/替换元素
-在数组指定位置插入元素
+    1.Slice方法
+        1.可以用来从数组提取特定元素
+        该方法不会改变元素数组
+        而是将截取到的元素封装到一个新的数组中返回
+        2.语法
+        arr.slice(start,end);
+        3.参数
+        1.截取开始的位置的索引 包含开始索引
+        2.截取结束的位置的索引 不包含结束索引
+        (第二个参数可以省略不写 
+        此时会截取从开始索引往后的所有元素)
+        4.索引可以传递一个负值 如果传递一个负值 则从后往前计算
+        -1倒数第一个
+        -2倒数第二个
+    2.Splice()方法
+        1.可以用来删除数组中的指定元素
+        2.使用splice()会影响到原数组
+        会将指定元素从原数组删除
+        并将被删除的元素作为返回值返回
+        3.参数
+        第一个 表示开始位置的索引
+        第二个 表示删除的数量
+        第三个及以后 传递一些新元素 这些元素会自动插入到开始位置索引前边
+        4.splice()方法是一个多功能的方法
+        可以删除/替换元素
+        在数组指定位置插入元素
+58.script标签中的async和defer
+    script标签用于加载脚本和执行脚本
+    直接使用script脚本 
+    HTML会按照顺序加载并执行脚本
+    脚本加载&执行过程中
+    会阻塞后续的DOM渲染
+    script标签提供两个属性async&await解决阻塞DOM渲染问题
+        defer
+            1.如果script标签设置该属性
+                则该浏览器会异步下载该文件
+                并不会影响到后续DOM的渲染
+            2.如果有多个设置defer的script标签存在
+                会按顺序执行所有的script
+            3.defer脚本会在文档渲染完毕后
+                DOMContentLoaded事件调用前执行
+        async
+            1.设置
+                会使script脚本异步的加载并在允许的情况下执行
+            2.执行
+                不会按script在页面中的顺序来执行 而是谁先加载完 谁执行
+            DOMConetntLoaded事件触发不会受async脚本加载影响
+            脚本加载完之前 就已经触发DOMContentLoaded
+            如果给async一定事件 有可能在DOMContentLoaded事件之前执行
+        PS：async执行是加载完成后就会去执行
+            不像defer要等待所有脚本加载完后 按顺序执行
+        
+        文档解析
+        脚本加载
+        脚本执行
+        DOMContentLoaded
+
+        普通script
+            文档解析过程中 如果遇到script脚本 
+            会停止页面解析进行下载
+            (Chrome会做一个优化 如果遇到script脚本
+            会快速查看后面有没有需要下载其他资源的
+            如果有会先下载哪些资源 然后再下载script对应资源
+            这样能剩下一部分下载时间)
+            资源的下载是在解析过程中进行的
+            虽说script脚本会很快加载完毕
+            但它前面script2并没有加载&执行
+            它只能处于一个挂起状态
+            等待script2执行完毕后再执行
+            当这两个脚本都执行完毕后 才会继续解析页面
+        defer
+            文档解析时 遇到设置defer的脚本
+            会在后台进行下载 但是不会阻止文档的渲染
+            当页面解析&渲染完毕后
+            会等到所有的defer脚本加载完毕并按照顺序执行
+            执行完毕后会触发DOMContentLoaded时间
+        async
+            async脚本会在加载完毕后执行
+            async脚本的加载不计入DOMContentLoadedhi见统计
+    推荐使用场景
+        defer
+            脚本代码依赖于页面中的DOM元素(文档是否解析完毕)
+            /被其他脚本文件依赖
+            例：
+                1.评论框
+                2.代码语法高亮
+                3.polyfill.js
+        async
+            脚本不关心页面中的DOM元素(文档是否解析完毕)
+            并不会产生其他脚本需要的数据
+            例：
+                1.百度统计
 
 
 
