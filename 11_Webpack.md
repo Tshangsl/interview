@@ -1,3 +1,14 @@
+(Loader让Webpack拥有加载和解析非JS文件的能力/
+Plugin扩展Webpack功能)
+(webpack.config.js配置文件
+mode模式/入口entry/输出output/loader/plugin)
+(mode development/production)
+(loader
+css-loader 匹配到CSS文件时 要用css-loader对css样式进行处理)
+(plugin
+html-webpack-plugin 打包HTML文件
+clean-webpack-plugin 
+mini-css-extract-plugin)
 0.webpack.config.js
     模式 mode
         development production(上线 压缩) 默认production

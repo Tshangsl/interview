@@ -797,9 +797,9 @@ deactived() keep-alive专属 组件被销毁时调用)
     6.不会在函数式组件中正常工作，因为它们没有缓存实例；
     7.当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
     服务器渲染期间不被调用
-    activited() 
+    activited()生命周期钩子函数
         keep-alive专属 组件被激活时调用 可更新组件
-    deactived() 
+    deactived()生命周期钩子函数
         keep-alive专属 组件被销毁时调用
     一般结合路由和动态组件一起使用
 20.Vue中的key
@@ -1484,13 +1484,21 @@ history模式
 abstract模式(Nodejs环境)
 
 SPA(hash模式/history模式)
-(Vue的单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来)
+(Vue的单页面应用是基于路由和组件的 
+路由用于设定访问路径 
+并将路径和组件映射起来)
 (SPA核心之一 更新视图而不重新请求页面)
-(SPA加载页面时，不会加载整个页面，而是只更新某个指定的容器中内容)
-(传统的页面应用 超链接实现页面切换跳转
-vue-router单页面应用 路径之间的切换 即组件的切换)
-(路由模块的本质 就是建立起url和页面之间的映射关系。)
-(vue-router实现单页面前端路由 提供两种方式(mode参数决定)：
+(SPA加载页面时
+不会加载整个页面
+而是只更新某个指定的容器中内容)
+(传统的页面应用 
+超链接实现页面切换跳转
+vue-router单页面应用/路径/组件的切换)
+(路由模块本质 建立起URL和页面之间映射关系)
+(vue-router
+实现SPA单页面前端路由 
+提供两种方式
+(mode参数决定)：
 (Hash模式 Vue-router模式/
 History模式 依赖H5 History API&服务器配置)
 
@@ -1498,48 +1506,31 @@ History模式 依赖H5 History API&服务器配置)
 (Vue在实现单页面前端路由时 提供两种方式 hash/history)
 (Vue-router比SPA多一个模式 abstract)
 
-(Hash模式 原理onhashchange事件 可以在window对象上监听这个事件
-1.URL的hash模拟一个完整的URL URL改变时 页面不重新加载 
-hash(#)是URL的锚点 代表网页中一个位置 
-改变#后面的部分 浏览器只会滚动到相应位置 不会重新加载页面
-2.Hash出现在URL中 但不会被包含在http请求中 对后端没有影响 
-因此改变hash不会重新加载页面/会在浏览器访问历史中增加一个记录 使用后退按钮 回到上一个位置
-3.Hash通过锚点值的改变 根据不同的值 渲染指定DOM位置不同数据 
-Hash模式原理是onhashchange事件 可以在window对象上监听这个事件)
-(History模式 利用了H5 API新增的pushState()方法和replaceState方法 提供对历史记录修改功能
-1.利用HTML5 History Interface中新增pushState()和replaceState()方法
-    方法用于浏览器记录栈 
-    当前已有的back() forward() go()基础上
-    提供了对历史记录修改的功能
-2.需要后端配置支持 要在服务器添加一个覆盖所有情况的候选资源 URL匹配不到静态资源 则应返回一个index.html页面
-)
-    Hash模式(vue-router默认 
-        1.使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载 hash（#）是URL 的锚点，代表的是网页中的一个位置，单单改变#后的部分，浏览器只会滚动到相应位置，不会重新加载网页
-        2.hash 出现在 URL 中，但不会被包含在 http 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面；同时每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用”后退”按钮，就可以回到上一个位置；
-        3.Hash模式通过锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。hash 模式的原理是 onhashchange 事件(监测hash值变化)，可以在 window 对象上监听这个事件。)
-    History模式(依赖HTML5 History API和服务器配置
-        1.这种模式充分利用了html5 history interface 中新增的 pushState() 和 replaceState() 方法。
-            这两个方法应用于浏览器记录栈，在当前已有的 back、forward、go 基础之上，它们提供了对历史记录修改的功能。只是当它们执行修改时，虽然改变了当前的 URL ，但浏览器不会立即向后端发送请求。
-        2.需要后台配置支持 要在服务端增加一个覆盖所有情况的候选资源：
-            如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html  app 依赖的页面。
-        3.解决了hash模式存在的问题. 
-            hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
-    )
-)
-(vue-router使用路由模块来实现页面跳转的方式
+(Hash模式 原理onhashchange事件 window对象上监听这个事件)
+(Vue-router默认模式)
+(1.URL的hash模拟一个完整URL URL改变 页面不重新加载 hash(#)是URL锚点 代表网页中一个位置)
+(2.Hash出现在URL中 不会被包含在HTTP中 对后端没有影响 改变Hash不会重新加载页面(原因) 会在浏览器访问历史中增加一个记录)
+(3.Hash通过锚点值的改变 根据不同的值 渲染指定DOM位置不同数据)
+
+(History模式 利用了H5 API新增的pushState()方法和replaceState方法 提供对历史记录修改功能) 
+(1.利用H5 History Interface中新增pushState()和replaceState()方法 用于浏览器记录栈
+在当前已有back() forward() go()基础上 提供对历史记录修改)
+(2.需要后端配置支持 服务器添加一个覆盖所有情况的候选项 URL匹配不到静态资源 则返回一个index.html页面)
+(3.解决Hash模式存在问题 Hash传参基于URL 如要传递复杂数据 会有体积限制 history模式可在UR里传参/可将数据存放到一个特定对象)    
+
+(vue-router使用路由模块实现页面跳转三种方式
     1.直接修改地址栏
     2.编程式的导航 this.$router.push(‘路由地址’)
     3.声明式的导航 <router-link to="路由地址"></router-link>
 )
 (vue-router参数传递
-    1.name传递参数
+    1.name-params/path-query传递参数
         路由文件src/router/index.js里配置name属性
         模板里(src/App.vue)用$route.name来接收 比如：<p>{{ $route.name}}</p>
     2.<router-link> 标签中的to传参
         <router-link :to="{name:xxx,params:{key:value}}">valueString</router-link>
         ...
-    3.利用url传递参数----在配置文件里以冒号的形式设置参数。   
-    4. 使用path来匹配路由，然后通过query来传递参数
+    3.利用url传参----在配置文件里以冒号的形式设置参数。   
 )
 ($router.push和$router.replace的区别：
     会向history 栈添加一个新的记录 点击浏览器的返回按钮时可以看到之前的页面。

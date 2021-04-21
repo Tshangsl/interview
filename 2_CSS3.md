@@ -163,7 +163,8 @@
             1.给父元素定义上边框/内边距/overflow:hidden
             2.添加浮动/绝对定位/BFC
         3.如果存在一个空的块级元素，
-            border、padding、inline content、height、min-height都不存在，那么上下边距中间将没有任何阻隔，上下外边距将会合并。
+            border、padding、inline content、height、min-height都不存在
+            上下边距中间将没有任何阻隔，上下外边距将会合并。
     当外边距塌陷时，外边距之间的计算方式是怎样的 
     由BFC决定
         1.两个都是正数，取较大的值
@@ -297,10 +298,8 @@
         6.align-self属性 
             允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
 
-        1.flex:1 
-            让所有弹性盒模型对象子元素都有相同长度 且忽略它们内部内容
-        2.默认flex:0,1,auto
-            {flex-grow flex-shrink flex-basic}
+        1.flex:1 所有弹性盒模型对象子元素有相同长度 且忽略它们内部内容
+        2.flex:0,1,auto(flex不设置相关值时默认值)
         3.flex:auto flex:(1 1 auto)
         4.flex:none flex:(0 0 auto)
         5.flex:initial flex:(0 1 auto)
@@ -640,7 +639,7 @@ Top
                         2.添加word-break:break-all;
                         使一个单词能够在换行时进行拆分 
                         文字和省略号贴合效果更佳
-
+30.CSS画一个圆
 
 
 

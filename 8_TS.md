@@ -9,3 +9,4 @@ void null/undefined never obj
 类型断言 编译期间
 
 TS只是提供开发期间一个错误提示 运行仍按JS语法运行
+3.TS优点
