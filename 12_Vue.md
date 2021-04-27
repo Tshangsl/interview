@@ -1241,6 +1241,7 @@ deactived() keep-alive专属 组件被销毁时调用)
             2.这个 prop 以一种原始的值传入且需要进行转换。 在这种情况下，最好使用这个 prop 的值来定义一个计算属性
         缺点：
             写起来不太方便 要使UI发生变更就必须创建各种 action 来维护对应的 state
+            
 32.Vue一些指令(directive)及具体作用
         指令 (Directives)：
             是带有 v- 前缀的特殊 attribute。
@@ -1776,7 +1777,30 @@ MVVM(Model View ViewModel)
         (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)
         没有的话,仅仅把 this.dirty = true。
         (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
-47.Vuex(State Getters Mutations Actions Module)
+47.vue-router源码
+    仅展示关键方法 细节处不讨论
+    目录结构
+    vue-router
+        components #存放vue-router两个核心组件
+            link.js
+            view.js
+        history     #存放浏览器跳转相关逻辑
+            base.js
+            hash.js
+        create-matcher.js #创建匹配器
+        create-route-map.js #创建路由映射表
+        index.js        #引用时的入口函数
+        install.js      #install方法
+48.vue原理(手写代码实现数据劫持)
+    1.核心点 Object.defineProperty
+    2.默认Vue在初始化数据时 
+        会给data中的数据使用Object.defineProperty重新定义所有属性 当页面取到对应属性时 会进行依赖收集(收集当前组建的watcher) 如果属性发生变化会通知相关依赖进行更新操作
+    3.数组方法的劫持涉及到原型相关知识 
+        首先数组实例大部分方法都来源自Array.prototype对象
+        这里不能直接篡改Array.prototype对象
+        这样会影响所有的数组实例 为避免这种情况
+        需要采用原型继承得到一个新的原型对象
+49.Vuex(State Getters Mutations Actions Module)
     1.定义:
         一个专为 Vue.js 应用程序开发的状态管理插件。
         每一个 Vuex 应用的核心就是 store（仓库）。

@@ -81,6 +81,42 @@ function postOrder(root){
     console.log('当前遍历的结点值是',root.val);
 }
 
+// 判断对称二叉树
+/*
+首先判断根节点是否相同
+    左子树的右节点和右子树的左节点是否相同
+    右子树的左节点和左子树的右节点是否相同
+*/
+// 递归实现对称二叉树判断
+function isSymmetrical(root){
+    return isSymmetrical(root,root);
+}
+function isSymmetricalTree(node1,node2){
+    // 判断两个节点都是否为空
+    if(!node1&&!node2){
+        return true;
+    }
+    // 判断两个节点是否存在一个为空
+    if(!node1||!node2){
+        return false;
+    }
+    // 判断两个节点是否相同
+    if(node1.val!=node2.val){
+        return false;
+    }
+    return isSymmetricalTree(node1.left, node2.right) && isSymmetricalTree(node1.right, node2.left);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -206,7 +206,9 @@
         animation：以下六个元素的简写
         animation-name、animation-duration、animation-timing-function、animation-delay、animation-iteration-count、animation-direction
     transition和animation:
-        它们很像 flash 中的补间动画和逐帧动画；transition是从一个状态变化到另外一种状态，当变化有了平滑的效果后就产生了动画，它是一个公式化的变化，在比较规则的动画效果中我们可以使用，例如：旋转的风车、行驶的汽车、颜色的渐变等等；animation的动画效果更加灵活，可以实现像影片一样的复杂无规则的动画。
+        它们很像 flash 中的补间动画和逐帧动画；
+        transition是从一个状态变化到另外一种状态，当变化有了平滑的效果后就产生了动画，它是一个公式化的变化，在比较规则的动画效果中我们可以使用，例如：旋转的风车、行驶的汽车、颜色的渐变等等；
+        animation的动画效果更加灵活，可以实现像影片一样的复杂无规则的动画。
 7.CSS动画特性可以用JS实现，为什么还要用CSS实现(页面动画在移动设备上运行更快)
         让你的页面动画在移动设备上运行的更快一些
         JavaScript效率低的两大原因：
@@ -666,7 +668,16 @@ Top
                         使一个单词能够在换行时进行拆分 
                         文字和省略号贴合效果更佳
 30.CSS画一个圆
-
+    
+31.Chrome实现css字体小于12px解决方法
+    中文版的Chrome有个12px字体限制问题
+    当字体小于12px时 都以12px显示
+    CSS3一个新属性 transform:scale();
+    具体实现
+        p{
+            font-size:10px;
+            -webkit-transform:scale(0.8);
+        }
 
 
 
