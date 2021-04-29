@@ -95,7 +95,7 @@ const preOrderTraversal = function(root){
 console.log(preOrderTraversal(root));
 
 
-// 迭代实现后续遍历
+// 迭代实现后序遍历
 // 左 右 根
 // 把pop出来的当前结点unshift进res的头部 数组的顺序是从后往前填充
 // 调整左右结点入栈顺序
@@ -125,6 +125,23 @@ console.log(postOrderTraversal(root));
 // 必须先定位到最左的叶子结点
 // 定位过程中 必然会途径目标结点的父结点、爷爷结点和各种辈分的祖宗结点：
 // 途径过的每一个结点，我们都要及时地把它入栈。这样当最左的叶子结点出栈时，第一个回溯到的就是它的父结点：
+
+const inorderTraversal = function(root){
+    const res = [];
+    const stack = [];
+    let cur = root;
+    while(cur||stack.length){
+        while(cur){
+            stack.push(cur);
+            cur = cur.left;
+        }
+        cur = stack.pop();
+        res.push(cur.val);
+        cur = cur.right;
+    }
+    return res;
+}
+
 const inorderTraversal = function(root) {
     // 定义结果数组
     const res = []  

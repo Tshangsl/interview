@@ -367,6 +367,12 @@ function _new() {
     return obj;
 }
 
+Object.create = function(o){
+    function F(){}
+    F.prototype = o;
+    return new F();
+}
+
 // 实现instanceof关键字
 // instanceof就是判断构造函数的prototype属性是否出现在实例的原型链上
 // function instance_of(L,R){

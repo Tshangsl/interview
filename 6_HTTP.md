@@ -1,10 +1,23 @@
 1.
 1xx中间状态|
+    100请求者应当继续提出请求
+    101切换请求协议 如从HTTP切换到WebSocket
 2xx请求成功|
+    200请求成功
 3xx重定位重新请求|
+    301永久重定向 
+    302临时重定向 
+    304协商缓存命中 
 4xx请求报文错误|
+    400参数校验失败 
+    401未登录或token验证失败 
+    402用户已禁用(禁止该用户)
+    403禁止用户访问(禁止所有用户)
+    404资源未找到 
 5xx服务器端错误
-(H5一种新协议 实现浏览器和服务器全双工通信 一开始握手需借助HTTP请求完成)
+    500服务端错误 
+    503服务器正在忙
+(WebSocket H5一种新协议 实现浏览器和服务器全双工通信 一开始握手需借助HTTP请求完成)
         WebSocket protocol(应用层协议)是HTML5一种新的协议。它实现了浏览器与服务器全双工通信(full-duplex)。
         一开始的握手需要借助HTTP(非持久化单向)请求完成，单独建立一条TCP的通信信道进行数据传送 被用作即时通信代替轮询。
 2.
@@ -101,22 +114,6 @@ sessionStorage localStorage(不会自动把数据发给服务器，仅在本地�
             （"POST"请求时，还需额外设置请求头）
         （4）监听服务器响应，接收返回值。
 1.HTTP(无状态)常见状态码 及 常用的请求方式，区别和用途
-100请求者应当继续提出请求
-101切换请求协议 如从HTTP切换到WebSocket
-
-301永久重定向 
-302临时重定向 
-304协商缓存命中 
-
-400参数校验失败 
-401未登录或token验证失败 
-402用户已禁用   
-403禁止用户访问 
-404资源未找到 
-
-500服务端错误 
-503服务器正在忙
-
 101     切换请求协议 从HTTP切换到WebSocket(H5新增)
 200	 	操作成功	
 204     请求被受理但没有资源可以返回
@@ -450,6 +447,18 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
     sessionStorage(session Storage对象 会话存储 会话结束时清除 浏览器关闭前有效)
     ---解决了cookie存储空间不足问题 与cookie对比
     (5M|同源策略跨域无法访问|仅存储在客户端|以key和value形式存储数据)
+    localStorage如何存取对象
+        localStorage存储为字符串 使用JSON可以存储对象
+        JSON对象提供的parse和stringfy方法 将其他数据类型转化为字符串 再存储到storage中即可
+        存:
+            var obj = {"name":"ergouzi","age":"16"}
+            localStorage.setItem("userInfo",JSON.stringify(obj));
+        取:
+            var user = JSON.parse(localStorage.getItem("userInfo"))
+        删除:
+            localStorage.removeItem("userInfo);
+        清空：
+            localStorage.clear();
     1.简介
         1.sessionStorage 和 localStorage 是 HTML5 新增的两个特性，这两个特性主要是用来作为会话存储和本地存储来使用的，解决了 cookie 存储空间不足的问题；
         2.sessionStorage 属性允许你访问一个 session Storage 对象，用于存储当前会话的数据，存储在 sessionStorage 里面的数据在页面会话结束时会被清除。
@@ -483,6 +492,21 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
                 3.移除当前作用域下所有数据  
                 6.Cookie、sessionStorage、localStorage区别
     5.cookie(在浏览器和服务器间来回传递) sessionStorage localStorage(不会自动把数据发给服务器，仅在本地保存)对比
+    如何获取浏览器在网站的cookie
+        获得浏览器在网站的cookie
+        可以使不通过浏览器访问 也能使用自己的账号进行在浏览器上的操作
+        1.浏览器请求看
+            控制台->network标签->doc分类
+            name上点击右键 勾选domain 
+            需domain和所访问网页域名相同
+            点击域名相同的一个 弹出的小窗拉到中间 
+            可以看见cookie的值
+        2.控制器用代码看
+            控制台输入document.cookie 
+            可输出cookie的值
+        3.resource查看
+            点击resource标签 找到下面的cookies
+            点击本网站域名的cookie 该地方适合查看不适合复制
     共同点：
         都是保存在浏览器端，且同源的。 
     区别：
@@ -736,11 +760,13 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
             1.window.postMessage(message,targetOrigin) 方法是html5新引进的特性
             2.可以使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源
             3.目前IE8+、FireFox、Chrome、Opera等浏览器都已经支持window.postMessage方法。
-            调用postMessage方法的window对象是指要接收消息的那一个window对象，该方法的第一个参数message为要发送的消息，类型只能为字符串；第二个参数targetOrigin用来限定接收消息的那个window对象所在的域，如果不想限定域，可以使用通配符* 。
+            调用postMessage方法的window对象是指要接收消息的那一个window对象
+            该方法的第一个参数message为要发送的消息，类型只能为字符串
+            第二个参数targetOrigin用来限定接收消息的那个window对象所在的域，如果不想限定域，可以使用通配符* 
             需要接收消息的window对象，可是通过监听自身的message事件来获取传过来的消息，消息内容储存在该事件对象的data属性中。
         6.Web Socket
             原理：
-                JS创建了web socket之后，会有一个HTTP请求发送到浏览器以发起连接。取得服务器响应后，建立的连接会使用HTTP升级从HTTP协议交换为web sockt协议。s
+                JS创建了web socket之后，会有一个HTTP请求发送到浏览器以发起连接。取得服务器响应后，建立的连接会使用HTTP升级从HTTP协议交换为web sockt协议。
 9.multipart/form-data&
 application/json&
 application/www-form-urlencoded区别
@@ -1288,6 +1314,32 @@ application/www-form-urlencoded区别
     HTTP(应用层)
         Http协议是对客户端和服务器端之间数据之间实现可靠性的传输文字/图片/音频/视频等超文本数据的规范
         格式简称为“超文本传输协议”
+
+        定义了在与服务器交互的不同方式 
+        最常用的方法有四种
+        分别是GET POST PUT DELETE 
+        URL全称为资源描述符
+        一个URL地址对应着网络上一个资源
+        HTTP中的GET POST PUT DELETE 
+        对应着这个资源的查询 修改 增添 删除 四个操作
+
+        HTTP请求由三个部分构成
+            状态行
+            请求头(Request Header)
+            请求正文
+        HTTP响应由三个部分构成
+            状态行
+            响应头(Response Header)
+            响应正文
+        HTTP响应中包含一个状态码
+        用来表示服务器对客户端响应地结果
+        状态码一般由3位构成
+        1xx:请求已经接受 继续处理
+        2xx:请求已经处理掉
+        3xx:重定向
+        4xx:一般表示客户端有错误 请求无法实现
+        5xx:一般是服务器端的错误
+
     Socket和http的区别和应用场景
         1.Socket连接就是所谓的长连接，理论上客户端和服务器端一旦建立起连接将不会主动断掉；
         2.Socket适用场景：网络游戏，银行持续交互，直播，在线视屏等。
@@ -2049,8 +2101,41 @@ WebSocket(基于TCP协议 典型的应用层协议)
         降低网络拥塞状况/提高请求的响应速度/减轻源站负载压力
     工作原理&核心组件
         1.访问源站
-
-
+24.Form表单提交和AJAX提交区别
+    1.使用场景
+        安全性一样 都是发送HTTP协议 
+        安全性与提交文件的业务处理(格式检测 防注入)有关
+        与提交方式无关
+        Form表单提交
+        一般登录 点击提交触发submit事件 
+        会使页面发生跳转 页面的跳转等行为的控制往往在后端
+        后端控制页面的跳转及数据的传递
+        AJAX提交
+        通过JS来提交请求 请求与响应均由JS引擎处理
+        页面不会刷新
+        不希望页面跳转/将控制权放在前端 
+        通过JS操作页面跳转或数据变化
+        AJAX有个隐藏问题 浏览器不保存密码 不符合用户习惯
+        理想方式
+            建立隐藏的iframe
+            把form标签的target指向iframe 
+            然后检测iframe状态
+    比较
+        1.AJAX在提交请求接收时 都是异步进行 网页不需要刷新 只刷新页面局部 不关心也不影响其他部分的内容
+         Form提交则是新建一个页面 哪怕是提交给自己本身的页面也需要刷新 为了维持页面用户对表单的状态改变 要在控制器和模板之间传递更多参数以保持页面状态
+        2.AJAX提交时 是在后台新建一个请求
+          Form是放弃本页面 然后再请求
+        3.AJAX必须要用JS实现 存在调试麻烦 浏览器兼容问题
+        不启动JS的浏览器 无法完成操作
+          Form表单是浏览器自带的 无论是否开启JS都可以提交表单
+        4.AJAX在提交 请求接收时 整个过程都需要使用程序对其进行数据处理 
+          Form表单提交 根据表单结构自动完成 不需要代码干预 用submit提交
+    其他方面
+        关于输入内容的校验 
+        AJAX可以在获取到元素内部用程序判断 
+        Form表单的属性中有校验的字段
+        easyui jeecg等中都封装 用户只需添加正则表达式的校验规则
+    
 
 
 

@@ -26,7 +26,16 @@
         使用v-model指令绑定表单元素时 
         可以在视图直接获得数据
         视图改变时 数据也会进行更新
-
+    Vue原理
+        采用数据劫持配合发布者-订阅者模式
+        通过Object.defineProperty()来劫持各个属性的getter和setter
+        在数据发生变化时 发布消息给依赖收集器 通知观察者 调用相应回调函数 更新视图
+        具体
+            1.MVVM作为绑定的入口 整合Observer Compiler Watcher三者 通过Observer监听model变化
+            2.Compiler解析编译模板指令 最终利用Watcher搭起Observer和Compiler之间的通信桥梁
+            3.从而达到数据变化=>更新视图
+              视图交互变化=>数据model变更
+              的双向绑定效果
     (数据驱动/响应式原理/双向数据绑定 底层原理 
     ES5的Object.defineProperty/数据劫持(setter&getter)+发布订阅观察者模式)
     (通过getter进行依赖收集 
@@ -40,7 +49,8 @@
      把patch对象渲染到视图中)
     (数据=>视图 绑定元素时 触发getter getter返回一个初始值 能在视图中看到数据)
     (视图=>数据 视图中内容改变时 触发setter(观察者)通知Vue视图已更新
-                Vue重新生成虚拟DOM/VDOM 通过新旧DO对比生成patch对象
+                Vue重新生成虚拟DOM/VDOM 
+                通过新旧DOM对比生成patch对象
                 将patch对象渲染到视图中 )
     (Vue响应式实现步骤
         数据更新=>视图变化
@@ -2149,7 +2159,8 @@ MVVM(Model View ViewModel)
         3.abstract: 
             支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式。
 48.location.href与Vue-router路由跳转区别
-    1.vue-router使用pushState进行路由更新 静态跳转 页面不会重新加载 location.href会触发浏览器 页面重新加载一次
+    1.vue-router使用pushState进行路由更新 静态跳转 页面不会重新加载 
+    location.href会触发浏览器 页面重新加载一次
     (使用router跳转和使用history.pushState()没有差别
     vue-router用了history.pushState()尤其是在history模式下)
     2.vue-router使用diff算法 实现按需加载 减少DOM操作
@@ -2178,6 +2189,16 @@ MVVM(Model View ViewModel)
         2.location.href可直接获取当前路径
         3.parent.location.href跳转到上一层页面
         4.top.location.href跳转到最外层页面
+49.Vue路由守卫哪些/如何设置/使用场景
+    常用的两个路由守卫
+        router.beforeEach/router.afterEach
+    每个守卫方法接收三个参数
+        to:Route:即将要进入的目标 路由对象
+        from:Route:当前导航正要离开的路由
+        next:Function:一定要调用该方法来resolve这个钩子
+    项目中 
+    一般在beforeEach这个钩子函数中进行路由跳转的一些信息判断
+    判断是否登录 是否拿到对应的路由权限
 49.导航守卫
     定义：
         导航守卫就是路由跳转过程中的一些钩子函数，再直白点路由跳转是一个大的过程，这个大的过程分为跳转前中后等等细小的过程，在每一个过程中都有一函数，这个函数能让你操作一些其他的事儿的时机，这就是导航守卫。
@@ -2540,7 +2561,32 @@ MVVM(Model View ViewModel)
     这个封装好的类的实例进来
     通知也只通知它一个
     再由它负责通知其他地方
-
+60.Vue路由懒加载
+    对于SPA单页面应用 当打包构建时 JS包会变得非常大
+    影响页面加载速度
+    将不同路由对应的组件分割成不同的代码块
+    当路由被访问时 才加载对应组件
+    1.Vue异步组件
+        Vue允许以一个工厂函数的方式定义你的组件
+        这个工厂函数会异步解析你的组件定义
+        Vue只在这个组件需要被渲染时才会触发该工厂函数
+        且会把结果缓存起来供未来重新渲染
+        这个工厂函数会收到一个resolve回调
+        这个回调函数会在你从服务器得到组件定义时被调用
+    2.动态import
+    3.webpack提供的require.ensure
+    构建项目比较大时 懒加载可以分割代码
+    提高页面初始加载效率
+    几种常见Vue中路由懒加载方法
+    1.resolve
+        主要使用了resolve异步机制 用require代替import实现按需加载
+    2.官网方法
+        vue-router在官网提供一种方法 
+        可以理解为通过Promise的resolve机制
+        因为Promise函数返回的Promise为resolve组件本身
+        我们可以使用import导入组件
+    3.require.ensure
+        这种模式可以通过参数中的webpackChunkName将js分开打包
 
 
 

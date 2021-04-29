@@ -9,6 +9,7 @@ function ListNode(val){
     this.next = null;
 }
 
+
 // 入参是头结点
 const hasCycle = function(head){
     while(head){
@@ -69,6 +70,21 @@ const decCycle = function(head){
     return null;
 }
 
+const decCycle = function(head){
+    if(!head||!head.next){
+        return null;
+    }
+    let slow = head;
+    let fast = head;
+    while(fast&&fast.next.next){
+        fast = fast.next.next;
+        slow = slow.next;
+        if(slow == fast){
+            return slow;
+        }
+    }
+    return null;
+}
 
 // 思维
 // 环形链表系列题目

@@ -17,6 +17,11 @@ function TreeNode(val){
 // 新建二叉树结点 调用构造函数 传入数据域的值
 const node = new TreeNode(1);
 
+function TreeNode(val){
+    this.val = val;
+    this.left = this.right = null;
+}
+
 // 一颗二叉树结构的递归实现
 const root = {
     val:'A',
@@ -52,6 +57,7 @@ const root = {
 //     // 递归遍历右子树
 //     preOrder(root.right);
 // }
+
 
 function preOrder(root){
     if(!root){

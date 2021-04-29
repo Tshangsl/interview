@@ -9,6 +9,8 @@ css-loader 匹配到CSS文件时 要用css-loader对css样式进行处理)
 html-webpack-plugin 打包HTML文件
 clean-webpack-plugin 
 mini-css-extract-plugin)
+(webpack打包工具 把所有文件看作是资源
+根据它们依赖关系打包成一个最终文件)
 0.webpack.config.js
     模式 mode
         development production(上线 压缩) 默认production
@@ -57,6 +59,25 @@ mini-css-extract-plugin)
         在上面的打包demo中，整个立即执行函数里边只有三个变量和一个函数方法，__webpack_modules__存放了编译后的各个文件模块的JS内容，__webpack_module_cache__ 用来做模块缓存，__webpack_require__是Webpack内部实现的一套依赖引入函数。最后一句则是代码运行的起点，从入口文件开始，启动整个项目。
         其中值得一提的是__webpack_require__模块引入函数，我们在模块化开发的时候，通常会使用ES Module或者CommonJS规范导出/引入依赖模块，webpack打包编译的时候，会统一替换成自己的__webpack_require__来实现模块的引入和导出，从而实现模块缓存机制，以及抹平不同模块规范之间的一些差异性。
         AST(抽象语法树 Abstract Syntax Tree)
+3.webpack3和webpack4区别
+    1.mode
+        webpack增加了一个mode配置 
+        只有两种值development|production
+        对不同的环境会启用不同的配置
+    2.CommonsChunkPlugin
+        CommonsChunkPlugin已被从webpack4中移除
+        可使用optimization.splitChunks进行模块划分(提取公用代码)
+        需注意一个问题 默认配置只会对异步请求的模块进行提取拆分
+        如果要对entry进行拆分
+        需要设置opmization.splitChunks.chunks = 'all'
+    3.webpack4使用MiniCssExtractPlugin取代ExtractTextWebpackPlugin。
+    4.代码分割
+        使用动态import 而不是用system.import/require.ensure
+    5.vue-loader
+        使用vue-loader插件为.vue文件中的各部分使用相对应的loader如css-loader
+    6.UglifyJsPlugin
+        现在也不需要使用这个plugin了，只需要使用optimization.minimize为true就行，production mode下面自动为true
+        optimization.minimizer可以配置你自己的压缩程序
 1.Webpack原理 loader plugin做什么的
 webpack是一个模块打包器（module bundler），提供了一个核心，核心提供了很多开箱即用的功能。
 同时它可以用loader和plugin来扩展。webpack本身结构精巧，基于tapable的插件架构，扩展性强，众多的loader或者plugin让webpack稍显复杂。

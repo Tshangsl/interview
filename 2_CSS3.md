@@ -409,15 +409,19 @@
         允许根据诸如像导航历史这样的外部因素来应用样式（例如 :visited）
         同样 根据内容的状态（例如在一些表单元素上的 :checked），或者鼠标的位置（例如 :hover 让你知道是否鼠标在一个元素上悬浮）应用样式。
     分类：
-        伪类：
+        伪类：(:active/:focus/:hover/:link/:visited/:first-child/:)
             :active，将样式添加到被激活的元素。
             :focus，将样式添加到被选中的元素。
             :hover，当鼠标悬浮在元素上方是，向元素添加样式。
             :link，将特殊的样式添加到未被访问过的链接。
             :visited，将特殊的样式添加到被访问的链接。
-            :first-child，将特殊的样式添加到元素的第一个子元素。
+            :first-child，将特殊的样式添加到元素的第一个子元素
+            :last-child 选择器匹配属于其父元素的最后一个子元素的每个元素 p:last-child等同于p:nth-last-child(1)
+            :nth-child(n) :nth-child(n)选择器匹配属于其父元素的第N个子元素 不论子元素的类型 --与类型无关
+            :nth-of-type 选择器匹配属于父元素的特定类型的第N个子元素的每个元素 --与类型有关
+            :nth-last-child(n):选择器匹配属于其元素的第N个子元素的每个元素 不论元素的类型 从最后一个子元素开始计数
             :lang，允许创作者来定义指定的元素中使用的语言。
-        伪元素：
+        伪元素：(:before/:after)
             :first-letter，将特殊的样式添加到文本的首字母。
             :first-line，将特殊的样式添加到文本的首行。
             :before，在某元素之前插入某些内容。
@@ -668,7 +672,7 @@ Top
                         使一个单词能够在换行时进行拆分 
                         文字和省略号贴合效果更佳
 30.CSS画一个圆
-    
+    通过设置border-radius实现
 31.Chrome实现css字体小于12px解决方法
     中文版的Chrome有个12px字体限制问题
     当字体小于12px时 都以12px显示
@@ -678,6 +682,72 @@ Top
             font-size:10px;
             -webkit-transform:scale(0.8);
         }
+32.CSS3新属性calc
+    calc运算规则
+        1.使用通用的数学运算规则
+        2.使用+-*/四则运算
+        3.可使用百分比 px em rem等单位
+        4.可混合使用各种单位进行计算
+        5.表达式中有+ 和-时 其前后必须有空格
+            如width:calc(12% + 5em)
+        6.表达式中有*和/时 其前后可以没有空格
+            但建议留有空格
+    浏览器兼容性
+        1.pc端浏览器对calc()兼容性尚可 
+        IE9+、FF4.0+、Chrome19+、Safari6+都得到较好支持
+        需要在其前面加上各浏览器厂商的识别符
+        2.移动端浏览器仅有firefox for android支持
+        需要在其前面加上各浏览器厂商的识别符
+33.文本垂直居中方式有哪些
+    单行文本
+        line-height = height;
+    多行文本    
+    1.父元素 vertical-align:middle
+            display:table-cell
+            可实现子元素垂直居中
+    2.父元素 display:flex;
+            align-items:center            
+    3.父元素 padding
+34.CSS实现阴影
+    box-shadow: h-shadow v-shadow blur spread color inset;
+    属性值：
+        h-shadow 必需 水平阴影的位置。允许负值
+        v-shadow 必需 垂直阴影的位置。允许负值
+        blur 可选 模糊距离
+        spread 可选 阴影的大小
+        color 可选 阴影的颜色。
+        inset 可选  从外层的阴影（开始时）改变阴影内侧阴影
+35.link和@import区别
+    (XHTML CSS/加载顺序/兼容性/DOM控制样式/@import可CSS中再次引入其他CSS样式表)
+    本质上
+        两种方式都是为了加载CSS文件
+    区别：
+        1.link属于XHTML标签 @import完全是CSS提供的一种方式
+            link标签 加载CSS 定义RSS 定义ref连接属性 
+            @import 加载CSS
+        2.加载顺序
+            当一个页面被加载时/被浏览者浏览时
+            link引用的CSS会同时被加载
+            @import引用的CSS会等到页面完全被下载完再加载
+            所以有时浏览@import加载CSS的页面时会没有样式/闪烁
+            网速慢的时候比较明显
+        3.兼容性
+            link标签兼容性好
+            @import是CSS2.1提出的 只有IE5以上才能识别
+        4.使用DOM控制样式时的差别
+            使用JS控制DOM改变样式时
+            只能使用link标签
+            @import不是DOM可以控制的(不支持)
+        5.@import可以在CSS中再次引入其他样式表(不推荐)
+            如创建一个主样式表
+            在主样式表中再引入其他样式表
+36.如何用CSS实现硬件加速
+    CSS animation transforms transitions 不会自动开启GPU加速
+    而是由浏览器缓慢的软件渲染引擎来执行 
+    所以可以使用transform:translateZ(0)开启硬件加速
+    transform:translate3d(0,0,0);也可以
+
+
 
 
 
