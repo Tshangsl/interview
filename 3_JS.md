@@ -1712,6 +1712,54 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
         循环调用别的函数
     尾调用
         在return的地方执行递归
+62.class创建组件和function创建组件区别 ...react框架
+    function创建的组件
+        1.使用function构造函数创建的组件 
+        内部没有state私有的数据 
+        只有一个props来接收外界传递过来的数据    
+        2.使用function创建的组件叫无状态组件
+        3.应用场景:
+            如果一个组件只需要根据外界传递过来的props 渲染固定的页面结构 此时非常使用 无状态组件
+        4.优点：
+            由于删除了组件的生命周期 运行速度会相当于快一点
+        import React from "react";
+        function Hello(props){
+            return (
+                <div>
+                    <h1>
+                        创建组件方式二-参数-{JSON.stringify(props)}
+                    </h1>
+                    <p>
+                        将组建抽离成单独的问你件
+                    </p>
+                </div>
+            )
+        }
+        //导出组件
+        export default Hello;
+    class创建的组件
+        1.使用Class关键字创建的组件 内部除了this.props这个只读属性外 还有一个专门用于存放自己私有数据的this.state属性 这个state是可读可写的
+        2.使用class创建的组件叫有状态组件
+            有状态组件有自己的生命周期
+        3.应用场景：
+            如果一个组件需要存放自己的私有数据
+            或需要在组件的不同阶段执行不同的业务逻辑
+            此时非常适合有状态组件
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

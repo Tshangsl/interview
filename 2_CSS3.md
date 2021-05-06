@@ -746,8 +746,9 @@ Top
     而是由浏览器缓慢的软件渲染引擎来执行 
     所以可以使用transform:translateZ(0)开启硬件加速
     transform:translate3d(0,0,0);也可以
-
-
+37.如何实现一个自适应的正方形
+    1.使用vw vh em rem等相对单位
+    2.
 
 
 

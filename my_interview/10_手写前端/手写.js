@@ -113,8 +113,8 @@ console.log(unique1([1, 22, 22, 1, 34, 54, 56, 67, 78, 66, 88]));
 // 将将 [1, [2, [3]]] 这种多层的数组拍平成一层 [1, 2, 3]。
 // 使用 Array.prototype.flat 可以直接将多层数组拍平成一层：
 
-function flatten(arr){
-    while(arr.some(item=>Array.isArray(item))){
+function flatten(arr) {
+    while (arr.some(item => Array.isArray(item))) {
         arr = [].concat(...arr);
     }
     return arr;
@@ -187,7 +187,7 @@ function lazyLoad() {
 }
 // 12.深度优先实现深拷贝 待完善几种方式
 function clone(obj) {
-    if (typeof(obj) != 'Object') return;
+    if (typeof (obj) != 'Object') return;
     var o = obj.constructor == Array ? [] : {}
     for (let p in obj) {
         if (typeof obj[p] === 'object') {
@@ -195,17 +195,17 @@ function clone(obj) {
         } else {
             o[p] = obj[p];
         }
-    } 
+    }
     return o
 }
 
-function clone(obj){
-    if(typeof(obj)!='object')return;
-    var o = obj.constructor == Array?[]:{}
-    for(let p in obj){
-        if(typeof obj[p] == 'object'){
+function clone(obj) {
+    if (typeof (obj) != 'object') return;
+    var o = obj.constructor == Array ? [] : {}
+    for (let p in obj) {
+        if (typeof obj[p] == 'object') {
             o[p] = clone(o[p]);
-        }else{
+        } else {
             o[p] = obj[p];
         }
     }
@@ -389,8 +389,8 @@ function _new() {
     return obj;
 }
 
-Object.create = function(o){
-    function F(){}
+Object.create = function (o) {
+    function F() { }
     F.prototype = o;
     return new F();
 }
@@ -492,17 +492,17 @@ Object.create = function (proto, propertyObject = undefined) {
 // 如果非对象参数出现在源对象的位置（即非首参数），那么处理规则有所不同。首先，这些参数都会转成对象，如果无法转成对象，就会跳过。这意味着，如果undefined和null不在首参数，就不会报错
 // Object.assign可以用来处理数组，但是会把数组视为对象。
 // hasOwnProperty()方法返回一个布尔值 指示对象自身属性中是否具有指定属性(也就是 是否有指定的键)
-Object.assign = function(target,...source){
-    if(target === null||target === undefined){
+Object.assign = function (target, ...source) {
+    if (target === null || target === undefined) {
         throw new TypeError('target is null or undefined');
     }
     // 将target转化为对象
     let ret = Object(target);
-    source.forEach(obj=>{
-        if(obj!=null){
-            for(let key in obj){
+    source.forEach(obj => {
+        if (obj != null) {
+            for (let key in obj) {
                 // 为什么要在此处进行判断 已经是key in obj
-                if(obj.hasOwnProperty(key)){
+                if (obj.hasOwnProperty(key)) {
                     ret[key] = obj[key];
                 }
             }
@@ -569,11 +569,11 @@ Array.prototype.map = function (callback, thisArg) {
         throw new TypeError('callback is not a function')
     }
     const O = Object(this);
-    const len = O.length>>>0;
-    let k =0,res=[];
-    while(k<len){
-        if(k in O){
-            res[k] = callback.call(thisArg,O[k],k,O)
+    const len = O.length >>> 0;
+    let k = 0, res = [];
+    while (k < len) {
+        if (k in O) {
+            res[k] = callback.call(thisArg, O[k], k, O)
         }
         k++;
     }
@@ -583,9 +583,4 @@ Array.prototype.map = function (callback, thisArg) {
 // filter
 // some
 // reduce
-
-
-
-
-
 

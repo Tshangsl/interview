@@ -2409,18 +2409,34 @@ MVVM(Model View ViewModel)
     Vue.js 是构建客户端应用程序的框架。
     默认情况下，可以在浏览器中输出 Vue 组件，进行生成 DOM 和操作 DOM。然而，
     也可以将同一个组件渲染为服务端的 HTML 字符串，将它们直接发送到浏览器，最后将这些静态标记"激活"为客户端上完全可交互的应用程序。 
-    即：SSR大致的意思就是vue在客户端将标签渲染成的整个 html 片段的工作在服务端完成，服务端形成的html 片段直接返回给客户端这个过程就叫做服务端渲染。
-    服务器端SSR优缺点如下:
-        1.服务端渲染的优点
-            1.更好的SEO
-                因为 SPA 页面的内容是通过 Ajax 获取，而搜索引擎爬取工具并不会等待 Ajax 异步完成后再抓取页面内容，所以在 SPA 中是抓取不到页面通过 Ajax 获取到的内容；而 SSR 是直接由服务端返回已经渲染好的页面（数据已经包含在页面中），所以搜索引擎爬取工具可以抓取渲染好的页面；
-            2.服务端渲染的缺点
-                更快的内容到达时间（首屏加载更快）： SPA 会等待所有 Vue 编译后的 js 文件都下载完成后，才开始进行页面的渲染，文件下载等需要一定的时间等，所以首屏渲染需要一定的时间；SSR 直接由服务端渲染好页面直接返回显示，无需等待下载 js 文件及再去渲染等，所以 SSR 有更快的内容到达时间；
-        2.服务端渲染的缺点
-            1.更多开发条件限制
-                例如服务端渲染只支持 beforCreate 和 created 两个钩子函数，这会导致一些外部扩展库需要特殊处理，才能在服务端渲染应用程序中运行；并且与可以部署在任何静态文件服务器上的完全静态单页面应用程序 SPA 不同，服务端渲染应用程序，需要处于 Node.js server 运行环境；
-            2.更多服务器负载
-                在 Node.js  中渲染完整的应用程序，显然会比仅仅提供静态文件的  server 更加大量占用CPU 资源 (CPU-intensive - CPU 密集)，因此如果你预料在高流量环境 ( high traffic ) 下使用，请准备相应的服务器负载，并明智地采用缓存策略。
+    SSR
+        vue在客户端将标签渲染成的整个html片段的工作在服务端完成
+        服务端形成html片段直接返回给客户端
+    优点：(SEO/首屏加载速度)
+        1.更好的SEO
+            SPA页面内容通过Ajax获取
+            搜索引擎爬取工具并不会等待Ajax异步完成后再抓取页面内容
+            SPA中抓取不到页面通过Ajax获取内容
+            SSR直接由服务端返回已经渲染好的页面
+            （数据已经包含在页面中）
+            搜索引擎爬取工具可抓取渲染好的页面；
+        2.首屏加载更快 
+            SPA 会等待所有Vue编译后JS文件都下载完成后
+            才开始进行页面的渲染
+            文件下载等需要一定的时间等
+            首屏渲染需要一定的时间
+            SSR 直接由服务端渲染好页面直接返回显示
+            无需等待下载js文件再去渲染等
+    缺点：(开发条件限制/服务器负载加重)
+        1.开发条件限制增多
+            SSR只支持beforCreate/created两个钩子函数
+            会导致一些外部扩展库需要特殊处理 
+            才能在服务端渲染应用程序中运行
+            且与可以部署在任何静态文件服务器上的完全静态单页面应用程序 SPA 不同
+            服务端渲染应用程序
+            需要处于 Node.js server 运行环境
+        2.服务器负载加重
+            在 Node.js  中渲染完整的应用程序，显然会比仅仅提供静态文件的  server 更加大量占用CPU 资源 (CPU-intensive - CPU 密集)，因此如果你预料在高流量环境 ( high traffic ) 下使用，请准备相应的服务器负载，并明智地采用缓存策略。
 51.Vue项目优化
         1.代码层面的优化 
             v-if 和 v-show 区分使用场景
@@ -2561,7 +2577,7 @@ MVVM(Model View ViewModel)
     这个封装好的类的实例进来
     通知也只通知它一个
     再由它负责通知其他地方
-60.Vue路由懒加载
+60.Vue路由懒加载(异步加载组件)
     对于SPA单页面应用 当打包构建时 JS包会变得非常大
     影响页面加载速度
     将不同路由对应的组件分割成不同的代码块
@@ -2587,6 +2603,245 @@ MVVM(Model View ViewModel)
         我们可以使用import导入组件
     3.require.ensure
         这种模式可以通过参数中的webpackChunkName将js分开打包
+61.Vue如何自定义指令
+    Vue提供默认内置指令外
+        允许开发人员根据实际情况自定义指令
+        作用价值在于当开发人员在某些场景下
+        需要对普通DOM元素进行操作的时候
+    1.注册自定义指令
+        Vue自定义指令和组件一样存在
+            全局注册
+                Vue.directive(id,[definition])
+                id:自定义指令名称 
+                    指令名称不需要加v-前缀 
+                    默认自动加上前缀
+                    使用指令时一定要加上前缀
+                [definition]
+                    对象数据/指令函数
+            局部注册
+                Vue实例中添加directives对象数据
+            钩子函数
+                一个指令定义对象可以提供如下几个钩子函数
+                    (均为可选)
+                bind:
+                    只调用一次 指令第一次绑定到元素时调用 这里可以进行一次性的初始化设置
+                inserted:
+                    被绑定元素插入父节点时调用
+                    (仅保证父节点存在 但不一定被插入文档中)
+                update:
+                    所在组件的VNode更新时调用
+                componentUpdated:
+                    指令所在组件的VNode及其子VNode全部更新后调用
+                unbind:
+                    只调用一次 指令与元素解绑时调用
+            指令钩子函数的参数：
+                el：
+                    指令所绑定的元素 可以用来直接操作DOM 即放置指令的那个元素
+                binding:
+                    一个对象 里面包含了几个属性
+                vnode：
+                    Vue编译生成的虚拟结点
+                oldVnode：
+                    上一个虚拟结点
+                    仅在update和componentUpdate钩子中可用
+62.Vue-Router源码
+    Vue-Router是Vue.js官方的路由管理器 它和Vue.js可信深度集成 使构建SPA更容易
+    目录结构
+        --components 组件
+            --link.js route-link的实现
+            --view.js route-view的实现
+        --create-matcher.js 创建匹配
+        --create-route-map.js 创建路由的映射
+        --history 操作浏览器记录的一系列内容
+            --abstract.js 非浏览器的history
+            --base.js   基本的history
+            -hash.js hash模式的history
+            -html5.js html5模式的history
+        --index.js 入口文件
+        --install.js 插件安装的方法
+        --util 工具类库
+            --async.js 异步操作的工具库
+            --dom.js dom相关的函数
+            --location.js 对location的处理
+            --misc.js 一个工具方法
+            --params.js 处理参数
+            --path.js 处理路径
+            --push-state.js 处理html模式的pushState
+            --query.js 对query的处理
+            --resolve-components.js 异步加载组件
+            --route.js 路由
+            --scroll.js 处理滚动
+            --warn.js 打印一些警告
+    使用Vue-router时 主要有以下几步
+        <div id="app">
+            <!-- 路由匹配到的组件将渲染在这里 -->
+            <router-view></router-view>
+        </div>    
+        // 1. 安装 插件
+        Vue.use(VueRouter);
+        // 2. 创建router对象
+        const router = new VueRouter({
+            routes // 路由列表 eg: [{ path: '/foo', component: Foo }]
+        });
+        // 3. 挂载router
+        const app = new Vue({
+            router
+        }).$mount('#app');
+
+        其中 VueRouter 对象，就在vue-router 的入口文件 src/index.js
+
+        VueRouter 原型上定义了一系列的函数
+        我们日常经常会使用到
+        主要有go/push/replace/back/forward
+        以及一些导航守护beforeEach/beforeResolve/afterEach 等等
+        上面html 中使用到的 router-view ，以及经常用到的 router-link 则存在 src/components 目录下。
+62.Router-link和Router-view
+    router-link和router-view在同一个Vue文件中
+    router-link
+        设置路由跳转
+        <router-lonk :to="...">声明式导航
+        router.push(...)编程式导航
+    router-view
+        根据路由显示组件
+    Vue中这两者相互依存
+        router-link对应HTML中的a标签
+        与a标签不同的是跳转的时候 
+        不会刷新页面
+        router-view相当于router-link的承载页面
+        用于显示router-link的内容
+63.编程式导航&声明式导航
+    声明式导航：
+        直接渲染到页面
+        <router-link to="/url">
+    编程式导航：
+        JS中处理逻辑后需要页面进行跳转
+        this.$router其实就是router
+        Vue为方便在组件中使用router 才添加this.$router
+        this.$router.push();
+            会进行页面跳转 同时会在历史记录上留下记录
+        this.$router.replace();
+            和push功能相同 但是会替换当前页出现在历史记录中
+        this.$router.go(num);
+            表示距离当前页的在历史记录上的页数
+        this.$router.back()
+            返回到上一页
+        this.$router.forward()
+            前进到下一页
+    共同点：
+        都能进行导航 都可以触发路由 实现组件切换
+    区别：
+        写法不一样
+        声明式导航写在组件的template中 通过router-link触发
+        编程式导航写在JS函数中 通过this.$router.push(xxx)触发
+
+64.Vue-Router导航守卫
+    官方
+        vue-router提供的导航守卫主要用来通过跳转或取消的方式守卫导航
+    实际
+        导航守卫就是路由跳转过程中的一些钩子函数
+        路由跳转是一个大过程 
+        这个大过程分跳转前中后等细小过程
+        每一个过程都有一个函数
+        可以让你操作一些其他的事的时机
+    导航守卫全解析
+        一个钩子函数执行后输出的顺序
+            全局前置守卫:beforeEach
+            路由beforeEnter守卫
+            组件路由守卫beforeRouterEnter 此时this并不指向该组件实例
+            全局解析守卫beforeResolve
+            全局后置守卫afterEach
+            组件生命周期beforeCreate
+            组件生命周期created
+            组件生命周期beforeMount
+            组件生命周期mounted
+            组件路由守卫beforeRouteEnter的next回调
+    导航守卫分三种
+        1.全局的
+            路由实例上直接操作的钩子函数 
+            特点:
+                所有路由配置的组件都会触发
+                即触发路由就会触发这些钩子函数
+                钩子函数按执行顺序包括
+                    beforeEach
+                        路由跳转前触发
+                        参数 to from next
+                        主要用作登录验证 
+                        即路由还没跳转提前告知
+                        免得跳转后再告知晚了
+                    beforeResolve
+                        路由跳转前触发
+                        参数 to from next
+                        区别：
+                            导航被确认之前
+                            同时再所有组件内守卫和异步路由组件被解析之后 解析守卫被调用
+                        在beforeEach和组件内beforeRouteEnter之后 
+                        afterEach之前调用
+                    afterEach
+                        与beforeEach相反
+                        路由跳转完成后触发
+                        参数
+                            to from
+                        在beforeEach和beforeResolve之后
+                        beforeRouteEnter(组件内守卫)之前
+        2.单个路由独享的
+            单个路由配置时 也可设置的钩子函数
+            目前只有一个钩子函数
+                beforeEnter
+                    和beforeEach完全相同
+                    如果都设置则在beforeEach之后紧随执行
+                    参数:
+                        to from next
+        3.组件内
+            组件内执行的钩子函数 
+            类似于组件内的生命周期
+            相当于为配置路由的组件添加的生命周期钩子函数
+            钩子函数按执行顺序包括
+            beforeRouteEnter
+                渲染该组件对应路由被comfirm前调用
+                不能获取组件实例this
+                因为当守卫执行前 组件实例还没被创建
+            beforeRouteUpdate
+                在当前路由改变 但是该组件被复用时调用
+                举例来说 对于一个带有动态参数的路径
+                /foo/:id 在/foo/1和/foo/2之间跳转
+                由于会渲染同样的Foo组件
+                因此组件实例会被复用
+                这个钩子会在这个情况下被调用
+                可以访问组件实例的this
+            beforeRouteLeave
+                导航离开该组件的对应路由调用
+                可以访问组件实例this
+        导航守卫回调参数
+            to:目标路由对象
+            from:即将要离开的路由对象
+            next:最重要一个参数
+            PS:
+                1.但凡涉及到有next参数的钩子 必须调用next()才能继续往下执行下一个钩子 否则路由跳转会停止
+                2.如果要中断当前的导航要调用next(false)如果浏览器的URL改变了(可能是用户手动或浏览器后退按钮)则URL地址会重置到from路由对应的地址
+                (主要用于登录验证不通过的处理)
+                3.next可以这样使用 next('/')/next({path:'/'})跳转到一个不同的地址 意思是当前导航被中断 然后进行一个新的导航 可传递的参数和router.push()选项一致
+                4.在beforeRouteEnter钩子中next((vm)=>{})内接受的回调函数参数为当前组件的实例vm 这个回调函数在生命周期mounted之后调用 即它是所有导肮守卫和生命周期函数最后执行的那个钩子
+                5.next(errror) 如果传入next的参数是一个Error实例 则导航会被终止且该错误会被传递给router.onError()注册过的回调
+    总结：
+        切换路由时：
+            beforeRouterLeave->
+            beforeEach->
+            beforeEnter->
+            beforeRouteEnter->
+            beforeResolve->
+            afterEach->
+            beforeCreate->
+            created->
+            beforeMount->
+            mounted->
+            beforeRouteEnter的next回调
+        路由更新时:
+            beforeRouteUpdate
+
+
+
+
+
 
 
 
