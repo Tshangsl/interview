@@ -112,6 +112,14 @@ console.log(unique1([1, 22, 22, 1, 34, 54, 56, 67, 78, 66, 88]));
 // 8.数组扁平化 ES5实现 递归
 // 将将 [1, [2, [3]]] 这种多层的数组拍平成一层 [1, 2, 3]。
 // 使用 Array.prototype.flat 可以直接将多层数组拍平成一层：
+
+function flatten(arr){
+    while(arr.some(item=>Array.isArray(item))){
+        arr = [].concat(...arr);
+    }
+    return arr;
+}
+
 function flatten(arr) {
     let result = [];
     for (let i = 0, len = arr.length; i < len; i++) {
@@ -124,7 +132,7 @@ function flatten(arr) {
     return result;
 }
 console.log(flatten([1, [1, 2, [1, 2, 3]]]));
-// 8.数组扁平化 ES6实现 ??
+// 8.数组扁平化 ES6实现
 function flatten1(arr) {
     while (arr.some(item => Array.isArray(item))) {
         arr = [].concat(...arr);
@@ -190,6 +198,20 @@ function clone(obj) {
     } 
     return o
 }
+
+function clone(obj){
+    if(typeof(obj)!='object')return;
+    var o = obj.constructor == Array?[]:{}
+    for(let p in obj){
+        if(typeof obj[p] == 'object'){
+            o[p] = clone(o[p]);
+        }else{
+            o[p] = obj[p];
+        }
+    }
+    return o;
+}
+
 // call不固定参数 apply数组 bind
 // 13.call 使用一个指定的this值和一个/多个参数来调用一个函数
 /*
