@@ -747,12 +747,56 @@ Top
     所以可以使用transform:translateZ(0)开启硬件加速
     transform:translate3d(0,0,0);也可以
 37.如何实现一个自适应的正方形
-    1.使用vw vh em rem等相对单位
-    2.
-
-
-
-
+    1.使用vw相对单位
+        .placeholder{
+            width:100%;
+            height:100vw;
+        }
+        优点:简洁方便
+        缺点：浏览器兼容性不好
+    2.设置垂直方向padding撑开容器
+        CSS盒模型中 
+        margin padding的百分比数值相对父元素宽度计算
+        .placeholder{
+            width:100%;
+            padding-bottom:100%;
+        }
+        给容器内添加内容  高度溢出
+        内容区域占据38px高度 设置容器高度为0
+        .placehoder{
+            width:100%;
+            padding-bottom:100%;
+            height:0;
+        }
+        优点：简洁明了 兼容性好
+        缺点：填充内容后会出现问题
+            可能碰上max-height不收缩
+    3.利用伪元素的margin(padding)-top撑开容器
+        .placeholder{
+            width:100%;
+        }
+        .placehoder:after{
+            content:'';
+            display:block;
+            //margin百分比相对于父元素宽度计算
+            margin-top:100%;
+        }
+        margin collapse
+            容器与伪元素在垂直方向发生外边距折叠
+        在父元素上触发BFC
+        .placeholder{
+            width:100%;
+            overflow:hidden;
+        }
+        .placehoder:after{
+            content:'';
+            display:block;
+            //margin百分比相对于父元素宽度计算
+            margin-top:100%;
+        }
+        PS：若使用垂直方向上的padding撑开父元素
+            则不需要触发BFC
+    如果需求是制作相对视口高度自适应的正方形 使用vh单位
 
 
 

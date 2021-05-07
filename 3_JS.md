@@ -831,8 +831,13 @@ JS
             var person1 = new Person('hanmeimei')
             person1.say() //hanmeimei
 20.ES5/ES6继承有什么区别
-    (ES5通过prototype/构造函数机制实现 先创建子类的实例对象 再将父类的方法添加到this上)
-    (ES6先创建父类的实例对象this(所以必须先调用父类的super方法)再用子类的构造函数修改this)
+    (ES5通过prototype/构造函数机制实现 
+        先创建子类的实例对象 
+        再将父类的方法添加到this上)
+    (ES6
+        先创建父类的实例对象this
+        (所以必须先调用父类的super方法)
+        再用子类的构造函数修改this)
     1.ES5继承通过prototype或构造函数机制实现
         实质上是先创建子类的实例对象 
         然后再将父类的方法添加到this上

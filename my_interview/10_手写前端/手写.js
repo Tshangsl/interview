@@ -109,6 +109,49 @@ function unique1(arr) {
     return [...new Set(arr)];
 }
 console.log(unique1([1, 22, 22, 1, 34, 54, 56, 67, 78, 66, 88]));
+// 7.数组乱序 sort实现
+/*
+    Math.random()-0.5随机得到一个正数 负数 0
+    正数按降序排列
+    负数按升序排列
+    0不变
+    由此得到一个乱序数组
+*/
+var values = [1, 2, 3, 4, 5];
+values.sort(function () {
+    return Math.random() - 0.5;
+})
+console.log(values);
+// 7.数组乱序 Fisher-Yates实现
+/*
+    该算法由Ronald Fisher和Frank Yates首次提出
+    原理
+        遍历数组元素 
+        将当前元素与以后随机位置的元素进行交换
+    Math.floor()
+        返回小于或等于一个给定数字的最大整数
+        可以理解为向下取整
+*/
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length; i; i--) {
+        j = Math.floor(Math.random() * i);
+        x = a[i - 1];
+        a[i - 1] = a[j];
+        a[j] = x;
+    }
+    return a;
+}
+// 7.数组乱序 Fisher-Yates ES6实现
+/*
+    使用ES6解构赋值新特性
+*/
+function shuffle(a) {
+    for (let i = a.length; i; i--) {
+        let j = Math.floor(Math.random() * i);
+        [a[i - 1], a[j]] = [a[j], a[i - 1]];
+    }
+}
 // 8.数组扁平化 ES5实现 递归
 // 将将 [1, [2, [3]]] 这种多层的数组拍平成一层 [1, 2, 3]。
 // 使用 Array.prototype.flat 可以直接将多层数组拍平成一层：
@@ -580,7 +623,402 @@ Array.prototype.map = function (callback, thisArg) {
     return res;
 }
 
+const { rejects } = require('assert');
 // filter
+// 返回一个新数组 符合既定条件的元素
+Array.prototype.filter = function(arr,callback){
+    let flag = !Array.isArray(arr)||!arr.length||typeof callback !=='function'
+    if(flag){
+        return [];
+    }else{
+        let newArr = [];
+        for(let index = 0;index<arr.length;index++){
+            if(callback(arr[index],index,arr)){
+                newArr.push(arr[index]);
+            }
+        }
+        return newArr;
+    }
+}
+
 // some
+
 // reduce
+//按顺序执行 最后结果汇总为一个值返回 需要判断有无初始值
+function reduce(arr,callback,initValue){
+    let flag = !Array.isArray(arr)||!arr.length||typeof callback !=='function';
+    if(flag){
+        return []
+    }else{
+        // 判断有没有初始值
+        let isValue = initValue === 0?(!initValue):(!!initValue);
+        let reduceValue = isValue?initValue:arr[0];
+        // 判断相加的值
+        for(let index = isValue?0:1;index<arr.length;index++){
+            reduceValue = callback(reduceValue,arr[index],index,arr)
+        }
+        return reduceValue;
+    }
+}
+
+// JS手写callback封装成promise实现方法
+// 封装fs异常回调为测试对象
+const fs = require('fs');
+const { resolve } = require('path');
+const promisify = function (fn, receiver) {
+    return function () {
+        let _len = arguments.length,
+            args = Array(_len),
+            _key = 0;
+        for (_key; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+        return new Promise((resolve, rejects) => {
+            //PS:以下数组内的function执行的是fn的最后一个参数 示例里就是fs,re    
+            fn.apply(receiver, [].concat(args, [function (er, res) {
+                return err ? rejects(err) : resolve(res);
+            }]))
+        })
+    }
+}
+const readFilePromise = promisify(fs.readFile, fs);
+readFilePromise('./test.html', 'utf-8').then(res => {
+    console.log(res);
+}).catch(err => {
+    console.log(err);
+})
+
+// 写一个函数可以控制最大并发数
+function concurrentPoll() {
+    this.tasks = [];
+    this.max = 10;
+    setTimeout(() => {
+        this.run();
+    }, 0)
+}
+concurrentPoll.prototype.addTask = function (task) {
+    this.tasks.push(task);
+}
+concurrentPoll.prototype.run = function () {
+    if (this.tasks.length == 0) {
+        return
+    }
+    var min = Math.min(this.tasks.length, max);
+    for (var i = 0; i < min; i++) {
+        this.max--;
+        var task = this.tasks.shift();
+        task().then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        }).finally(() => {
+            this.max++;
+            this.run();
+        })
+    }
+}
+
+// JSONP
+/*
+    AJAX请求有跨域限制
+
+    远程服务器上设法把数据装进JS格式文件中
+    供客户端调用和进一步处理
+
+    JSON纯字符数据格式 可简洁描述复杂数据
+    JSON被JS原生支持
+
+    web客户端通过与调用脚本相同的方式
+    调用跨域服务器上动态生成的JS格式文件
+    服务器之所以要动态生成JSON文件
+    目的就在于把客户端需要的数据装进去
+
+    为便于客户端使用数据
+    逐渐形成一种非正式传输协议 称为JSONP
+    该协议一个要点 允许用户传递一个callback参数给服务端
+    服务端返回数据时将这个callback参数作为函数名来包裹住JSON数据
+    这样客户端可随意定制自己的函数自动处理返回数据
+*/
+const jsonP = ({ url, params, callbackName }) => {
+    // 提供JSONP服务的URL地址
+    // 不管是什么类型的地址 最后生成的返回值都是一段JS代码
+    /*不把远程JS文件写死 在调用的URL中传递一个code参数
+     告诉服务器参数信息
+     callback参数告诉服务器 本地回调函数叫xxxHandler
+     把查询结果传入这个函数中进行调用
+     */
+    const geturl = () => {
+        let dataSrc = ''
+        for (let key in params) {
+            dataSrc += `${key}=${params[key]}&`
+        }
+        dataSrc += `callback=${callbackName}`
+        return `${url}?${dataSrc}`
+    }
+    return new Promise((resolve, reject) => {
+        // 创建script标签 设置其属性
+        const script_ = document.createElement('script');
+        script_.src = geturl();
+        // 把script标签加入head 此时调用开始
+        document.body.appendChild(script_)
+        window[callbackName] = data => {
+            resolve(data)
+            document.body.removeChild(script_)
+        }
+    })
+}
+
+// 实现一个异步队列Queue 要求按时间依次执行callback
+/*
+    new Queue().task(1000,function(){
+        console.log(1);
+    }).task(2000,function(){
+        console.log(2);
+    }).start()
+*/
+function Queue2() {
+    this.queue = [];
+    this.task = (time, fn) => {
+        this.queue.push(resolve => {
+            setTimeout(()=>{
+                resolve(fn());
+            },time)
+        })
+    }
+    this.start = async()=>{
+        for(let item of this.queue){
+            await new Promise(item);
+        }
+    }
+}
+
+// JS实现一个异步队列来按顺序执行函数 Promise实现
+var funcs = [func1,func2,func3];
+var funPromise = funcs.map(function(func,i){
+    return new Promise(function(resolve){
+        func();
+        console.log('func'+(i+1)+'well done');
+        // 如果func是异步方法 需要把resolve定义到方法的callback中
+        resolve();
+    })
+})
+Promise.all(funcPromise).then(function(){
+    console.log('all well done');
+})
+
+// JS实现一个异步队列来顺序执行函数 async/await实现
+var funcs = [func1,func2,func3];
+(async()=>{
+    for(let i =0;i<focus.length;i++){
+        await funcs[i]();
+        console.log('func'+(i+1)+'well done');
+    }
+    console.log('all well done');
+
+})
+
+// 类型封装函数
+function getType(value){
+    // 判断数据是null的情况
+    if(value === null){
+        return value+"";
+    }
+    // 判断数据是引用数据类型的情况
+    if(typeof value === "object"){
+        let valueClass = Object.prototype.toString.call(value).split(' ')[1];
+        let type = valueClass.substring(0,valueClass.length-1);
+        return type.toLowerCase(); 
+    // 判断数据是基本数据类型的情况
+    }else{
+        return typeof value;
+    }
+}
+
+// generator自动执行函数
+// 做什么用的
+// Promise封装读取文件方法
+function readFile(fileName){
+    return new Promise((resolve,reject)=>{
+        fs.readFile(fileName,function(err,data){
+            if(err) reject(err);
+            resolve(data.toString());
+        })
+    })
+}
+// generator函数
+function* gentT2(){
+    var f1 = yield readFile('ip.txt');
+    var f2 = yield readFile('ip1.txt');
+    console.log(f1,f2);
+}
+// 自动执行方法
+function run(gen){
+    var g = gen();
+    function next(data){
+        var res = g.next(data);
+        if(res.done) return res.value;
+        res.value.then((data)=>{
+            next(data);
+        })
+    }
+    next();
+}
+
+
+// 发布订阅者模式
+/*
+    EventEmitter是Node.js内置模块events提供的一个类
+    它是Node事件流的核心 是服务端的东西
+    on(event,listener)
+        为指定事件注册一个监听器 接收一个字符串event和一个回调函数
+    off/removeAllListner(event,listener)
+        移除指定事件的所有监听回调    
+    emit(event,[arg1],[arg2])
+        按监听器顺序执行执行每个监听器
+    once(event,listner)
+        和on类似 但只触发一次 随后便解除事件监听
+*/
+class EventEmitter{
+    constructor(){
+        // 初始化events事件对象
+        this._events = {}
+    }
+    /*
+        触发事件
+        原理:将该事件添加到该事件类型的队列中
+        状态:未执行
+    */
+    on(event,cb){
+        // 获取原队列
+        const query = this._events[event]||{};
+        // 队列中追加cb
+        query.push(cb);
+        // 重新赋值事件队列
+        this._events[event] = query;
+    }
+    /*
+        取消事件
+        原理:将所有该事件类型的事件从队列中删除
+        状态:取消执行
+    */
+    off(event,cb){
+    // 获取原队列
+        const query = this._events[event];  
+        // 取消事件
+        this._events[event] = query&&query.filter(fn=>fn!==cb)
+        return this;
+    }
+    /*
+        触发事件
+        原理:执行该事件类型的所有事件 按照队列顺序执行
+        状态:准备执行|执行中
+        使用方式:xx.emit(eventName,args)
+    */
+    emit(...args){
+        // 获取事件队列
+        const query = this._events[args[0]];
+        // 获取事件触发的参数
+        const params = Array.prototype.slice.call(args,1);
+        // 执行事件队列中的回调函数数组
+        query.forEach(fn=>{
+            fn.call(params);
+        })
+        return this
+    }
+    /*
+        单次触发事件
+        原理:执行一次该事件
+    */
+   once(event,cb){
+        // 封装一个单次执行函数
+        const wrapperFun = (...args)=>{
+            // 执行回调函数
+            cb.apply(this,args);
+            // 移除事件队列中所有该类型的回调函数
+            this.off(event,cb)
+        }
+        // 将单次执行函数添加到事件队列
+        this.on(event,wrapperFun);
+        return this;
+    }
+}
+
+// 实现sleep Promise+setTimeout
+function sleep(time){
+    return new Promise(resolve=>{
+        console.log(resolve);
+        setTimeout(resolve,time)
+    })
+}
+sleep(10000).then(res=>{
+    console.log('sleep exe ending');
+})
+
+// 实现sleep callback回调
+function sleep(time,callback){
+    return new Promise(resolve=>{
+        setTimeout(callback,time)
+    })
+}
+sleep(3000,()=>{
+    console.log('sleep exe ending');
+})
+
+// 实现sleep data+循环
+function sleep(time){
+    const startDate = new Date().getTime();
+    while(new Date().getTime()-startDate<time){};
+}
+sleep(3000);
+console.log('sleep exe ending');
+
+// 实现promise.all
+// Array.from()方法从一个类数组/可迭代对象创建一个新的 浅拷贝的数组
+Promise.prototype.all = function(iterators){
+    const promises = Array.from(iterators);
+    const promiseList = [],
+        len = promises.length;
+    let count = 0;
+    return new Promise((resolve,reject)=>{
+        promises.forEach((promise,index)=>{
+            Promise.resolve(promise).then(res=>{
+                count++;
+                promiseList[index] = res;
+                if(count === len){
+                    resolve(promiseList);
+                }      
+            }).catch(e=>{
+                reject(e);
+            })
+        })
+    })
+}
+
+// 实现Promise.retry 重试
+/*
+目的：
+    为解决同步调用失败重新尝试问题
+代码实现原理：
+    手写一个随机数生成函数 
+    判断结果是否大于或小于某个阈值
+    如在判断次数以内
+    依据返回结果
+    否则重新尝试执行随机数生成函数
+    超过判断次数则抛出异常
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
