@@ -234,4 +234,44 @@
         不是最后
             找到该元素的下一个元素
             在它下一个元素之前用insertBefore插入
+22.JS中的textContent/innerText/innerHTML用法及区别
+    1.textContent用法
+        1.设置标签中的文本内容
+        2.获取标签中的文本内容
+    2.
+    3.
+    4.innerText和textContent区别
+        1.设置标签中的文本内容 应该使用textContent属性 谷歌火狐支持 IE8不支持
+        2.设置标签中的文本内容 应该使用innerTetx属性 谷歌火狐IE8都支持
+        3.如果这个属性在浏览器中不支持 则该属性的类型是undefined
+        4.判断这个属性的类型是否是undefined 就知道浏览器是否支持
+    5.
+        1.如果使用innerText主要设置文本 设置标签内容 是没有标签效果的
+        2.innerHTML可以设置文本内容
+        3.innerHTML的主要作用是在标签中设置新的HTML标签 是有标签效果的
+        4.
+        5.
+        6.
+23.e.clientX e.clientY e.pageX e.pageY e.offsetX e.offsetY
+e.clientX e.clientY
+    鼠标相对于浏览器窗口可视区域的X Y坐标
+    窗口坐标 可视区域不包括工具栏和滚动条
+    IE事件和标准事件都定义了这两个属性
+e.pageX e.pageY
+    类似于e.clientX e.clientY
+    它们使用的是文档坐标而非窗口坐标
+    这两个属性不是标准属性 但是得到了广泛支持
+    IE事件中没有这两个贤惠能干
+e.offsetX e.offsetY
+    鼠标相对于事件源对象srcElement的X Y坐标
+    只有IE事件有这两个属性 标准事件没有对应的属性
+e.screenX e.screenY
+    鼠标相对于用户显示器屏幕左上角的X,Y坐标。标准事件和IE事件都定义了这2个属性
+
+
+
+
+
+
+
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拖拽</title>
+    <style>
+        *{
+            margin:0;
+            padding: 0;
+        }
+        #div1{
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="box1">
+        <div id="div1"></div>
+    </div>
+    <script>
+        var oDiv1 = document.getElementById('div1');
+        oDiv1.onmousedown = function(e){
+            let left = oDiv1.offsetLeft;
+            let top = oDiv1.offsetTop;
+            let x = e.clientX;
+            let y = e.clientY;
+            document.onmousemove = function(e){
+                oDiv1.style.left = e.clientX - x+left+'px';
+                oDiv1.style.top = e.clientY-y+top+'px';
+            }
+        }
+        oDiv1.onmouseup = function(){
+            document.onmousemove = null;
+        }
+    </script>
+</body>
+</html>

@@ -53,18 +53,29 @@ Cookie/Session/Token/JWT用于客户端和服务器端进行会话验证的凭�
         Token和JWT区别：
             1.Token需要查数据库验证Token是否有效
               令牌 是访问资源的凭证 
-            2.JWT不用查数据库/少查询数据库 直接在服务器端进行校验 
+            2.JWT
+            包含三部分
+                Header 头部
+                Payload 负载
+                Signature 签名
+                由三部分生成token 三部分之间用.作分割
+            不用查数据库/少查询数据库 直接在服务器端进行校验 并且不用查库
             因为用户的信息及加密信息在第二部分payload负载和第三部分signature签证中已经生成 
-  
             只要在服务端进行校验就行 校验也是JWT自己实现的
         Token认证流程
             1，用户输入用户名 密码 发送给服务器
             2.服务器验证用户名和密码 正确则返回一个签名过的Token(Token可以认为就是个长字符串 浏览器客户端拿到这个Token)
-            3.后续每次请求中 浏览器会把Token作为Http Header发送给服务器 服务器验证签名是否有效 如果有效则认证成功 可以返回客户端请求的数据
+            3.后续每次请求中 
+            浏览器会把Token作为Http Header发送给服务器 
+            服务器验证签名是否有效 
+            如果有效则认证成功 可以返回客户端请求的数据
             PS：这种方式的特点就是客户端的Token自己保留大量信息 服务器没有存储这些信息
-        JWT概念
-            JWT是JSON Web Token的缩写 它将用户信息加密到Token中 服务器不保存任何内部信息
-            服务器通过使用保存的密匙验证Token的正确性 只要正确即通过验证
+        JWT
+            JWT JSON Web Token缩写 
+            将用户信息加密到Token中 
+            服务器不保存任何内部信息
+            服务器通过使用保存的密匙验证Token的正确性 
+            只要正确即通过验证
         JWT组成(Header/PayLoad/Signature)
             三个部分
             Header头部
@@ -259,19 +270,35 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         SSL握手通过交换三个随机数 计算出主会话密钥
         由于安全性，会继续扩展出更多的临时密钥。
         保证通讯过程的绝对安全
-4.Cookie Session 和Token JWT(基于token实现)
+4.Cookie Session Token JWT(基于token实现)
 (客户端和服务器端进行会话验证的凭证)
     Cookie Session Token 存在的意义
         (HTTP无状态协议 浏览器不会保留任何会话信息 服务端无法确定访问者 用于客户端和服务端进行会话验证的凭证)
         (Cookie里可以存储JSON格式的数据 JSON格式数据其实就是符合key-value键值对的字符串格式数据)
         (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 用于客户端和服务器端进行会话验证的凭证 )
-        (Cookie 存储在客户端 只能存储字符串数据 cookie.setMaxAge()设置任意时间有效 不超过4k
-        |Session(基于Cookie实现) 存储在服务器端 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大)
-        (Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session
+
+        1.Cookie/Session
+
+        保存用户状态 
+        主要用于客户端和服务端进行会话验证的凭证
+
+        (Cookie 存储在客户端 只能存储字符串数据 cookie.setMaxAge()可以设置任意时间有效 不超过4k
+        |Session(基于Cookie实现) 存储在服务器端 占用资源 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大
+        服务器集群情况下 无法轻易做到共享)
+
+        2.Session/Token
+        (Session 占用服务端资源 使S有状态化 服务器集群需要用到缓存
+        |Token 不占用服务端资源 使S无状态化)
+        
+        3.Token/JWT
+        (Token:服务端验证客户端发来的token信息要进行数据的查询操作
+        |JWT验证客户端发来的token信息 服务端使用密钥校验 不用数据库的查询 存放在cookie中 存放在localStorage中)
+
+        (Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session认证流程
             1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
             2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
-        )
             3.当客户端再次访问服务器端时，请求会自动判断该域名下是否存在Cookie信息，如果有则发给服务器端，服务器端会从Cookie中拿到SessionID，再根据SessionID找到对应的Session，如果有对应的Session则通过，继续执行请求，否则就中断
+        )
         (Token 访问API所需资源凭证 不需存储服务端 服务端只需根据客户端传来的token进行合法验证)
         (JWT:基于token实现 流程
             1.客户端发送用户信息给服务端请求登录
@@ -281,14 +308,9 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
                 JWT机制和/Session机制十分相似
         )
         (Session和Token Session 是一种记录服务器和客户端会话状态的机制，使服务端有状态化，可以记录会话信息。
-         Token 是令牌，访问资源接口（API）时所需要的资源凭证。Token 使服务端无状态化，不会存储会话信息。)
-         (JWT:存放在cookie中 存放在localStorage中)
-         (服务端验证客户端发来的token信息要进行数据的查询操作；
-         JWT验证客户端发来的token信息就不用， 在服务端使用密钥校验就可以，不用数据库的查询。)
+        Token 是令牌，访问资源接口（API）时所需要的资源凭证。Token 使服务端无状态化，不会存储会话信息。)
          HTTP是一种无状态协议 无法确保每一次会话是否为同一个用户发出 浏览器不会保留任何会话信息 所以服务器端也就无法确定访问者信息，因此浏览器和服务端会进行一个会话跟踪，在进行一些特殊用户权限才有的操作时，将用户状态用Cookie或Session保存起来
-    Cookie Session ：将用户状态用cookie和session保存起来 主要用于客户端和服务端进行会话验证的凭证
-    Cookie：(存储在客户端)(expires/max-age)
-        一种主要用于客户端和服务端进行会话验证的凭证
+    Cookie
         属性表：
             1.name=value String 键值对,字符串类型，用于设置Cookie 的名称和值        
             2.expires 符合 HTTP-date 规范的时间戳 指定Cookie 的生存期，用于设置Cookie的过期时间
@@ -300,34 +322,127 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
             2.服务器端通过在HTTP响应头设置Set-Cookie
                 服务器端设置后，客户端再次同一服务端发起请求时，就会携带这个Cookie并发到服务端上
                 在域名相同(端口号不同的跨域)的情况下，Cookie是可以共享的，而其他跨域情况则无法共享
-    Session：(session存储在服务器端 SessionId存储在客户端的Cookie中 安全性比cookie高)
-        1.基于Cookie实现的另一种记录服务器端和客户端会话状态的机制
-        2.Session存储在服务端，而SessionId会被存储在客户端的Cookie中
-        认证过程：
-            1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(也就是Set-Cookie)
-            2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
-            3.当客户端再次访问服务器端时，请求会自动判断该域名下是否存在Cookie信息，如果有则发给服务器端，服务器端会从Cookie中拿到SessionID，再根据SessionID找到对应的Session，如果有对应的Session则通过，继续执行请求，否则就中断
-        缺点及解决方案：
-            扩展性不好，Session面对服务器集群是无法共享Session的。
-            Session是存储在Tomcat容器中的，所以如果后端机器是多台的话，多个机器间是无法共享Session的，此时可以使用Spring提供的分布式Session的解决方案，将Session放在Redis中
-    Cookie和Session区别：
-        1.安全性:因为Cookie可以通过刻划断修改，而Session只能在服务器端设置，所以安全性比Cookie高，一般会用于验证用户登陆状态
-        2.适用性：Cookie只能存储字符串数据，而Session可以存储任意类型数据
-        3.有效性 Cookie可以设置任意时间有效，而Session一般失效事件短
-        4.继承性 一般客户端设置Cookie，如果要用于验证就需要服务器端创建Session
-    Token：(访问API所需资源凭证 不需存储服务端 服务端只需根据客户端传来的token进行合法验证)
-        访问资源接口(API-Application Programming Interface)时所需要的资源凭证
-        与Session相比，token的优点时不需要存储数据在服务端
+    Session
+        基于Cookie实现的另一种记录服务器端和客户端会话状态的机制
+        Session缺点
+            1.当服务器访问量增加时 会存在很多Session 
+            如果没有设置超时或销毁的话 
+            很容易造成服务器崩溃等状况
+            2.服务端为集群或分布式时 
+            用户登陆其中一台服务器
+            会将session保存到该服务器的内存中 
+            但是当用户访问到其他服务器时
+            会无法访问
+            通常采用缓存一致性技术来保证可以共享
+            或者采用第三方缓存来保存session
+            会不方便
+        解决方案：
+            存储在Tomcat容器中的
+            如果后端机器多台
+            多个机器间无法共享Session
+            使用Spring提供的分布式Session的解决方案将Session放在Redis中
+    Token：
+        (访问API所需资源凭证 
+        不需存储服务端 
+        服务端只需根据客户端传来的token进行合法验证)
+        访问资源接口
+        (API-Application Programming Interface)
+        所需要的资源凭证
+    是什么：
+        token是一种身份验证的机制 
+        初始时用户提交账号数据给服务端
+        服务端采用一定策略生成一个字符串token
+        token字符串包含少量用户信息
+        并有一定期限
+        服务端会把token字符串传给客户端
+        客户端保存token字符串
+        并在接下来的请求中带上这个字符串
+    Token机制
+        1.服务端如何根据token获取用户信息
+            服务端生成token时 加入少量用户信息 比如用户id
+            服务端接收到token之后 可以解析出这些数据
+            从而将token和用户关联起来
+        2.如何确保识别伪造的token
+        (代指token不是经过服务端来生成)
+            一般情况下 建议放入token中的数据是不敏感的数据
+            这样只要服务端使用私钥对数据生成签名 然后和数据拼接起来 作为token一部分即可
+            如JWT
+            另一种模式 基于加密的算法
+                对数据进行加密 把加密的结果作为token
+        3.如何应对冒充情况
+            1.加干扰码
+            2.有效期
+            3.token刷新
+        非法客户端拦截合法客户端的token
+        然后使用这个token向服务端发送请求
+        冒充合法客户端
+    拦截验证
+        客户端每一次请求 
+        必须携带token UA 
+        拦截器会对敏感资源的访问进行拦截
+        然后根据UA解析Token
+        解析不成功 
+        表示Token与UA不匹配
+        解析成功之后
+        判断Token是否已过期
+        如果是 拒绝服务
+        所有都通过情况下
+        拦截器方向 
+        请求传达到业务服务者
+    Token优点(与Session相比)
+        1.不需要存储数据在服务端
         服务端只需要根据客户端传来的token进行合法验证
-        通过后则返回请求资源即可，减轻了服务器端的资源占用压力
-        目前最流行的JWT(JSON WEB TOKEN)就是基于token实现，以下以JWT标准介绍token
-    JWT认证流程：
+        通过后返回请求资源
+        减轻服务器端的资源占用压力
+        目前最流行的JWT(JSON WEB TOKEN)就是基于token实现
+        以下以JWT标准介绍token
+    JWT
+    三个部分
+        Header 头部
+            一个JSON对象 描述JWT的元数据
+            {"alg":"HS256","typ":"JWT"}
+            alg属性:(algorithm)
+                签名的算法 默认是HMAC SHA256(写成HS256)
+            typ属性:(type)
+                这个令牌(token)的类型(type)
+                JWT令牌统一写成JWT
+            最后 将上面的JSON对象使用Base64URL转成字符串
+        Payload 负载
+            一个JSON对象 用来存放实际要传递的数据
+            JWT规定了7个官方字段 供选用
+            iss(issuer):签发人
+            exp (expiration time)：过期时间
+            sub (subject)：主题
+            aud (audience)：受众
+            nbf (Not Before)：生效时间
+            iat (Issued At)：签发时间
+            jti (JWT ID)：编号
+            除了官方字段 还可以在这个部分定义私有字段
+            { "sub": "1234567890", "name": "sssssss", "admin": true }
+            JWT默认是不加密的 任何人都可以读到 不要把秘密信息放在这个部分
+            这个JSON对象也要使用Base64URL算法转成字符串
+        Signature 签名
+            JWT的第三部分是一个签证信息
+            该签证信息由三部分组成
+            header(base64后)
+            payload(base64后)
+            secret(服务器端自定义的一个秘钥)
+            这个部分需要base64加密后的header
+            base64加密后的payload使用连接组成的字符串
+            以及秘钥secret构成一个组合
+            通过header中声明的加密方式对这个组合进行加密
+            构成了jwt的第三部分。
+        写成一行就是
+        Header.Payload.Signature
+    认证流程：
         1.客户端发送用户信息给服务端请求登录
-        2.服务端验证用户信息，验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie 或 localStorage 中
-        3.客户端继续第二次业务请求，请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
+        2.服务端验证用户信息
+        验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie 或 localStorage 中
+        3.客户端继续第二次业务请求
+        请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
         4.服务端根据 headers 中的 Token 进行验证，验证通过后返回业务请求的数据
-    JWT优点：
-        1.可用于应用管理，避开同源策略
+    Token/JWT优点：
+        1.完全由应用管理，可以避开同源策略
         2.避免 CSRF(Cross Site Request Forgery) 跨站请求伪造 攻击
         3.实现无状态服务端，能够在多个服务间使用，可扩展性好
 5.cookie session token JWT
@@ -370,6 +485,10 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         1.占资源： 每个经过认证的用户都要存放session到内存中，而随着认证用户的增多，服务端的开销较大。
         2.CSRF攻击：基于cookie来进行用户识别时,用户cookie如果被截获，就容易受到跨站请求伪造的攻击。
     3.Token(令牌)
+    (Session记录C/S会话状态的机制
+    使服务端有状态化 可以记录会话信息/)
+    (Token 令牌 访问API时所需资源凭证
+    使服务端无状态化 不会存储会话信息)
         定义：
             token(令牌) 是一串字符串，通常作为鉴权凭据，最常用的使用场景是 API 鉴权。
          token 主要有三种：
@@ -384,15 +503,23 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         token鉴权流程：
             。。。
         Refresh Token：
-            专用于刷新 access token 的 token。Access Token的有效期比较 短，当 Acesss Token 由于过期而失效时，使用 Refresh Token 就可以获取到新的 Token，如果 Refresh Token过期就只能重新登陆了。
+            专用于刷新 access token 的 token
+            Access Token的有效期比较 短
+            当 Acesss Token 由于过期而失效时
+            使用 Refresh Token 就可以获取到新的 Token
+            如果 Refresh Token过期就只能重新登陆了。
         Token 和 Session 的区别：
-            1.Session 是一种记录服务器和客户端会话状态的机制，使服务端有状态化，可以记录会话信息。
-            Token 是令牌，访问资源接口（API）时所需要的资源凭证。Token 使服务端无状态化，不会存储会话信息。
+            
+            
             2.Session 和 Token 并不矛盾，作为身份认证 Token 安全性比 Session 好，因为每一个请求都有签名还能防止监听以及重放攻击
             3.而 Session 就必须依赖链路层来保障通讯安全了。如果你需要实现有状态的会话，仍然可以增加 Session 来在服务器端保存一些状态。
-            4.所谓 Session 认证只是简单的把 User 信息存储到 Session 里，因为 SessionID 的不可预测性，暂且认为是安全的。而 Token ，如果指的是 OAuth Token 或类似的机制的话，提供的是 认证 和 授权 ，认证是针对用户，授权是针对 App 。其目的是让某 App 有权利访问某用户的信息。
+            4.所谓 Session 认证只是简单的把 User 信息存储到 Session 里，因为 SessionID 的不可预测性，暂且认为是安全的
+            而 Token ，如果指的是 OAuth Token 或类似的机制的话，提供的是 认证 和 授权 ，认证是针对用户，授权是针对 App 。其目的是让某 App 有权利访问某用户的信息。
     4.JWT
-        JSON Web Token（简称JWT）是目前最流行的跨域认证解决方案，是一种认证授权机制，是一种基于 JSON 的开放标准。
+        JSON Web Token（简称JWT）
+        目前最流行跨域认证解决方案
+        一种认证授权机制
+        一种基于 JSON 的开放标准
         组成：
             一个 JWT token 是一个字符串，它由头部、载荷与签名三部分组成，中间用 . 分隔，形式如下：
             base64(header).base64(json payload).signature
@@ -437,8 +564,10 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         使用 JWT 时需要考虑的问题
             1.JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
             2.JWT 不加密的情况下，不能将秘密数据写入 JWT。
-            3.JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。
-            4.JWT 最大的优势是服务器不再需要存储Session，使得服务器认证鉴权业务可以方便扩展。
+            3.JWT 不仅可以用于认证，也可以用于交换信息。
+            有效使用 JWT，可以降低服务器查询数据库的次数。
+            4.JWT 最大的优势是服务器不再需要存储Session
+            使得服务器认证鉴权业务可以方便扩展。
                 但这也是 JWT 最大的缺点：由于服务器不需要存储 Session 状态，因此使用过程中无法废弃某个 Token 或者更改 Token 的权限。也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。
             5.JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
             6.JWT 适合一次性的命令认证，颁发一个有效期极短的JWT，即使暴露了危险也很小由 于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
@@ -1834,7 +1963,7 @@ http2.0
         http1.0 默认使用非持久连接 
         http1.1 通过使用持久连接来使多个http请求复用同一个 TCP连接 
         避免使用非持久连接时每次需要建立连接的时延。
-    2.资源请求方面
+    2.资源请求方面 断点续传功能
         http1.0 中 存在一些浪费带宽的现象 如客户端只是需要某个对象的一部分 服务器却将整个对象送过来了，不支持断点续传功能
         http1.1 则在请求头引入了 range 头域
         它允许只请求资源的某个部分，即返回码是 206（Partial Content），这样就方便了开发者自由的选择以便于充分利用带宽和连接。

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>select</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #main {
+            position: relative;
+            width: 280px;
+            height: 42px;
+        }
+
+        #content {
+            width: 280px;
+            height: 42px;
+            line-height: 42px;
+            padding-left: 10px;
+            background: rgb(255, 255, 255);
+            border-radius: 2px;
+            border: 1px solid rgb(221, 221, 221);
+            font-size: 16px;
+            font-family: MicrosoftYaHei;
+            color: rgb(51, 51, 51);
+            cursor: pointer;
+        }
+
+        #selectImg {
+            position: absolute;
+            top: 13px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        #selectItem {
+            display: none;
+            border: 1px solid #eee;
+            width: 290px;
+        }
+
+        #selectItem ul {
+            list-style: none;
+        }
+
+        #selectItem ul li {
+            height: 30px;
+            line-height: 30px;
+            padding-left: 10px;
+            cursor: pointer;
+        }
+
+        #selectItem ul li:hover {
+            background-color: #f5f7fa;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div id="content">
+
+        </div>
+        <img src="" alt="" id="selectImg">
+        <div id="selectItem"></div>
+    </div>
+    <script>
+        let data = [{ name: '北京', value: '1' }, { name: '上海', value: '2' }];
+        let content = document.getElementById('content');
+        let selectImg = document.getElementById('selectImg');
+        let selectItem = document.getElementById('selectItem');
+
+        // content中的ul和li是使用JS语法动态生成的
+        let ul = document.createElement('ul');
+        selectItem.appendChild(ul);
+        for (let i = 0; i < data.length; i++) {
+            let li = document.createElement('li');
+            // setAttribute()方法添加指定的属性 并为其赋指定的值
+            // 如这个指定的属性已存在 则仅仅设置更改值
+            li.setAttribute('data-value', data[i].value);
+            li.innerText = data[i].name;
+            ul.appendChild(li);
+        }
+
+        // 点击下拉箭头 设置内容列表显示隐藏
+        selectImg.onclick = function () {
+            console.log(selectItem.style.display);
+            if (selectItem.style.display == 'none' || selectItem.style.display == '') {
+                selectItem.style.display = 'block';
+            } else {
+                selectItem.style.display = 'none';
+            }
+        }
+
+        // 点击content区域设置列表显示隐藏
+        content.onclick = function () {
+            if (selectItem.style.display == 'none' || selectItem.style.display == '') {
+                selectItem.style.display = 'block';
+            } else {
+                selectItem.style.display = 'none';
+            }
+        }
+
+        // 点击每个列表行 控制内容
+        let lis = selectItem.getElementsByTagName('li');
+        for (let i = 0; i < lis.length; i++) {
+            lis[i].onclick = function () {
+                content.innerText = this.innerHTML;
+                selectItem.style.display = 'none';
+            }
+        }
+
+    </script>
+</body>
+
+</html>

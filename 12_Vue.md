@@ -405,15 +405,6 @@ Vue中nextTick机制
         (Vue.nextTick  在DOM更新后做点什么 参数回调函数 DOM更新完调用)
         (数据变化后要执行某个操作 这个操作需要使用随数据改变而改变DOM结构 这个操作应该放进Vue.$nextTick()的回调函数中)
         (为了在数据变化之后等待Vue完成更新DOM 可以在数据变化之后立即使用Vue.nextTick(callback)这样回调函数在DOM更新完后就会调用)
-        JS运行机制
-            JS 执行是单线程的，它是基于事件循环(eventLoop)的。事件循环大致分为以下几个步骤:
-                1.所有同步任务主线程上执行 形成一个执行栈（execution context stack）。
-                2.主线程之外 存在一个"任务队列"（task queue）
-                    异步任务有了运行结果 就在"任务队列"之中放置一个事件
-                3.一旦"执行栈"中的所有同步任务执行完毕
-                    系统会读取"任务队列"，看看里面有哪些事件。
-                    那些对应的异步任务，于是结束等待状态，进入执行栈.
-                4.开始执行。主线程不断重复上面的第三步。
         (主线程的执行过程就是一个tick 而所有的异步操作都是通过任务队列来调度)
         (消息队列中存放的是一个个任务task
             task分
@@ -425,8 +416,10 @@ Vue中nextTick机制
             决定如何执行宏任务macro微任务micro的机制
         )
         消息队列中存放的是一个个的任务（task）。
-        规范中规定 task 分为两大类，分别是 macro task(宏任务) 和 micro task(微任务).
-        并且每个 macro task 结束后，都要清空所有的 micro task。
+        规范中规定 task 分为两大类
+            macro task(宏任务)
+            micro task(微任务)
+            每个 macro task 结束后，都要清空所有的 micro task。
         浏览器中常见宏任务
              setTimeout、MessageChannel、postMessage、setImmediate
         宏任务优先级
@@ -439,11 +432,19 @@ Vue中nextTick机制
             MutationObsever 和 Promise.then
         微任务优先级
             process.nextTick>Promise=MutationObserver
+        延迟调用优先级
+            Promise>MutationObserver>setImmediate>setTimeout
         异步更新队列：
-            Vue在更新DOM时是异步执行的 只要监听到数据变化 Vue将开启一个队列 并缓冲在同一事件循环中发生的所有数据变更。
-            如果同一个 watcher 被多次触发，只会被推入到队列中一次。
-            这种在缓冲时去除重复数据对于避免不必要的计算和 DOM 操作是非常重要的。
-            然后，在下一个的事件循环“tick”中，Vue 刷新队列并执行实际 (已去重的) 工作。
+            Vue在更新DOM时是异步执行的 
+            只要监听到数据变化 
+            Vue将开启一个队列 
+            并缓冲在同一事件循环中发生的所有数据变更
+            如果同一个 watcher 被多次触发
+            只会被推入到队列中一次
+
+            缓冲时去除重复数据对于避免不必要的计算和 DOM 操作非常重要
+            下一个事件循环“tick”中
+            Vue 刷新队列并执行实际 (已去重的) 工作。
             Vue 在内部对异步队列尝试使用原生的 Promise.then、MutationObserver 和 setImmediate
             如果执行环境不支持，则会采用 setTimeout(fn, 0) 代替。
             在 vue2.5 的源码中，macrotask 降级的方案依次是：setImmediate、MessageChannel、setTimeout
@@ -451,9 +452,60 @@ Vue中nextTick机制
             1.vue 用异步队列的方式来控制 DOM 更新和 nextTick 回调先后执行
             2.microtask 因为其高优先级特性，能确保队列中的微任务在一次事件循环前被执行完毕
             3.考虑兼容问题,vue 做了 microtask 向 macrotask 的降级方案
+        Vue.nextTick实现原理
+            MutationObserver/MO
+                是H5中的API 是一个用于监听DOM变动的接口 
+                它可以监听一个DOM对象上发生的
+                    子节点删除 
+                    属性修改
+                    文本内容修改等
+            调用过程
+                先给它绑定回调 得到MO实例
+                这个回调会在MO实例监听到变动时触发
+                这里的MO回调放在microtask中执行
+                // 创建MO实例
+                const observer = new MutationObserver(callback)
+                const textNode = '想要监听的Don节点'
+                observer.observe(textNode, {
+                    characterData: true // 说明监听文本内容的修改
+                })
+            源码
+                nextTick的实现单独有一个JS文件来维护它
+                在src/core/util/next-tick.js中
+                nextTick源码主要分两块
+                    能力检测
+                        由于宏任务耗费时间大于微任务
+                        浏览器支持情况下 优先使用微任务
+                        浏览器不支持微任务 再使用宏任务
+                    根据能力检测以不同方式执行回调队列 
+                        next-tick.js对外暴露了nextTick这一个参数 所以每次调用Vue.nextTick时会执行:
+                        1.把传入的回调函数cb压入callbacks数组
+                        2.执行timeFunc函数 延迟调用flushCallbacks函数
+                        3.遍历执行callbacks数组中所有函数
+                        这里的callbacks没有直接在nextTick中执行回调函数原因是 保证在同一个tick内多次执行nextTick 不会开启多个异步任务 而是把这些异步任务都压成一个同步任务在下一个tick执行完毕
+            语法
+                Vue.nextTick([callback,context])
+                参数:
+                    {Function}[callback]:
+                        回调函数 不传时提供promise调用
+                    {Object}[context]:
+                        回调函数执行的上下文环境 
+                        不传默认自动绑定到调用它的实例上
+                    Vue实例方法vm.$nextTick做了进一步封装
+                    把context参数设置为当前Vue实例
+            使用目的
+                为了可以获取更新后的DOM
+            触发时机
+                同一事件循环中的数据变化后 
+                DOM完成更新
+                立即执行Vue.nextick()的回调
 14.Vue render函数(用来生成VDOM)
     Vue渲染/render函数用来生成VDOM/虚拟DOM
     1.Vue更新渲染render整体流程
+        (模板编译生成AST/
+        AST生成Vue的render渲染函数/
+        render渲染函数结合数据生成VDOM树/
+        diff和patch后生成新的UI界面 真实DOM渲染)
         1.模板通过编译Compiler生成AST(Abstract Synax Tree)抽象语法树
         2.AST生成Vue的render渲染函数
         3.render渲染函数结合数据生成VNODE(Virtual DOM Node)树
@@ -461,35 +513,31 @@ Vue中nextTick机制
         概念解释：
         模板：
             Vue模板是纯HTML 
-            基于Vue的模板语法 可以比较方便地处理数据和UI界面
+            基于Vue的模板语法 
+            可以比较方便地处理数据和UI界面
         AST：(Abstract Synax Tree)
             Vue将HTML模板解析为AST 
             并对AST进行一些优化的标记处理 
             提取最大的静态树 
             以使VDOM直接跳过后面的diff
         render渲染函数
-            (Vue推荐使用模板构建应用程序 
+            (Vue推荐使用模板创建HTML构建应用程序 
             底层实现中Vue最终还是会将模板编译成render渲染函数 
-            若想得到更好的控制 
-            可以直接写渲染函数)
+            若想得到更好的控制 一些场景中 真正需要JS的完全编程能力
+            可以直接写渲染函数 它比模板更接近编译器)
             用来生成VDOM 
-            Vue推荐使用模板构建应用程序
-            底层实现中Vue最终还是会将模板编译成渲染函数
-            若我们想要得到更好的控制 可以直接写渲染函数
         Watcher：
             (每一个Vue组件都有一个对应的watcher 
             它会在组件render时收集组件所依赖的数据
             并在依赖更新时触发组件重新渲染 
             Vue会自动优化并更新需要更新的DOM)
         render函数可以作为一条分割线
-            (render函数左边编译期 将Vue模板转换成渲染函数)
-            (render函数右边运行时 将渲染函数生成的VDOM树 进行diff和patch)
+            (将Vue模板编译成AST生成render函数/
+            数据结合render函数生成VDOM树 diff和patch映射到真正的DOM树)
+            (render函数左边/编译期/将Vue模板转换成渲染函数)
+            (render函数右边/运行时/将渲染函数生成的VDOM树 进行diff和patch)
             1.render函数左边可以称为编译期 将Vue模板转换成渲染函数
             2.render函数右边可以称为运行时 将渲染函数生成的VDOM树 进行diff和patch
-    2.render
-        Vue推荐绝大多数情况下 使用模板创建HTML 
-        一些场景中 真正需要JS的完全编程能力
-        可以用渲染函数 它比模板更接近编译器
     3.虚拟DOM
         1.Vue编译器在编译模板后 会将这些模板编译成渲染函数render 当渲染函数render被调用时 会返回一个虚拟DOM树
         2.在Vue底层实现上 Vue将模板编译成虚拟DOM渲染函数 结合Vue自带的响应系统 在相应状态改变时 Vue能智能计算出重新渲染组件的最小代价并映射到DOM操作上
