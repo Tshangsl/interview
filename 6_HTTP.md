@@ -28,9 +28,10 @@ post提交数据|参数无长度限制|数据放在http请求体|不会被浏览
 HTTPS 有CA证书 (SSL安全套接字协议 身份验证|加密|完整)有SSL加密传输协议 默认443端口)
 4.
 (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 
-Cookie/Session/Token/JWT用于客户端和服务器端进行会话验证的凭证 )
-        (Cookie 存储在客户端 只能存储字符串数据 可设置任意时间有效 cookie.setMaxAge() 不超过4k
-        |Session(基于Cookie实现) 存储在服务器端 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大)
+Cookie/Session/Token/JWT
+用于客户端和服务器端进行会话验证的凭证 )
+        (Cookie 存储在客户端 只能存储字符串数据 可设置任意时间有效 cookie.setMaxAge() 不超过4k 不可跨域
+        |Session(基于Cookie实现) 存储在服务器端 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 占用服务端资源 服务器集群状态下 无法轻易做到资源共享)
         (Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session
             1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
             2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
@@ -271,57 +272,73 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         由于安全性，会继续扩展出更多的临时密钥。
         保证通讯过程的绝对安全
 4.Cookie Session Token JWT(基于token实现)
-(客户端和服务器端进行会话验证的凭证)
-    Cookie Session Token 存在的意义
+        
+        Cookie Session存在意义
         (HTTP无状态协议 浏览器不会保留任何会话信息 服务端无法确定访问者 用于客户端和服务端进行会话验证的凭证)
         (Cookie里可以存储JSON格式的数据 JSON格式数据其实就是符合key-value键值对的字符串格式数据)
-        (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 用于客户端和服务器端进行会话验证的凭证 )
+        (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 浏览器和服务端会进行一个会话跟踪，在进行一些特殊用户权限才有的操作时，将用户状态用Cookie或Session保存起来 用于客户端和服务器端进行会话验证的凭证 )
 
-        1.Cookie/Session
-
-        保存用户状态 
-        主要用于客户端和服务端进行会话验证的凭证
-
-        (Cookie 存储在客户端 只能存储字符串数据 cookie.setMaxAge()可以设置任意时间有效 不超过4k
-        |Session(基于Cookie实现) 存储在服务器端 占用资源 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大
-        服务器集群情况下 无法轻易做到共享)
-
-        2.Session/Token
-        (Session 占用服务端资源 使S有状态化 服务器集群需要用到缓存
-        |Token 不占用服务端资源 使S无状态化)
-        
+        1.Cookie/Session对比
+        共同点:保存用户状态 客户端和服务端进行会话验证的凭证
+        (Cookie 存储在客户端 只能存储字符串数据 cookie.setMaxAge()可以设置任意时间有效 不超过4k cookie不可跨域 会受到CSRF攻击 不可跨域
+        |Session(基于Cookie实现) 存储在服务器端 占用资源 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 服务器集群情况下 无法轻易做到共享 需要借助缓存
+        由于是借助cookie实现的 可能会受到CSRF攻击 基于cookie实现 不可跨域)
+        2.Session/Token对比
+        (Session 一种记录服务器和客户端会话状态的机制 占用服务端资源 使服务器端有状态化 可以存储会话信息 服务器集群需要用到缓存做资源共享 会受到CSRF攻击 基于cookie实现有跨域问题 多点登录
+        |Token 令牌 访问API所需资源凭证 不占用服务端资源 使服务器端无状态化 不会存储会话信息 不会受到CSRF攻击 不受同源策略限制 单点登录)
         3.Token/JWT
-        (Token:服务端验证客户端发来的token信息要进行数据的查询操作
-        |JWT验证客户端发来的token信息 服务端使用密钥校验 不用数据库的查询 存放在cookie中 存放在localStorage中)
-
-        (Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session认证流程
+        (Token: 访问API所需资源凭证 令牌 不需存储在服务器端 服务端验证客户端发来的token信息 要进行数据的查询操作 完全由应用管理 避开同源策略 避免受到CSRF攻击
+            服务器端验证方法：查询服务器端数据库
+        |JWT验证客户端发来的token信息 服务端使用密钥校验 不用数据库的查询 存放在cookie/localStorage中 存放在localStorage中 完全由应用管理 完全避开同源策略 避免受到CSRF攻击
+            服务器端验证方法：)
+        
+        1.(Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session认证流程
             1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
             2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
             3.当客户端再次访问服务器端时，请求会自动判断该域名下是否存在Cookie信息，如果有则发给服务器端，服务器端会从Cookie中拿到SessionID，再根据SessionID找到对应的Session，如果有对应的Session则通过，继续执行请求，否则就中断
         )
-        (Token 访问API所需资源凭证 不需存储服务端 服务端只需根据客户端传来的token进行合法验证)
-        (JWT:基于token实现 流程
+        2.(JWT:基于token实现 流程
             1.客户端发送用户信息给服务端请求登录
             2.服务端验证用户信息，验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie/localStorage 中
             3.客户端继续第二次业务请求，请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
             4.服务端根据 headers 中的 Token 进行验证，验证通过后返回业务请求的数据
                 JWT机制和/Session机制十分相似
         )
-        (Session和Token Session 是一种记录服务器和客户端会话状态的机制，使服务端有状态化，可以记录会话信息。
-        Token 是令牌，访问资源接口（API）时所需要的资源凭证。Token 使服务端无状态化，不会存储会话信息。)
-         HTTP是一种无状态协议 无法确保每一次会话是否为同一个用户发出 浏览器不会保留任何会话信息 所以服务器端也就无法确定访问者信息，因此浏览器和服务端会进行一个会话跟踪，在进行一些特殊用户权限才有的操作时，将用户状态用Cookie或Session保存起来
     Cookie
-        属性表：
-            1.name=value String 键值对,字符串类型，用于设置Cookie 的名称和值        
-            2.expires 符合 HTTP-date 规范的时间戳 指定Cookie 的生存期，用于设置Cookie的过期时间
+        cookie不可跨域 每个cookie都会绑定单一的域名 无法在别的域名下获取使用 一级域名和二级域名之间是允许共享使用的
+        cookie跨域问题产生
+            一个cookie从一个服务器产生 在另一个服务器需要用到 由于浏览器安全策略 cookie只能在同一域名产生和使用
+        cookie组成
+            1.Name Value name=value String 键值对,字符串类型，用于设置Cookie 的名称和值
+            2.Expires 符合 HTTP-date 规范的时间戳 指定Cookie 的生存期，用于设置Cookie的过期时间
             3.max-age non-zero-digit 在 cookie 失效之前需要经过的秒数,与expires功能相似
-            4.domain 域名String 指定Cookie 所属的域名，默认为当前域名
-            5.path URL 路径 指定 cookie 在哪个路径（路由）下生效，默认是 '/'
-        创建方式:
+            4.Domain 
+                域名String 指定Cookie 所属的域名，默认为当前域名
+                指cookie的域名 当访问localhost的接口时会自动携带cookie
+            5.Path URL 路径 指定 cookie 在哪个路径（路由）下生效，默认是 '/'
+            Size
+            HTTP
+        cookie创建方式
             1.客户端通过js设置，举例，用一个js-cookies库 已封装好document.cookie方法
             2.服务器端通过在HTTP响应头设置Set-Cookie
                 服务器端设置后，客户端再次同一服务端发起请求时，就会携带这个Cookie并发到服务端上
                 在域名相同(端口号不同的跨域)的情况下，Cookie是可以共享的，而其他跨域情况则无法共享
+        cookie跨域解决方案
+        1.设置Nginx代理服务器 
+            将两个服务器域名统一到一个反向代理服务器
+        2.顶级域名与二级域名
+            (使用二级域名共享cookie有一个限制条件
+            两个域名的二级域名必须相同)
+            通过设置domain
+            顶级域名服务器与二级域名服务器之间那个设置都能生效
+            设置完毕后写回到客户端 
+            用另一个服务器即可访问此cookie
+        cookie跨域解决方案
+            1.服务端将cookie写到客户端后 客户端对cookie进行解析 
+            将token解析出来 此后请求都把这个Token带上即可
+            2.多个域名共享cookie 在写到客户端的时候设置cookie的domain
+            3.将Token保存在SessionStorage中
+            (不依赖cookie就没有跨域问题)
     Session
         基于Cookie实现的另一种记录服务器端和客户端会话状态的机制
         Session缺点
@@ -342,12 +359,30 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
             多个机器间无法共享Session
             使用Spring提供的分布式Session的解决方案将Session放在Redis中
     Token：
+        三种：
+            1.自定义的 token：开发者根据业务逻辑自定义的 token
+            2.JWT：JSON Web Token，定义在 RFC 7519 中的一种 token 规范
+            3.Oauth2.0：定义在 RFC 6750 中的一种授权规范，其实并不是一种 token，只是其中也有用到 token。
         (访问API所需资源凭证 
         不需存储服务端 
         服务端只需根据客户端传来的token进行合法验证)
         访问资源接口
         (API-Application Programming Interface)
         所需要的资源凭证
+    简单token组成
+        UID用户唯一的身份标识
+        time当前时间的时间戳
+        sign
+        (签名 token的前几位以哈希算法压缩成的一定长度的十六进制字符串)
+    引入：
+        Token是在客户端频繁向服务端请求数据 
+        服务端频繁去数据库查询用户名和密码并进行对比
+        判断用户名和密码正确与否 
+        并作出相应提示
+    使用Token目的：
+        减轻服务器压力
+        减少频繁的查询数据库
+        使服务器更加健壮    
     是什么：
         token是一种身份验证的机制 
         初始时用户提交账号数据给服务端
@@ -363,7 +398,7 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
             服务端接收到token之后 可以解析出这些数据
             从而将token和用户关联起来
         2.如何确保识别伪造的token
-        (代指token不是经过服务端来生成)
+            (代指token不是经过服务端来生成)
             一般情况下 建议放入token中的数据是不敏感的数据
             这样只要服务端使用私钥对数据生成签名 然后和数据拼接起来 作为token一部分即可
             如JWT
@@ -376,6 +411,61 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         非法客户端拦截合法客户端的token
         然后使用这个token向服务端发送请求
         冒充合法客户端
+    Token身份验证流程
+        对称加密算法
+        加密
+            将登录凭证做数字签名
+            加密后得到字符串作为token
+        解密
+            拿到token串 做解密和签名认证
+            判断其有效性
+    Token有效期问题
+        如果这个Token在服务端持久化(如存入数据库)
+        它就是一个永久的身份令牌
+        解决操作过程中不能让用户感到Token失效问题
+        1.在服务器端保存Token状态 
+            用户每次操作都会自动刷新(推迟)Token过期时间
+            Session就是采用这种策略保持用户登陆状态
+            前后端分离 SPA 每秒可能发起很多次请求
+            每次刷新过期时间代价大
+            为提升效率 减少消耗
+            把Token过期时间保存在缓存/内存中
+        2.使用Refresh Token 可以避免频繁的读写操作
+            服务端不需要刷新Token过期时间
+            一旦Token过期 反馈给前端
+            前端使用Refresh Token
+            申请一个全新的Token继续使用
+            服务器端只需在客户端请求更新Token时
+            对Refresh Token有效性检查
+            Refresh Token也有有效期 
+            不过长一点
+    Refresh Token
+        Refresh Token及过期时间是存储在服务器的数据库中
+        只有在申请新的AccessToken时才会验证 
+        不会对业务接口响应时间造成影响
+        也不需要向Session一样
+        一致保存在内存中应对大量请求
+
+        专用于刷新 access token 的 token
+        Access Token的有效期比较 短
+        当 Acesss Token 由于过期而失效时
+        使用 Refresh Token 就可以获取到新的 Token
+        如果 Refresh Token过期就只能重新登陆了
+    Token无状态
+        如果把所有状态信息都附加在Token上 服务器就可以不保存
+        但服务端仍然要认证Token有效
+        只要服务端能确认是自己签发的Token 
+        且其信息未被改动过 就可认为Token有效
+        签名可以实现上述所说
+        此处签发和验证都是同一方
+        (非同一方 非对称加密算法)
+        对称加密算法即可达到要求
+        对称加密算法比非对称算法快得多
+    Token单点登录
+        Token无状态后 单点登录就相对容易
+        前端拿到一个有效的Token 
+        它就可以在任何同一体系的服务上认证通过
+        只要它们使用相同的密钥和算法来认证Token的有效性
     拦截验证
         客户端每一次请求 
         必须携带token UA 
@@ -389,6 +479,10 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         所有都通过情况下
         拦截器方向 
         请求传达到业务服务者
+    Token服务器端有效性校验
+        服务器端利用算法生成token
+        并将token存储在高并发的数据库中
+        并设置过期时间
     Token优点(与Session相比)
         1.不需要存储数据在服务端
         服务端只需要根据客户端传来的token进行合法验证
@@ -396,13 +490,44 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         减轻服务器端的资源占用压力
         目前最流行的JWT(JSON WEB TOKEN)就是基于token实现
         以下以JWT标准介绍token
+        2.服务端不用存放token数据
+        用解析token的计算时间换取session的存储空间
+        从而减轻服务器的压力
+        减少频繁查询数据库
+    Token特点
+        1.服务端无状态化 可扩展性好
+        2.支持移动端设备
+        3.安全
+        4.支持跨程序调用
+    Token用处
+        1.防止表单重复提交
+        2.反CSRF
+        3.身份验证 单点登录
+    如果你的用户数据可能需要和第三方共享
+    或允许第三方调用API接口 用Token
     JWT
+        JSON Web Token
+        目前最流行的跨域认证解决方案
+        一种认证授权机制
+        一种基于 JSON 的开放标准
+    JWT自包含
+        负载payload中可以包含所需的所有用户部分的信息
+        可以避免对服务端数据库的多次查询
+    服务器端JWT如何认证自身有效
+        服务端获取header中的JWT 
+        用base64URL算法解码各部分内容
+        并在服务端用同样的密钥和算法生成signature
+        与传过来的signature对比 验证JWT是否合法
     三个部分
+        组成：
+        一个 JWT token 是一个字符串，它由头部、载荷与签名三部分组成，中间用 . 分隔，形式如下：
+        base64(header).base64(json payload).signature
         Header 头部
             一个JSON对象 描述JWT的元数据
             {"alg":"HS256","typ":"JWT"}
             alg属性:(algorithm)
                 签名的算法 默认是HMAC SHA256(写成HS256)
+                或RSA
             typ属性:(type)
                 这个令牌(token)的类型(type)
                 JWT令牌统一写成JWT
@@ -431,128 +556,62 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
             base64加密后的payload使用连接组成的字符串
             以及秘钥secret构成一个组合
             通过header中声明的加密方式对这个组合进行加密
-            构成了jwt的第三部分。
+            构成了jwt的第三部分
+        PS：
+            secret是保存在服务器端的
+            JWT的签发生成也是在服务器端的
+            secret就是用来进行JWT的签发和JWT的验证
+            它就是服务端的私钥 
+            任何场景都不应该泄漏出去
+            一旦客户端得知这个secret
+            意味着客户端是可以自我签发JWT
         写成一行就是
         Header.Payload.Signature
+    使用方式：
+        1、存放在cookie中
+        当用户希望访问一个受保护的路由或者资源的时候，可以把它放在 Cookie 里面自动发送，但是这样不能跨域。
+        2、存放在localstorage中，添加到header中发送
+        请求时放在 HTTP 请求头信息的 Authorization 字段里，使用 Bearer 模式添加 JWT Authorization: Bearer <token>
+        3、通过接口参数
+        可以把 JWT 放在 POST 请求的数据体里，或者通过 URL 的 queryString 传输。
     认证流程：
-        1.客户端发送用户信息给服务端请求登录
-        2.服务端验证用户信息
-        验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie 或 localStorage 中
-        3.客户端继续第二次业务请求
-        请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
-        4.服务端根据 headers 中的 Token 进行验证，验证通过后返回业务请求的数据
+        1.POST/user/login 输入用户名密码进行登录
+        2.服务器端使用密钥创建JWT
+        3.把JWT返回给浏览器
+        4.客户端将token保存在本地(通常使用localStorage/cookie)
+        当用户希望访问一个受保护的路由或资源时 需要请求头的Authorization字段使用Bearer模式添加JWT
+        4.在发给服务器的请求头中发送JWT
+        服务端保护路由将检查请求头Authorization中的JWT信息
+        5.检查JWT的签名 从JWT获取用户信息 减少查询数据库需要
+        6.把响应发送给客户端
+        因为JWT是自包含的(内部包含了一些会话信息)
+        因此减少了查询数据库的需求
     Token/JWT优点：
         1.完全由应用管理，可以避开同源策略
         2.避免 CSRF(Cross Site Request Forgery) 跨站请求伪造 攻击
         3.实现无状态服务端，能够在多个服务间使用，可扩展性好
-5.cookie session token JWT
-    Cookie Session ：将用户状态用cookie和session保存起来 主要用于客户端和服务端进行会话验证的凭证
-    1.Cookie(存储在客户端Client)
-        定义：
-            指某些网站为了辨别用户身份而储存在用户本地终端（Client Side）上的数据（通常经过加密）。
-        Cookie的工作原理：
-            (服务器单从网络连接上无从知道客户身份)
-            HTTP是一种无状态传输协议，它不能以状态来区分和管理请求和响应。
-            服务器单从网络连接上无从知道客户身份。于是给客户端发布一个通行证—cookie来区
-        1.服务器通过response的set-cookie告诉客户端去写入cookie，后面的请求都会携带该cookie。
-            cookie有以下重要参数：
-                name=value
-                domain
-                path
-                maxAge
-                expires
-                secure
-                httpOnly
-    2.Session(存储在服务器端Server)
-        (使服务端有状态化 可以记录会话信息)
-        使服务端有状态化，可以记录会话信息。
-        定义：
-            另一种记录服务器和客户端会话状态的机制。
-            session存储在服务器端，该会话对应的key即sessionId会被存储到客户端的cookie中。
-            session通过cookie来传递sessionId，达到用户鉴权的目的。
-            除此之外，sessionId也可以不通过cookie传递，比如通过response返回客户端，再当作请求的参数传递给服务器去验证。
-    Cookie 和 Session 对比
-        1.安全性： 
-            Session 比 Cookie 安全，Session 是存储在服务器端的，Cookie 是存储在客户端的。
-        2.存取值的类型：
-            Cookie只支持存字符串数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存任意数据类型。
-        3.有效期：
-             Cookie可设置为长时间保持，比如我们经常使用的默认登录功能，
-             Session 一般失效时间较短，客户端关闭（默认情况下）或者 Session 超时都会失效。
-        4.存储大小：
-             单个 Cookie 保存的数据不能超过 4K，Session 可存储数据远高于 Cookie，但是当访问量过多，会占用过多的服务器资源。
-    session缺点：
-        1.占资源： 每个经过认证的用户都要存放session到内存中，而随着认证用户的增多，服务端的开销较大。
-        2.CSRF攻击：基于cookie来进行用户识别时,用户cookie如果被截获，就容易受到跨站请求伪造的攻击。
-    3.Token(令牌)
-    (Session记录C/S会话状态的机制
-    使服务端有状态化 可以记录会话信息/)
-    (Token 令牌 访问API时所需资源凭证
-    使服务端无状态化 不会存储会话信息)
-        定义：
-            token(令牌) 是一串字符串，通常作为鉴权凭据，最常用的使用场景是 API 鉴权。
-         token 主要有三种：
-            1.自定义的 token：开发者根据业务逻辑自定义的 token
-            2.JWT：JSON Web Token，定义在 RFC 7519 中的一种 token 规范
-            3.Oauth2.0：定义在 RFC 6750 中的一种授权规范，其实并不是一种 token，只是其中也有用到 token。
-        token特点：
-            1.服务端无状态化、可扩展性好
-            2.支持移动端设备
-            3.安全性高
-            4.支持跨程序调用
-        token鉴权流程：
-            。。。
-        Refresh Token：
-            专用于刷新 access token 的 token
-            Access Token的有效期比较 短
-            当 Acesss Token 由于过期而失效时
-            使用 Refresh Token 就可以获取到新的 Token
-            如果 Refresh Token过期就只能重新登陆了。
-        Token 和 Session 的区别：
-            
-            
-            2.Session 和 Token 并不矛盾，作为身份认证 Token 安全性比 Session 好，因为每一个请求都有签名还能防止监听以及重放攻击
-            3.而 Session 就必须依赖链路层来保障通讯安全了。如果你需要实现有状态的会话，仍然可以增加 Session 来在服务器端保存一些状态。
-            4.所谓 Session 认证只是简单的把 User 信息存储到 Session 里，因为 SessionID 的不可预测性，暂且认为是安全的
-            而 Token ，如果指的是 OAuth Token 或类似的机制的话，提供的是 认证 和 授权 ，认证是针对用户，授权是针对 App 。其目的是让某 App 有权利访问某用户的信息。
-    4.JWT
-        JSON Web Token（简称JWT）
-        目前最流行跨域认证解决方案
-        一种认证授权机制
-        一种基于 JSON 的开放标准
-        组成：
-            一个 JWT token 是一个字符串，它由头部、载荷与签名三部分组成，中间用 . 分隔，形式如下：
-            base64(header).base64(json payload).signature
-        认证流程：
-            1.用户输入用户名/密码登录，服务端认证成功后，会返回给客户端一个 JWT。
-            2.客户端将 jwt 保存到本地，当用户希望访问一个受保护的路由或者资源的时候，需要请求头的 Authorization 字段中使用 Bearer 模式添加 JWT 。
-            3.服务端的保护路由将会检查请求头 Authorization 中的 JWT 信息，如果合法，则允许访问。因为 JWT 内部包含了一些用户信息，因此减少了需要查询数据库的需要。
-        使用方式：
-            1、存放在cookie中
-            当用户希望访问一个受保护的路由或者资源的时候，可以把它放在 Cookie 里面自动发送，但是这样不能跨域。
-            2、存放在localstorage中，添加到header中发送
-            请求时放在 HTTP 请求头信息的 Authorization 字段里，使用 Bearer 模式添加 JWT。
-            Authorization: Bearer <token>
-            3、通过接口参数
-            可以把 JWT 放在 POST 请求的数据体里，或者通过 URL 的 queryString 传输。
-    自定义Token 和 JWT 的关系：
+    Token/JWT为什么能避免CSRF攻击
+        用户发请求给服务端时
+        前端使用JS将JWT放在header中手动发送给服务端
+        服务端验证header中的JWT字段
+        而非cookie信息 这样就避免了CSRF漏洞攻击
+    自定义Token和JWT 的关系：
         相同点： 
             都是访问资源的令牌，都可以记录用户的信息，都是使服务端无状态化，都是只有验证成功后，客户端才能访问服务端上受保护的资源
         区别：
             服务端验证客户端发来的token信息要进行数据的查询操作；
             JWT验证客户端发来的token信息就不用， 在服务端使用密钥校验就可以，不用数据库的查询。
-    5、各种鉴权方式注意点
+    各种鉴权方式注意点
         使用 cookie 注意点
             1.因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
             2.不要存储敏感数据，比如用户密码，账户余额
             3.使用 httpOnly 在一定程度上提高安全性
-            4.尽量减少 cookie 的体积，能存储的数据量不能超过 4kb
-            设置正确的 domain 和 path，减少数据传输
+            4.尽量减少 cookie 的体积，能存储的数据量不能超过 4kb设置正确的 domain 和 path，减少数据传输
             5.cookie 无法跨域，子域名可以访问父域名
             6.一个浏览器针对一个网站最多存 20 个Cookie，浏览器一般只允许存放 300 个Cookie
             7.移动端对 cookie 的支持不是很好，而 session 一般基于 cookie 实现，所以移动端常用的是 token
         使用 session 注意点
-            1.用户同时在线量较多时，session 存储在服务器会占据较多内存，需要定期清理过期 的 session
+            1.用户同时在线量较多时，session 存储在服务器会占据较多内存，需要定期清理过期的session
             2.当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。因为 session是由单个服务器创建的，处理用户请求的服务器不一定是 那个创建 session 的服务器，那么该服务器就无法拿到之前已经放入到 session 中的登录凭证之类的信息了。
             3.当多个应用要共享 session时，因为不同的应用可能部署的主机不一样需要在各个应用做好 cookie 跨域的处理。
             4.sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie ，一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现
@@ -564,14 +623,28 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
         使用 JWT 时需要考虑的问题
             1.JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
             2.JWT 不加密的情况下，不能将秘密数据写入 JWT。
-            3.JWT 不仅可以用于认证，也可以用于交换信息。
-            有效使用 JWT，可以降低服务器查询数据库的次数。
-            4.JWT 最大的优势是服务器不再需要存储Session
-            使得服务器认证鉴权业务可以方便扩展。
-                但这也是 JWT 最大的缺点：由于服务器不需要存储 Session 状态，因此使用过程中无法废弃某个 Token 或者更改 Token 的权限。也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。
-            5.JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
-            6.JWT 适合一次性的命令认证，颁发一个有效期极短的JWT，即使暴露了危险也很小由 于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
-            7.为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。
+            3.JWT 不仅可以用于认证，也可以用于交换信息 有效使用 JWT，可以降低服务器查询数据库的次数。
+            4.JWT 最大的优势是服务器不再需要存储Session 使得服务器认证鉴权业务可以方便扩展
+                这也是 JWT 最大的缺点：由于服务器不需要存储 Session 状态
+                因此使用过程中无法废弃某个 Token 或者更改 Token 的权限
+                也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。
+            5.JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限
+                为了减少盗用，JWT的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
+            6.JWT 适合一次性的命令认证，颁发一个有效期极短的JWT
+                即使暴露了危险也很小 由于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
+            7.为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。      
+5.单点登录 多点登录
+    单点登录SSO
+        一个多系统共存的环境下
+        用户的一次登录能得到其他所有系统的新人
+    多点登录
+        以微信为例
+            可以PC端 phone端同时登陆/收发消息
+            但是一个端只能登录一个实例 
+            pc1登录 pc2登录 后者会把前者踢出 
+        同一个账号可以在不同终端同时登录 同时收发信息
+        禁止用户多点在线
+        一个端同一个账号只能登录一个实例  
 6.localStorage(Document源对象 本地存储 除非手动清除否则一直有效)和 
     sessionStorage(session Storage对象 会话存储 会话结束时清除 浏览器关闭前有效)
     ---解决了cookie存储空间不足问题 与cookie对比
@@ -707,7 +780,12 @@ HTTPS(SSL 身份验证|加密|完整) 有CA证书 运行在SSL/TLS之上 SSL/TLS
 9.跨域相关(主要用来防止CSRF攻击)
     (无论怎样的跨域资源获取方案 本质上都需要服务器端的支持)
     (JSONP CORS Node中间件代理 nginx反向代理 postMessage)
-
+    cookie跨域解决方案
+        1.服务端将cookie写到客户端后 客户端对cookie进行解析 
+        将token解析出来 此后请求都把这个Token带上即可
+        2.多个域名共享cookie 在写到客户端的时候设置cookie的domain
+        3.将Token保存在SessionStorage中
+        (不依赖cookie就没有跨域问题)
     跨域cookie解决方案
         cookie跨域问题产生
             一个cookie从一个服务器产生 在另一个服务器需要用到
