@@ -394,7 +394,8 @@
     4.z-index:0和z-index:auto的区别，当一个定位元素不设置z-index的时候，默认值就是auto
 18.CSS伪类(没创建)伪元素(创建)
 (区别:有没有创建一个文档流外的元素)
-(伪类：弥补常规CSS选择器的不足 可以使用多个 文档树中已有 :focus)
+(伪类：弥补常规CSS选择器的不足 可以使用多个 文档树中已有 
+    :active/:focus/:hover/:link/:visited/:first-child/)
 (伪元素：创建一个有内容的虚拟容器 同时使用一个 文档树中新建 :before :after)
     伪类：
         (添加到选择器的关键字，指定要选择的元素的特殊状态 通过选择器，格式化DOM树以外的信息以及不能被常规CSS选择器获取到的信息。)
@@ -409,7 +410,7 @@
         允许根据诸如像导航历史这样的外部因素来应用样式（例如 :visited）
         同样 根据内容的状态（例如在一些表单元素上的 :checked），或者鼠标的位置（例如 :hover 让你知道是否鼠标在一个元素上悬浮）应用样式。
     分类：
-        伪类：(:active/:focus/:hover/:link/:visited/:first-child/:)
+        伪类：(:active/:focus/:hover/:link/:visited/:first-child/:last-child/:nth-child(n)/:nth-of-type/:nth-last-child(n)/:lang)
             :active，将样式添加到被激活的元素。
             :focus，将样式添加到被选中的元素。
             :hover，当鼠标悬浮在元素上方是，向元素添加样式。
@@ -421,11 +422,11 @@
             :nth-of-type 选择器匹配属于父元素的特定类型的第N个子元素的每个元素 --与类型有关
             :nth-last-child(n):选择器匹配属于其元素的第N个子元素的每个元素 不论元素的类型 从最后一个子元素开始计数
             :lang，允许创作者来定义指定的元素中使用的语言。
-        伪元素：(:before/:after)
-            :first-letter，将特殊的样式添加到文本的首字母。
-            :first-line，将特殊的样式添加到文本的首行。
-            :before，在某元素之前插入某些内容。
-            :after，在某元素之后插入某些内容。
+        伪元素：(::before/::after/::first-letter/::first-line)
+            ::first-letter，将特殊的样式添加到文本的首字母。
+            ::first-line，将特殊的样式添加到文本的首行。
+            ::before，在某元素之前插入某些内容。
+            ::after，在某元素之后插入某些内容。
     伪类(已有) 伪元素(创建)区别：(有没有创建一个文档树之外的元素)
         伪类的操作对象是文档树中已有的元素
         伪元素创建了一个文档树外的元素。

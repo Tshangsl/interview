@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container{
+            width: 300px;
+            height: 500px;
+            margin: 50px auto;
+        }
+        #menu{
+            width: 300px;
+            height: 40px;
+            margin: 0;
+            padding: 0;
+            border-bottom: 1px solid #000;
+        }
+        /* 为什么此处不能前面加上#menu */
+        li{
+            width: 100px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            float: left;
+            background-color: #ccc;
+            list-style: none;
+        }
+        li.active{
+            color: #ccc;
+            background-color: #000;
+        }
+        #content div{
+            background-color: #ccc;
+            display: none;
+            height: 200px;
+        }
+        #content div:first-child{
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <ul id="menu">
+            <li index="0" class="active">1</li>
+            <li index="1">2</li>
+            <li index="2">3</li>
+        </ul>
+        <div id="content">
+            <div>1</div>
+            <div>2</div>
+            <div>3</div>
+        </div>
+    </div>
+    <script>
+        let oMenu = document.getElementById('menu');
+        let aLi = oMenu.getElementsByTagName('li');
+        let oContent = document.getElementById('content');
+        let aDiv = oContent.getElementsByTagName('div');
+
+        oMenu.onclick = function (e) {
+            e = e || window.event;
+            let target = e.target || e.srcElement;
+            if (target.tagName == 'LI') {
+                for (let i = 0; i < aLi.length; i++) {
+                    aLi[i].className = '';
+                    aDiv[i].style.display = 'none';
+                }
+                let index = target.getAttribute('index');
+                target.className = 'active';
+                aDiv[index].style.display = 'block';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -193,6 +193,8 @@
             1.可以节省大量内存占用 减少事件注册
                 比如在ul上代理所有li的click事件
             2.可以实现当新增子元素无需对其再次进行绑定
+        IE event对象有srcElement属性 没有target属性
+        Firefox event对象有target属性 没有srcElement属性
 16.不能直接给数组绑定事件 只能对具体元素绑定事件
     执行时间和事件触发时间
     e有兼容性问题 兼容标准浏览器和IE浏览器 按顺序
@@ -235,24 +237,19 @@
             找到该元素的下一个元素
             在它下一个元素之前用insertBefore插入
 22.JS中的textContent/innerText/innerHTML用法及区别
-    1.textContent用法
-        1.设置标签中的文本内容
-        2.获取标签中的文本内容
-    2.
-    3.
-    4.innerText和textContent区别
-        1.设置标签中的文本内容 应该使用textContent属性 谷歌火狐支持 IE8不支持
-        2.设置标签中的文本内容 应该使用innerTetx属性 谷歌火狐IE8都支持
-        3.如果这个属性在浏览器中不支持 则该属性的类型是undefined
-        4.判断这个属性的类型是否是undefined 就知道浏览器是否支持
-    5.
-        1.如果使用innerText主要设置文本 设置标签内容 是没有标签效果的
-        2.innerHTML可以设置文本内容
-        3.innerHTML的主要作用是在标签中设置新的HTML标签 是有标签效果的
-        4.
-        5.
-        6.
-23.e.clientX e.clientY e.pageX e.pageY e.offsetX e.offsetY
+    innerText和innerHTML区别
+    innerText属性
+        将文本内容设置或返回为指定节点及其所有子节点的纯文本
+    innerHTML属性
+        将获取和设置元素中的纯文本或HTML内容
+        与InnerText不同 InnerHTML允许使用HTML格式文本
+        且不会自动对文本进行编码和解码
+23.
+/e.clientX e.clientY  鼠标  相对于 浏览器窗口
+/e.pageX e.pageY      鼠标  相对于 文档
+/e.offsetX e.offsetY  鼠标  相对于 事件源对象srcElement 只IE有
+/e.screenX e.screenY  鼠标  相对于 显示器屏幕
+
 e.clientX e.clientY
     鼠标相对于浏览器窗口可视区域的X Y坐标
     窗口坐标 可视区域不包括工具栏和滚动条
@@ -261,7 +258,7 @@ e.pageX e.pageY
     类似于e.clientX e.clientY
     它们使用的是文档坐标而非窗口坐标
     这两个属性不是标准属性 但是得到了广泛支持
-    IE事件中没有这两个贤惠能干
+    IE事件中没有这两个属性
 e.offsetX e.offsetY
     鼠标相对于事件源对象srcElement的X Y坐标
     只有IE事件有这两个属性 标准事件没有对应的属性

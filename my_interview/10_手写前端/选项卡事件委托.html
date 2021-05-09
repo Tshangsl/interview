@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选项卡事件委托</title>
+    <style>
+        #container{
+            width: 300px;
+            height: 500px;
+            margin: 50px auto;
+        }
+        #menu{
+            width: 300px;
+            height: 40px;
+            padding: 0;
+            margin: 0;
+            border-bottom: 1px solid #000;
+        }
+        #menu li{
+            width: 100px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            float: left;
+            background-color: #ccc;
+            list-style: none;
+        }
+        li.active{
+            color: #ccc;
+            background-color: #000;
+        }
+        #content div{
+            background-color: #ccc;
+            height: 200px;
+            display: none;
+        }
+        #content div:first-child{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <ul id="menu">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+        </ul>
+        <div id="content">
+            <div>1</div>
+            <div>2</div>
+            <div>3</div>
+        </div>
+    </div>
+    <script>
+        let oMenu = document.getElementById('menu');
+        let aLi = oMenu.getElementsByTagName('li');
+        let oContent = document.getElementById('content');
+        let aDiv = oContent.getElementsByTagName('div');
+       
+        oMenu.onclick = function(e){
+            e = e||window.event;
+            let target = e.target||e.srcElement;
+            if(target.tagName == 'LI'){
+                // 清空class
+                for(let i = 0;i<aLi.length;i++){
+                    aLi[i].className = '';
+                    aDiv[i].style.display = 'none';
+                }
+                // 设置target
+                target.className = 'active';
+                aDiv[target.index].style.display = 'block';
+            }              
+        }
+        for(let i = 0;i<aLi.length;i++){
+            aLi[i].index = i;
+        }
+    </script>
+</body>
+</html>

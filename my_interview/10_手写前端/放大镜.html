@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放大镜</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #small{
+            float: left;
+            position: relative;
+        }
+        #big{
+            float: left;
+            width: 400px;
+            height: 400px;
+            overflow: hidden;
+            display: none;
+            position: relative;
+        }
+        #big img{
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #drag{
+            width: 200px;
+            height: 200px;
+            background-color: rgba(255,255,255,0.5);
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="small">
+        <img src="" alt="">
+        <div id="drag"></div>
+    </div>
+    <div id="big">
+        <img src="" alt="">
+    </div>
+    <script>
+        let oSmall = document.getElementById('small');
+        let oDrag = document.getElementById('drag');
+        let oBig = document.getElementById('big');
+        let oBigImg = oBig.getElementsByTagName('img')[0];
+
+        oSmall.onmouseover = function () {
+            oBig.style.display = 'block'
+            oDrag.style.display = 'block';
+        }
+        oSmall.onmousemove = function () {
+            // 具体应用到的left top 一定要加px
+            oDrag.style.left = e.clientX - oDrag.offsetWidth / 2 + 'px';
+            oDrag.style.top = e.clientY - oDrag.offsetHeight / 2 + 'px';
+            let left = oDrag.offsetLeft;
+            let top = oDrag.offsetTop;
+            let maxLeft = oSmall.offsetWidth - oDrag.offsetWidth;
+            let maxTop = oSmall.offsetHeight - oDrag.offsetHeight;
+            if (left < 0) {
+                oDrag.style.left = 0;
+            }
+            if (top < 0) {
+                oDrag.style.top = 0;
+            }
+            if (left > maxLeft) {
+                oDrag.style.left = maxLeft + 'px';
+            }
+            if (top > maxTop) {
+                oDrag.style.top = maxTop + 'px';
+            }
+
+            let maxBigLeft = oBigImg.offsetWidth - oBig.offsetWidth;
+            let maxBigTop = oBigImg.offsetHeight - oBig.offsetHeight;
+            let scaleX = maxBigLeft / maxLeft;
+            let scaleY = maxBigTop / maxTop;
+            oBigImg.style.left = -scaleX*oDrag.offsetLeft+'px';
+            oBigImg.style.top = -scaleY*oDrag.offsetTop+'px';
+        }
+        oSmall.onmouseout = function () {
+            oBig.style.display = 'none';
+            oDrag.style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

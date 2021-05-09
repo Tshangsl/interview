@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选项卡</title>
+    <style>
+        #container{
+            width: 300px;
+            height: 500px;
+            margin: 50px auto;
+        }
+        #menu{
+            height: 40px;
+            width: 300px;
+            padding: 0;
+            margin: 0;
+            border-bottom: 1px solid #000;
+        }
+        li{
+            list-style: none;
+            float: left;
+            width: 100px;
+            height: 40px;
+            text-align: center;
+            background-color: #ccc;
+        }
+        li.active{
+            color: #fff;
+            background-color: #000;
+        }
+        #content div{
+            background: #ccc;
+            height: 200px;
+            display: none;
+        }
+        #content div:first-child{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <ul id="menu">
+            <li class="active">菜单1</li>
+            <li>菜单1</li>
+            <li>菜单1</li>
+        </ul>
+        <div id="content">
+            <div>1</div>
+            <div>2</div>
+            <div>3</div>
+        </div>
+    </div>
+    <script>
+        let oMenu = document.getElementById('menu');
+        let aLi = oMenu.getElementsByTagName('li');
+        let oContent = document.getElementById('content');
+        let aDiv = oContent.getElementsByTagName('div');
+        // 此处设置for循环 是为了找到是那个li触发的click事件
+        for(let i = 0;i<aLi.length;i++){
+            // aLi[i].index = i;
+            aLi[i].onclick = function(){
+                //清空class display都设置为none 
+                for(let j = 0;j<aLi.length;j++){
+                    aLi[j].className = '';
+                    aDiv[j].style.display = 'none';
+                }
+                aLi[i].className = 'active';
+                aDiv[i].style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

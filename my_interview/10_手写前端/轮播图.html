@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轮播图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        #container {
+            width: 750px;
+            margin: 50px auto;
+            position: relative;
+        }
+
+        #img-box img {
+            display: none;
+        }
+
+        #img-box img:first-child {
+            display: block;
+        }
+
+        #tab {
+            position: absolute;
+            right: 50px;
+            bottom: 40px;
+        }
+
+        #tab li {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            text-align: center;
+            line-height: 20px;
+            color: #ffffff;
+            float: left;
+            margin-right: 5px;
+        }
+
+        #tab li.active {
+            background: rgba(255, 0, 0, 0.8);
+        }
+
+        .btn {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #ffffff;
+            font-size: 50px;
+            text-align: center;
+            line-height: 40px;
+            position: absolute;
+            top: 50%;
+            margin-top: -25px;
+            /* top: calc(50% - 25px); */
+            /* transform: translateY(-50%); */
+        }
+
+        #prev {
+            left: 0;
+        }
+
+        #next {
+            right: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="img-box">
+            <img src="" alt="">
+            <img src="" alt="">
+            <img src="" alt="">
+        </div>
+        <ul id="tab">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+        <span class="btn" id="prev">&lt;</span>
+        <span class="btn" id="next">&gt;</span>
+    </div>
+    <script>
+        var oContainer = document.getElementById('container');
+        var oTab = document.getElementById('tab');
+        var oImgBox = document.getElementById('img-box');
+
+        var aLi = oTab.getElementsByTagName('li');
+        var aImg = oImgBox.getElementsByTagName('img');
+
+        var oPrev = document.getElementById('prev');
+        var oNext = document.getElementById('next');
+
+        var curIndex = 0;
+        function changeImg() {
+            for (let j = 0; j < aLi.length; j++) {
+                aLi[j].className = '';
+                aImg[j].style.display = 'none';
+            }
+            aLi[curIndex].className = 'active';
+            aImg[curIndex].style.display = 'block';
+        }
+
+        // 点击li 图片跳转到相应的index
+        for (let i = 0; i < aLi.length; i++) {
+            aLi[i].index = i;
+            aLi[i].onclick = function () {
+                curIndex = this.index;
+                changeImg();
+            }
+        }
+
+        // 点击左箭头 图片往左一张
+        oNext.onclick = function () {
+            curIndex++;
+            if (curIndex > 4) {
+                curIndex = 0;
+            }
+            changeImg();
+        }
+
+        // 点击右箭头 图片往右一张
+        oPrev.onclick = function () {
+            curIndex--;
+            if (curIndex < 0) {
+                curIndex = 4;
+            }
+            changeImg();
+        }
+
+        // 设置定时器 每1s自动向后翻转一个图片
+        let timer;
+        function go() {
+            timer = setInterval(() => {
+                oNext.onclick();
+            }, 1000);
+        }
+        go();
+
+        // 设置鼠标悬浮轮播图不动 移除定时器再次启动
+        oContainer.onmouseover = function () {
+            clearInterval(timer);
+        }
+        oContainer.onmouseout = function () {
+            go();
+        }
+    </script>
+</body>
+
+</html>
