@@ -2578,6 +2578,8 @@ MVVM(Model View ViewModel)
     结合响应系统 
     Vue能智能计算出最少需要重新渲染多少组件
 58.嵌套路由
+    实际应用界面 通常由多层嵌套的组件组合而成
+    在home路由里配置了它的children
 59.Vue中template编译的理解
     先转化成AST树 将得到的render函数返回VNode(Vue的虚拟DOM节点)
     1.首先通过compile编译器把template编译成AST语法树

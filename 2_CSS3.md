@@ -17,7 +17,7 @@
         Box是CSS布局的对象和基本单位 直观点来说 一个页面是由很多个 Box 组成的。
         元素的类型和 display 属性，决定了这个 Box 的类型。
         (不同类型的 Box， 会参与不同的 Formatting Context)(格式化上下文)
-        （一个决定如何渲染文档的容器）
+        (一个决定如何渲染文档的容器)
         因此Box内的元素会以不同的方式渲染。让我们看看有哪些盒子：
             1.block-level 
                 box:display 属性为 block, list-item, table 的元素，
@@ -88,10 +88,17 @@
     ul标签+li标签+calc函数 利用flex布局实现
     具体设置
         ul width:100% display:flex flex-wrap:wrap
-        li calc(calc(100%/3)-10px) box-sizing:border-box 将content-box转化成border-box
+        li calc(calc(100%/3)-10px) 
+            box-sizing:border-box 将content-box转化成border-box
             设置height margin border
 3.CSS3清除浮动方式
 目的：为了解决，父元素因为子元素浮动引起的内部高度为0的问题
+            (额外标签法/
+            父元素添加overflow:hidden/
+            after伪元素/
+            before&after双伪元素/
+            父级同时浮动/
+            父元素设置高度)
         解决方法：
             1. 额外标签法(最后一个标签后/新加一个标签/给其设置clear:both) 不推荐使用
                 在最后一个浮动标签后，新加一个标签，给其设置clear:both     
@@ -113,10 +120,10 @@
                 .clearfix{
                     *zoom: 1;/*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
                 }
-            4.给浮动元素父级设置高度
+            4.使用before和after双伪元素清除浮动
             5.父级同时浮动(需要给父级同级元素添加浮动)
-            6.使用before和after双伪元素清除浮动
-4.css三列布局，中间自适应，水平方向垂直方向都说
+            6.给浮动元素父级设置高度
+4.css两列布局，右侧自适应/三列布局，中间自适应
     两列布局：
     BFC+float float + 负 margin flex 实现两栏布局
     左側固定，右侧自适应的几种方法
@@ -138,44 +145,44 @@
             左右两侧使用绝对定位，
             中间设置margin-left margin-right值
         3.flex弹性盒模型 
-            父元素容器设置display：
-            子级项目 flex/左右两侧 flex-basis 元素本身大小/中间flex-grow 占满剩余空间
-            
             父元素设置为弹性盒子
             左右两侧使用flex-basis设置元素本身大小
-            中间使用flex-grow:1设置占满剩余空间
-            
-        1.基于float实现 使左右两个aside分别浮动到左右两侧
-        2.基于position:absolute实现
-        3.基于display:flex实现
+            中间使用flex-grow:1设置占满剩余空间            
         4.基于display:table实现
         5.基于display:grid实现
 5.外边距塌陷/外边距合并 及形成原因(由BFC决定)
-    父元素(由BFC决定 定义边框/内边距/overflow:hidden/使用BFC)
+    (原因：由BFC决定 
+     解决方法：定义边框/内边距/overflow:hidden/使用BFC)
+    父元素
     定义：也称为外边距合并
         指两个在正常流中相邻（兄弟或父子关系）的块级元素外边距
         组合在一起变成单个外边距
         1.当上下相邻的两个块级元素相遇，
             上面的元素有下边距margin-bottom，下面的元素有上边距margin-top，则它们之间的垂直距离取两个值中的较大者。
-            尽量只给一个盒子添加margin值
-        2.对于两个嵌套关系的块元素，如
-            果父元素没有上内边距及边框，父元素的上外边距会与子元素的上外边距发生合并，合并后的外边距为两者中的较大者。
+            解决方法:
+                尽量只给一个盒子添加margin值
+        2.对于两个嵌套关系的块元素
+            如果父元素没有上内边距及边框，父元素的上外边距会与子元素的上外边距发生合并，合并后的外边距为两者中的较大者。
+            解决方法:
             1.给父元素定义上边框/内边距/overflow:hidden
             2.添加浮动/绝对定位/BFC
         3.如果存在一个空的块级元素，
-            border、padding、inline content、height、min-height都不存在
+            border padding inline content height min-height都不存在
             上下边距中间将没有任何阻隔，上下外边距将会合并。
     当外边距塌陷时，外边距之间的计算方式是怎样的 
     由BFC决定
         1.两个都是正数，取较大的值
         2.两个都是负数，取绝对值较大的值
         3.一正一负，取两个值得和
-    原因：由块级格式上下文决定的，BFC，元素在 BFC 中会进行上下排列，然后垂直距离由 margin 决定，并且会发生重叠，具体表现为同正取最大的，同负取绝对值最大的，一正一负，相加BFC 是页面中一个独立的隔离容器，内部的子元素不会影响到外部的元素。
+    原因：由块级格式上下文决定的
+        元素在 BFC 中会进行上下排列，然后垂直距离由 margin 决定，并且会发生重叠 具体表现为同正取最大的，同负取绝对值最大的，一正一负，相加
+        BFC是页面中一个独立的隔离容器，内部的子元素不会影响到外部的元素。
 6.CSS动画有哪些
     CSS3中由三个关于动画的样式属性 
         transform(变形) transition(过渡) animation(动画)
-    transform(变形)：(不会产生动画 仅是原有形态的改变)(translate是transform一个属性)
-        可以用来设置元素的形状改变
+    transform(变形)：(rotate/scale/skew/translate/matrix/none)
+        (不会产生动画 仅是原有形态的改变 可以用来设置元素的形状改变)
+        (translate是transform一个属性)
             rotate(旋转)
             scale(缩放)
             skew（扭曲）
@@ -190,13 +197,17 @@
             x:left center right
             y:top center bottom
     transition(过渡)：
+        (类似flash中的补间动画 样式的属性值从一种状态平滑过渡到另一种状态)
         用来设置样式的属性值如何从一种状态变平滑过渡到另一种状态 它有四个属性值
             transition-property(变换的属性，即那种形式的变换：大小、位置、扭曲等)
             transition-duration（变换延续的时间）
             transition-timing-function（变换的速率）
             transition-delay（变换的延时）
     animation(动画):
-        类似于 flash 中的逐帧动画，逐帧动画就像电影的播放 一样，表现非常细腻并且有非常大的灵活性。然而transition只是指定了开始和结束态，整个动画的过程也是由特定的函数控制。
+        (类似flash中的逐帧动画 动画效果更灵活)
+        类似于 flash 中的逐帧动画，逐帧动画就像电影的播放一样
+        表现非常细腻并且有非常大的灵活性
+        然而transition只是指定了开始和结束态，整个动画的过程也是由特定的函数控制。
         animation-name 设置动画的名称，可以同时赋值多个动画名称，用,隔开：
         animation-duration 设置动画的持续时间，单位为s，默认值为0：
         animation-timing-function 和transition-timing-function类似：
@@ -207,7 +218,8 @@
         animation-name、animation-duration、animation-timing-function、animation-delay、animation-iteration-count、animation-direction
     transition和animation:
         它们很像 flash 中的补间动画和逐帧动画；
-        transition是从一个状态变化到另外一种状态，当变化有了平滑的效果后就产生了动画，它是一个公式化的变化，在比较规则的动画效果中我们可以使用，例如：旋转的风车、行驶的汽车、颜色的渐变等等；
+        transition是从一个状态变化到另外一种状态，当变化有了平滑的效果后就产生了动画
+            它是一个公式化的变化，在比较规则的动画效果中我们可以使用例如：旋转的风车、行驶的汽车、颜色的渐变等等；
         animation的动画效果更加灵活，可以实现像影片一样的复杂无规则的动画。
 7.CSS动画特性可以用JS实现，为什么还要用CSS实现(页面动画在移动设备上运行更快)
         让你的页面动画在移动设备上运行的更快一些
@@ -247,7 +259,7 @@
             百分比是基于父元素的设置而言的，如果父元素为100px，那么子元素100%也就是100px。而 vh 和 vw 始终是针对窗口的宽高。
 10.rem移动端适配
     PC 端浏览器下（以谷歌浏览器为主），字体的默认大小是16px，字体最小为12px 。 
-    但是在移动端下字体没有默认大小。
+    移动端浏览器字体没有默认大小。
     iphone5下 1rem=16px
     1.获取html的宽
         let htmlwidth=document.documentElement.clientWidth || document.body.clientWidth;
@@ -265,18 +277,26 @@
     iphone4开始，iphone就是dpr就等于2了。所以其实就是把UI图/2，就是你应该在css写多少px。
     1.100%布局适配
     2.rem做适配
-12.Flex基础概念，父级容器属性(Flex容器)，子级容器属性(Flex项目)
+12.Flex基础概念
+父级容器属性(Flex容器)
+子级容器属性(Flex项目)
     布局的传统解决方案
         基于盒装模型依赖display属性+position属性+float属性
-    flex:弹性盒布局，CSS3的新属性，用于方便布局，比如垂直居中
+    Flex:
+        弹性盒布局，CSS3的新属性，用于方便布局，比如垂直居中
     基础概念：
         (1.Flex容器/项目|主轴 交叉轴|项目默认沿主轴排列)
         1.采用Flex布局的元素，称为Flex容器(flex container)简称容器，它的所有子元素自动成为容器成员，称为Flex项目(flex item)简称项目
         2.容器默认存在两根轴：水平的主轴(main axis)和垂直的交叉轴(cross axis)，主轴的开始位置(与边框的交叉点)叫做mian start 结束位置叫做mian end 交叉轴的开始位置叫cross start 结束位置叫 cross end
         3.项目默认沿主轴排列，单个项目占据的主轴空间叫main size 占据的交叉空间叫cross size
         总结：弹性布局由父级容器，子级容器构成，通过设置主轴和交叉轴来控制子元素的排序方式
-    父级容器属性:flex-flow(flex-direction flex-wrap)
-        (2.flex-direction子元素排列方向/flex-wrap换行/justify-content(主轴)/align-items(交叉轴)/align-content(多根轴线))
+    父级容器属性:
+        flex-flow(flex-direction flex-wrap)
+        (2.flex-direction子元素排列方向/
+        flex-wrap换行/
+        justify-content(主轴)/
+        align-items(交叉轴)/
+        align-content(多根轴线))
         1.flex-direction:row|row-reverse|column|column-reverse
             该属性定义了子元素排列方向
         2.flex-wrap：**nowrap | wrap | wrap-reverse;  
@@ -301,7 +321,7 @@
         3.flex-shrink(负值对该属性无效) 定义了项目的缩小比例 默认为1 如果空间不足 该项目将缩小
             都为1，当空间不足时，都将等比例缩小
             一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小
-        4.flex-basis属性
+        4.flex-basis属性(项目占据的主轴空间)
             用于设置或检索弹性盒伸缩基准值
             项目占据的主轴空间
             属性值：
@@ -319,33 +339,36 @@
         5.flex属性 (flex-grow/flex-shrink/flex-basis简写)
             默认值0 1 auto
             该属性有三个快捷值：
-                auto (1 1 auto)
-                none (0 0 auto)
-                initial(0 1 auto)。
+                flex:auto (1 1 auto)
+                flex:none (0 0 auto)
+                flex:initial(0 1 auto)flex不设置相关属性时默认值
             建议优先使用这个属性代替单独写三个分离的属性
             因为浏览器会推算相关值。
         6.align-self属性 
             允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
-        1.flex:1 所有弹性盒模型对象子元素有相同长度 且忽略它们内部内容
-        2.flex:0,1,auto(flex不设置相关值时默认值)
+        1.flex:1 1 0(1) 所有弹性盒模型对象子元素有相同长度 且忽略它们内部内容
+        2.flex:0 1 auto(flex不设置相关值时默认值)
         3.flex:auto flex:(1 1 auto)
         4.flex:none flex:(0 0 auto)
         5.flex:initial flex:(0 1 auto)
-13.使用CSS 让一个div不可视,visibility/hidden display/none opacity/0(可以设置过渡效果)区别
-            rgba和opacity 0-1 完全透明-完全不透明
-        1.display:none;(不在文档流)
-        2.  z-index:-10s;
-            position:relative;
-        3.opacity:0;(在文档流)
-        4.绝对定位移出可视区
-        5.visibility:hidden;(在文档流)
+13.使用CSS 让一个div不可视
+        rgba和opacity 0-1 完全透明-完全不透明
+        1.display:none;(不在文档流 触发回流和重绘)
+        2.opacity:0;(在文档流 触发重绘)
+        3.visibility:hidden;(在文档流 触发重绘) 
+        4.z-index:-10s;
+          position:relative;
+        5.绝对定位移出可视区
 
-        1.visibility:hidden
-            位置在文档流 不被删除 触发浏览器渲染引擎的重绘
-        2.display:none 
-            隐藏元素 位置不被保留，触发浏览器渲染引擎的回流和重绘。
-        3.opacity:0
-            元素设置为透明，位置不被保留，所以会触发浏览器渲染引擎的重绘
+        1.display:none 
+            隐藏元素 位置不被保留
+            触发浏览器渲染引擎的回流和重绘。
+        2.opacity:0
+            元素设置为透明 位置被保留
+            触发浏览器渲染引擎的重绘
+        3.visibility:hidden
+            位置在文档流 位置被保留
+            触发浏览器渲染引擎的重绘
 14.CSS中盒模型是什么，都由什么组成，有哪几种,转换方法是什么
     定义:网页中，每一个元素都占有一定的空间 无论是div h1-h6 还是p 都可以看成是盒子
     组成:content padding border margin
@@ -363,7 +386,8 @@
         上右下左
 15.position属性都有哪些特点
     1.inhert：从父元素继承 position 属性的值。
-    2.static：默认值 没有定位 元素出现在正常的流中（忽略 top, bottom, left, right 或者 z-index 声明）。
+    2.static：默认值 没有定位 元素出现在正常的流中
+    （忽略 top, bottom, left, right 或者 z-index 声明）。
     3.relative:生成相对定位的元素，相对于元素本身正常位置进行定位。因此，"left:20" 会向元素的 LEFT 位置添加 20 像素。
     4.absolute:生成绝对定位的元素，相对于 static 定位以外的第一个祖先元素进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
     5.fixed:生成绝对定位的元素，相对于浏览器窗口进行定位。元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
@@ -389,14 +413,15 @@
         该属性只有在设置了position定位之后才会生效
     2.父元素的层级再高也不会盖住子元素
         正常情况下即使设置了子元素的z-index为负值，依然无法实现这个效果，其实这里只要将a元素的z-index设置为auto，即可实现上述效果。
-    3.同级下，z-index的值越大，堆叠顺序越靠前，相同的z-index值的时候，后面的会在前面的层级之上。
-        z-index值可以设置0和负数的。
-    4.z-index:0和z-index:auto的区别，当一个定位元素不设置z-index的时候，默认值就是auto
+    3.同级下，z-index的值越大，堆叠顺序越靠前
+        相同的z-index值的时候，后面的会在前面的层级之上 z-index值可以设置0和负数的。
+    4.z-index:0和z-index:auto的区别
+        当一个定位元素不设置z-index的时候，默认值就是auto
 18.CSS伪类(没创建)伪元素(创建)
 (区别:有没有创建一个文档流外的元素)
 (伪类：弥补常规CSS选择器的不足 可以使用多个 文档树中已有 
     :active/:focus/:hover/:link/:visited/:first-child/)
-(伪元素：创建一个有内容的虚拟容器 同时使用一个 文档树中新建 :before :after)
+(伪元素：创建一个有内容的虚拟容器 同时使用一个 文档树中新建 ::before ::after)
     伪类：
         (添加到选择器的关键字，指定要选择的元素的特殊状态 通过选择器，格式化DOM树以外的信息以及不能被常规CSS选择器获取到的信息。)
         是添加到选择器的关键字，指定要选择的元素的特殊状态。 例如，:hover 可被用于在用户将鼠标悬停在按钮上时改变按钮的颜色。
@@ -438,16 +463,12 @@
         CSS3中伪类和伪元素的语法不同；
         可以同时使用多个伪类，而只能同时使用一个伪元素；
 19.CSS三种基本定位机制 
-    普通流 
-    浮动 
-    绝对定位
+(普通流/浮动/绝对定位)
 20.CSS常用布局
     弹性布局 flex
     容器属性
     item属性
     网格布局 grid
-    容器属性
-    item属性
 21.
 Height
     clientHeight content+padding
@@ -481,13 +502,15 @@ Top
         单位px 可读可设置
     offsetTop:当前元素顶部距离最近父元素顶部的距离 和有没有滚动条没有关系 单位px 只读元素        
 22.CSS响应式设计适配多种设备
+(H5声明部分/相对单位/flex布局float布局/link标签media属性/媒体查询/图片自适应)
     1. <meta name="viewport" content="width=device-width, initial-scale=1" />
-    2. 不要使用绝对宽度
-    3. 字体大小和长宽边距属性不要用”px”,应该用相对大小的“rem”
-    4. 使用流动布局 - 如果宽度太小，放不下两个元素，后面的元素会自动滚动到前面元素的下方，不会在水平方向overflow（溢出），避免了水平滚动条的出现
-    5. link标签的media属性- <link rel="stylesheet" type="text/css" media="screen and (min-width: 600px) and (max-device-width: 980px)"  href="css600-980.css" />  
-    6. Media Query
-    7. 图片的自适应（自动缩放）
+    2. 使用相对单位
+    3. 使用流动布局 - 如果宽度太小，放不下两个元素，后面的元素会自动滚动到前面元素的下方，不会在水平方向overflow（溢出），避免了水平滚动条的出现
+    4. link标签的media属性- 
+    <link rel="stylesheet" type="text/css" media="screen and (min-width: 600px) and (max-device-width: 980px)"  href="css600-980.css" />  
+    5. Media Query 媒体查询
+        H4和CSS2中允许使用media指定特定媒体类型
+    6. 图片的自适应（自动缩放）
         - img{max-width: 100%;}     
         - 最好还是根据不同大小的屏幕，加载不同分辨率的图片
 23.雪碧图(CSS Sprites)/CSS精灵(前端性能优化)
@@ -513,7 +536,10 @@ Top
             图片太大 一次请求获取数据量大
             拿到这个大图需要的时间长
             降低网页整体体验
-24.CSS三大特性(层叠性/继承性/优先级)
+24.CSS三大特性
+(层叠性/
+继承性 与文字有关属性/
+优先级)
     层叠性
         1.给一个标签设置的样式发生冲突的时候即样式的覆盖
         2.浏览器的渲染机制是从上到下的，当有冲突的时候就采用最后的那个样式
@@ -528,9 +554,15 @@ Top
         a标签超链接不能实现字体颜色的继承，字体大小可以继承
         h1不可以继承文字的大小，继承过来还会做一个计算
     优先级
-        1，默认样式<标签选择器 <类选择器 <id选择器 <行内样式 <！important
-        0 1 10 100 1000 1000以上
+        1，默认样式0<标签选择器1<类选择器10<id选择器100<行内样式1000<！important
 25.CSS7阶层叠水平
+(background border/
+负z-index/
+block块状水平盒子
+float浮动盒子/
+inline inline-block水平盒子/
+z-index:auto z-index:0/
+正z-index)
     层叠顺序 Stack Order
     1.层叠上下文 background/border
     2.负z-index
@@ -540,30 +572,32 @@ Top
     6.z-index:auto/z-index:0
     7.正z-index
 26.CSS实现三角形
-    CSS可以实现各种各样三角形
-    减少了切图加载图片
+    CSS可以实现各种各样三角形 减少了切图加载图片
     原理：
         盒子宽和高都是0时 边框显示为三角形
         如想实现倒三角 
         只设置最上面的边有颜色 其他边为transparent
         同理可以实现各种三角形
-    以下是各种三角形实现方式
+    各种三角形实现方式
     1.倒三角的实现
-    2.向上三角的实现(只需保留下面的边)
-    3.向右三角的实现(保留左面的边)
-    4.向左三角的实现(保留右边的边)
+        设置最上面的边有颜色 其他边为transparent
+    2.向上三角的实现
+        只需保留下面的边 其他边为transparent
+    3.向右三角的实现
+        只保留左面的边 其他边为transparent
+    4.向左三角的实现
+        保留右边的边 其他边为transparent
     5.保留上边和右边组成三角形
-    6.开发中可以利用伪类 定位实现
-    不改变DOM结构 简洁优雅 
-    content:''提供给三角形的位置
-    这个属性不能少
+    6.利用伪类 定位实现
+        不改变DOM结构 简洁优雅 
+        content:''提供给三角形的位置
+        这个属性不能少
     7.三角线箭头
-    设置两个伪类 前一个伪类覆盖至另一个伪类 留出一些线
-27.CSS link @ import 加载顺序
-    1.link无论放在那里都是优先加载 import受代码顺序影响
-    2.代码引用文件都是在文档加载完成以后才开始加载的
-    3.link支持使用JS控制DOM去改变样式 @import不支持
-28.优雅降级/渐进增强
+        设置两个伪类 
+        前一个伪类覆盖至另一个伪类 
+        留出一些线
+27.优雅降级(向下兼容)/
+渐进增强(向上兼容)
     渐进增强(向上兼容)
         一开始就针对低版本浏览器进行构建页面 
         完成基本功能 
@@ -582,14 +616,26 @@ Top
         高版本支持低版本的/
         后期开发的版本支持和兼容早期开发的版本
 29.CSS文字溢出ellipsis
+(单行文本截断 text-overflow:ellipsis)
+(多行文本截断 
+    1.-webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    display:-webkit-box;
+    2.定位元素
+    设置相对定位的容器高度
+    用包含省略号(...)的元素模拟实现
+    通过伪元素绝对定位到行尾并遮住文字
+    再通过overflow:hidden;
+    隐藏多余文字
+    3.float特性实现)
     将文本溢出部分进行隐藏/用省略号代替
         1.单行文本截断 
             text-overflow:ellipsis(需加width属性兼容部分浏览)
-             div {
-                 white-space: nowrap;
-                 overflow: hidden;
-                 text-overflow: ellipsis;
-                 }
+            div:{
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                }
         优点:
             属性浏览器原生支持 各大浏览器兼容性好
         缺点：
@@ -599,19 +645,25 @@ Top
         2.-webkit-line-clamp实现
             div {
                 display: -webkit-box;
-                overflow: hidden;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
+                overflow: hidden;
             }
-            需要和display -webkit-box-orient和overflow结合适用
-                display:-webkit-box;
+            -webkit-line-clamp
+                是webkit私有属性 是一个不规范的属性
+                没有出现在CSS规范草案中
+                用来限制在一个块元素显示的文本的行数
+                为实现该效果
+                它需组合其他webkit属性
+                常见结合属性
+                    1.dispaly:-webkit-box;
                     必须结合的属性
                     将对象作为弹性伸缩盒子模型显示
-                -webkit-box-orient;
+                    2.-webkit-box-orient:vertical;
                     必须结合的属性
                     设置/检索
                     伸缩盒对象的子元素排列方式
-                text-overflow:ellipsis;
+                    3.text-overflow:ellipsis;
                     可选属性
                     可以用来多行文本下
                     省略号...隐藏超出范围文本
@@ -632,6 +684,9 @@ Top
         3.定位元素实现多行文本截断
                 设置相对定位的容器高度
                 用包含省略号(...)的元素模拟实现
+                通过伪元素绝对定位到行尾并遮住文字
+                再通过overflow:hidden;
+                隐藏多余文字
                 p{
                     position:relative;
                     line-height:18px;
@@ -672,22 +727,37 @@ Top
                         2.添加word-break:break-all;
                         使一个单词能够在换行时进行拆分 
                         文字和省略号贴合效果更佳
-30.CSS画一个圆
-    通过设置border-radius实现
-31.Chrome实现css字体小于12px解决方法
-    中文版的Chrome有个12px字体限制问题
+29.CSS画一个圆/椭圆/半椭圆
+    圆
+    1.宽度高度相等
+    border-radius:50%;
+    椭圆
+    1.宽度高度不相等
+    border-radius:50%/50%;
+    半椭圆
+    1.宽度高度不相等
+    border-radius:50%/100% 100% 0 0;
+30.Chrome实现css字体小于12px解决方法
+    中文版的Chrome有12px字体限制问题
     当字体小于12px时 都以12px显示
-    CSS3一个新属性 transform:scale();
+    
+    使用CSS3一个新属性 transform:scale();
     具体实现
         p{
             font-size:10px;
             -webkit-transform:scale(0.8);
         }
-32.CSS3新属性calc
+31.CSS3新属性calc
+    (通用的数学运算规则/
+    +-*/四则运算/
+    百分比 px em rem等相对单位/
+    混合使用各种单位/
+    + - 前后需有空格/
+    * / 前后可以没有建议保留)
     calc运算规则
         1.使用通用的数学运算规则
         2.使用+-*/四则运算
-        3.可使用百分比 px em rem等单位
+        3.可使用百分比 px em rem等相对单位
         4.可混合使用各种单位进行计算
         5.表达式中有+ 和-时 其前后必须有空格
             如width:calc(12% + 5em)
@@ -699,17 +769,19 @@ Top
         需要在其前面加上各浏览器厂商的识别符
         2.移动端浏览器仅有firefox for android支持
         需要在其前面加上各浏览器厂商的识别符
-33.文本垂直居中方式有哪些
+32.文本垂直居中方式有哪些
     单行文本
         line-height = height;
     多行文本    
-    1.父元素 vertical-align:middle
-            display:table-cell
+    1.父元素 
+            该属性设置一个元素的垂直对齐方式
+            vertical-align:middle;
+            display:table-cell;
             可实现子元素垂直居中
     2.父元素 display:flex;
             align-items:center            
     3.父元素 padding
-34.CSS实现阴影
+33.CSS实现阴影
     box-shadow: h-shadow v-shadow blur spread color inset;
     属性值：
         h-shadow 必需 水平阴影的位置。允许负值
@@ -718,8 +790,13 @@ Top
         spread 可选 阴影的大小
         color 可选 阴影的颜色。
         inset 可选  从外层的阴影（开始时）改变阴影内侧阴影
-35.link和@import区别
-    (XHTML CSS/加载顺序/兼容性/DOM控制样式/@import可CSS中再次引入其他CSS样式表)
+34.link和@import区别
+(相同:加载CSS文件)
+(不同:
+link 
+XHTML标签/CSS同页面一起加载/兼容性好/可使用JS控制DOM改变样式
+import 
+CSS提供方式/CSS等页面下载完加载/CSS2.1提出IE5以上识别/不支持)
     本质上
         两种方式都是为了加载CSS文件
     区别：
@@ -742,12 +819,20 @@ Top
         5.@import可以在CSS中再次引入其他样式表(不推荐)
             如创建一个主样式表
             在主样式表中再引入其他样式表
-36.如何用CSS实现硬件加速
-    CSS animation transforms transitions 不会自动开启GPU加速
-    而是由浏览器缓慢的软件渲染引擎来执行 
-    所以可以使用transform:translateZ(0)开启硬件加速
-    transform:translate3d(0,0,0);也可以
-37.如何实现一个自适应的正方形
+35.CSS实现硬件加速
+    CSS animation transforms transitions 
+    不会自动开启GPU加速
+    由浏览器缓慢的软件渲染引擎来执行 
+    开启硬件加速
+    1.transform:translateZ(0)
+        表示在浏览器的Z轴上移动
+    2.transform:translate3d(0,0,0)
+36.如何实现一个自适应的正方形
+(margin padding的百分比数值相对父元素宽度计算)
+(
+1.使用vw相对单位
+2.设置垂直方向padding撑开容器
+3.利用伪元素margin/padding-top撑开容器)
     1.使用vw相对单位
         .placeholder{
             width:100%;
