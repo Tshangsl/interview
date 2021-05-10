@@ -38,6 +38,16 @@ JS
                 Symbol.iterator是一个有名的符号 被用来给对象添加一个特殊方法 使得对象可以被迭代
             4.使用Symbol.for('xxx')获取全局的symbol值
             5.用来重置对象的属性 比如Symbol.toStringTag
+        symbol被当作对象属性
+        symbol诞生之前 对象的键key只能是字符串
+        定义：
+            symbols 是一种无法被重建的基本类型。
+            这时 symbols 有点类似与对象创建的实例互相不相等的情况，但同时 symbols 又是一种无法被改变的基本类型数据
+        Symbol作为对象的属性：
+            1.Object.keys() 并没有返回 symbols，这是为了向后兼容性的考虑。老代码不兼容 symbols，因此古老的 Object.keys() 不应该返回 symbols。
+            2.适合作为对象的私有属性
+            3.阻止对象属性名冲突
+                通过使用symbols 不同的库在初始化的时候生成其所需要的symbol 然后就可以在对象上任意赋值
     引用数据类型:Object(对象Object 数组Array 函数Function) 
     区别：
         1.两者作为函数的参数进行传递时：
@@ -1018,14 +1028,16 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
      5.函数 arguments 保留字 if1语句声明函数 语法错误
      6.eval 包含上下文不再创建变量和对象
     )
-    严格模式规则
+    严格模式规则(apply&call&bind null/undefined/arguments.callee/全局作用域undefined/ES6模块化默认严格模式)
         1.使用apply/call/bind，当传入参数是null/undefined时，this指向null/undefined，而不是全局对象。
             而在非严格模式下使用函数的 apply()或 call()方法时，null 或 undefined 值会被转换为全局对象。
         2.不再支持arguments.callee。非严格模式下，arguments.callee指向当前正在执行的函数。
-        3.用于标准化正常的JavaScript语义。
-        4.可以嵌入到非严格模式中，关键字 ‘use strict’。
-        5.代码应遵循JS严格的语法规则。例如，分号在每个语句声明之后使用。 
-        6.严格模式下this 是undefined 非严格模式下 一般this指向window
+        3.严格模式下this 是undefined 非严格模式下 一般this指向window
+        4.ES6 的模块化自动采用严格模式，不管你有没有在模块头部加上"use strict";)
+            COMMONJS模块化默认不是严格模式
+        4.用于标准化正常的JavaScript语义。
+        5.可以嵌入到非严格模式中，关键字 ‘use strict’。
+        6.代码应遵循JS严格的语法规则。例如，分号在每个语句声明之后使用。 
     严格模式概念
         ES5引入 
         通过严格模式 可以在函数内部选择进行较为严格的全局或局部的错误条件检测
@@ -1043,7 +1055,6 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
             不支持严格模式的引擎就当遇到了一个未赋值的字符串字面量 会忽略这个编译指示
     1.全局作用域中(函数外部)给出"use strict"则整个代码都将使用严格模式(如果将带有"use strict"的代码放到其他文件的全局中 则该文件中的JS代码也将处于严格模式下)
     2.可以只在函数内打开严格模式 如果不想让整篇代码都处在严格模式下 建议只在需要测试的特定函数中开启严格模式
-    
     (
     1.变量 创建/删除/变量名(不能使用保留字 implements interface let等作变量名)
     2.对象 严格模式下
@@ -1061,6 +1072,22 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
     4.eval函数 严格模式下
             1.包含上下文中不再创建变量或函数
     )
+    严格模式限制:
+        变量必须声明后再使用
+        函数的参数不能有同名属性，否则报错
+        不能使用with语句
+        不能对只读属性赋值，否则报错
+        不能使用前缀 0 表示八进制数，否则报错
+        不能删除不可删除的属性，否则报错
+        不能删除变量delete prop，会报错，只能删除属性delete global[prop]
+        eval不会在它的外层作用域引入变量
+        eval和arguments不能被重新赋值
+        arguments不会自动反映函数参数的变化
+        不能使用arguments.callee
+        不能使用arguments.caller
+        禁止this指向全局对象
+        不能使用fn.caller和fn.arguments获取函数调用的堆栈
+        增加了保留字（比如protected、static和interface）
 27.什么是防抖(最后一次) 节流(冷却一段时间) 如何实现
     防抖和节流  
         防止短时间内高频触发事件
@@ -1552,13 +1579,13 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
             3.defer脚本会在文档渲染完毕后
                 DOMContentLoaded事件调用前执行
     推荐使用场景
-    defer
+    defer(评论框/代码语法高亮)
         脚本代码依赖于页面中的DOM元素(文档是否解析完毕)
         /被其他脚本文件依赖
             1.评论框
             2.代码语法高亮
             3.polyfill.js
-    async
+    async(百度统计)
         脚本不关心页面中的DOM元素(文档是否解析完毕)
         并不会产生其他脚本需要的数据
             1.百度统计
