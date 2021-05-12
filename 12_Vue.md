@@ -182,15 +182,11 @@
         缺点：
             写起来不太方便 要使UI发生变更就必须创建各种 action 来维护对应的 state
     Vue中的模板语法
-        Vue.js使用了基于HTML的模板语法 
-        允许开发者声明式的将DOM绑定至底层Vue实例的数据
-        所有Vue.js的模板都是合法的HTML 
-        所以能被遵循规范的浏览器和HTML解析器解析
-
-        在底层的实现上
-        Vue将模板编译成虚拟DOM渲染函数
-        结合响应系统 
-        Vue能智能计算出最少需要重新渲染多少组件
+        1.Vue.js使用了基于HTML的模板语法 允许开发者声明式的将DOM绑定至底层Vue实例的数据 
+            所有Vue.js的模板都是合法的HTML 所以能被遵循规范的浏览器和HTML解析器解析
+        2.在底层的实现上 Vue将模板编译成虚拟DOM render渲染函数
+            结合响应系统 Vue能智能计算出最少需要重新渲染多少组件 并把DOM操作次数减到最少
+        3.熟悉VDOM 并偏爱JS原生 可以不用模板 直接写render渲染函数 使用可选的JSX语法 
     Vue中template编译的理解
         先转化成AST树 将得到的render函数返回VNode(Vue的虚拟DOM节点)
         1.首先通过compile编译器把template编译成AST语法树
@@ -642,7 +638,7 @@
             2.把此虚拟DOM转成真实DOM并插入页面中(render)
             3.如果有事件发生修改了虚拟DOM 比较两棵虚拟DOM树的差异 得到差异对象diff
             4.把差异对象应用到真正的DOM树上(patch)
-8.Vue中Dom异步更新&nextTick
+7.Vue中Dom异步更新&nextTick
 Dom异步更新：
     Vue 异步执行 DOM 更新。
     观察到数据变化
@@ -759,6 +755,86 @@ Vue中nextTick机制
                 同一事件循环中的数据变化后 
                 DOM完成更新
                 立即执行Vue.nextick()的回调
+8.Vue中的component
+    (data是函数 每个实例可以维护一份被返回对象的独立的拷贝)
+    (组件是可复用的 Vue 实例，且带有一个名字：)
+    (el是根实例特有的选项)
+    每用一次组件，就会有一个它的新实例被创建。
+    一个组件的 data 选项必须是一个函数
+    (每个实例可以维护一份被返回对象的独立的拷贝)
+    定义组件名的方式(两种):
+    1.使用 kebab-case(短横线分隔命名)
+        须在引用这个自定义元素时使用 kebab-case，例如 <my-component-name>。
+    2.使用 PascalCase(首字母大写命名)
+        <my-component-name> 和 <MyComponentName> 
+        都是可接受的
+        直接在 DOM (即非字符串的模板) 中使用时只有 kebab-case(短横线分隔命名) 是有效的
+    name作用：
+        1.递归组件时，组件调用自身使用；
+        2.用is特殊特性和component内置组件标签时使用；
+        3.keep-alive内置组件标签中include 和exclude属性中使用。
+    销毁：
+        1.没有使用keep-alive时的路由切换；
+        2.v-if='false'；
+        3.执行vm.$destroy()；
+    1.全局注册
+    (全局注册的行为必须在根 Vue 实例 (通过 new Vue) 创建之前发生。)
+        Vue.component('my-component-name', {
+        // ... options ...
+        })
+        缺点：
+            你使用一个像 webpack 这样的构建系统，全局注册所有的组件意味着即便你已经不再使用一个组件了，它仍然会被包含在你最终的构建结果中。这造成了用户下载的 JavaScript 的无谓的增加。
+    2.局部注册(局部注册的组件在其子组件中不可用) 
+        1.通过一个普通的 JavaScript 对象来定义组件：
+        var ComponentA = { /* ... */ }
+        2.在 components 选项中定义你想要使用的组件：
+            new Vue({
+            el: '#app',
+            components: {
+                'component-a': ComponentA,
+                'component-b': ComponentB
+            }
+            })
+    3.模块系统局部注册(使用了诸如 Babel 和 webpack 的模块系统)
+        1.推荐创建一个 components 目录，并将每个组件放置在其各自的文件中。
+        2.局部注册之前导入每个你想使用的组件。
+    4.基础组件自动化全局注册
+        基础组件，它们会在各个组件中被频繁的用到。
+        恰好使用了 webpack (或在内部使用了 webpack 的 Vue CLI 3+)，那么就可以使用 require.context 只全局注册这些非常通用的基础组件
+    组件传值：
+        父组件-子组件 props
+        子组件-父组件 this.$emit()
+    命名规范：
+        链式命名my-component 驼峰命名MyComponent
+    1.在字符串模板中<my-component></my-component> 和 <MyComponent></MyComponent>都可以使用，
+    2.在非字符串模板中最好使用<MyComponent></MyComponent>，因为要遵循W3C规范中的自定义组件名
+    (字母全小写且必须包含一个连字符)，避免和当前以及未来的 HTML 元素相冲突。
+prop:
+    1.Prop 的大小写 (camelCase vs kebab-case)
+        HTML 中的 attribute 名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符。这意味着当你使用 DOM 中的模板时，camelCase (驼峰命名法) 的 prop 名需要使用其等价的 kebab-case (短横线分隔命名) 命名：
+        使用字符串模板，那么这个限制就不存在了。
+
+            一个组件默认可以拥有任意数量的 prop，任何值都可以传递给任何 prop。在上述模板中，你会发现我们能够在组件实例中访问这个值，就像访问 data 中的值一样。
+        <input v-model="searchText">等价于
+        <input
+        v-bind:value="searchText"
+        v-on:input="searchText = $event.target.value"
+        >
+        在不同组件之间进行动态切换是非常有用的，
+        上述内容可以通过 Vue 的 <component> 元素加一个特殊的 is attribute 来实现：
+    单文件组件
+        全局注册遇到的问题:
+            全局定义 (Global definitions) 强制要求每个 component 中的命名不得重复
+            字符串模板 (String templates) 缺乏语法高亮，在 HTML 有多行的时候，需要用到丑陋的 \
+            不支持 CSS (No CSS support) 意味着当 HTML 和 JavaScript 组件化时，CSS 明显被遗漏
+            没有构建步骤 (No build step) 限制只能使用 HTML 和 ES5 JavaScript，而不能使用预处理器，如 Pug (formerly Jade) 和 Babel
+        文件扩展名为 .vue 的 single-file components (单文件组件) 为以上所有问题提供了解决方法，并且还可以使用 webpack 或 Browserify 等构建工具。     
+        获得：
+            完整语法高亮
+            CommonJS 模块
+            组件作用域的 CSS
+        Node Package Manager (NPM)：阅读 Getting Started guide 中关于如何从注册地 (registry) 获取包的章节。
+    局部注册
 9.location.href与Vue-router路由跳转区别
 (Vue-router pushState
 进行路由更新 静态跳转 页面不会重新加载/
@@ -911,6 +987,70 @@ params(name引入 接参 this.$route.params.name 类似post传参 参数地址�
           query是拼接在url后面的参数，没有也没关系。
             params一旦设置在路由，params就是路由的一部分，如果这个路由有params传参，但是在跳转的时候没有传这个参数，会导致跳转失败或者页面会没有内容。
         4.params、query不设置也可以传参，params不设置的时候，刷新页面或者返回参数会丢失 query则不会有这个问题        
+12.Vue-router源码
+    Vue-Router是Vue.js官方的路由管理器 它和Vue.js可信深度集成 使构建SPA更容易
+    目录结构
+    vue-router
+        components #存放vue-router两个核心组件
+            link.js
+            view.js
+        history     #存放浏览器跳转相关逻辑
+            base.js
+            hash.js
+        create-matcher.js #创建匹配器
+        create-route-map.js #创建路由映射表
+        index.js        #引用时的入口函数
+        install.js      #install方法
+    目录结构
+        --components 组件
+            --link.js route-link的实现
+            --view.js route-view的实现
+        --create-matcher.js 创建匹配
+        --create-route-map.js 创建路由的映射
+        --history 操作浏览器记录的一系列内容
+            --abstract.js 非浏览器的history
+            --base.js   基本的history
+            -hash.js hash模式的history
+            -html5.js html5模式的history
+        --index.js 入口文件
+        --install.js 插件安装的方法
+        --util 工具类库
+            --async.js 异步操作的工具库
+            --dom.js dom相关的函数
+            --location.js 对location的处理
+            --misc.js 一个工具方法
+            --params.js 处理参数
+            --path.js 处理路径
+            --push-state.js 处理html模式的pushState
+            --query.js 对query的处理
+            --resolve-components.js 异步加载组件
+            --route.js 路由
+            --scroll.js 处理滚动
+            --warn.js 打印一些警告
+    使用Vue-router时 主要有以下几步(安装插件 创建router对象 挂载router)
+        <div id="app">
+            <!-- 路由匹配到的组件将渲染在这里 -->
+            <router-view></router-view>
+        </div>    
+        1. 安装 插件
+        Vue.use(VueRouter);
+        2. 创建router对象
+        const router = new VueRouter({
+            routes // 路由列表 eg: [{ path: '/foo', component: Foo }]
+        });
+        3. 挂载router
+        const app = new Vue({
+            router
+        }).$mount('#app');
+
+        其中 VueRouter 对象，就在vue-router 的入口文件 src/index.js
+
+        VueRouter 原型上定义了一系列的函数
+        我们日常经常会使用到
+        主要有go/push/replace/back/forward
+        以及一些导航守护beforeEach/beforeResolve/afterEach 等等
+        上面html 中使用到的 router-view 
+        以及经常用到的 router-link 则存在 src/components 目录下。
 13.
 Vue-router
 (SPA single page application的路径管理器 WebApp的链接路径管理系统)
@@ -1264,20 +1404,6 @@ SPA(hash模式/history模式)
             1.将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
             2.在配置路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
             3.加一个首屏 loading 图，提升用户体验；
-47.vue-router源码
-    仅展示关键方法 细节处不讨论
-    目录结构
-    vue-router
-        components #存放vue-router两个核心组件
-            link.js
-            view.js
-        history     #存放浏览器跳转相关逻辑
-            base.js
-            hash.js
-        create-matcher.js #创建匹配器
-        create-route-map.js #创建路由映射表
-        index.js        #引用时的入口函数
-        install.js      #install方法
 48.Vue-router
     1.重定向页面
         1.const router = new VueRouter({
@@ -2221,28 +2347,28 @@ vm.$mount([elementOrSelector]) 返回vm实例本身 可链式调用其他实例�
             <li is="cardList"></li>
         </ul>
 28.keep-alive
-(actived deactived keep-alive专属)
-(抽象组件 本身不会渲染一个DOM 不会出现在父组件链中)
-(使用keep-alive包裹动态组件 缓存不活动的组件实例 代替销毁)
-(组件切换 默认销毁 需求 组件切换后 不进行销毁 保留之前状态 keep-alive实现 被切换到的组件都有自己的名字)
-两个属性(字符串或者正则表达式匹配的组件name)
-(include定义缓存白名单即会缓存的组件
-exclude定义缓存黑名单即不会缓存的组件)
-(activted()钩子函数 keep-alive专属 组件激活时调用 可更新组件
-deactived()钩子函数 keep-alive专属 组件被销毁时调用)
-    1.include定义缓存白名单，会缓存的组件；
-    2.exclude定义缓存黑名单，不会缓存的组件；
-    3.以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"
-    4.匹配首先检查组件自身的 name 选项，如果 name 选项不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)。匿名组件不能被匹配；
-    5.max最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉；
-    6.不会在函数式组件中正常工作，因为它们没有缓存实例；
-    7.当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
-    服务器渲染期间不被调用
-    activited()生命周期钩子函数
-        keep-alive专属 组件被激活时调用 可更新组件
-    deactived()生命周期钩子函数
-        keep-alive专属 组件被销毁时调用
-    一般结合路由和动态组件一起使用
+    (actived deactived keep-alive专属)
+    (抽象组件 本身不会渲染一个DOM 不会出现在父组件链中)
+    (使用keep-alive包裹动态组件 缓存不活动的组件实例 代替销毁)
+    (组件切换 默认销毁 需求 组件切换后 不进行销毁 保留之前状态 keep-alive实现 被切换到的组件都有自己的名字)
+    两个属性(字符串或者正则表达式匹配的组件name)
+    (include定义缓存白名单即会缓存的组件
+    exclude定义缓存黑名单即不会缓存的组件)
+    (activted()钩子函数 keep-alive专属 组件激活时调用 可更新组件
+    deactived()钩子函数 keep-alive专属 组件被销毁时调用)
+        1.include定义缓存白名单，会缓存的组件；
+        2.exclude定义缓存黑名单，不会缓存的组件；
+        3.以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"
+        4.匹配首先检查组件自身的 name 选项，如果 name 选项不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)。匿名组件不能被匹配；
+        5.max最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉；
+        6.不会在函数式组件中正常工作，因为它们没有缓存实例；
+        7.当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
+        服务器渲染期间不被调用
+        activited()生命周期钩子函数
+            keep-alive专属 组件被激活时调用 可更新组件
+        deactived()生命周期钩子函数
+            keep-alive专属 组件被销毁时调用
+        一般结合路由和动态组件一起使用
 29.Vue中的key
     (VDOM DOM diff 新旧VDOM对比做辨识用)
     (使用字符串/数值/布尔/符号等基本数据类型值作key)
@@ -2286,6 +2412,7 @@ deactived()钩子函数 keep-alive专属 组件被销毁时调用)
     (.stop 防止事件冒泡 等同JS中event.stopPropagation)
     (.prevent 防止执行预设的行为 等于JS中的event.preventDefault)
     (.once 只触发一次)
+    (给组件绑定自定义事件无效解决 加上修饰词.native)
     表单修饰符
     (.lazy 
     input标签v-model用lazy修饰之后 不会立即监听input的value的改变 会在input失去焦点之后，才会监听input的value的改变)
@@ -2305,6 +2432,7 @@ deactived()钩子函数 keep-alive专属 组件被销毁时调用)
         4 .self：将事件绑定到自身，只有自身才能触发
         5 .once：只触发一次
         6 .passive：不阻止事件的默认行为
+        7 .native 在父组件中给子组件绑定一个原生的事件 就将子组件变成了普通的HTML标签 不加.native 事件是无法触发的
     事件修饰符(要注意顺序很重要，用@click.prevent.self会阻止所有的点击，而@click.self.prevent只会阻止对元素自身的点击。)
         .stop：阻止事件传递；
         .prevent： 阻止默认事件；
@@ -2331,22 +2459,160 @@ deactived()钩子函数 keep-alive专属 组件被销毁时调用)
     .down
     .left
     .right
-7.Vue事件中使用event对象
+31.Vue事件中使用event对象
     ($event.currentTarget 始终指向事件所绑定的元素)
     ($event.target        始终指向事件发生时元素)
 
     1.@click="handleOpen" 默认第一个参数传入event对象;
     2.@click="handleOpen(0, $event)",如果自己需要传入参数和event对象，则需要使用$event来获取event对象并传入handleOpen。
-24.模板语法
-    1.Vue.js 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。
-        所有 Vue.js 的模板都是合法的 HTML，所以能被遵循规范的浏览器和 HTML 解析器解析。
-    2.在底层的实现上，
-        Vue 将模板编译成虚拟 DOM 渲染render函数。
-        结合响应系统，Vue 能够智能地计算出最少需要重新渲染多少组件，并把 DOM 操作次数减到最少。
-    3.如果你熟悉虚拟 DOM 并且偏爱 JavaScript 的原始力量，你也可以不用模板
-        直接写渲染 (render) 函数，使用可选的 JSX 语法
-27.双向绑定
-    1.三种实行方法：
+32.vue中的slot
+(单个插槽/默认插槽/匿名插槽
+具名插槽
+作用域插槽 子组件给父组件传参 父组件决定如何展示)
+    插槽使用在子组件中
+    目的：将父组件中的子组件模板数据正常显示
+    (单个插槽|默认插槽|匿名插槽/具名插槽/作用域插槽(子组件给父组件传参 父组件决定如何展示))
+    1.单个插槽|默认插槽|匿名插槽
+        (不用设置name属性)
+        单个插槽可以放置在组件的任意位置 
+        一个组件中只能有一个该类插槽。
+    2.具名插槽 <slot name="up"></slot>
+        有name属性 
+        可以在一个组件中出现N次，出现在不同的位置
+        父组件通过html模板上的slot属性关联具名插槽。没有slot属性的html模板默认关联匿名插槽。
+    3.作用域插槽 | 带数据的插槽 slot-scopes
+        (作用域插槽就是子组件给父组件传参 父组件决定怎么展示)
+        前面两种，都是在组件的template里面写
+        作用域插槽要求，在slot上面绑定数据
+        父组件只需要提供一套样式（在确实用作用域插槽绑定的数据的前提下）。
+        数据使用的都是子组件插槽自己绑定的那个数组
+33.scoped
+    (Vue通过在DOM结构以及CSS样式上加上唯一标志 保证唯一 达到样式私有化 不污染全局)
+    (如果一个项目所有style标签都加上scoped属性 相当于实现了样式的模块化)
+    (在公共组件中使用 修改公共组件样式需要用/deep/)
+    (样式穿透 deep 深度作用选择器 >>>别名 
+    一个选择器能影响子组件 像SASS之类预处理器无法正确解析>>> 使用/deep/操作符代替)
+34.Vue中的template
+(template模板占位符
+1.字符串模板写法/
+2.template标签/
+3.script标签)
+    template的作用是模板占位符，可帮助我们包裹元素，但在循环过程当中，template不会被渲染到页面上
+    template标签内容天生不可见，设置了display：none；
+    要操作template标签内部的dom必须要用下面的方法–content属性：
+    三种写法：(字符串模板/template标签/script标签)
+        1.字符串模板写法(直接写在vue 构造器中)
+            这种写法比较直观,适用于html代码不多的场景,但是如果模板里html代码太多,不便于维护,不建议这么写.
+        2.写在template标签里,这种写法跟写html很像.
+        3.写在script标签里,这种写法官方推荐,vue官方推荐script中type属性加上"x-template"        
+35.mixin混入
+(全局混入 main.js中引入 会影响每一个之后创建的Vue实例组件
+局部混入 a.vue中引入 只影响a.vue文件中创建的Vue实例)
+    1.全局混入
+        1.在main.js中写入
+            import Vue from 'vue';
+            import mixins from './mixins';
+            Vue.mixin(mixins);
+            全局混入可以写在mixins文件夹中index.js中，全局混入会影响到每一个之后创建的 Vue 实例（组件）；
+    2.局部混入
+        1.局部混入的注册，在mixins文件中创建一个a_mixin.js文件，然后再a.vue文件中写入
+            <script>
+                import aMixin from 'mixins/a_mixin'
+                export default{
+                    mixins:[aMixin],
+                }
+            </script>
+        2.局部混入只会影响a.vue文件中创建的Vue实例，不会影响到其子组件创建的Vue实例；
+    3.组件的选项和混入的选项是怎么合并的
+        1.数据对象【data选项】，在内部进行递归合并，并在发生冲突时以组件数据优先；
+        2.同名钩子函数将合并为一个数组，因此都将被调用。另外，混入对象的钩子将在组件自身钩子之前调用；
+        3.watch对象合并时，相同的key合成一个对象，且混入监听在组件监听之前调用；
+        4.值为对象的选项【filters选项、computed选项、methods选项、components选项、directives选项】将被合并为同一个对象。两个对象键名冲突时，取组件对象的键值对。
+36.过滤器
+(用途
+1.双花括号插值
+2.v-bind表达式)
+(过滤 一个数据经过过滤之后出来另一样东西
+可以是符合条件的 可以是给该数据添加装饰的)
+(全局注册/局部注册)
+    Vue.js 允许你自定义过滤器，可被用于一些常见的文本格式化。
+    过滤器可以用在两个地方：双花括号插值和 v-bind 表达式 (后者从 2.1.0+ 开始支持)
+    过滤器应该被添加在 JavaScript 表达式的尾部，由“管道”符号指示：
+    1.一个插值可以连续使用两个过滤器吗?
+    可以，{{ message | filterA | filterB }}
+    2.过滤器除了在插值上使用，还可以用在那个地方？
+    还可以v-bind 表达式 上，如：<div :id="rawId | formatId"></div>
+    Vue 中怎么自定义过滤器(同样接受全局注册和局部注册)
+        可以用全局方法 Vue.filter() 注册一个自定义过滤器，它接收两个参数：过滤器 ID 和过滤器函数。过滤器函数以值为参数，返回转换后的值
+            Vue.filter('reverse', function (value) {
+            return value.split('').reverse().join('')
+            })
+            <!-- 'abc' => 'cba' -->
+            <span v-text="message | reverse"></span>
+        过滤器也同样接受全局注册和局部注册
+37.Vue如何自定义指令
+    Vue提供默认内置指令外
+        允许开发人员根据实际情况自定义指令
+        作用价值在于当开发人员在某些场景下
+        需要对普通DOM元素进行操作的时候
+    1.注册自定义指令
+        Vue自定义指令和组件一样存在
+            全局注册
+                Vue.directive(id,[definition])
+                id:自定义指令名称 
+                    指令名称不需要加v-前缀 
+                    默认自动加上前缀
+                    使用指令时一定要加上前缀
+                [definition]
+                    对象数据/指令函数
+            局部注册
+                Vue实例中添加directives对象数据
+            钩子函数
+                一个指令定义对象可以提供如下几个钩子函数
+                    (均为可选)
+                bind:
+                    只调用一次 指令第一次绑定到元素时调用 这里可以进行一次性的初始化设置
+                inserted:
+                    被绑定元素插入父节点时调用
+                    (仅保证父节点存在 但不一定被插入文档中)
+                update:
+                    所在组件的VNode更新时调用
+                componentUpdated:
+                    指令所在组件的VNode及其子VNode全部更新后调用
+                unbind:
+                    只调用一次 指令与元素解绑时调用
+            指令钩子函数的参数：
+                el：
+                    指令所绑定的元素 可以用来直接操作DOM 即放置指令的那个元素
+                binding:
+                    一个对象 里面包含了几个属性
+                vnode：
+                    Vue编译生成的虚拟结点
+                oldVnode：
+                    上一个虚拟结点
+                    仅在update和componentUpdate钩子中可用
+38.动态绑定Class和Style(对象语法/数组语法/对象和数组混合/对象和计算属性)
+    将test、active、active-click三个className,绑到div上，渲染成<div class="test active active-click"></div>其中test是固定的，active受data中actived控制，active-click受data中actived和clicked控制，请用4种写法实现。
+    4种方法
+    1.对象语法
+    <div class="test" :class="{
+  	active: actived ,
+  	'active-click': clicked && actived}">
+    </div>
+    2.数组语法
+    <div class="test" :class="[
+  	actived? activeClass : '', 
+  	clicked && actived ? activeClickClass : '']">
+    </div> 
+    3.对象和数组混合
+    <div :class="[
+  	testClass , 
+  	{active: actived} , 
+   	{'active-click': clicked && actived}
+  ]"></div>
+    4.对象和计算属性(推荐)
+39.双向绑定
+    1.三种实行方法：(发布订阅者模式/脏值检查/数据劫持)
         目前几种主流的mvc(vm)框架都实现了单向数据绑定，
         而我所理解的双向数据绑定无非就是在单向绑定的基础上给可输入元素（input、textare等）添加了change(input)事件，来动态修改model和 view，并没有多高深。所以无需太过介怀是实现的单向或双向绑定。
         1.发布者-订阅者模式(backbone.js)
@@ -2429,198 +2695,21 @@ deactived()钩子函数 keep-alive专属 组件被销毁时调用)
         1.通过在父组件上自定义一个监听事件<myComponent @diy="handleDiy"></myComponent>,在子组件用this.$emit('diy',data)来触发这个diy事件，其中data为子组件向父组件通信的数据,在父组件中监听diy个事件时，可以通过$event访问data这个值。
         2.通过在父组件上用修饰符.sync绑定一个数据<myComponent :show.sync="show"></myComponent>,在子组件用this.$emit('update:show',data)来改变父组件中show的值。
         3.通过v-model。
-29.mixin混入
-(全局混入 main.js中引入 会影响每一个之后创建的Vue实例组件
-局部混入 a.vue中引入 只影响a.vue文件中创建的Vue实例)
-    1.全局混入
-        1.在main.js中写入
-            import Vue from 'vue';
-            import mixins from './mixins';
-            Vue.mixin(mixins);
-            全局混入可以写在mixins文件夹中index.js中，全局混入会影响到每一个之后创建的 Vue 实例（组件）；
-    2.局部混入
-        1.局部混入的注册，在mixins文件中创建一个a_mixin.js文件，然后再a.vue文件中写入
-            <script>
-                import aMixin from 'mixins/a_mixin'
-                export default{
-                    mixins:[aMixin],
-                }
-            </script>
-        2.局部混入只会影响a.vue文件中创建的Vue实例，不会影响到其子组件创建的Vue实例；
-    3.组件的选项和混入的选项是怎么合并的
-        1.数据对象【data选项】，在内部进行递归合并，并在发生冲突时以组件数据优先；
-        2.同名钩子函数将合并为一个数组，因此都将被调用。另外，混入对象的钩子将在组件自身钩子之前调用；
-        3.watch对象合并时，相同的key合成一个对象，且混入监听在组件监听之前调用；
-        4.值为对象的选项【filters选项、computed选项、methods选项、components选项、directives选项】将被合并为同一个对象。两个对象键名冲突时，取组件对象的键值对。
-30.过滤器
-(用途
-1.双花括号插值
-2.v-bind表达式)
-(过滤 一个数据经过过滤之后出来另一样东西
-可以是符合条件的 可以是给该数据添加装饰的)
-(全局注册/局部注册)
-    Vue.js 允许你自定义过滤器，可被用于一些常见的文本格式化。
-    过滤器可以用在两个地方：双花括号插值和 v-bind 表达式 (后者从 2.1.0+ 开始支持)
-    过滤器应该被添加在 JavaScript 表达式的尾部，由“管道”符号指示：
-    1.一个插值可以连续使用两个过滤器吗?
-    可以，{{ message | filterA | filterB }}
-    2.过滤器除了在插值上使用，还可以用在那个地方？
-    还可以v-bind 表达式 上，如：<div :id="rawId | formatId"></div>
-    Vue 中怎么自定义过滤器(同样接受全局注册和局部注册)
-        可以用全局方法 Vue.filter() 注册一个自定义过滤器，它接收两个参数：过滤器 ID 和过滤器函数。过滤器函数以值为参数，返回转换后的值
-            Vue.filter('reverse', function (value) {
-            return value.split('').reverse().join('')
-            })
-            <!-- 'abc' => 'cba' -->
-            <span v-text="message | reverse"></span>
-        过滤器也同样接受全局注册和局部注册
-33.Vue中的template
-(template模板占位符
-1.字符串模板写法/
-2.template标签/
-3.script标签)
-    template的作用是模板占位符，可帮助我们包裹元素，但在循环过程当中，template不会被渲染到页面上
-    template标签内容天生不可见，设置了display：none；
-    要操作template标签内部的dom必须要用下面的方法–content属性：
-    三种写法：(字符串模板/template标签/script标签)
-        1.字符串模板写法(直接写在vue 构造器中)
-            这种写法比较直观,适用于html代码不多的场景,但是如果模板里html代码太多,不便于维护,不建议这么写.
-        2.写在template标签里,这种写法跟写html很像.
-        3.写在script标签里,这种写法官方推荐,vue官方推荐script中type属性加上"x-template"        
-34.vue中的slot
-(单个插槽/默认插槽/匿名插槽
-具名插槽
-作用域插槽 子组件给父组件传参 父组件决定如何展示)
-    插槽使用在子组件中
-    目的：将父组件中的子组件模板数据正常显示
-    (单个插槽|默认插槽|匿名插槽/具名插槽/作用域插槽(子组件给父组件传参 父组件决定如何展示))
-    1.单个插槽|默认插槽|匿名插槽
-        (不用设置name属性)
-        单个插槽可以放置在组件的任意位置 
-        一个组件中只能有一个该类插槽。
-    2.具名插槽 <slot name="up"></slot>
-        有name属性 
-        可以在一个组件中出现N次，出现在不同的位置
-        父组件通过html模板上的slot属性关联具名插槽。没有slot属性的html模板默认关联匿名插槽。
-    3.作用域插槽 | 带数据的插槽 slot-scopes
-        (作用域插槽就是子组件给父组件传参 父组件决定怎么展示)
-        前面两种，都是在组件的template里面写
-        作用域插槽要求，在slot上面绑定数据
-        父组件只需要提供一套样式（在确实用作用域插槽绑定的数据的前提下）。
-        数据使用的都是子组件插槽自己绑定的那个数组
-31.scoped
-    (Vue通过在DOM结构以及CSS样式上加上唯一标志 保证唯一 达到样式私有化 不污染全局)
-    (如果一个项目所有style标签都加上scoped属性 相当于实现了样式的模块化)
-    (在公共组件中使用 修改公共组件样式需要用/deep/)
-    (样式穿透 deep 深度作用选择器 >>>别名 
-    一个选择器能影响子组件 像SASS之类预处理器无法正确解析>>> 使用/deep/操作符代替)
-35.Vue中的component
-    (组件是可复用的 Vue 实例，且带有一个名字：)
-    (el是根实例特有的选项)
-    每用一次组件，就会有一个它的新实例被创建。
-    一个组件的 data 选项必须是一个函数
-    (每个实例可以维护一份被返回对象的独立的拷贝)
-    定义组件名的方式(两种):
-    1.使用 kebab-case(短横线分隔命名)
-        须在引用这个自定义元素时使用 kebab-case，例如 <my-component-name>。
-    2.使用 PascalCase(首字母大写命名)
-        <my-component-name> 和 <MyComponentName> 
-        都是可接受的
-        直接在 DOM (即非字符串的模板) 中使用时只有 kebab-case(短横线分隔命名) 是有效的
-    name作用：
-        1.递归组件时，组件调用自身使用；
-        2.用is特殊特性和component内置组件标签时使用；
-        3.keep-alive内置组件标签中include 和exclude属性中使用。
-    销毁：
-        1.没有使用keep-alive时的路由切换；
-        2.v-if='false'；
-        3.执行vm.$destroy()；
-    1.全局注册
-    (全局注册的行为必须在根 Vue 实例 (通过 new Vue) 创建之前发生。)
-        Vue.component('my-component-name', {
-        // ... options ...
-        })
-        缺点：
-            你使用一个像 webpack 这样的构建系统，全局注册所有的组件意味着即便你已经不再使用一个组件了，它仍然会被包含在你最终的构建结果中。这造成了用户下载的 JavaScript 的无谓的增加。
-    2.局部注册(局部注册的组件在其子组件中不可用) 
-        1.通过一个普通的 JavaScript 对象来定义组件：
-        var ComponentA = { /* ... */ }
-        2.在 components 选项中定义你想要使用的组件：
-            new Vue({
-            el: '#app',
-            components: {
-                'component-a': ComponentA,
-                'component-b': ComponentB
-            }
-            })
-    3.模块系统局部注册(使用了诸如 Babel 和 webpack 的模块系统)
-        1.推荐创建一个 components 目录，并将每个组件放置在其各自的文件中。
-        2.局部注册之前导入每个你想使用的组件。
-    4.基础组件自动化全局注册
-        基础组件，它们会在各个组件中被频繁的用到。
-        恰好使用了 webpack (或在内部使用了 webpack 的 Vue CLI 3+)，那么就可以使用 require.context 只全局注册这些非常通用的基础组件
-    组件传值：
-        父组件-子组件 props
-        子组件-父组件 this.$emit()
-    命名规范：
-        链式命名my-component 驼峰命名MyComponent
-    1.在字符串模板中<my-component></my-component> 和 <MyComponent></MyComponent>都可以使用，
-    2.在非字符串模板中最好使用<MyComponent></MyComponent>，因为要遵循W3C规范中的自定义组件名
-    (字母全小写且必须包含一个连字符)，避免和当前以及未来的 HTML 元素相冲突。
-prop:
-    1.Prop 的大小写 (camelCase vs kebab-case)
-        HTML 中的 attribute 名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符。这意味着当你使用 DOM 中的模板时，camelCase (驼峰命名法) 的 prop 名需要使用其等价的 kebab-case (短横线分隔命名) 命名：
-        使用字符串模板，那么这个限制就不存在了。
-
-            一个组件默认可以拥有任意数量的 prop，任何值都可以传递给任何 prop。在上述模板中，你会发现我们能够在组件实例中访问这个值，就像访问 data 中的值一样。
-        <input v-model="searchText">等价于
-        <input
-        v-bind:value="searchText"
-        v-on:input="searchText = $event.target.value"
-        >
-        在不同组件之间进行动态切换是非常有用的，
-        上述内容可以通过 Vue 的 <component> 元素加一个特殊的 is attribute 来实现：
-    单文件组件
-        全局注册遇到的问题:
-            全局定义 (Global definitions) 强制要求每个 component 中的命名不得重复
-            字符串模板 (String templates) 缺乏语法高亮，在 HTML 有多行的时候，需要用到丑陋的 \
-            不支持 CSS (No CSS support) 意味着当 HTML 和 JavaScript 组件化时，CSS 明显被遗漏
-            没有构建步骤 (No build step) 限制只能使用 HTML 和 ES5 JavaScript，而不能使用预处理器，如 Pug (formerly Jade) 和 Babel
-        文件扩展名为 .vue 的 single-file components (单文件组件) 为以上所有问题提供了解决方法，并且还可以使用 webpack 或 Browserify 等构建工具。     
-        获得：
-            完整语法高亮
-            CommonJS 模块
-            组件作用域的 CSS
-        Node Package Manager (NPM)：阅读 Getting Started guide 中关于如何从注册地 (registry) 获取包的章节。
-    局部注册
+40.强制刷新组件
+        1.this.$forceUpdate()。
+        2.组件上加上key，然后变化key的值。
+    Vue渲染模板保留模板中的HTML注释
+        组件中将comments选项设置为true
+        <template comments> ... <template>
+    Vue中重置data
+        Object.assign(this.$data,this.$options.data())
 41.Vue数组中对象删除属性delete和Vue.delete删除数组区别
     delete只是被删除的元素变成了 empty/undefined 其他的元素的键值还是不变。
         delete this.a[1]
         this.$set(this.a)
     Vue.delete直接删除了数组 改变了数组的键值。
         this.$delete(this.b, 1)
-42.Vue 组件 data是函数(每个实例可以维护一份被返回对象的独立的拷贝)
-43.动态绑定Class和Style(对象语法/数组语法/对象和数组混合/对象和计算属性)
-    将test、active、active-click三个className,绑到div上，渲染成<div class="test active active-click"></div>其中test是固定的，active受data中actived控制，active-click受data中actived和clicked控制，请用4种写法实现。
-    4种方法
-    1.对象语法
-    <div class="test" :class="{
-  	active: actived ,
-  	'active-click': clicked && actived}">
-    </div>
-    2.数组语法
-    <div class="test" :class="[
-  	actived? activeClass : '', 
-  	clicked && actived ? activeClickClass : '']">
-    </div> 
-    3.对象和数组混合
-    <div :class="[
-  	testClass , 
-  	{active: actived} , 
-   	{'active-click': clicked && actived}
-  ]"></div>
-    4.对象和计算属性(推荐)
-53.Vue和React和jQuery区别
+42.Vue和React和jQuery区别
     Vue和React：
         1.数据流
         2.监听数据的变化方式不同
@@ -2631,13 +2720,13 @@ prop:
     Vue(专注于数据层 通过数据双向绑定 最终表现在DOM层减少DOM操作)和jQuery(专注视图层 通过操作DOM实现页面的一些逻辑渲染)：
         jQuery 专注视图层，通过操作 DOM 去实现页面的一些逻辑渲染；
         Vue 专注于数据层，通过数据的双向绑定，最终表现在 DOM 层面，减少了 DOM 操作 Vue 使用了组件化思想，使得项目子集职责清晰，提高了开发效率，方便重复利用，便于协同开发
-54.Vue与Angular区别
+42.Vue与Angular区别
     x
     2.Vue的双向绑定基于ES5中的getter/setter实现
     Angular由自己实现一套模板编译规则 需要进行所谓脏值检查
     Vue则不需要 因此Vue在性能上更高效 代价是对于IE9以下的浏览器无法支持
     3.Vue需要提供一个el对象进行实例化 后续的所有作用范围也是在el对象之下 Angular是整个HTML页面 一个页面可以有多个Vue实例 而Angular不是
-55.Vue/Angular/React区别
+42.Vue/Angular/React区别
     Vue/Angular
         相同点：
             1.都支持指令 内置指令和自定义指令
@@ -2658,13 +2747,13 @@ prop:
             1.React依赖Vitrual DOM Vue.js使用的是DOM模板
             React采用的VDOM会对渲染出来的结果做脏值检查
             2.Vue在模板中提供了指令 过滤器 可以非常方便快捷操作DOM
-54.vue-admin-template&Element UI
+42.vue-admin-template&Element UI
     vue-admin-template:
     一个极简的vue admin管理后台 只包含 Element UI &axios &iconfont&permission control &init 这些搭建后台必要的东西
     目前版本 v4.0+ 基于Vue-Cli构建
     Element UI:
     基于Vue2.0的组件库
-55.Vue-Cli配置功能
+42.Vue-Cli配置功能
     1.ES6代码转换成ES5代码
     2.scss/sass/less/stylus转css
     3..vue文件转换成js文件
@@ -2675,117 +2764,9 @@ prop:
     8.每次构建代码清除之前生成的代码
     9.定义环境变量
     10.区分开发环境打包跟生产环境打包
-56.shim()
-    shim是一个小型库，可透明地截取API，更改传递的参数，处理操作本身，或将操作重定向到别处。垫片通常在API的行为发生变化时出现，从而导致仍依赖旧功能的旧应用程序出现兼容性问题。在这些情况下，较新的代码之上的较薄的兼容层仍然可以支持较旧的API。垫片也可以用于在不同的软件平台上运行程序，而不是开发它们。
-
-1.强制刷新组件
-    1.this.$forceUpdate()。
-    2.组件上加上key，然后变化key的值。
-2.父组件中的自定义事件
-接收子组件的多个参数
-    使用this.$emit()函数的第二个参数 做对象使用
-    this.$emit('eventName',data)
-    data可以是个对象，包含子组件的多个参数，然后传给父组件。
-3.给组件绑定自定义事件无效怎么解决？
-    加上修饰词.native。
-61.Vue如何自定义指令
-    Vue提供默认内置指令外
-        允许开发人员根据实际情况自定义指令
-        作用价值在于当开发人员在某些场景下
-        需要对普通DOM元素进行操作的时候
-    1.注册自定义指令
-        Vue自定义指令和组件一样存在
-            全局注册
-                Vue.directive(id,[definition])
-                id:自定义指令名称 
-                    指令名称不需要加v-前缀 
-                    默认自动加上前缀
-                    使用指令时一定要加上前缀
-                [definition]
-                    对象数据/指令函数
-            局部注册
-                Vue实例中添加directives对象数据
-            钩子函数
-                一个指令定义对象可以提供如下几个钩子函数
-                    (均为可选)
-                bind:
-                    只调用一次 指令第一次绑定到元素时调用 这里可以进行一次性的初始化设置
-                inserted:
-                    被绑定元素插入父节点时调用
-                    (仅保证父节点存在 但不一定被插入文档中)
-                update:
-                    所在组件的VNode更新时调用
-                componentUpdated:
-                    指令所在组件的VNode及其子VNode全部更新后调用
-                unbind:
-                    只调用一次 指令与元素解绑时调用
-            指令钩子函数的参数：
-                el：
-                    指令所绑定的元素 可以用来直接操作DOM 即放置指令的那个元素
-                binding:
-                    一个对象 里面包含了几个属性
-                vnode：
-                    Vue编译生成的虚拟结点
-                oldVnode：
-                    上一个虚拟结点
-                    仅在update和componentUpdate钩子中可用
-62.Vue-Router源码
-    Vue-Router是Vue.js官方的路由管理器 它和Vue.js可信深度集成 使构建SPA更容易
-    目录结构
-        --components 组件
-            --link.js route-link的实现
-            --view.js route-view的实现
-        --create-matcher.js 创建匹配
-        --create-route-map.js 创建路由的映射
-        --history 操作浏览器记录的一系列内容
-            --abstract.js 非浏览器的history
-            --base.js   基本的history
-            -hash.js hash模式的history
-            -html5.js html5模式的history
-        --index.js 入口文件
-        --install.js 插件安装的方法
-        --util 工具类库
-            --async.js 异步操作的工具库
-            --dom.js dom相关的函数
-            --location.js 对location的处理
-            --misc.js 一个工具方法
-            --params.js 处理参数
-            --path.js 处理路径
-            --push-state.js 处理html模式的pushState
-            --query.js 对query的处理
-            --resolve-components.js 异步加载组件
-            --route.js 路由
-            --scroll.js 处理滚动
-            --warn.js 打印一些警告
-    使用Vue-router时 主要有以下几步
-        <div id="app">
-            <!-- 路由匹配到的组件将渲染在这里 -->
-            <router-view></router-view>
-        </div>    
-        // 1. 安装 插件
-        Vue.use(VueRouter);
-        // 2. 创建router对象
-        const router = new VueRouter({
-            routes // 路由列表 eg: [{ path: '/foo', component: Foo }]
-        });
-        // 3. 挂载router
-        const app = new Vue({
-            router
-        }).$mount('#app');
-
-        其中 VueRouter 对象，就在vue-router 的入口文件 src/index.js
-
-        VueRouter 原型上定义了一系列的函数
-        我们日常经常会使用到
-        主要有go/push/replace/back/forward
-        以及一些导航守护beforeEach/beforeResolve/afterEach 等等
-        上面html 中使用到的 router-view ，以及经常用到的 router-link 则存在 src/components 目录下。
-11.Vue渲染模板保留模板中的HTML注释
-    组件中将comments选项设置为true
-    <template comments> ... <template>
-12.Vue中重置data
-    Object.assign(this.$data,this.$options.data())
-
+42.shim()
+    shim是一个小型库，可透明地截取API，更改传递的参数，处理操作本身，或将操作重定向到别处。
+    垫片通常在API的行为发生变化时出现，从而导致仍依赖旧功能的旧应用程序出现兼容性问题。在这些情况下，较新的代码之上的较薄的兼容层仍然可以支持较旧的API。垫片也可以用于在不同的软件平台上运行程序，而不是开发它们。
 
 
 
