@@ -122,8 +122,8 @@ values.sort(
     //正数按降序排列
     //负数按升序排列 
     function () {
-    return Math.random() - 0.5;
-})
+        return Math.random() - 0.5;
+    })
 console.log(values);
 // 7.数组乱序 Fisher-Yates洗牌算法实现
 /*
@@ -623,14 +623,14 @@ Array.prototype.map = function (callback, thisArg) {
 
 const { rejects } = require('assert');
 // filter 返回一个新数组 符合既定条件的元素
-Array.prototype.filter = function(arr,callback){
-    let flag = !Array.isArray(arr)||!arr.length||typeof callback !=='function'
-    if(flag){
+Array.prototype.filter = function (arr, callback) {
+    let flag = !Array.isArray(arr) || !arr.length || typeof callback !== 'function'
+    if (flag) {
         return [];
-    }else{
+    } else {
         let newArr = [];
-        for(let index = 0;index<arr.length;index++){
-            if(callback(arr[index],index,arr)){
+        for (let index = 0; index < arr.length; index++) {
+            if (callback(arr[index], index, arr)) {
                 newArr.push(arr[index]);
             }
         }
@@ -642,17 +642,17 @@ Array.prototype.filter = function(arr,callback){
 
 // reduce
 //按顺序执行 最后结果汇总为一个值返回 需要判断有无初始值
-function reduce(arr,callback,initValue){
-    let flag = !Array.isArray(arr)||!arr.length||typeof callback !=='function';
-    if(flag){
+function reduce(arr, callback, initValue) {
+    let flag = !Array.isArray(arr) || !arr.length || typeof callback !== 'function';
+    if (flag) {
         return []
-    }else{
+    } else {
         // 判断有没有初始值
-        let isValue = initValue === 0?(!initValue):(!!initValue);
-        let reduceValue = isValue?initValue:arr[0];
+        let isValue = initValue === 0 ? (!initValue) : (!!initValue);
+        let reduceValue = isValue ? initValue : arr[0];
         // 判断相加的值
-        for(let index = isValue?0:1;index<arr.length;index++){
-            reduceValue = callback(reduceValue,arr[index],index,arr)
+        for (let index = isValue ? 0 : 1; index < arr.length; index++) {
+            reduceValue = callback(reduceValue, arr[index], index, arr)
         }
         return reduceValue;
     }
@@ -777,56 +777,56 @@ function Queue2() {
     this.queue = [];
     this.task = (time, fn) => {
         this.queue.push(resolve => {
-            setTimeout(()=>{
+            setTimeout(() => {
                 resolve(fn());
-            },time)
+            }, time)
         })
     }
-    this.start = async()=>{
-        for(let item of this.queue){
+    this.start = async () => {
+        for (let item of this.queue) {
             await new Promise(item);
         }
     }
 }
 
 // JS实现一个异步队列来按顺序执行函数 Promise实现
-var funcs = [func1,func2,func3];
-var funPromise = funcs.map(function(func,i){
-    return new Promise(function(resolve){
+var funcs = [func1, func2, func3];
+var funPromise = funcs.map(function (func, i) {
+    return new Promise(function (resolve) {
         func();
-        console.log('func'+(i+1)+'well done');
+        console.log('func' + (i + 1) + 'well done');
         // 如果func是异步方法 需要把resolve定义到方法的callback中
         resolve();
     })
 })
-Promise.all(funcPromise).then(function(){
+Promise.all(funcPromise).then(function () {
     console.log('all well done');
 })
 
 // JS实现一个异步队列来顺序执行函数 async/await实现
-var funcs = [func1,func2,func3];
-(async()=>{
-    for(let i =0;i<focus.length;i++){
+var funcs = [func1, func2, func3];
+(async () => {
+    for (let i = 0; i < focus.length; i++) {
         await funcs[i]();
-        console.log('func'+(i+1)+'well done');
+        console.log('func' + (i + 1) + 'well done');
     }
     console.log('all well done');
 
 })
 
 // 类型封装函数
-function getType(value){
+function getType(value) {
     // 判断数据是null的情况
-    if(value === null){
-        return value+"";
+    if (value === null) {
+        return value + "";
     }
     // 判断数据是引用数据类型的情况
-    if(typeof value === "object"){
+    if (typeof value === "object") {
         let valueClass = Object.prototype.toString.call(value).split(' ')[1];
-        let type = valueClass.substring(0,valueClass.length-1);
-        return type.toLowerCase(); 
-    // 判断数据是基本数据类型的情况
-    }else{
+        let type = valueClass.substring(0, valueClass.length - 1);
+        return type.toLowerCase();
+        // 判断数据是基本数据类型的情况
+    } else {
         return typeof value;
     }
 }
@@ -834,27 +834,27 @@ function getType(value){
 // generator自动执行函数
 // 做什么用的
 // Promise封装读取文件方法
-function readFile(fileName){
-    return new Promise((resolve,reject)=>{
-        fs.readFile(fileName,function(err,data){
-            if(err) reject(err);
+function readFile(fileName) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(fileName, function (err, data) {
+            if (err) reject(err);
             resolve(data.toString());
         })
     })
 }
 // generator函数
-function* gentT2(){
+function* gentT2() {
     var f1 = yield readFile('ip.txt');
     var f2 = yield readFile('ip1.txt');
-    console.log(f1,f2);
+    console.log(f1, f2);
 }
 // 自动执行方法
-function run(gen){
+function run(gen) {
     var g = gen();
-    function next(data){
+    function next(data) {
         var res = g.next(data);
-        if(res.done) return res.value;
-        res.value.then((data)=>{
+        if (res.done) return res.value;
+        res.value.then((data) => {
             next(data);
         })
     }
@@ -875,8 +875,8 @@ function run(gen){
     once(event,listner)
         和on类似 但只触发一次 随后便解除事件监听
 */
-class EventEmitter{
-    constructor(){
+class EventEmitter {
+    constructor() {
         // 初始化events事件对象
         this._events = {}
     }
@@ -885,9 +885,9 @@ class EventEmitter{
         原理:将该事件添加到该事件类型的队列中
         状态:未执行
     */
-    on(event,cb){
+    on(event, cb) {
         // 获取原队列
-        const query = this._events[event]||{};
+        const query = this._events[event] || {};
         // 队列中追加cb
         query.push(cb);
         // 重新赋值事件队列
@@ -898,11 +898,11 @@ class EventEmitter{
         原理:将所有该事件类型的事件从队列中删除
         状态:取消执行
     */
-    off(event,cb){
-    // 获取原队列
-        const query = this._events[event];  
+    off(event, cb) {
+        // 获取原队列
+        const query = this._events[event];
         // 取消事件
-        this._events[event] = query&&query.filter(fn=>fn!==cb)
+        this._events[event] = query && query.filter(fn => fn !== cb)
         return this;
     }
     /*
@@ -911,13 +911,13 @@ class EventEmitter{
         状态:准备执行|执行中
         使用方式:xx.emit(eventName,args)
     */
-    emit(...args){
+    emit(...args) {
         // 获取事件队列
         const query = this._events[args[0]];
         // 获取事件触发的参数
-        const params = Array.prototype.slice.call(args,1);
+        const params = Array.prototype.slice.call(args, 1);
         // 执行事件队列中的回调函数数组
-        query.forEach(fn=>{
+        query.forEach(fn => {
             fn.call(params);
         })
         return this
@@ -926,65 +926,65 @@ class EventEmitter{
         单次触发事件
         原理:执行一次该事件
     */
-   once(event,cb){
+    once(event, cb) {
         // 封装一个单次执行函数
-        const wrapperFun = (...args)=>{
+        const wrapperFun = (...args) => {
             // 执行回调函数
-            cb.apply(this,args);
+            cb.apply(this, args);
             // 移除事件队列中所有该类型的回调函数
-            this.off(event,cb)
+            this.off(event, cb)
         }
         // 将单次执行函数添加到事件队列
-        this.on(event,wrapperFun);
+        this.on(event, wrapperFun);
         return this;
     }
 }
 
 // 实现sleep Promise+setTimeout
-function sleep(time){
-    return new Promise(resolve=>{
+function sleep(time) {
+    return new Promise(resolve => {
         console.log(resolve);
-        setTimeout(resolve,time)
+        setTimeout(resolve, time)
     })
 }
-sleep(10000).then(res=>{
+sleep(10000).then(res => {
     console.log('sleep exe ending');
 })
 
 // 实现sleep callback回调
-function sleep(time,callback){
-    return new Promise(resolve=>{
-        setTimeout(callback,time)
+function sleep(time, callback) {
+    return new Promise(resolve => {
+        setTimeout(callback, time)
     })
 }
-sleep(3000,()=>{
+sleep(3000, () => {
     console.log('sleep exe ending');
 })
 
 // 实现sleep data+循环
-function sleep(time){
+function sleep(time) {
     const startDate = new Date().getTime();
-    while(new Date().getTime()-startDate<time){};
+    while (new Date().getTime() - startDate < time) { };
 }
 sleep(3000);
 console.log('sleep exe ending');
 
 // 实现promise.all
 // Array.from()方法从一个类数组/可迭代对象创建一个新的 浅拷贝的数组
-Promise.prototype.all = function(iterators){
+Promise.prototype.all = function (iterators) {
     const promises = Array.from(iterators);
     const promiseList = [],
         len = promises.length;
     let count = 0;
-    return new Promise((resolve,reject)=>{
-        promises.forEach((promise,index)=>{
-            Promise.resolve(promise).then(res=>{
+    return new Promise((resolve, reject) => {
+        promises.forEach((promise, index) => {
+            Promise.resolve(promise).then(res => {
                 count++;
                 promiseList[index] = res;
-                if(count === len){
+                if (count === len) {
                     resolve(promiseList);
-                }      
-            }).catch(e=>{
+                }
+            }).catch(e => {
                 reject(e);
             })
         })
@@ -1005,12 +1005,70 @@ Promise.prototype.all = function(iterators){
 */
 
 
+// lazyMan
+/*
+    需求分析
+    1.需要封装一个对象 且这个对象提供不同的方法 如eat
+    2.能进行链式调用 则每个调用方法都必须返回当前对
+    3.sleep sleepFirst 方法需要异步
+*/
+/*
+    解题思路
+    1.采用ES6的class 实现封装对象_LazyMan
+    2.提供一系列方法 如eat sleep sleepFirst异步方法 采用Promise和setTimeout实现
+    3.链式调用 考虑到其中含异步方法 采用任务队列及ES6的async wait实现 每次调用都往队列中加入方法
+        然后循环调用任务队列 循环中通过异步实现异步的方法 保证正确
+*/
+class _LazyMan {
+    constructor(name) {
+        this.taskQueue = [];
+        this.runTimer = null;
+        this.sayHi(name);
+    }
+    run() {
+        if (this.runTimer) {
+            clearTimeout(this.runTimer);
+        }
+        this.runTimer = setTimeout(async () => {
+            for (let asyncFun of this.taskQueue) {
+                await asyncFun();
+            }
+            this.taskQueue.length = 0;
+            this.runTimer = null;
+        })
+        return this;
+    }
+    sayHi(name) {
+        this.taskQueue.push(async () => console.log(`Hi this is ${name}`));
+    }
+    eat(food) {
+        this.taskQueue.push(async () => console.log(`Eat ${food}`));
+    }
+    sleep(second) {
+        this.taskQueue.push(async () => {
+            console.log(`Sleep ${second} s`);
+            return this._timeout(second);
+        })
+        return this.run();
+    }
+    sleepFirst(second) {
+        this.taskQueue.unshift(async () => {
+            this.taskQueue.unshift(async () => {
+                console.log(`Sleep first ${second} s`)
+                return this._timeout(second);
+            });
+            return this.run();
+        })
+    }
+    async _timeout(second) {
+        await new Promise(resolve => {
+            setTimeout(resolve, second * 1e3);
+        })
+    }
+}
 
-
-
-
-
-
+let lazyMan = name => new _LazyMan(name);
+lazyMan('Hank').sleep(10).eat('dinner');
 
 
 

@@ -5,8 +5,6 @@
   代表该构造函数的原型对象
   3.prototype有一个constructor属性 指向它的构造函数
   构造函数的constructor只想自身
-
-
 */
 
 /*

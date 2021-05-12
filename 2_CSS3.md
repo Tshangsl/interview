@@ -13,7 +13,7 @@
         只有Block-level box参与 
         它规定了内部的Block-level Box如何布局 
         并且和这个区域外部毫不相干
-    Box：css布局基本单位
+    Box：CSS布局基本单位
         Box是CSS布局的对象和基本单位 直观点来说 一个页面是由很多个 Box 组成的。
         元素的类型和 display 属性，决定了这个 Box 的类型。
         (不同类型的 Box， 会参与不同的 Formatting Context)(格式化上下文)
@@ -794,9 +794,9 @@ z-index:auto z-index:0/
 (相同:加载CSS文件)
 (不同:
 link 
-XHTML标签/CSS同页面一起加载/兼容性好/可使用JS控制DOM改变样式
+XHTML标签/CSS同页面一起加载 异步/兼容性好/可使用JS控制DOM改变样式
 import 
-CSS提供方式/CSS等页面下载完加载/CSS2.1提出IE5以上识别/不支持)
+CSS提供方式/CSS等页面下载完加载 同步/CSS2.1提出IE5以上识别/不支持)
     本质上
         两种方式都是为了加载CSS文件
     区别：

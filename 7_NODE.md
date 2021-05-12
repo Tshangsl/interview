@@ -1,3 +1,82 @@
+1.Node中的事件循环
+    Node中的事件循环和浏览器中是完全不相同的东西
+    Node.js采用V8作为JS解析引擎
+    I/O处理方面使用自己设计的libuv 
+    libuv是一个基于事件驱动的跨平台抽象层
+    封装了不同操作系统一些底层特性
+    对外提供统一的API 事件循环机制也是它里面的实现
+    Node.js运行机制
+        1.V8引擎解析JS脚本
+        2.解析后的代码 调用Node API
+        3.libuv库负责Node API执行 它将不同的任务分配给不同的线程 形成一个Event Loop事件循环 以异步的方式将任务的执行结果返回给V8引擎
+        4.V8引擎再将结果返回给用户
+    六个阶段
+        libuv引擎中的事件循环分为6个阶段 它们会按照顺序反复运行
+        每当进入某一个阶段时 都会从对应的回调队列中取出函数执行
+        当队列为空 或者执行的回调函数数量达到系统设置的阈值 就会进入下一阶段
+        timers
+            这个阶段执行timer(setTimeOut setInterval)回调 
+        I/O callbacks
+            处理一些上一轮循环中少量为执行的I/O回调
+        idle,prepare
+            仅node内部使用
+        poll
+            获取新的I/O事件 适当条件下node将阻塞在这里
+        check
+            执行setImmediate()的回调
+        close callbacks
+            执行socket的close事件回调   
+        PS：上述六个阶段都不包含process.nextTick
+        timer poll check 日常开发中绝大部分异步任务都是在这个三个阶段处理的
+            1.timer 
+            timer阶段会执行setTimeOut和setInterval回调 并且是由poll阶段控制的 同样在Node定时器指定的时间也不是准确时间 只能是尽快执行
+            2.poll
+                一个至关重要的阶段 该阶段中
+                系统会做两件事
+                1.回到timer阶段执行回调
+                2.执行I/O回调
+                    进入该阶段时如没有设定了timer 会发生以下两件事情
+                    1.如果poll队列不为空 会遍历回调队列并同步执行 直到队列为空或达到系统限制
+                    2.如果poll队列为空 会有两件事发生
+                        1.如果有setImmediate回调需要执行 poll阶段会停止并进入check阶段执行回调
+                        2.如果没有setImmediate回调需要执行 会等待回调被加入到队列中并立即执行回调
+                        这里同样会有个超时时间设置防止一直等待下去
+                设定了 timer 的话且 poll 队列为空，则会判断是否有 timer 超时，如果有的话会回到 timer 阶段执行回调
+            3.check阶段
+                setImmediate()的回调会被加入check队列中，从event loop的阶段图可以知道，check阶段的执行顺序在poll阶段之后
+                    一开始执行栈的同步任务（这属于宏任务）执行完毕后（依次打印出start end，并将2个timer依次放入timer队列）,会先去执行微任务（这点跟浏览器端的一样），所以打印出promise3
+                    然后进入timers阶段，执行timer1的回调函数，打印timer1，并将promise.then回调放入microtask队列，同样的步骤执行timer2，打印timer2；这点跟浏览器端相差比较大，timers阶段有几个setTimeout/setInterval都会依次执行，并不像浏览器端，每执行一个宏任务后就去执行一个微任务（关于Node与浏览器的 Event Loop 差异，下文还会详细介绍）。
+    Node中事件循环大致顺序
+        外部输入数据-->
+        轮询阶段(poll)-->
+        检查阶段(check)-->
+        关闭事件回调阶段(close callback)-->
+        定时器检测阶段(timer)-->
+        I/O事件回调阶段(I/O callbacks)-->
+        闲置阶段(idle prepare)-->
+        轮询阶段(按照该顺序反复运行)        
+    Micro-Task和Macro-Task
+        Node端事件循环中的异步队列也是这两种
+        常见的宏任务
+            setTimeout setInterval setImmediate script整体代码 I/O
+        常见的微任务
+            process.nextTick new Promise().then()回调
+    注意
+        1.setTimeout和setImmediate
+            两者非常像 区别主要在于调用时机不同
+            setImmediate 设计在poll阶段完成时执行，即check阶段；
+            setTimeout 设计在poll阶段为空闲时，且设定时间到达后执行，但它在timer阶段执行
+            。。。
+        2.process.nextTick
+            该函数其实是独立于Event Loop之外 它有一个自己的队列 当每个阶段完成后 如果存在nextTick队列 就会清空队列中的所有回调函数 并且由于其他microtask执行
+    Node与浏览器的事件轮询差异
+        浏览器环境下
+            microtask任务队列是每个macrotask执行完之后执行
+            Node.js中 microtask会在事件循环的各个阶段执行 也就是一个阶段执行完毕就会执行microtask队列的任务
+    总结
+        浏览器和Node环境下 microtask任务队列的执行时机不同
+        1.Node端 microtask在事件循环的各个阶段之间执行
+        2.浏览器端 microtask在事件循环的macrotask执行完之后执行
 1. 什么是nodejs？我们在哪里使用它？
     Nodejs是服务器端的一门技术，而非语言，它是基于Google V8 JavaScrit引擎而开发的，用来开发可扩展的服务器端程序
     Google V8 JavaScrit引擎:

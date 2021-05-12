@@ -11,6 +11,66 @@ clean-webpack-plugin
 mini-css-extract-plugin)
 (webpack打包工具 把所有文件看作是资源
 根据它们依赖关系打包成一个最终文件)
+1.loader的执行顺序为什么是后写的先执行 即从右往左
+    webpack选择了compose方式 而不是pipe的方式
+    函数组合
+        是函数式编程中非常重要的思想
+    两种形式
+        1.pipe 从左向右组合函数
+            在Uninx有pipeline概念 ps aux|grep node 这些都是从左向右的
+        2.compose 从右向左组合函数
+            函数式编程中有组合的概念 
+            数学中常见的f(g(x))在函数式编程一般的实现方式是从右往左
+    其实也可以实现从左往右
+    只不过webpack选择了函数式编程的方式 所以loader顺序从右往左
+    如果webpack选择pipe方式 写loader顺序就是从左往右
+2.webpack配置优化
+    1.优化loader配置
+        1.include&exclude
+        2.resolve.modules
+        3.resolve.mainFields
+            mainFields用于配置第三方模块使用那个入口文件 isomorphic-fetch当target为web或webworker时，值是["browswer","module","main"]当target为其他情况时，值是["module","main"] ```js resolve: {mainFields:['main'] }, ```
+        4.resolve.alias
+            resolve.alias配置项通过别名来把原导入路径映射成一个新的导入路径 此优化方法会影响使用Tree-Shaking去除无效代码
+        5.resolve.extensions
+            在导入语句没带文件后缀时，Webpack会自动带上后缀后去尝试询问文件是否存在 默认后缀是 extensions: ['.js', '.json']
+                后缀列表尽可能小
+                频率最高的往前方
+                导出语句里尽可能带上后缀
+        6.module.noParse
+            module.noParse 配置项可以让 Webpack 忽略对部分没采用模块化的文件的递归解析处理
+            被忽略掉的文件里不应该包含 import 、 require 、 define 等模块化语句
+    2.DLL
+        .dll为后缀的文件称为动态链接库 一个动态链接库中可以包含给其他模块调用的函数和数据
+            把基础模块独立出来打包到单独的动态链接库
+            当需要导入的模块在动态链接库中 模块不能再次被打包 而是动态链接库中获取dll-plugin
+    3.HappyPack
+        能让Webpack把任务分解给多个子进程去并发执行
+        子进程狐狸玩之后再把结果发送给主进程
+    4.ParallelUglifyPlugin
+        ParallelUglifyPlugin可以把对JS文件的船形压缩变为开启多个子进程并行执行
+    5.服务器自动刷新
+        可以监听到本地源码文件发生变化时，自动重新构建出可运行的代码后再刷新浏览器
+    6.区分环境
+        在开发网页的时候，一般都会有多套运行环境，例如：
+        在开发过程中方便开发调试的环境。
+        发布到线上给用户使用的运行环境。
+        环境区别
+            线上的代码被压缩
+            开发环境可能会打印只有开发者才能看到的日志
+            开发环境和线上环境后端数据接口可能不同
+    7.CDN叫内容分发网络，通过把资源部署到世界各地，用户在访问时按照就近原则从离用户最近的服务器获取资源，从而加速资源的获取速度。
+        HTML文件不缓存，放在自己的服务器上，关闭自己服务器的缓存，静态资源的URL变成指向CDN服务器的地址
+        静态的JavaScript、CSS、图片等文件开启CDN和缓存，并且文件名带上HASH值
+        为了并行加载不阻塞，把不同的静态资源分配到不同的CDN服务器上
+3.webpack执行过程
+    1.初始化compiler:new Compiler(config) config就是webpack.config.js文件
+    2.开始编译 调用compiler的run方法开始编译
+    3.确定入口 根据config的entry找到所有入口文件
+    4.编译模板 从入口文件触发，调用所有配置的loader对模块进行编译，并且还要收集模块依赖的模块，不断递归进行编译（这个过程会用到使用AST收集依赖，AST就是抽象语法树，像什么eslint, sass, typescript等等都会用到AST，AST可以用@babel/parser插件来生成）
+    5.完成模块编译：在经过第4步使用Loader编译完所有模块后，得到每个模块编译的内容和它们的依赖关系
+    6.输出资源：根据入口和模块之间的依赖关系，组装成一个个包含多个模块的Chunk，再把每个chunk转换成单独的文件加入到输出列表。（这步是可以修改输出内容的最后机会）。
+    7.输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统。
 0.webpack.config.js
     模式 mode
         development production(上线 压缩) 默认production
