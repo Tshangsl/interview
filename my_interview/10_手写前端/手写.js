@@ -118,11 +118,14 @@ console.log(unique1([1, 22, 22, 1, 34, 54, 56, 67, 78, 66, 88]));
     由此得到一个乱序数组
 */
 var values = [1, 2, 3, 4, 5];
-values.sort(function () {
+values.sort(
+    //正数按降序排列
+    //负数按升序排列 
+    function () {
     return Math.random() - 0.5;
 })
 console.log(values);
-// 7.数组乱序 Fisher-Yates实现
+// 7.数组乱序 Fisher-Yates洗牌算法实现
 /*
     该算法由Ronald Fisher和Frank Yates首次提出
     原理
@@ -142,7 +145,7 @@ function shuffle(a) {
     }
     return a;
 }
-// 7.数组乱序 Fisher-Yates ES6实现
+// 7.数组乱序 Fisher-Yates洗牌算法ES6实现
 /*
     使用ES6解构赋值新特性
 */
@@ -152,6 +155,7 @@ function shuffle(a) {
         [a[i - 1], a[j]] = [a[j], a[i - 1]];
     }
 }
+
 // 8.数组扁平化 ES5实现 递归
 // 将将 [1, [2, [3]]] 这种多层的数组拍平成一层 [1, 2, 3]。
 // 使用 Array.prototype.flat 可以直接将多层数组拍平成一层：
@@ -195,6 +199,7 @@ function debounce(fn, delay) {
         timer = setTimeout(fn, delay);
     }
 }
+
 // 10.节流
 // 每执行一次会冷却一段时间
 function throttle(fn, delay) {
@@ -241,20 +246,6 @@ function clone(obj) {
     }
     return o
 }
-
-function clone(obj) {
-    if (typeof (obj) != 'object') return;
-    var o = obj.constructor == Array ? [] : {}
-    for (let p in obj) {
-        if (typeof obj[p] == 'object') {
-            o[p] = clone(o[p]);
-        } else {
-            o[p] = obj[p];
-        }
-    }
-    return o;
-}
-
 // call不固定参数 apply数组 bind
 // 13.call 使用一个指定的this值和一个/多个参数来调用一个函数
 /*
@@ -289,11 +280,14 @@ function clone(obj) {
 //     // call函数具有返回值 
 //     return res;
 // }
+
+// call 不定长参数
 Function.prototype.call = function (context) {
     // this是执行上下文的一部分 
     if (typeof this !== 'Function') {
         throw new TypeError('error');
     }
+    // 非严格模式下会做此转换
     context = context || window;
     context.fn = this;
     let args = [...arguments].slice(1);
@@ -301,7 +295,8 @@ Function.prototype.call = function (context) {
     delete context.fn;
     return res;
 }
-// apply
+
+// apply 参数数组
 Function.prototype.apply = function (context) {
     if (typeof this !== 'function') {
         return new TypeError('error');
@@ -318,6 +313,7 @@ Function.prototype.apply = function (context) {
     delete context.fn;
     return res;
 }
+
 // bind
 Function.prototype.bind = function (context) {
     if (typeof this !== 'function') {
@@ -432,6 +428,7 @@ function _new() {
     return obj;
 }
 
+
 Object.create = function (o) {
     function F() { }
     F.prototype = o;
@@ -460,6 +457,7 @@ function instance_of(L, R) {
 
 // 实现Object.create()
 //创建一个新对象 使用现有对象提供新创建的对象的__proto__
+
 /*
 1.Object.create()方法创建一个新的对象 
 并以方法的第一个参数作为新对象的__proto__属性的值
@@ -603,7 +601,7 @@ Array.prototype.forEach = function (callback, thisArg) {
     }
 }
 
-// map
+// map 返回一个新数组 数组中元素为原始数组调用函数处理后值
 Array.prototype.map = function (callback, thisArg) {
     if (this === null || this === undefined) {
         throw new TypeError('this is null or undefined');
@@ -624,8 +622,7 @@ Array.prototype.map = function (callback, thisArg) {
 }
 
 const { rejects } = require('assert');
-// filter
-// 返回一个新数组 符合既定条件的元素
+// filter 返回一个新数组 符合既定条件的元素
 Array.prototype.filter = function(arr,callback){
     let flag = !Array.isArray(arr)||!arr.length||typeof callback !=='function'
     if(flag){

@@ -1226,7 +1226,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
         (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 
         Cookie/Session/Token/JWT        
         用于客户端和服务器端进行会话验证的凭证 )
-        (Cookie 存储在客户端 只能存储字符串数据 可设置任意时间有效 cookie.setMaxAge() 不超过4k 不可跨域
+        (Cookie 存储在客户端 只能存储字符串数据 可设置任意时间有效 cookie.setMaxAge() 不超过4k 不可跨域 CSRF
         |Session(基于Cookie实现) 存储在服务器端 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 占用服务端资源 服务器集群状态下 无法轻易做到资源共享)
         (Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session
             1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
@@ -2323,9 +2323,7 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
 14.CSRF(Cross Site Request Forgery(伪造))
 (XSS 利用合法用户获取其信息)
 (CSRF 伪装成合法用户发起请求 原理和XSS正好相反)
-(防范：
-    post修改信息/关键表单提交需验证码/表单预植入加密信息 验证请求为此表单发送
-)
+(防范：post修改信息/关键表单提交需验证码/表单预植入加密信息 验证请求为此表单发送)
     原理和XSS正好相反
         XSS(Cross Site Script 跨站脚本攻击)利用合法用户获取其信息
         CRSF(Cross Site Request Forgery跨站请求伪造)伪装成合法用户发起请求

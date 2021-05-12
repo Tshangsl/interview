@@ -1031,13 +1031,14 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
     严格模式规则(apply&call&bind null/undefined/arguments.callee/全局作用域undefined/ES6模块化默认严格模式)
         1.使用apply/call/bind，当传入参数是null/undefined时，this指向null/undefined，而不是全局对象。
             而在非严格模式下使用函数的 apply()或 call()方法时，null 或 undefined 值会被转换为全局对象。
-        2.不再支持arguments.callee。非严格模式下，arguments.callee指向当前正在执行的函数。
+        2.严格模式下不再支持arguments.callee 非严格模式下，arguments.callee指向当前正在执行的函数。
         3.严格模式下this 是undefined 非严格模式下 一般this指向window
-        4.ES6 的模块化自动采用严格模式，不管你有没有在模块头部加上"use strict";)
-            COMMONJS模块化默认不是严格模式
-        4.用于标准化正常的JavaScript语义。
+        4.ES6 的模块化自动采用严格模式，不管你有没有在模块头部加上"use strict")COMMONJS模块化默认不是严格模式
+        5.可全局声明严格模式 可函数内部局部声明严格模式
+
         5.可以嵌入到非严格模式中，关键字 ‘use strict’。
         6.代码应遵循JS严格的语法规则。例如，分号在每个语句声明之后使用。 
+        7.用于标准化正常的JavaScript语义。
     严格模式概念
         ES5引入 
         通过严格模式 可以在函数内部选择进行较为严格的全局或局部的错误条件检测
