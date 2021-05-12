@@ -1,5 +1,5 @@
 1.Vue事件驱动
-        (依赖收集 核心思想 事件发布订阅模式)
+    (依赖收集 核心思想 事件发布订阅模式)
     (目的是将观察者Watcher对象存放到当前闭包的订阅者Dep的subs中)
     (形成这样一个关系 Object->Dep->Watcher1/Watcher2-->视图1/2)
 
@@ -113,6 +113,9 @@
             getter进行依赖收集/
             setter方法是一个观察者 
             数据变更时通知Watcher订阅者更新视图/
+            触发视图更新：
+            1.push()、pop()、shift()删除、unshift()添加、splice()、sort()、reverse()这些方法会改变被操作的数组；
+            2.filter()、concat()、slice()这些方法不会改变被操作的数组，返回一个新的数组；
             无法监听
             (对象属性添加删除 Vue.set解决/混合原有对象创建新对象)
             (数组 索引设置/修改长度)
@@ -165,7 +168,7 @@
             Vue会重新生成虚拟DOM 
             通过新旧虚拟DOM对比生成patch对象 
             将patch对象渲染到视图中
-31.Vue单向数据流
+    Vue单向数据流
         单向数据流
         (数据流是单向的/数据流动方向可以跟踪/流动单一/追查问题时可以更快捷)
         (每次父组件发生更新 子组件中所有prop都会刷新为最新的值)
@@ -178,7 +181,23 @@
             2.这个 prop 以一种原始的值传入且需要进行转换。 在这种情况下，最好使用这个 prop 的值来定义一个计算属性
         缺点：
             写起来不太方便 要使UI发生变更就必须创建各种 action 来维护对应的 state
-25.object.defineProperty(obj,prop,descriptor)
+    Vue中的模板语法
+        Vue.js使用了基于HTML的模板语法 
+        允许开发者声明式的将DOM绑定至底层Vue实例的数据
+        所有Vue.js的模板都是合法的HTML 
+        所以能被遵循规范的浏览器和HTML解析器解析
+
+        在底层的实现上
+        Vue将模板编译成虚拟DOM渲染函数
+        结合响应系统 
+        Vue能智能计算出最少需要重新渲染多少组件
+    Vue中template编译的理解
+        先转化成AST树 将得到的render函数返回VNode(Vue的虚拟DOM节点)
+        1.首先通过compile编译器把template编译成AST语法树
+        (abstract syntax tree 源代码的抽象语法结构的树状表现形式)
+        complie是createCompiler的返回值 createCompiler是用以创建编译器的 另外compiler还负责合并option
+        2.AST经过generate(将AST语法树转化成render function字符串的过程)得到render函数 render的返回值是VNode VNode是Vue的虚拟DOM节点 里面有(标签名/子节点/文本等)
+2.object.defineProperty(obj,prop,descriptor)&proxy
     参数:(三个参数都是必填)
         obj:要定义属性的对象
         prop:要定义或修改的属性的名称或Symbol
@@ -237,7 +256,8 @@
                 一个描述符同时拥有 value 或 writable 和 get 或 set 键，则会产生一个异常。
     直接在一个对象上定义一个新属性/修改一个对象的现有属性 并返回此对象
     应当在Object构造器对象上调用此方法 而不是在任意一个Object类型的实例上调用
-26.Proxy与Object.defineProperty
+    
+    Proxy与Object.defineProperty
     1.Proxy(代理器 目标对象之前架设一层拦截 外界对该对象的访问 都必须先通过这层拦截)
         (原意代理 此处表示由它代理某些操作 可译为代理器)
         在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，
@@ -288,7 +308,7 @@
             3.让Object操作都变成函数行为。某些Object操作是命令式，比如name in obj和delete obj[name]，而Reflect.has(obj, name)和Reflect.deleteProperty(obj, name)让它们变成了函数行为。
             4.Reflect对象的方法与Proxy对象的方法一一对应，只要是Proxy对象的方法，就能在Reflect对象上找到对应的方法。这就让Proxy对象可以方便地调用对应的Reflect方法，完成默认行为，作为修改行为的基础。也就是说，不管Proxy怎么修改默认行为，你总可以在Reflect上获取默认行为。
 
-2.Vue
+3.Vue
 (核心功能是一个视图模板引擎 
 在此基础上+组件系统components/客户端路由Vue-route/大规模状态管理Vuex->一个完整的框架)
 (Vue.js只提供Vue-cli生态中最核心 组件系统+双向数据绑定/数据驱动)
@@ -308,6 +328,15 @@
     Vue.js只提供Vue-cli生态中最核心的
         组件系统和
         双向数据绑定/数据驱动(视图模板引擎)
+        核心：
+        数据驱动 组件系统
+            虽然没有完全遵循 MVVM 模型，但是 Vue 的设计也受到了它的启发。
+            因此在文档中经常会使用 vm (ViewModel 的缩写) 这个变量名表示 Vue 实例。
+            所有的 Vue 组件都是 Vue 实例，并且接受相同的选项对象 (一些根实例特有的选项除外)。
+            生命周期钩子的 this 上下文指向调用它的 Vue 实例。
+            不要在选项 property 或回调上使用箭头函数
+            vm(ViewModel)是Vue的一个实例
+            实例属性/实例方法(数据/事件/生命周期)
     Vue.js两个核心
         组件系统
         数据驱动/双向数据绑定
@@ -376,7 +405,244 @@
                 1.Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
                 2.改变 store 中的状态的唯一途径就是显式地提交  (commit) mutation。这样使得我们可以方便地跟踪每一个状态的变化。
         )
-13.Vue中Dom异步更新&nextTick
+5.Vue render函数(用来生成VDOM)
+    Vue渲染/render函数用来生成VDOM/虚拟DOM
+    1.Vue更新渲染render整体流程
+        Compiler整个过程
+        (模板编译生成AST/
+        AST生成Vue的render渲染函数/
+        render渲染函数结合数据生成VDOM树/
+        diff和patch后生成新的UI界面 真实DOM渲染)
+        1.模板通过编译Compiler生成AST(Abstract Synax Tree)抽象语法树
+        2.AST生成Vue的render渲染函数
+        3.render渲染函数结合数据生成VNODE(Virtual DOM Node)树
+        4.diff和patch后生成新的UI界面(真实DOM渲染)
+        概念解释：
+        模板：
+            Vue模板是纯HTML 
+            基于Vue的模板语法 
+            可以比较方便地处理数据和UI界面
+        AST：(Abstract Synax Tree)
+            Vue将HTML模板解析为AST 
+            并对AST进行一些优化的标记处理 
+            提取最大的静态树 
+            以使VDOM直接跳过后面的diff
+        render渲染函数
+            (Vue推荐使用模板创建HTML构建应用程序 
+            底层实现中Vue最终还是会将模板编译成render渲染函数 
+            若想得到更好的控制 一些场景中 真正需要JS的完全编程能力
+            可以直接写渲染函数 它比模板更接近编译器)
+            用来生成VDOM 
+        Watcher：
+            (每一个Vue组件都有一个对应的watcher 
+            它会在组件render时收集组件所依赖的数据
+            并在依赖更新时触发组件重新渲染 
+            Vue会自动优化并更新需要更新的DOM)
+        render函数可以作为一条分割线
+            (将Vue模板编译成AST生成render函数/
+            数据结合render函数生成VDOM树 diff和patch映射到真正的DOM树)
+            (render函数左边/编译期/将Vue模板转换成渲染函数)
+            (render函数右边/运行时/将渲染函数生成的VDOM树 进行diff和patch)
+            1.render函数左边可以称为编译期 将Vue模板转换成渲染函数
+            2.render函数右边可以称为运行时 将渲染函数生成的VDOM树 进行diff和patch
+    3.虚拟DOM
+        1.Vue编译器在编译模板后 会将这些模板编译成渲染函数render 当渲染函数render被调用时 会返回一个虚拟DOM树
+        2.在Vue底层实现上 Vue将模板编译成虚拟DOM渲染函数 结合Vue自带的响应系统 在相应状态改变时 Vue能智能计算出重新渲染组件的最小代价并映射到DOM操作上
+        3.Vue支持我们通过data参数传递一个JavaScript对象作为组件数据, Vue将遍历data对象属性, 使用Object.defineProperty方法设置描述对象, 通过gett/setter函数来拦截对该属性的读取和修改.
+        4.Vue创建了一层Watcher层, 在组件渲染的过程中把属性记录为依赖, 当依赖项的setter被调用时, 会通知Watcher重新计算, 从而使它关联的组件得以更新.
+    4.Vue渲染机制
+        (独立构建   包含模板编译器   渲染过程 HTML字符串->render函数->VNODE->真实DOM)
+        (运行时构建 不包含模板编译器 渲染过程 render函数->VNODE->真实DOM)
+        (运行时构建的包 比独立构建少一个模板编译器(因此速度上会更快))
+        (渲染过程提供三种模板(自定义render/template/el) 这三种模板最终都要得到render函数 )
+        (渲染具体过程
+            1.new Vue执行初始化
+            2.挂载$mount 通过自定义render方法 template el 等生成render渲染函数
+            3.通过Watcher监听数据的变化
+            4.数据变化时 render函数执行生成VNODE虚拟NODE对象
+            5.DOM diff算法 对比新旧VNode对象 
+                通过patch算法 添加/修改/删除真正的DOM元素
+        )
+        两个概念
+            1.独立构建
+                包含模板编译器
+                渲染过程 HTML字符串=>render函数=>VNODE=>真实DOM
+            2.运行时构建
+                不包含模板编译器 
+                渲染过程 render函数=>VNODE=>真实DOM
+            3.运行时构建的包 比独立构建少一个模板编译器(因此运行速度上会更快)在$mount函数上也不同 $mount方法是整个渲染过程中的起始点
+        渲染过程提供三种模板：(这三种模式最终都要得到render函数)
+            1.自定义render函数
+            2.template
+            3.el
+        Vue渲染
+            1.new Vue 执行初始化
+            2.挂载$mount 通过自定义render方法template el等生成render渲染函数
+            3.通过Watcher监听数据的变化
+            4.当数据变化时 render函数执行生成VNODE对象
+            5.通过DOM diff算法 对比新旧VNode对象 通过patch算法 添加/修改/删除真正的DOM元素
+    5.理解使用render函数
+        1.createElement
+            第1个参数: {String | Object | Function }, 必传
+            第2个参数: { Object }, 可选
+            第3个参数: { String | Array }, 可选
+    6.使用render函数替代模板功能
+        使用Vue模板时 可在模板中灵活的使用v-if、v-for、v-model和<slot>等模板语法。
+        但在render函数中是没有提供专用的API。如果在render使用这些，需要使用原生的JavaScript来实现。
+6.虚拟DOM/VDOM(使用JS对象模拟)
+    1.真实DOM 浏览器解析流程 真实DOM在浏览器渲染时遇到的问题引出虚拟DOM
+        webkit渲染引擎工作流程
+        所有浏览器渲染引擎工作流程大致分为5步
+            (DOM树 CSSOM树 Render树 Layout布局 Painting绘制 实际进行时不是独立的会有交叉)
+            1.创建DOM树
+                用HTML分析器分析HTML元素 构建一颗DOM树
+            2.创建Style Rules
+                用CSS分析器分析CSS文件和元素上的inline样式 生成页面样式表
+            3.构建Render树
+                将DOM和样式表关联起来 构建一棵Render树 (Attachment)
+                每个DOM节点都有attach方法 接受样式信息 返回一个render对象(又名renderer)这些render对象最终会被构建成以可Render树
+            4.布局Layout
+                确定节点坐标 根据Render树结构 为每个Render树上的节点确定一个在显示屏上出现的精确坐标
+            5.绘制Painting
+                根据Render树和节点显示坐标 然后调用每个节点的paint方法 将它们绘制出来
+        注意：
+            1.DOM 树的构建不是文档加载完成开始的
+                构建 DOM 树是一个渐进过程，为达到更好的用户体验，渲染引擎会尽快将内容显示在屏幕上，它不必等到整个 HTML 文档解析完成之后才开始构建 render 树和布局。
+            2.Render树/DOM树/CSS样式表
+                实际进行的时候并不是完全独立的，而是会有交叉，会一边加载，一边解析，以及一边渲染。
+            3.CSS 的解析注意点
+                CSS的解析式从右向左逆向解析的 嵌套标签越多 解析越慢
+            4.JS操作真实DOM代价
+                用我们传统的开发模式，原生 JS 或 JQ 操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程。
+                在一次操作中，我需要更新 10 个 DOM 节点，浏览器收到第一个 DOM 请求后并不知道还有 9 次更新操作，因此会马上执行流程，最终执行10 次。例如，第一次计算完，紧接着下一个 DOM 更新请求，这个节点的坐标值就变了，前一次计算为无用功。
+                计算 DOM 节点坐标值等都是白白浪费的性能。即使计算机硬件一直在迭代更新，操作 DOM 的代价仍旧是昂贵的，频繁操作还是会出现页面卡顿，影响用户体验
+    2.虚拟DOM(Virtual-DOM)--使用JS对象模拟
+        存在意义/实现方式：
+        为了解决浏览器性能设计出来
+        页面的更新可以先全部反映在JS对象(虚拟DOM)上 
+        操作内存中的JS对象的速度显然更快 
+        等更新完成后 
+        将最终的JS对象映射成真实的DOM 
+        交由浏览器绘制
+        用JS对象模拟DOM树：
+            1.JS对象来表示DOM节点 使用对象的属性记录节点的类型/属性/子节点
+            2.渲染用JS表示的DOM对象
+            3.比较两棵虚拟DOM树的差异-diff算法
+                diff算法：
+                    比较两棵VDOM树的差异 
+                    1.如需完全比较 O(n^3)
+                    2.由于前端很少会跨级移动DOM元素 
+                    VDOM只会对同一个层级的元素进行比较
+                    O(n)
+            4.diff算法具体实现
+                1.深度优先遍历 记录差异
+                    每个节点有一个唯一的标记 每遍历到一个节点 把该节点和新的树进行对比 如果有差异就记录到一个对象中
+                2.差异类型(元素节点1/属性节点2/文本节点3)
+                    1.节点替换 如将div换成h1
+                    2.顺序互换 移动/删除/新增子节点
+                    3.属性更改
+                    4.文本改变
+                3.列表对比算法
+                4.实例输出
+             5.将两个虚拟DOM对象的差异应用到真正的DOM树(patch.js)
+                1.深度优先遍历DOM树
+                2.对原有DOM树进行DOM操作     
+                    根据不同类型数据 对当前节点进行不同的DOM操作
+                3.DOM结构改变  
+    3.总结VDOM算法主要实现三步骤
+        1.用JS对象模拟DOM树(VNode定义)
+        2.比较两棵虚拟DOM树的差异 diff.js
+        3.将两个虚拟DOM对象的差异应用到真正的DOM树 patch.js
+
+        1.用JS对象模拟DOM树(VNode定义)
+        2.比较两棵虚拟DOM树差异 diff.js
+        3.将两个虚拟DOM对象的差异应用到真正的DOM patch.js
+7.虚拟DOM&DOM-diff
+    虚拟DOM存在意义：
+        虚拟DOM就是为了解决浏览器性能问题而被设计出来的。
+        如前，若一次操作中有10次更新DOM的动作，虚拟DOM不会立即操作DOM
+        而是将这10次更新的diff内容保存到本地一个JS对象中，
+        最终将这个JS对象一次性attch到DOM树上，再进行后续操作，避免大量无谓的计算量。
+        所以，用JS对象模拟DOM节点的好处是，页面的更新可以先全部反映在JS对象(虚拟DOM)上，
+        操作内存中的JS对象的速度显然要更快，等更新完成后，再将最终的JS对象映射成真实的DOM，交由浏览器去绘制。
+    虚拟DOM/VDOM：
+        1.用JS去按照DOM结构来实现树状结构对象/可叫DOM对象
+        2.是仅存在内存中的DOM 因还未展示到页面中 所以称作VDOM
+        3.Virtual DOM其实就是一棵以JavaScript对象(VNode节点)为基础的树 
+            用对象属性来描述节点 实际上它只是对一层真实DOM的抽象 最终可以通过一系列操作使这棵树映射到真实环境上。
+        4.JS中虚拟DOM表现为一个Object对象 并且最少包含标签名(tag)属性(attrs)和子元素对象(children)三个属性 不同框架对这三个属性的命名可能会有差异
+        5.Virtual DOM 对象的节点跟 DOM Tree 每个位置的属性一一对应的，因为人们创造出虚拟 DOM 就是为了更好地将虚拟节点渲染到视图上，也就是把虚拟DOM变成真实的 DOM 节点，提高视图的渲染性能。
+    优点：
+        1.减少DOM操作
+            两个虚拟DOM对比用到的算法就是DOM diff
+            JS层面上 DOM操作并不慢 慢在浏览器渲染的过程里，改变一行数据就要全部重新渲染
+            虚拟 DOM 比 DOM 快，
+            因为需要更新的 DOM 节点要比原生 DOM 操作更新的节点少，浏览器重绘的时间更短
+            虚拟 DOM 的优势不在于单次的操作，
+            用对比的算法，它可以将多次操作合并成一次操作，
+            在大量、频繁的数据更新下，能够对视图进行合理、高效的更新。
+        2.跨平台
+            虚拟DOM是以JS对象作为基础 本质就是一个JS对象 并不依赖真实平台环境 使它具有跨平台能力 
+            在浏览器上可以变成DOM 
+            其他平台可以变成相应渲染对象
+    优点:
+            保证性能下限
+            无需手动操作DOM
+            跨平台
+        缺点:
+            无法进行极致优化
+        实现原理：
+            1.用 JavaScript 对象模拟真实 DOM 树，对真实 DOM 进行抽象；
+            2.diff 算法 — 比较两棵虚拟 DOM 树的差异；
+            3.pach 算法 — 将两个虚拟 DOM 对象的差异应用到真正的 DOM 树。
+    DOM-diff：(比较两颗虚拟DOM树用到的算法)
+        DIFF算法：
+        (Diff仅在两棵树同级虚拟节点间递归比较 最终实现整颗DOM树更新)
+        (比较分三个层级
+        层级比较 Tree Diff/
+            1.对一个父节点下所有子节点比较 判断子节点类型 
+            2.组件则做Component组件比较
+            3.标签/元素 Element比较 
+        组件比较 Component Diff/
+        元素比较 Element Diff)
+            1.Diff仅在两棵树同级虚拟节点间递归比较 最终实现整颗DOM树更新
+            2.是React框架采用的方法 也就是判断DOM是否发生了变化 然后找到这个变化 这样我们才能实现差量更新
+        三个步骤：
+            1.用 JS 对象的方式来表示 DOM 树的结构，然后根据这个对象构建出真实的 DOM 树，插到文档中。
+            2.当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树进行比较，记录两棵树的差异
+            3.最后把所记录的差异应用到所构建的真正的DOM树上，视图更新
+        比较时分为三个层级:
+            层级比较 Tree Diff
+            组件比较 Component Diff
+            元素比较 Element Diff
+            1.Tree Diff（层级比较）
+                1.先进行树结构的层级比较，对同一个父节点下的所有子节点进行比较；
+                2.接着看节点是什么类型的，是组件就做 Component Diff;
+                3.如果节点是标签或者元素，就做 Element Diff;
+            2.Component Diff （组件比较）
+                1.若组件类型相同，则继续按照层级比较其虚拟 DOM的结构;
+                2.如果组件类型不同，则替换整个组件的所有内容
+            3.Element Diff (元素比较)
+                1.如果节点是原生标签，则看标签名做比较是否相同来决定替换还是更新属性
+                2.然后进入标签后代递归 Tree Diff
+        DOM变化主要有三种：
+            applendChild
+            replaceChild
+            removeChild
+        DOM diff算法主要做三件事
+            创建节点
+            删除节点
+            更新节点
+        给定任意两棵树 采用先序深度优先遍历的算法找到最少的转换步骤
+        DOM-diff比较两个虚拟DOM的区别 也就是在比较两个对象的区别
+        作用：
+            根据两个虚拟对象创建出补丁 描述改变的内容 将这个补丁用来更新DOM
+        过程：
+            1.用JS对象模拟DOM(虚拟DOM)
+            2.把此虚拟DOM转成真实DOM并插入页面中(render)
+            3.如果有事件发生修改了虚拟DOM 比较两棵虚拟DOM树的差异 得到差异对象diff
+            4.把差异对象应用到真正的DOM树上(patch)
+8.Vue中Dom异步更新&nextTick
 Dom异步更新：
     Vue 异步执行 DOM 更新。
     观察到数据变化
@@ -493,713 +759,7 @@ Vue中nextTick机制
                 同一事件循环中的数据变化后 
                 DOM完成更新
                 立即执行Vue.nextick()的回调
-14.Vue render函数(用来生成VDOM)
-    Vue渲染/render函数用来生成VDOM/虚拟DOM
-    1.Vue更新渲染render整体流程
-        Compiler整个过程
-        (模板编译生成AST/
-        AST生成Vue的render渲染函数/
-        render渲染函数结合数据生成VDOM树/
-        diff和patch后生成新的UI界面 真实DOM渲染)
-        1.模板通过编译Compiler生成AST(Abstract Synax Tree)抽象语法树
-        2.AST生成Vue的render渲染函数
-        3.render渲染函数结合数据生成VNODE(Virtual DOM Node)树
-        4.diff和patch后生成新的UI界面(真实DOM渲染)
-        概念解释：
-        模板：
-            Vue模板是纯HTML 
-            基于Vue的模板语法 
-            可以比较方便地处理数据和UI界面
-        AST：(Abstract Synax Tree)
-            Vue将HTML模板解析为AST 
-            并对AST进行一些优化的标记处理 
-            提取最大的静态树 
-            以使VDOM直接跳过后面的diff
-        render渲染函数
-            (Vue推荐使用模板创建HTML构建应用程序 
-            底层实现中Vue最终还是会将模板编译成render渲染函数 
-            若想得到更好的控制 一些场景中 真正需要JS的完全编程能力
-            可以直接写渲染函数 它比模板更接近编译器)
-            用来生成VDOM 
-        Watcher：
-            (每一个Vue组件都有一个对应的watcher 
-            它会在组件render时收集组件所依赖的数据
-            并在依赖更新时触发组件重新渲染 
-            Vue会自动优化并更新需要更新的DOM)
-        render函数可以作为一条分割线
-            (将Vue模板编译成AST生成render函数/
-            数据结合render函数生成VDOM树 diff和patch映射到真正的DOM树)
-            (render函数左边/编译期/将Vue模板转换成渲染函数)
-            (render函数右边/运行时/将渲染函数生成的VDOM树 进行diff和patch)
-            1.render函数左边可以称为编译期 将Vue模板转换成渲染函数
-            2.render函数右边可以称为运行时 将渲染函数生成的VDOM树 进行diff和patch
-    3.虚拟DOM
-        1.Vue编译器在编译模板后 会将这些模板编译成渲染函数render 当渲染函数render被调用时 会返回一个虚拟DOM树
-        2.在Vue底层实现上 Vue将模板编译成虚拟DOM渲染函数 结合Vue自带的响应系统 在相应状态改变时 Vue能智能计算出重新渲染组件的最小代价并映射到DOM操作上
-        3.Vue支持我们通过data参数传递一个JavaScript对象作为组件数据, Vue将遍历data对象属性, 使用Object.defineProperty方法设置描述对象, 通过gett/setter函数来拦截对该属性的读取和修改.
-        4.Vue创建了一层Watcher层, 在组件渲染的过程中把属性记录为依赖, 当依赖项的setter被调用时, 会通知Watcher重新计算, 从而使它关联的组件得以更新.
-    4.Vue渲染机制
-        (独立构建   包含模板编译器   渲染过程 HTML字符串->render函数->VNODE->真实DOM)
-        (运行时构建 不包含模板编译器 渲染过程 render函数->VNODE->真实DOM)
-        (运行时构建的包 比独立构建少一个模板编译器(因此速度上会更快))
-        (渲染过程提供三种模板(自定义render/template/el) 这三种模板最终都要得到render函数 )
-        (渲染具体过程
-            1.new Vue执行初始化
-            2.挂载$mount 通过自定义render方法 template el 等生成render渲染函数
-            3.通过Watcher监听数据的变化
-            4.数据变化时 render函数执行生成VNODE虚拟NODE对象
-            5.DOM diff算法 对比新旧VNode对象 
-                通过patch算法 添加/修改/删除真正的DOM元素
-        )
-        两个概念
-            1.独立构建
-                包含模板编译器
-                渲染过程 HTML字符串=>render函数=>VNODE=>真实DOM
-            2.运行时构建
-                不包含模板编译器 
-                渲染过程 render函数=>VNODE=>真实DOM
-            3.运行时构建的包 比独立构建少一个模板编译器(因此运行速度上会更快)在$mount函数上也不同 $mount方法是整个渲染过程中的起始点
-        渲染过程提供三种模板：(这三种模式最终都要得到render函数)
-            1.自定义render函数
-            2.template
-            3.el
-        Vue渲染
-            1.new Vue 执行初始化
-            2.挂载$mount 通过自定义render方法template el等生成render渲染函数
-            3.通过Watcher监听数据的变化
-            4.当数据变化时 render函数执行生成VNODE对象
-            5.通过DOM diff算法 对比新旧VNode对象 通过patch算法 添加/修改/删除真正的DOM元素
-    5.理解使用render函数
-        1.createElement
-            第1个参数: {String | Object | Function }, 必传
-            第2个参数: { Object }, 可选
-            第3个参数: { String | Array }, 可选
-    6.使用render函数替代模板功能
-        使用Vue模板时 可在模板中灵活的使用v-if、v-for、v-model和<slot>等模板语法。
-        但在render函数中是没有提供专用的API。如果在render使用这些，需要使用原生的JavaScript来实现。
-15.虚拟DOM/VDOM(使用JS对象模拟)
-    1.真实DOM 浏览器解析流程 真实DOM在浏览器渲染时遇到的问题引出虚拟DOM
-        webkit渲染引擎工作流程
-        所有浏览器渲染引擎工作流程大致分为5步
-            (DOM树 CSSOM树 Render树 Layout布局 Painting绘制 实际进行时不是独立的会有交叉)
-            1.创建DOM树
-                用HTML分析器分析HTML元素 构建一颗DOM树
-            2.创建Style Rules
-                用CSS分析器分析CSS文件和元素上的inline样式 生成页面样式表
-            3.构建Render树
-                将DOM和样式表关联起来 构建一棵Render树 (Attachment)
-                每个DOM节点都有attach方法 接受样式信息 返回一个render对象(又名renderer)这些render对象最终会被构建成以可Render树
-            4.布局Layout
-                确定节点坐标 根据Render树结构 为每个Render树上的节点确定一个在显示屏上出现的精确坐标
-            5.绘制Painting
-                根据Render树和节点显示坐标 然后调用每个节点的paint方法 将它们绘制出来
-        注意：
-            1.DOM 树的构建不是文档加载完成开始的
-                构建 DOM 树是一个渐进过程，为达到更好的用户体验，渲染引擎会尽快将内容显示在屏幕上，它不必等到整个 HTML 文档解析完成之后才开始构建 render 树和布局。
-            2.Render树/DOM树/CSS样式表
-                实际进行的时候并不是完全独立的，而是会有交叉，会一边加载，一边解析，以及一边渲染。
-            3.CSS 的解析注意点
-                CSS的解析式从右向左逆向解析的 嵌套标签越多 解析越慢
-            4.JS操作真实DOM代价
-                用我们传统的开发模式，原生 JS 或 JQ 操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程。
-                在一次操作中，我需要更新 10 个 DOM 节点，浏览器收到第一个 DOM 请求后并不知道还有 9 次更新操作，因此会马上执行流程，最终执行10 次。例如，第一次计算完，紧接着下一个 DOM 更新请求，这个节点的坐标值就变了，前一次计算为无用功。
-                计算 DOM 节点坐标值等都是白白浪费的性能。即使计算机硬件一直在迭代更新，操作 DOM 的代价仍旧是昂贵的，频繁操作还是会出现页面卡顿，影响用户体验
-    2.虚拟DOM(Virtual-DOM)--使用JS对象模拟
-        存在意义/实现方式：
-        为了解决浏览器性能设计出来
-        页面的更新可以先全部反映在JS对象(虚拟DOM)上 
-        操作内存中的JS对象的速度显然更快 
-        等更新完成后 
-        将最终的JS对象映射成真实的DOM 
-        交由浏览器绘制
-        用JS对象模拟DOM树：
-            1.JS对象来表示DOM节点 使用对象的属性记录节点的类型/属性/子节点
-            2.渲染用JS表示的DOM对象
-            3.比较两棵虚拟DOM树的差异-diff算法
-                diff算法：
-                    比较两棵VDOM树的差异 
-                    1.如需完全比较 O(n^3)
-                    2.由于前端很少会跨级移动DOM元素 
-                    VDOM只会对同一个层级的元素进行比较
-                    O(n)
-            4.diff算法具体实现
-                1.深度优先遍历 记录差异
-                    每个节点有一个唯一的标记 每遍历到一个节点 把该节点和新的树进行对比 如果有差异就记录到一个对象中
-                2.差异类型(元素节点1/属性节点2/文本节点3)
-                    1.节点替换 如将div换成h1
-                    2.顺序互换 移动/删除/新增子节点
-                    3.属性更改
-                    4.文本改变
-                3.列表对比算法
-                4.实例输出
-             5.将两个虚拟DOM对象的差异应用到真正的DOM树(patch.js)
-                1.深度优先遍历DOM树
-                2.对原有DOM树进行DOM操作     
-                    根据不同类型数据 对当前节点进行不同的DOM操作
-                3.DOM结构改变  
-    3.总结VDOM算法主要实现三步骤
-        1.用JS对象模拟DOM树(VNode定义)
-        2.比较两棵虚拟DOM树的差异 diff.js
-        3.将两个虚拟DOM对象的差异应用到真正的DOM树 patch.js
-
-        1.用JS对象模拟DOM树(VNode定义)
-        2.比较两棵虚拟DOM树差异 diff.js
-        3.将两个虚拟DOM对象的差异应用到真正的DOM patch.js
-16.虚拟DOM&DOM-diff
-    虚拟DOM存在意义：
-        虚拟DOM就是为了解决浏览器性能问题而被设计出来的。
-        如前，若一次操作中有10次更新DOM的动作，虚拟DOM不会立即操作DOM
-        而是将这10次更新的diff内容保存到本地一个JS对象中，
-        最终将这个JS对象一次性attch到DOM树上，再进行后续操作，避免大量无谓的计算量。
-        所以，用JS对象模拟DOM节点的好处是，页面的更新可以先全部反映在JS对象(虚拟DOM)上，
-        操作内存中的JS对象的速度显然要更快，等更新完成后，再将最终的JS对象映射成真实的DOM，交由浏览器去绘制。
-    虚拟DOM/VDOM：
-        1.用JS去按照DOM结构来实现树状结构对象/可叫DOM对象
-        2.是仅存在内存中的DOM 因还未展示到页面中 所以称作VDOM
-        3.Virtual DOM其实就是一棵以JavaScript对象(VNode节点)为基础的树 
-            用对象属性来描述节点 实际上它只是对一层真实DOM的抽象 最终可以通过一系列操作使这棵树映射到真实环境上。
-        4.JS中虚拟DOM表现为一个Object对象 并且最少包含标签名(tag)属性(attrs)和子元素对象(children)三个属性 不同框架对这三个属性的命名可能会有差异
-        5.Virtual DOM 对象的节点跟 DOM Tree 每个位置的属性一一对应的，因为人们创造出虚拟 DOM 就是为了更好地将虚拟节点渲染到视图上，也就是把虚拟DOM变成真实的 DOM 节点，提高视图的渲染性能。
-    优点：
-        1.减少DOM操作
-            两个虚拟DOM对比用到的算法就是DOM diff
-            JS层面上 DOM操作并不慢 慢在浏览器渲染的过程里，改变一行数据就要全部重新渲染
-            虚拟 DOM 比 DOM 快，
-            因为需要更新的 DOM 节点要比原生 DOM 操作更新的节点少，浏览器重绘的时间更短
-            虚拟 DOM 的优势不在于单次的操作，
-            用对比的算法，它可以将多次操作合并成一次操作，
-            在大量、频繁的数据更新下，能够对视图进行合理、高效的更新。
-        2.跨平台
-            虚拟DOM是以JS对象作为基础 本质就是一个JS对象 并不依赖真实平台环境 使它具有跨平台能力 
-            在浏览器上可以变成DOM 
-            其他平台可以变成相应渲染对象
-    优点:
-            保证性能下限
-            无需手动操作DOM
-            跨平台
-        缺点:
-            无法进行极致优化
-        实现原理：
-            1.用 JavaScript 对象模拟真实 DOM 树，对真实 DOM 进行抽象；
-            2.diff 算法 — 比较两棵虚拟 DOM 树的差异；
-            3.pach 算法 — 将两个虚拟 DOM 对象的差异应用到真正的 DOM 树。
-    DOM-diff：(比较两颗虚拟DOM树用到的算法)
-        DIFF算法：
-        (Diff仅在两棵树同级虚拟节点间递归比较 最终实现整颗DOM树更新)
-        (比较分三个层级
-        层级比较 Tree Diff/
-            1.对一个父节点下所有子节点比较 判断子节点类型 
-            2.组件则做Component组件比较
-            3.标签/元素 Element比较 
-        组件比较 Component Diff/
-        元素比较 Element Diff)
-            1.Diff仅在两棵树同级虚拟节点间递归比较 最终实现整颗DOM树更新
-            2.是React框架采用的方法 也就是判断DOM是否发生了变化 然后找到这个变化 这样我们才能实现差量更新
-        三个步骤：
-            1.用 JS 对象的方式来表示 DOM 树的结构，然后根据这个对象构建出真实的 DOM 树，插到文档中。
-            2.当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树进行比较，记录两棵树的差异
-            3.最后把所记录的差异应用到所构建的真正的DOM树上，视图更新
-        比较时分为三个层级:
-            层级比较 Tree Diff
-            组件比较 Component Diff
-            元素比较 Element Diff
-            1.Tree Diff（层级比较）
-                1.先进行树结构的层级比较，对同一个父节点下的所有子节点进行比较；
-                2.接着看节点是什么类型的，是组件就做 Component Diff;
-                3.如果节点是标签或者元素，就做 Element Diff;
-            2.Component Diff （组件比较）
-                1.若组件类型相同，则继续按照层级比较其虚拟 DOM的结构;
-                2.如果组件类型不同，则替换整个组件的所有内容
-            3.Element Diff (元素比较)
-                1.如果节点是原生标签，则看标签名做比较是否相同来决定替换还是更新属性
-                2.然后进入标签后代递归 Tree Diff
-        DOM变化主要有三种：
-            applendChild
-            replaceChild
-            removeChild
-        DOM diff算法主要做三件事
-            创建节点
-            删除节点
-            更新节点
-        给定任意两棵树 采用先序深度优先遍历的算法找到最少的转换步骤
-        DOM-diff比较两个虚拟DOM的区别 也就是在比较两个对象的区别
-        作用：
-            根据两个虚拟对象创建出补丁 描述改变的内容 将这个补丁用来更新DOM
-        过程：
-            1.用JS对象模拟DOM(虚拟DOM)
-            2.把此虚拟DOM转成真实DOM并插入页面中(render)
-            3.如果有事件发生修改了虚拟DOM 比较两棵虚拟DOM树的差异 得到差异对象diff
-            4.把差异对象应用到真正的DOM树上(patch)
-14.Vuex
-    设计思想
-        Vuex 借鉴了Flux Redux 将数据存放到全局的store
-        再将store挂载到每个Vue实例组件中 利用Vue.js的细粒度数据响应机制来进行高效的状态更新
-    Vuex的store如何挂载注入到组件中
-    1.在Vue项目中先安装Vuex
-    2.利用Vue插件机制 使用Vue.use(vuex) 调用Vuex的install方法 装载Vuex
-    3.applyMinxin方法使用Vue混入机制 Vue的生命周期beforeCreate钩子函数混入vuexInit方法
-    分析源码
-        Vuex利用Vue的mixin混入机制 
-        在beforeCreate钩子函数前混入vuexInit方法
-        vuexInit方法实现了store注入vue组件实例
-        并注册了vuex store的引用属性$store
-    Vuex的state和getters如何映射到各个组件实例中响应式更新状态
-    store实现的源码在src/store.js
-    1.源码中找到resetStoreVM核心方法
-        Vuex的state状态是响应式的
-        借助Vue的data是响应式的
-        将state存入vue实例组件的data中
-        
-        Vuex的getters借助Vue的计算属性
-        computed实现数据实时监听
-
-        computed计算属性监听data数据变更主要经历以下几个过程
-    小结
-        Vuex通过全局注入store对象 来实现组件间状态共享
-        在大型复杂的项目中(多级组件嵌套)
-        需要实现一个组件更改某个数据
-        多个组件自动获取更改后的数据进行业务逻辑处理
-        此时使用Vuex比较合适
-13.Vuex
-getters相当于vue中的计算属性 通过getters进一步处理 得到我们想要的数值
-且允许传参 第一个参数是state
-1.可以通过$store来获取
-2.前面的方法名和获取的属性名是一致的
-    import {mapState,mapMutations} from "vuex";
-    computed里面(mapState mapGetters)
-    1.mapState辅助函数(state类似于vue中的data)
-    computed:{
-        ...mapState(['nickname','age','gender'])
-    },
-    2.mapGetters辅助函数(getters相当于vue中computed)
-    computed:{
-       ...mapGetters(['realname','money_us'])
-    },
-    methods里面(mapMutations mapActions)
-    3.mapMutations辅助函数(mutations类似于vue中的methods)
-    (mutations需要通过commit调用其里面的方法
-    它也可以传入参数 第一个参数是state 第二个参数是载荷(payLoad)
-    即额外的参数 该参数最好写成对象形式 可以传递更多信息)
-    (mutations只能写同步方法不能写异步方法如axios setTimeout 主要作用就修改state)
-    (为什么调用mutations中的方法对state中的数值进行修改 而不直接进行修改呢
-    作者在mutations中做了类似埋点操作如果
-    从mutations中操作的话， 能被检测到，可以更方便用调试工具调试，调试工具可以检测到实时变化，而直接改变state中的属性，则无法实时监测
-    )
-    (mutations中写异步，也能够调成功，但是由于是异步的，不能被调试工具追踪到，所有不推荐这样写，不利于调试,这是官方的约定。)
-    methods:{
-        ...mapMutations(['changePage'])
-    }
-    4.mapActions
-    (action类似mutation
-    区别：
-        action可以提交mutation
-        action不要直接操作state 而是去操作mutation
-        action包含异步操作 类似axios请求 都可以放在action中写
-        action默认就是异步 而且返回promise
-    )
-    methods:{
-    ...mapActions(['getUserInfo'])
-    }
-    (this.$store.dispatch(‘getUserInfo’))
-49.Vuex(State Getters Mutations Actions Module)
-    1.定义:
-        一个专为 Vue.js 应用程序开发的状态管理插件。
-        每一个 Vuex 应用的核心就是 store（仓库）。
-        “store” 基本上就是一个容器，它包含着你的应用中大部分的状态 ( state )。
-        它采用集中式存储管理应用的所有组件的状态
-        更改状态的唯一方法是提交mutation，
-        例this.$store.commit('SET_VIDEO_PAUSE', video_pause，SET_VIDEO_PAUSE为mutations属性中定义的方法
-        1.Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。 
-    2.改变 store 中的状态的唯一途径就是显式地提交 (commit) mutation。这样使得我们可以方便地跟踪每一个状态的变化。
-     主要包括以下几个模块：
-        State：
-            定义了应用状态的数据结构，可以在这里设置默认的初始状态。
-        Getter：
-            允许组件从 Store 中获取数据，mapGetters 辅助函数仅仅是将 store 中的 getter 映射到局部计算属性。
-        Mutation：
-            是唯一更改 store 中状态的方法，且必须是同步函数。
-        Action：
-            用于提交 mutation，而不是直接变更状态，可以包含任意异步操作。
-        Module：
-            允许将单一的 Store 拆分为多个 store 且同时保存在单一的状态树中。
-    2.解决问题:
-        1.多个组件依赖于同一状态时，对于多层嵌套的组件的传参将会非常繁琐，并且对于兄弟组件间的状态传递无能为力。
-        2.来自不同组件的行为需要变更同一状态。以往采用父子组件直接引用或者通过事件来变更和同步状态的多份拷贝。以上的这些模式非常脆弱，通常会导致无法维护的代码。
-    3.应用场景:
-        1.多个组件依赖于同一状态时。
-        2.来自不同组件的行为需要变更同一状态。
-    4.如何手动引入:
-        1.先安装依赖nnpm install vuex --save
-        2.在项目目录src中建立store文件夹
-        3.在store文件夹下新建index.js文件,写入
-            import Vue from 'vue';
-            import Vuex from 'vuex';
-            Vue.use(Vuex);
-            //不是在生产环境debug为true
-            const debug = process.env.NODE_ENV !== 'production';
-            //创建Vuex实例对象
-            const store = new Vuex.Store({
-                strict:debug,//在不是生产环境下都开启严格模式
-                state:{
-                },
-                getters:{
-                },
-                mutations:{
-                },
-                actions:{
-                }
-            })
-            export default store;
-        4.main.js文件中引入Vuex
-            import Vue from 'vue';
-            import App from './App.vue';
-            import store from './store';
-            const vm = new Vue({
-                store:store,
-                render: h => h(App)
-            }).$mount('#app')
-    5.5个核心属性
-        1.state、
-            状态存储 
-            改变Vuex中的状态的唯一途径就是显式地提交 (commit) mutation
-            this.$store.commit('SET_NUMBER',10)
-        2.getters、
-        3.mutations、
-        4.actions、
-        5.modules 
-    6.Vuex中状态是对象时，使用时要注意什么
-        对象是引用类型，复制后改变属性还是会影响原始数据，
-        这样会改变state里面的状态，是不允许，
-        所以先用深度克隆复制对象，再修改。
-    7.可以使用mapState辅助函数, 利用对象展开运算符将state混入computed对象中 实现在组件中批量使用Vuex的state状态
-        import {mapState} from 'vuex'
-        export default{
-            computed:{
-                ...mapState(['price','number'])
-            }
-        }
-    8.Vuex中要从state派生一些状态出来，且多个组件使用它，该怎么
-        1.使用getter属性，相当Vue中的计算属性computed，只有原状态改变派生状态才会改变。
-        2.getter接收两个参数，第一个是state，第二个是getters(可以用来访问其他getter)。
-        3.组件中可以用计算属性computed通过this.$store.getters.total这样来访问这些派生转态。
-    9.怎么通过getter来实现在组件内可以通过特定条件来获取state的状态
-        通过让getter返回一个函数，来实现给getter传参。然后通过参数来进行判断从而获取state中满足要求的状态。
-        然后在组件中可以用计算属性computed通过this.$store.getters.getTodoById(2)这样来访问这些派生转态。
-    10.怎么在组件中批量使用Vuex的getter属性
-        使用mapGetters辅助函数, 利用对象展开运算符将getter混入computed 对象中
-            import {mapGetters} from 'vuex'
-            export default{
-                computed:{
-                    ...mapGetters(['total','discountTotal'])
-                }
-            }
-    11.怎么在组件中批量给Vuex的getter属性取别名并使用
-        使用mapGetters辅助函数, 利用对象展开运算符将getter混入computed 对象中
-        import {mapGetters} from 'vuex'
-        export default{
-            computed:{
-                ...mapGetters({
-                    myTotal:'total',
-                    myDiscountTotal:'discountTotal',
-                })
-            }
-        }
-    12.在Vuex的state中有个状态number表示货物数量，在组件怎么改变它。
-        1.首先要在mutations中注册一个mutation
-        const store = new Vuex.Store({
-            state: {
-                number: 10,
-            },
-            mutations: {
-                SET_NUMBER(state,data){
-                    state.number=data;
-                }
-            },
-        });
-        2.在组件中使用this.$store.commit提交mutation，改变number
-            this.$store.commit('SET_NUMBER',10)
-    14.在组件中多次提交同一个mutation，怎么写使用更方便。
-        1.使用mapMutations辅助函数,在组件中这么使用
-        import { mapMutations } from 'vuex'
-        methods:{
-            ...mapMutations({
-                setNumber:'SET_NUMBER',
-            })
-        }
-        2.然后调用this.setNumber(10)相当调用this.$store.commit('SET_NUMBER',10)
-    15.Vuex中action和mutation有什么区别/共同点
-        区别：
-            1.action 提交的是 mutation，而不是直接变更状态。mutation可以直接变更状态。
-            2.action 可以包含任意异步操作。mutation只能是同步操作。
-            3.提交方式不同，action 是用this.$store.dispatch('ACTION_NAME',data)来提交。mutation是用this.$store.commit('SET_NUMBER',10)来提交。
-            4.接收参数不同，mutation第一个参数是state，而action第一个参数是context，其包含了
-        相同：
-            第二参数都可以接收外部提交时传来的参数。
-            this.$store.dispatch('ACTION_NAME',data)和
-            this.$store.commit('SET_NUMBER',10)
-    16.在组件中多次提交同一个action，怎么写使用更方便。
-        1.使用mapActions辅助函数,在组件中这么使用
-            methods:{
-                ...mapActions({
-                    setNumber:'SET_NUMBER',
-                })
-            }
-        2.调用this.setNumber(10)相当调用this.$store.dispatch('SET_NUMBER',10)
-    17.Vuex中action通常是异步的，那么如何知道action什么时候结束呢？
-        1.在action函数中返回Promise，然后再提交时候用then处理
-        actions:{
-            SET_NUMBER_A({commit},data){
-                return new Promise((resolve,reject) =>{
-                    setTimeout(() =>{
-                        commit('SET_NUMBER',10);
-                        resolve();
-                    },2000)
-                })
-            }
-        }
-        this.$store.dispatch('SET_NUMBER_A').then(() => {
-        // ...
-        })
-    18.Vuex中有两个action，分别是actionA和actionB，其内都是异步操作，在actionB要提交actionA，需在actionA处理结束再处理其它操作，怎么实现？
-        1.利用ES6的async和await来实现。
-            actions:{
-                async actionA({commit}){
-                    //...
-                },
-                async actionB({dispatch}){
-                    await dispatch ('actionA')//等待actionA完成
-                    // ... 
-                }
-            }
-    19.有用过Vuex模块吗，为什么要使用，怎么使用。
-        使用单一状态树，应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store 对象就有可能变得相当臃肿。所以将 store 分割成模块（module）。每个模块拥有自己的 state、mutations、actions、getters，甚至是嵌套子模块，从上至下进行同样方式的分割。
-            1.在module文件新建moduleA.js和moduleB.js文件。在文件中写入
-                const state={
-                    //...
-                }
-                const getters={
-                    //...
-                }
-                const mutations={
-                    //...
-                }
-                const actions={
-                    //...
-                }
-                export default{
-                    state,
-                    getters,
-                    mutations,
-                    actions
-                }
-            2.index.js引入模块
-                import Vue from 'vue';
-                import Vuex from 'vuex';
-                Vue.use(Vuex);
-                import moduleA from './module/moduleA'
-                import moduleB from './module/moduleB'
-                const store = new Vuex.Store({
-                    modules:{
-                        moduleA,
-                        moduleB
-                    }
-                })
-                export default store
-    20.模块中，getter和mutation接收的第一个参数state，是模块的state，也就是局部的state。
-    21.模块中，getter和mutation和action中怎么访问全局的state和getter？
-        1.在getter中可以通过第三个参数rootState访问到全局的state,可以通过第四个参数rootGetters访问到全局的getter。
-        2.在mutation中不可以访问全局的satat和getter，只能访问到局部的state。
-        3.在action中第一个参数context中的context.rootState访问到全局的state，context.rootGetters访问到全局的getter。
-    22.在组件中怎么访问Vuex模块中的getter和state,怎么提交mutation和action？
-        1.直接通过this.$store.getters和this.$store.state来访问模块中的getter和state。
-        2.直接通过this.$store.commit('mutationA',data)提交模块中的mutation。
-        3.直接通过this.$store.dispatch('actionA,data')提交模块中的action。
-    23.用过Vuex模块的命名空间吗？为什么使用，怎么使用。
-        1.默认情况下，模块内部的action、mutation和getter是注册在全局命名空间，如果多个模块中action、mutation的命名是一样的，那么提交mutation、action时，将会触发所有模块中命名相同的mutation、action。
-        2.这样有太多的耦合，如果要使你的模块具有更高的封装度和复用性，你可以通过添加namespaced: true 的方式使其成为带命名空间的模块。
-            export default{
-                namespaced: true,
-                state,
-                getters,
-                mutations,
-                actions
-            }
-    24.怎么在带命名空间的模块内提交全局的mutation和action？
-        将 { root: true } 作为第三参数传给 dispatch 或 commit 即可。
-    this.$store.dispatch('actionA', null, { root: true })
-    this.$store.commit('mutationA', null, { root: true })
-    25.怎么在带命名空间的模块内注册全局的action？
-        actions: {
-            actionA: {
-                root: true,
-                handler (context, data) { ... }
-            }
-        }
-    26.组件中怎么提交modules中的带命名空间的moduleA中的mutationA？
-        this.$store.commit('moduleA/mutationA',data)
-    27.怎么使用mapState，mapGetters，mapActions和mapMutations这些函数来绑定带命名空间的模块？
-        首先使用createNamespacedHelpers创建基于某个命名空间辅助函数
-        import { createNamespacedHelpers } from 'vuex';
-        const { mapState, mapActions } = createNamespacedHelpers('moduleA');
-        export default {
-            computed: {
-                // 在 `module/moduleA` 中查找
-                ...mapState({
-                    a: state => state.a,
-                    b: state => state.b
-                })
-            },
-            methods: {
-                // 在 `module/moduleA` 中查找
-                ...mapActions([
-                    'actionA',
-                    'actionB'
-                ])
-            }
-        }
-    28.Vuex插件有用过吗？怎么用简单介绍一下？
-        Vuex插件就是一个函数，它接收 store 作为唯一参数。在Vuex.Store构造器选项plugins引入。 
-        1.在store/plugin.js文件中写入
-            export default function createPlugin(param){
-                return store =>{
-                    //...
-                }
-            }
-        2.然后在store/index.js文件中写入
-            import createPlugin from './plugin.js'
-            const myPlugin = createPlugin()
-            const store = new Vuex.Store({
-            // ...
-            plugins: [myPlugin]
-            })
-    29.Vuex插件中怎么监听组件中提交mutation和action？
-        1.用Vuex.Store的实例方法subscribe监听组件中提交mutation
-        2.用Vuex.Store的实例方法subscribeAction监听组件中提交action 在store/plugin.js文件中写入
-    30.在v-model上怎么用Vuex中state的值？
-        需要通过computed计算属性来转换。
-        <input v-model="message">
-            // ...
-            computed: {
-                message: {
-                    get () {
-                        return this.$store.state.message
-                    },
-                    set (value) {
-                        this.$store.commit('updateMessage', value)
-                    }
-                }
-            }
-    31.Vuex的严格模式是什么,有什么作用,怎么开启？
-        在严格模式下，无论何时发生了状态变更且不是由 mutation函数引起的，将会抛出错误。这能保证所有的状态变更都能被调试工具跟踪到。
-        在Vuex.Store 构造器选项中开启,如下
-        const store = new Vuex.Store({
-            strict:true,
-        })
-18.vue初始化和生命周期钩子函数
-(初始化:开始创建、初始化数据、编译模板、挂载Dom、数据变化时更新DOM、卸载)
-(生命周期:Vue实例从创建到销毁的过程)
-(Vue实例有一个完整的生命周期 指一个实例从开始创建到销毁这个过程)
-(生命周期钩子自动绑定this到实例上 可以通过this操作访问到数据和方法)
-(生命周期钩子函数
-beforeCreate(
-    实例el创建之前初始化之后
-    Data 不能读取
-    DOM 未生成
-
-    el  undefined
-    data undefined
-    DOM 未生成
-)
-created(
-    实例创建之后 
-    vm.$el未定义 挂载属性el不存在
-    能读取到data的值(属性和方法的运算watch/event事件回调)
-    模板渲染成HTML DOM未生成
-
-    数据初始化最好在此阶段完成
-    完成数据观测，    
-
-    el  undefined
-    data [Object Object]
-    DOM未生成
-)
-beforeMount(
-    $el挂载前 vm.$el还是未定义
-    相关Render函数首次被调用 将模块渲染成HTML
-    相关的 render 函数首次被调用
-    期间将模块渲染成html
-    将编译完成的html挂载到对应的虚拟DOM
-
-    el  [Object HTMLDivElement]
-    data [Object Object]
-    DOM 相关render函数首次被调用 将模块渲染成HTML
-    meaasge Vue生命周期
-) 
-mounted(
-    $el挂载后被调用
-    此时vm.$el可以调用
-
-    编译好的HTML挂载到页面完成后
-    不能保证所有的子组件都挂载
-    要等视图全部更新完毕用vm.$nextTick();
-    编译好的html挂载到页面完成后所执行的事件钩子函数。
-    挂载完毕阶段
-
-    此时编译好的HTML已经挂载到了页面上 页面上已经渲染出了数据
-    一般会利用这个钩子函数做一些
-    ajax请求获取数据进行数据初始化
-    el  [Object HTMLDivElement]
-    data [Object Object]
-    meaasge Vue生命周期
-    此阶段中DOM渲染完成
-) 
-beforeUpadate(
-    检测到修改数据
-    更新渲染视图之前触发
-
-    修改vue实例的data时
-    vue就会自动帮我们更新渲染视图
-    检测到我们要修改数据 
-    更新渲染视图之前触发
-)
-updated(
-    此阶段为更新渲染视图之后触发
-    此时再读取视图上的内容，已经是最新的内容。
-    PS:
-    1.该钩子在服务器端渲染期间不被调用。
-    2.应该避免在此期间更改状态，
-    因为这可能会导致更新无限循环。
-)
-beforeDestory(
-    实例销毁前触发
-    调用实例的destroy() 
-    此时实例仍然完全可用；
-    方法可以销毁当前的组件，在销毁前，
-    会触发beforeDestroy钩子。
-)
-destoryed(
-    实例销毁后触发
-    此时该实例与其他实例的关联已经被清除，
-    Vue实例指示的所有东西都会解绑定，
-    所有的事件监听器会被移除，
-    所有的子实例也会被销毁。
-)
-)
-22.在哪个生命周期内调用异步请求(created)/什么阶段才能访问操作DOM(mounted)？
-    1.(created beforeMounted mounted)
-        这三个钩子函数中data 已创建
-        可将服务端端返回的数据进行赋值
-        推荐在 created 钩子函数中调用异步请求 可以更快获取服务端数据
-        服务器端没有mounted和beforeMount生命周期钩子函数
-    created 钩子函数中调用异步请求优点： 
-        (更快获取服务端数据/ssr不支持beforeMount Mounted生命周期钩子)
-        1.能更快获取到服务端数据，减少页面 loading 时间；
-        2.ssr(服务端渲染) 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
-    什么阶段能访问操作DOM
-        钩子函数 mounted 被调用前
-        Vue 已经将编译好的模板挂载到页面上
-        在 mounted 中可以访问操作 DOM
-48.location.href与Vue-router路由跳转区别
+9.location.href与Vue-router路由跳转区别
 (Vue-router pushState
 进行路由更新 静态跳转 页面不会重新加载/
 同一个页面跳转
@@ -1239,7 +799,7 @@ location.href
         2.location.href可直接获取当前路径
         3.parent.location.href跳转到上一层页面
         4.top.location.href跳转到最外层页面
-60.Vue路由懒加载(异步加载组件)
+10.Vue路由懒加载(异步加载组件)
     对于SPA单页面应用 当打包构建时 JS包会变得非常大
     影响页面加载速度
     将不同路由对应的组件分割成不同的代码块
@@ -1265,7 +825,7 @@ location.href
         我们可以使用import导入组件
     3.require.ensure
         这种模式可以通过参数中的webpackChunkName将js分开打包
-36.
+11.
 $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
 $router(vue-router实例对象 包括路由跳转方法/钩子函数)
 的区别
@@ -1283,7 +843,7 @@ $router(vue-router实例对象 包括路由跳转方法/钩子函数)
             $route.router 路由规则所属的路由器
             $route.matchd 数组，包含当前匹配的路径中所包含的所有片段所对象的配置参数对象
             $route.name 当前路由的名字，如果没有使用具体路径，则名字为空
-37.vue-router使用
+12.vue-router使用
 query(path引入 接参 this.$route.query.name 类似get传参 参数地址栏显示 拼接在url后面的参数，没有也没关系 不设置 没关系)
 params(name引入 接参 this.$route.params.name 类似post传参 参数地址栏不显示 是路由的一部分 必须要有 不设置 刷新页面或者返回参数会丢失)
 传参区别
@@ -1300,7 +860,7 @@ params(name引入 接参 this.$route.params.name 类似post传参 参数地址�
           query是拼接在url后面的参数，没有也没关系。
             params一旦设置在路由，params就是路由的一部分，如果这个路由有params传参，但是在跳转的时候没有传这个参数，会导致跳转失败或者页面会没有内容。
         4.params、query不设置也可以传参，params不设置的时候，刷新页面或者返回参数会丢失 query则不会有这个问题        
-38.
+13.
 Vue-router(SPA single page application的路径管理器 WebApp的链接路径管理系统)
 
 Vue-router hash模式(浏览器环境) history模式 abstract模式(Nodejs环境)
@@ -1423,7 +983,7 @@ Vue路由有三种模式 比SPA多了一个abstract)
         })    
     9.为啥不能用a标签
         用Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，这里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。
-49.Vue路由守卫哪些/如何设置/使用场景
+14.Vue路由守卫哪些/如何设置/使用场景
     常用的两个路由守卫
         router.beforeEach/router.afterEach
     每个守卫方法接收三个参数
@@ -1433,137 +993,7 @@ Vue路由有三种模式 比SPA多了一个abstract)
     项目中 
     一般在beforeEach这个钩子函数中进行路由跳转的一些信息判断
     判断是否登录 是否拿到对应的路由权限
-49.导航守卫
-    定义：
-        导航守卫就是路由跳转过程中的一些钩子函数
-        路由跳转是一个大的过程
-        这个大的过程分为跳转前中后等等细小的过程
-        每一个过程中都有一函数
-        这个函数能让你操作一些其他的事儿的时机
-    导航守卫全解析：
-        1.全局前置导航守卫 beforeEach
-        2.路由beforeEnter守卫
-        3.组件路由守卫 beforeRouteEnter 此时this并不指向该组件
-        4.全局解析守卫 beforeResolve
-        5.全局后置守卫 afterEach
-
-        6.组件生命周期beforeCreate
-        7.组件生命周期created
-        8.组件生命周期beforeMount
-        9.组件生命周期mounted
-        
-        10.组件路由守卫beforeRouteEnter的next回调
-    常用的两个路由守卫
-        全局前置导航守卫 router.beforeEach
-        全局后置导航守卫 router.afterEach
-    分类：
-    (路由守卫分类
-    1.全局
-    2.单个路由独享
-    3.组件内)
-        全局的
-            是指路由实例上直接操作的钩子函数，他的特点是所有路由配置的组件都会触发，直白点就是触发路由就会触发这些钩子函数，如下的写法。钩子函数按执行顺序包括beforeEach、beforeResolve（2.5+）、afterEach三个（以下的钩子函数都是按执行顺序讲解的）：
-            const router = new VueRouter({ ... })
-
-            router.beforeEach((to, from, next) => {
-            // ...
-            })
-            [beforeEach]：在路由跳转前触发，参数包括to,from,next（参数会单独介绍）三个，这个钩子作用主要是用于登录验证，也就是路由还没跳转提前告知，以免跳转了再通知就为时已晚。
-
-            [beforeResolve]（2.5+）：这个钩子和beforeEach类似，也是路由跳转前触发，参数也是to,from,next三个，和beforeEach区别官方解释为：
-
-            区别是在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，解析守卫就被调用。
-            即在 beforeEach 和 组件内beforeRouteEnter 之后，afterEach之前调用。
-
-            [afterEach]：和beforeEach相反，他是在路由跳转完成后触发，参数包括to,from没有了next（参数会单独介绍）,他发生在beforeEach和beforeResolve之后，beforeRouteEnter（组件内守卫，后讲）之前。
-        单个路由独享的
-            是指在单个路由配置的时候也可以设置的钩子函数，其位置就是下面示例中的位置，也就是像Foo这样的组件都存在这样的钩子函数。目前他只有一个钩子函数beforeEnter：
-        组件内
-    完整的导航守卫流程
-        导航被触发。
-        在失活的组件里调用离开守卫beforeRouteLeave(to,from,next)。
-        调用全局的beforeEach( (to,from,next) =>{} )守卫。
-        在重用的组件里调用 beforeRouteUpdate(to,from,next) 守卫。
-        在路由配置里调用beforeEnter(to,from,next)路由独享的守卫。
-        解析异步路由组件。
-        在被激活的组件里调用beforeRouteEnter(to,from,next)。
-        在所有组件内守卫和异步路由组件被解析之后调用全局的beforeResolve( (to,from,next) =>{} )解析守卫。
-        导航被确认。
-        调用全局的afterEach( (to,from) =>{} )钩子。
-        触发 DOM 更新。
-        用创建好的实例调用beforeRouteEnter守卫中传给 next 的回调函数
-        beforeRouteEnter(to, from, next) {
-            next(vm => {
-                //通过vm访问组件实例
-            })
-        },
-    6.路由导航守卫都是在Vue实例生命周期钩子函数之前执行的。
-    7.讲一下导航守卫的三个参数的含义？
-        to：即将要进入的目标 路由对象。
-        from：当前导航正要离开的路由对象。
-        next：函数，必须调用，不然路由跳转不过去。
-
-        next()：进入下一个路由。
-        next(false)：中断当前的导航。
-        next('/')或next({ path: '/' }) : 跳转到其他路由，当前导航被中断，进行新的一个导航。
-    8.在afterEach钩子中不可以使用next() 不接受next的参数。
-    9.全局导航守卫有哪些？怎么使用？
-        1.router.beforeEach：全局前置守卫。
-        2.router.beforeResolve：全局解析守卫。
-        3.router.afterEach：全局后置钩子。
-    10.什么是路由独享的守卫，怎么使用？
-        什么是路由独享的守卫，怎么使用？
-    11.在组件内使用的导航守卫有哪些？怎么使用？
-        beforeRouteLeave：在失活的组件里调用离开守卫。
-        beforeRouteUpdate：在重用的组件里调用,比如包含<router-view />的组件。
-        beforeRouteEnter：在进入对应路由的组件创建前调用。
-    12.在beforeRouteEnter导航守卫中不可以用this
-        为守卫在导航确认前被调用,因此即将登场的新组件还没被创建。
-        可以通过传一个回调给next来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数。
-        beforeRouteEnter(to, from, next) {
-            next(vm => {
-                console.log(vm)
-            })
-        }
-62.Router-link和Router-view
-    router-link和router-view在同一个Vue文件中
-    router-link
-        设置路由跳转
-        <router-lonk :to="...">声明式导航
-        router.push(...)编程式导航
-    router-view
-        根据路由显示组件
-    Vue中这两者相互依存
-        router-link对应HTML中的a标签
-        与a标签不同的是跳转的时候 
-        不会刷新页面
-        router-view相当于router-link的承载页面
-        用于显示router-link的内容
-63.编程式导航&声明式导航
-    声明式导航：
-        直接渲染到页面
-        <router-link to="/url">
-    编程式导航：
-        JS中处理逻辑后需要页面进行跳转
-        this.$router其实就是router
-        Vue为方便在组件中使用router 才添加this.$router
-        this.$router.push();
-            会进行页面跳转 同时会在历史记录上留下记录
-        this.$router.replace();
-            和push功能相同 但是会替换当前页出现在历史记录中
-        this.$router.go(num);
-            表示距离当前页的在历史记录上的页数
-        this.$router.back()
-            返回到上一页
-        this.$router.forward()
-            前进到下一页
-    共同点：
-        都能进行导航 都可以触发路由 实现组件切换
-    区别：
-        写法不一样
-        声明式导航写在组件的template中 通过router-link触发
-        编程式导航写在JS函数中 通过this.$router.push(xxx)触发
-
+14.导航守卫
 64.Vue-Router导航守卫
     官方
         vue-router提供的导航守卫主要用来通过跳转或取消的方式守卫导航
@@ -1667,8 +1097,137 @@ Vue路由有三种模式 比SPA多了一个abstract)
             beforeRouteEnter的next回调
         路由更新时:
             beforeRouteUpdate
-            
-39.SPA 单页面的理解 优缺点 优化首屏加载速度慢的问题
+
+    定义：
+        导航守卫就是路由跳转过程中的一些钩子函数
+        路由跳转是一个大的过程
+        这个大的过程分为跳转前中后等等细小的过程
+        每一个过程中都有一函数
+        这个函数能让你操作一些其他的事儿的时机
+    导航守卫全解析：
+        1.全局前置导航守卫 beforeEach
+        2.路由beforeEnter守卫
+        3.组件路由守卫 beforeRouteEnter 此时this并不指向该组件
+        4.全局解析守卫 beforeResolve
+        5.全局后置守卫 afterEach
+
+        6.组件生命周期beforeCreate
+        7.组件生命周期created
+        8.组件生命周期beforeMount
+        9.组件生命周期mounted
+        
+        10.组件路由守卫beforeRouteEnter的next回调
+    常用的两个路由守卫
+        全局前置导航守卫 router.beforeEach
+        全局后置导航守卫 router.afterEach
+    分类：
+    (路由守卫分类
+    1.全局
+    2.单个路由独享
+    3.组件内)
+        全局的
+            是指路由实例上直接操作的钩子函数，他的特点是所有路由配置的组件都会触发，直白点就是触发路由就会触发这些钩子函数，如下的写法。钩子函数按执行顺序包括beforeEach、beforeResolve（2.5+）、afterEach三个（以下的钩子函数都是按执行顺序讲解的）：
+            const router = new VueRouter({ ... })
+
+            router.beforeEach((to, from, next) => {
+            // ...
+            })
+            [beforeEach]：在路由跳转前触发，参数包括to,from,next（参数会单独介绍）三个，这个钩子作用主要是用于登录验证，也就是路由还没跳转提前告知，以免跳转了再通知就为时已晚。
+
+            [beforeResolve]（2.5+）：这个钩子和beforeEach类似，也是路由跳转前触发，参数也是to,from,next三个，和beforeEach区别官方解释为：
+
+            区别是在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，解析守卫就被调用。
+            即在 beforeEach 和 组件内beforeRouteEnter 之后，afterEach之前调用。
+
+            [afterEach]：和beforeEach相反，他是在路由跳转完成后触发，参数包括to,from没有了next（参数会单独介绍）,他发生在beforeEach和beforeResolve之后，beforeRouteEnter（组件内守卫，后讲）之前。
+        单个路由独享的
+            是指在单个路由配置的时候也可以设置的钩子函数，其位置就是下面示例中的位置，也就是像Foo这样的组件都存在这样的钩子函数。目前他只有一个钩子函数beforeEnter：
+        组件内
+    完整的导航守卫流程
+        导航被触发。
+        在失活的组件里调用离开守卫beforeRouteLeave(to,from,next)。
+        调用全局的beforeEach( (to,from,next) =>{} )守卫。
+        在重用的组件里调用 beforeRouteUpdate(to,from,next) 守卫。
+        在路由配置里调用beforeEnter(to,from,next)路由独享的守卫。
+        解析异步路由组件。
+        在被激活的组件里调用beforeRouteEnter(to,from,next)。
+        在所有组件内守卫和异步路由组件被解析之后调用全局的beforeResolve( (to,from,next) =>{} )解析守卫。
+        导航被确认。
+        调用全局的afterEach( (to,from) =>{} )钩子。
+        触发 DOM 更新。
+        用创建好的实例调用beforeRouteEnter守卫中传给 next 的回调函数
+        beforeRouteEnter(to, from, next) {
+            next(vm => {
+                //通过vm访问组件实例
+            })
+        },
+    6.路由导航守卫都是在Vue实例生命周期钩子函数之前执行的。
+    7.讲一下导航守卫的三个参数的含义？
+        to：即将要进入的目标 路由对象。
+        from：当前导航正要离开的路由对象。
+        next：函数，必须调用，不然路由跳转不过去。
+
+        next()：进入下一个路由。
+        next(false)：中断当前的导航。
+        next('/')或next({ path: '/' }) : 跳转到其他路由，当前导航被中断，进行新的一个导航。
+    8.在afterEach钩子中不可以使用next() 不接受next的参数。
+    9.全局导航守卫有哪些？怎么使用？
+        1.router.beforeEach：全局前置守卫。
+        2.router.beforeResolve：全局解析守卫。
+        3.router.afterEach：全局后置钩子。
+    10.什么是路由独享的守卫，怎么使用？
+        什么是路由独享的守卫，怎么使用？
+    11.在组件内使用的导航守卫有哪些？怎么使用？
+        beforeRouteLeave：在失活的组件里调用离开守卫。
+        beforeRouteUpdate：在重用的组件里调用,比如包含<router-view />的组件。
+        beforeRouteEnter：在进入对应路由的组件创建前调用。
+    12.在beforeRouteEnter导航守卫中不可以用this
+        为守卫在导航确认前被调用,因此即将登场的新组件还没被创建。
+        可以通过传一个回调给next来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数。
+        beforeRouteEnter(to, from, next) {
+            next(vm => {
+                console.log(vm)
+            })
+        }
+15.Router-link和Router-view
+    router-link和router-view在同一个Vue文件中
+    router-link
+        设置路由跳转
+        <router-lonk :to="...">声明式导航
+        router.push(...)编程式导航
+    router-view
+        根据路由显示组件
+    Vue中这两者相互依存
+        router-link对应HTML中的a标签
+        与a标签不同的是跳转的时候 
+        不会刷新页面
+        router-view相当于router-link的承载页面
+        用于显示router-link的内容
+15.编程式导航&声明式导航
+    声明式导航：
+        直接渲染到页面
+        <router-link to="/url">
+    编程式导航：
+        JS中处理逻辑后需要页面进行跳转
+        this.$router其实就是router
+        Vue为方便在组件中使用router 才添加this.$router
+        this.$router.push();
+            会进行页面跳转 同时会在历史记录上留下记录
+        this.$router.replace();
+            和push功能相同 但是会替换当前页出现在历史记录中
+        this.$router.go(num);
+            表示距离当前页的在历史记录上的页数
+        this.$router.back()
+            返回到上一页
+        this.$router.forward()
+            前进到下一页
+    共同点：
+        都能进行导航 都可以触发路由 实现组件切换
+    区别：
+        写法不一样
+        声明式导航写在组件的template中 通过router-link触发
+        编程式导航写在JS函数中 通过this.$router.push(xxx)触发            
+16.SPA 单页面的理解 优缺点 优化首屏加载速度慢的问题
         SPA（ single-page application ）
             (仅在Web页面初始化时加载/页面加载完成后/利用路由机制实现HTML内容变换)
             仅在 Web 页面初始化时加载相应的 HTML、JavaScript 和 CSS。
@@ -1697,7 +1256,483 @@ Vue路由有三种模式 比SPA多了一个abstract)
             1.将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
             2.在配置路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
             3.加一个首屏 loading 图，提升用户体验；
-40.
+17.Vuex
+    设计思想
+        Vuex 借鉴了Flux Redux 将数据存放到全局的store
+        再将store挂载到每个Vue实例组件中 利用Vue.js的细粒度数据响应机制来进行高效的状态更新
+    Vuex的store如何挂载注入到组件中
+    1.在Vue项目中先安装Vuex
+    2.利用Vue插件机制 使用Vue.use(vuex) 调用Vuex的install方法 装载Vuex
+    3.applyMinxin方法使用Vue混入机制 Vue的生命周期beforeCreate钩子函数混入vuexInit方法
+    分析源码
+        Vuex利用Vue的mixin混入机制 
+        在beforeCreate钩子函数前混入vuexInit方法
+        vuexInit方法实现了store注入vue组件实例
+        并注册了vuex store的引用属性$store
+    Vuex的state和getters如何映射到各个组件实例中响应式更新状态
+    store实现的源码在src/store.js
+    1.源码中找到resetStoreVM核心方法
+        Vuex的state状态是响应式的
+        借助Vue的data是响应式的
+        将state存入vue实例组件的data中
+        
+        Vuex的getters借助Vue的计算属性
+        computed实现数据实时监听
+
+        computed计算属性监听data数据变更主要经历以下几个过程
+    小结
+        Vuex通过全局注入store对象 来实现组件间状态共享
+        在大型复杂的项目中(多级组件嵌套)
+        需要实现一个组件更改某个数据
+        多个组件自动获取更改后的数据进行业务逻辑处理
+        此时使用Vuex比较合适
+17.Vuex
+getters相当于vue中的计算属性 通过getters进一步处理 得到我们想要的数值
+且允许传参 第一个参数是state
+1.可以通过$store来获取
+2.前面的方法名和获取的属性名是一致的
+    import {mapState,mapMutations} from "vuex";
+    computed里面(mapState mapGetters)
+    1.mapState辅助函数(state类似于vue中的data)
+    computed:{
+        ...mapState(['nickname','age','gender'])
+    },
+    2.mapGetters辅助函数(getters相当于vue中computed)
+    computed:{
+       ...mapGetters(['realname','money_us'])
+    },
+    methods里面(mapMutations mapActions)
+    3.mapMutations辅助函数(mutations类似于vue中的methods)
+    (mutations需要通过commit调用其里面的方法
+    它也可以传入参数 第一个参数是state 第二个参数是载荷(payLoad)
+    即额外的参数 该参数最好写成对象形式 可以传递更多信息)
+    (mutations只能写同步方法不能写异步方法如axios setTimeout 主要作用就修改state)
+    (为什么调用mutations中的方法对state中的数值进行修改 而不直接进行修改呢
+    作者在mutations中做了类似埋点操作如果
+    从mutations中操作的话， 能被检测到，可以更方便用调试工具调试，调试工具可以检测到实时变化，而直接改变state中的属性，则无法实时监测
+    )
+    (mutations中写异步，也能够调成功，但是由于是异步的，不能被调试工具追踪到，所有不推荐这样写，不利于调试,这是官方的约定。)
+    methods:{
+        ...mapMutations(['changePage'])
+    }
+    4.mapActions
+    (action类似mutation
+    区别：
+        action可以提交mutation
+        action不要直接操作state 而是去操作mutation
+        action包含异步操作 类似axios请求 都可以放在action中写
+        action默认就是异步 而且返回promise
+    )
+    methods:{
+    ...mapActions(['getUserInfo'])
+    }
+    (this.$store.dispatch(‘getUserInfo’))
+17.Vuex(State Getters Mutations Actions Module)
+    定义:
+        一个专为 Vue.js 应用程序开发的状态管理插件。
+        每一个 Vuex 应用的核心就是 store（仓库）。
+        “store” 基本上就是一个容器，它包含着你的应用中大部分的状态 ( state )。
+        它采用集中式存储管理应用的所有组件的状态
+        更改状态的唯一方法是提交mutation，
+        例this.$store.commit('SET_VIDEO_PAUSE', video_pause，SET_VIDEO_PAUSE为mutations属性中定义的方法
+        1.Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。 
+    改变 store 中的状态的唯一途径就是显式地提交 (commit) mutation。这样使得我们可以方便地跟踪每一个状态的变化。
+     主要包括以下几个模块：
+        State：
+            定义了应用状态的数据结构，可以在这里设置默认的初始状态。
+        Getter：
+            允许组件从 Store 中获取数据，mapGetters 辅助函数仅仅是将 store 中的 getter 映射到局部计算属性。
+        Mutation：
+            是唯一更改 store 中状态的方法，且必须是同步函数。
+        Action：
+            用于提交 mutation，而不是直接变更状态，可以包含任意异步操作。
+        Module：
+            允许将单一的 Store 拆分为多个 store 且同时保存在单一的状态树中。
+    解决问题:
+        1.多个组件依赖于同一状态时，对于多层嵌套的组件的传参将会非常繁琐，并且对于兄弟组件间的状态传递无能为力。
+        2.来自不同组件的行为需要变更同一状态。以往采用父子组件直接引用或者通过事件来变更和同步状态的多份拷贝。以上的这些模式非常脆弱，通常会导致无法维护的代码。
+    应用场景:
+        1.多个组件依赖于同一状态时。
+        2.来自不同组件的行为需要变更同一状态。
+    手动引入:
+        1.先安装依赖nnpm install vuex --save
+        2.在项目目录src中建立store文件夹
+        3.在store文件夹下新建index.js文件,写入
+            import Vue from 'vue';
+            import Vuex from 'vuex';
+            Vue.use(Vuex);
+            //不是在生产环境debug为true
+            const debug = process.env.NODE_ENV !== 'production';
+            //创建Vuex实例对象
+            const store = new Vuex.Store({
+                strict:debug,//在不是生产环境下都开启严格模式
+                state:{
+                },
+                getters:{
+                },
+                mutations:{
+                },
+                actions:{
+                }
+            })
+            export default store;
+        4.main.js文件中引入Vuex
+            import Vue from 'vue';
+            import App from './App.vue';
+            import store from './store';
+            const vm = new Vue({
+                store:store,
+                render: h => h(App)
+            }).$mount('#app')
+    5.5个核心属性
+        1.state、
+            状态存储 
+            改变Vuex中的状态的唯一途径就是显式地提交 (commit) mutation
+            this.$store.commit('SET_NUMBER',10)
+        2.getters、
+        3.mutations、
+        4.actions、
+        5.modules 
+    Vuex中状态是对象时 使用注意事项
+        对象是引用类型 复制后改变属性还是会影响原始数据
+        这样会改变state里面的状态 不允许
+        先用深度克隆复制对象 再修改。
+    Vuex 使用mapState辅助函数 利用对象展开运算符将state混入computed对象中 实现在组件中批量使用Vuex的state状态
+        import {mapState} from 'vuex'
+        export default{
+            computed:{
+                ...mapState(['price','number'])
+            }
+        }
+    Vuex中要从state派生一些状态 多个组件使用它
+        1.使用getter属性，相当Vue中的计算属性computed，只有原状态改变派生状态才会改变。
+        2.getter接收两个参数，第一个是state，第二个是getters(可以用来访问其他getter)。
+        3.组件中可以用计算属性computed通过this.$store.getters.total这样来访问这些派生转态。
+    Vuex 通过getter实现组件内可以通过特定条件来获取state的状态
+        通过让getter返回一个函数，来实现给getter传参。然后通过参数来进行判断从而获取state中满足要求的状态。
+        然后在组件中可以用计算属性computed通过this.$store.getters.getTodoById(2)这样来访问这些派生转态。
+    Vuex 组件中批量使用Vuex的getter属性
+        使用mapGetters辅助函数, 利用对象展开运算符将getter混入computed 对象中
+            import {mapGetters} from 'vuex'
+            export default{
+                computed:{
+                    ...mapGetters(['total','discountTotal'])
+                }
+            }
+    Vuex 组件中批量给Vuex的getter属性取别名并使用
+        使用mapGetters辅助函数, 利用对象展开运算符将getter混入computed 对象中
+        import {mapGetters} from 'vuex'
+        export default{
+            computed:{
+                ...mapGetters({
+                    myTotal:'total',
+                    myDiscountTotal:'discountTotal',
+                })
+            }
+        }
+    Vuex state中有个状态number表示货物数量，在组件怎么改变它。
+        1.首先要在mutations中注册一个mutation
+        const store = new Vuex.Store({
+            state: {
+                number: 10,
+            },
+            mutations: {
+                SET_NUMBER(state,data){
+                    state.number=data;
+                }
+            },
+        });
+        2.在组件中使用this.$store.commit提交mutation，改变number
+            this.$store.commit('SET_NUMBER',10)
+    Vuex中action和mutation有什么区别/共同点
+        区别：
+            1.action 提交的是 mutation，而不是直接变更状态。mutation可以直接变更状态。
+            2.action 可以包含任意异步操作。mutation只能是同步操作。
+            3.提交方式不同，action 是用this.$store.dispatch('ACTION_NAME',data)来提交。mutation是用this.$store.commit('SET_NUMBER',10)来提交。
+            4.接收参数不同，mutation第一个参数是state，而action第一个参数是context，其包含了
+        相同：
+            第二参数都可以接收外部提交时传来的参数。
+            this.$store.dispatch('ACTION_NAME',data)和
+            this.$store.commit('SET_NUMBER',10)
+    Vuex 组件中多次提交同一个mutation 方便使用法
+        1.使用mapMutations辅助函数,在组件中这么使用
+        import { mapMutations } from 'vuex'
+        methods:{
+            ...mapMutations({
+                setNumber:'SET_NUMBER',
+            })
+        }
+        2.然后调用this.setNumber(10)相当调用this.$store.commit('SET_NUMBER',10)
+    Vuex 组件中多次提交同一个action 方便使用法
+        1.使用mapActions辅助函数,在组件中这么使用
+            methods:{
+                ...mapActions({
+                    setNumber:'SET_NUMBER',
+                })
+            }
+        2.调用this.setNumber(10)相当调用this.$store.dispatch('SET_NUMBER',10)
+    Vuex 如何知道action什么时候结束
+        1.在action函数中返回Promise，然后再提交时候用then处理
+        actions:{
+            SET_NUMBER_A({commit},data){
+                return new Promise((resolve,reject) =>{
+                    setTimeout(() =>{
+                        commit('SET_NUMBER',10);
+                        resolve();
+                    },2000)
+                })
+            }
+        }
+        this.$store.dispatch('SET_NUMBER_A').then(() => {
+        // ...
+        })
+    Vuex中有两个action，分别是actionA和actionB，其内都是异步操作，在actionB要提交actionA，需在actionA处理结束再处理其它操作
+        1.利用ES6的async和await来实现。
+            actions:{
+                async actionA({commit}){
+                    //...
+                },
+                async actionB({dispatch}){
+                    await dispatch ('actionA')//等待actionA完成
+                    // ... 
+                }
+            }
+    Vuex模块
+        使用单一状态树 应用的所有状态会集中到一个比较大的对象
+        当应用变得非常复杂时 store 对象就有可能变得相当臃肿
+        将 store 分割成模块（module）
+        每个模块拥有自己的 state mutations actions getters 嵌套子模块，从上至下进行同样方式的分割。
+            1.在module文件新建moduleA.js和moduleB.js文件。在文件中写入
+                const state={
+                    //...
+                }
+                const getters={
+                    //...
+                }
+                const mutations={
+                    //...
+                }
+                const actions={
+                    //...
+                }
+                export default{
+                    state,
+                    getters,
+                    mutations,
+                    actions
+                }
+            2.index.js引入模块
+                import Vue from 'vue';
+                import Vuex from 'vuex';
+                Vue.use(Vuex);
+                import moduleA from './module/moduleA'
+                import moduleB from './module/moduleB'
+                const store = new Vuex.Store({
+                    modules:{
+                        moduleA,
+                        moduleB
+                    }
+                })
+                export default store
+    Vuex 模块中 getter和mutation接收的第一个参数state 是模块的state 局部的state
+    Vuex 模块中 getter mutation action中访问全局的state和getter
+        1.在getter中可以通过第三个参数rootState访问到全局的state,可以通过第四个参数rootGetters访问到全局的getter。
+        2.在mutation中不可以访问全局的satat和getter，只能访问到局部的state。
+        3.在action中第一个参数context中的context.rootState访问到全局的state，context.rootGetters访问到全局的getter。
+    Vuex 组件中访问Vuex模块中的getter和state 提交mutation和action
+        1.直接通过this.$store.getters和this.$store.state来访问模块中的getter和state。
+        2.直接通过this.$store.commit('mutationA',data)提交模块中的mutation。
+        3.直接通过this.$store.dispatch('actionA,data')提交模块中的action。
+    Vuex模块命名空间
+        1.默认情况下，模块内部的action、mutation和getter是注册在全局命名空间，如果多个模块中action、mutation的命名是一样的，那么提交mutation、action时，将会触发所有模块中命名相同的mutation、action。
+        2.这样有太多的耦合，如果要使你的模块具有更高的封装度和复用性，你可以通过添加namespaced: true 的方式使其成为带命名空间的模块。
+            export default{
+                namespaced: true,
+                state,
+                getters,
+                mutations,
+                actions
+            }
+    Vuex在带命名空间的模块内提交全局的mutation和action
+        将 { root: true } 作为第三参数传给 dispatch 或 commit 即可。
+        this.$store.dispatch('actionA', null, { root: true })
+        this.$store.commit('mutationA', null, { root: true })
+    Vuex在带命名空间的模块内注册全局的action？
+        actions: {
+            actionA: {
+                root: true,
+                handler (context, data) { ... }
+            }
+        }
+    Vuex 组件中提交modules中带命名空间的moduleA中的mutationA
+        this.$store.commit('moduleA/mutationA',data)
+    Vuex插件使用
+        Vuex插件就是一个函数 它接受store作为唯一参数
+        在Vuex.store构造器选项plugins引入
+        1.store/plugin.js文件中写入
+            export default function createPlugin(param){
+                return store =>{
+                    //...
+                }
+            }
+        2.store/index.js文件中写入
+            import createPlugin from './plugin.js'
+            const myPlugin = createPlugin()
+            const store = new Vuex.Store({
+            // ...
+            plugins: [myPlugin]
+            })
+    Vuex监听组件提交mutation&action
+        1.Vuex.Store实例方法subscribe监听组件中提交mutation
+        2.用Vuex.Store的实例方法subscribeAction监听组件中提交action 在store/plugin.js文件中引入
+    v-model中使用Vuex中state
+        需通过computed计算属性转换
+        computed: {
+            message: {
+                get () {
+                    return this.$store.state.message
+                },
+                set (value) {
+                    this.$store.commit('updateMessage', value)
+                }
+            }
+        }
+    Vuex严格模式
+        不是由mutations函数引起的状态变更 抛出错误
+        开启
+            Vuex.Store构造器选项
+            const store = new Vuex.Store({
+                strict:true
+            })
+18.vue初始化和生命周期钩子函数
+(初始化:开始创建、初始化数据、编译模板、挂载Dom、数据变化时更新DOM、卸载)
+(生命周期:Vue实例从创建到销毁的过程)
+(Vue实例有一个完整的生命周期 指一个实例从开始创建到销毁这个过程)
+(生命周期钩子自动绑定this到实例上 可以通过this操作访问到数据和方法)
+(生命周期钩子函数
+beforeCreate(
+    实例el创建之前初始化之后
+    Data 不能读取
+    DOM 未生成
+
+    el  undefined
+    data undefined
+    DOM 未生成
+)
+created(
+    实例创建之后 
+    vm.$el未定义 挂载属性el不存在
+    能读取到data的值(属性和方法的运算watch/event事件回调)
+    模板渲染成HTML DOM未生成
+
+    数据初始化最好在此阶段完成
+    完成数据观测，    
+
+    el  undefined
+    data [Object Object]
+    DOM未生成
+)
+beforeMount(
+    $el挂载前 vm.$el还是未定义
+    相关Render函数首次被调用 将模块渲染成HTML
+    相关的 render 函数首次被调用
+    期间将模块渲染成html
+    将编译完成的html挂载到对应的虚拟DOM
+
+    el  [Object HTMLDivElement]
+    data [Object Object]
+    DOM 相关render函数首次被调用 将模块渲染成HTML
+    meaasge Vue生命周期
+) 
+mounted(
+    $el挂载后被调用
+    此时vm.$el可以调用
+
+    编译好的HTML挂载到页面完成后
+    不能保证所有的子组件都挂载
+    要等视图全部更新完毕用vm.$nextTick();
+    编译好的html挂载到页面完成后所执行的事件钩子函数。
+    挂载完毕阶段
+
+    此时编译好的HTML已经挂载到了页面上 页面上已经渲染出了数据
+    一般会利用这个钩子函数做一些
+    ajax请求获取数据进行数据初始化
+    el  [Object HTMLDivElement]
+    data [Object Object]
+    meaasge Vue生命周期
+    此阶段中DOM渲染完成
+) 
+beforeUpadate(
+    检测到修改数据
+    更新渲染视图之前触发
+
+    修改vue实例的data时
+    vue就会自动帮我们更新渲染视图
+    检测到我们要修改数据 
+    更新渲染视图之前触发
+)
+updated(
+    此阶段为更新渲染视图之后触发
+    此时再读取视图上的内容，已经是最新的内容。
+    PS:
+    1.该钩子在服务器端渲染期间不被调用。
+    2.应该避免在此期间更改状态，
+    因为这可能会导致更新无限循环。
+)
+beforeDestory(
+    实例销毁前触发
+    调用实例的destroy() 
+    此时实例仍然完全可用；
+    方法可以销毁当前的组件，在销毁前，
+    会触发beforeDestroy钩子。
+)
+destoryed(
+    实例销毁后触发
+    此时该实例与其他实例的关联已经被清除，
+    Vue实例指示的所有东西都会解绑定，
+    所有的事件监听器会被移除，
+    所有的子实例也会被销毁。
+)
+)
+18.在哪个生命周期内调用异步请求(created)/什么阶段才能访问操作DOM(mounted)？
+    1.(created beforeMounted mounted)
+        这三个钩子函数中data 已创建
+        可将服务端端返回的数据进行赋值
+        推荐在 created 钩子函数中调用异步请求 可以更快获取服务端数据
+        服务器端没有mounted和beforeMount生命周期钩子函数
+    created 钩子函数中调用异步请求优点： 
+        (更快获取服务端数据/ssr不支持beforeMount Mounted生命周期钩子)
+        1.能更快获取到服务端数据，减少页面 loading 时间；
+        2.ssr(服务端渲染) 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
+    什么阶段能访问操作DOM
+        钩子函数 mounted 被调用前
+        Vue 已经将编译好的模板挂载到页面上
+        在 mounted 中可以访问操作 DOM
+18.Vue 的父组件和子组件生命周期钩子函数执行顺序/
+            (加载渲染/子组件更新/父组件更新/销毁)
+            1.加载渲染过程 
+                父 beforeCreate -> 
+                父 created -> 
+                父 beforeMount -> 
+                子 beforeCreate -> 
+                子 created -> 
+                子 beforeMount -> 
+                子 mounted -> 
+                父 mounted  
+            2.子组件更新过程 
+                父 beforeUpdate -> 
+                子 beforeUpdate -> 
+                子 updated -> 
+                父 updated  
+            3.父组件更新过程
+                 父 beforeUpdate -> 
+                 父 updated  
+            4.销毁过程 
+                父 beforeDestroy -> 
+                子 beforeDestroy -> 
+                子 destroyed -> 
+                父 destroyed
+19.
 MVC(Model View Controller)
     View->Controller->Model->View 单向通信
 MVP(Model View Presenter) 
@@ -1750,7 +1785,7 @@ MVVM(Model View ViewModel)
             它采用双向绑定（data-binding）：View的变动，自动反映在 ViewModel，反之亦然。Angular 和 Ember 都采用这种模式。
         1.各部分之间的通信，都是双向的
         2.采用双向绑定：View 的变动，自动反映在 ViewModel，反之亦然
-32.Vue一些指令(directive)及具体作用
+20.Vue一些指令(directive)及具体作用
         指令 (Directives)：
             是带有 v- 前缀的特殊 attribute。
             指令 attribute 的值预期是单个 JavaScript 表达式 (v-for 是例外情况，稍后我们再讨论)。
@@ -1841,7 +1876,7 @@ MVVM(Model View ViewModel)
                 你也可以用 of 替代 in 作为分隔符，因为它更接近 JavaScript 迭代器的语法：
                 <div v-for="item of items"></div>
                 使用v-for遍历对象时 按Object.keys()的顺序的遍历，转成数组保证顺序。
-44.computed/methods/watch
+21.computed/methods/watch
     1.
     计算属性computed
     (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
@@ -1876,11 +1911,11 @@ MVVM(Model View ViewModel)
                 PS：监听数组变动不需要这么做 
                     deep无法监听到数组的变动和对象的新增
                     参考Vue数组 只有以响应式方式触发才会被监听到
-44.(computed data props methods 都会被挂载在vm实例上，因此这三个都不能同名。)
-45.created和mounted
+21.(computed data props methods 都会被挂载在vm实例上，因此这三个都不能同名。)
+21.created和mounted
     1.在created中，页面视图未出现，如果请求信息过多，页面会长时间处于白屏状态，DOM节点没出来，无法操作DOM节点。
     2.在mounted不会这样，比较好。
-46.计算属性computed(避免在模板中放入太多的逻辑，导致模板过重且难以维护。)
+21.计算属性computed(避免在模板中放入太多的逻辑，导致模板过重且难以维护。)
     特性：
         (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
     计算属性默认只有 getter，不过在需要时你也可以提供一个 setter：
@@ -1896,98 +1931,60 @@ MVVM(Model View ViewModel)
         (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)
         没有的话,仅仅把 this.dirty = true。
         (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
-17.Vue一些实例方法
-(vm.$nextTick(callback) DOM更新后想做点什么
-vm.$forceUpdate 强制Vue实例重新渲染 而非重新加载组件 会触发beforeUpdate和update钩子函数
-vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发beforeDestory和destoryed钩子函数)
-    1.vm.$mount()
-        返回vm，可链式调用其它实例方法；(不常用)
-    2.vm.$forceUpdate()
-        强制Vue实例重新渲染，不是重新加载组件
-        会触发beforeUpdate和updated这两个钩子函数
-        不会触发其他的钩子函数
-        仅仅影响实例本身和插入插槽内容的子组件，
-        而不是所有子组件；
-    3.vm.$nextTick()
-        参数为callback，等待视图全部更新后执行，回调函数的this自动绑定到调用它的实例上；
-    4.vm.$destroy()
-        销毁一个实例。
-        清理它与其它实例的连接，解绑全部指令及事件监听器,
-        不能清理实例的DOM和data，
-        会触发beforeDestroy和destroyed两个钩子函数。
-23.Vue API 实例属性/实例方法(数据/事件/生命周期)
-    Vue中的$(内置的实例方法 属性)
-        挂载在this上的vue内部属性
-        内部api的命名空间
-        一个特殊标记 增强区分 说明这是内置的实例方法属性
-    核心：
-        数据驱动 组件系统
-    虽然没有完全遵循 MVVM 模型，但是 Vue 的设计也受到了它的启发。
-    因此在文档中经常会使用 vm (ViewModel 的缩写) 这个变量名表示 Vue 实例。
-    所有的 Vue 组件都是 Vue 实例，并且接受相同的选项对象 (一些根实例特有的选项除外)。
-    生命周期钩子的 this 上下文指向调用它的 Vue 实例。
-    不要在选项 property 或回调上使用箭头函数
-    vm(ViewModel)是Vue的一个实例
-    实例属性/实例方法(数据/事件/生命周期)
-  全局配置：
-    Vue.config 是一个对象，包含 Vue 的全局配置。可以在启动应用之前修改下列 property：
-  全局API：
-  (实例方法
+22.Vue API 实例属性/实例方法(数据/事件/生命周期)
+Vue的$(内置的实例方法 属性)
+    挂载在this上的Vue内部属性 内部API的命名空间
+    一个特殊标记 增强区分 说明这是内置的实例方法属性
+全局配置
+    Vue.config是一个对象 包含Vue的全局配置 
+实例方法
+(vm.$nextTick(callback) DOM更新后想做点什么 等待视图全部更新后执行 回调函数this自动绑定到调用它的实例
+vm.$forceUpdate 强制Vue实例重新渲染 而非重新加载组件 会触发beforeUpdate和update钩子函数 仅影响实例本身和插入插槽内容子组件
+vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发beforeDestory和destoryed钩子函数
+vm.$mount([elementOrSelector]) 返回vm实例本身 可链式调用其他实例对象 不常使用)
+
+            如果 Vue 实例在实例化时没有收到 el 选项，则它处于“未挂载”状态，没有关联的 DOM 元素。可以使用 vm.$mount() 手动地挂载一个未挂载的实例。
+            如果没有提供 elementOrSelector 参数，模板将被渲染为文档之外的的元素，并且你必须使用原生 DOM API 把它插入文档中。
+            这个方法返回实例自身，因而可以链式调用其它实例方法。
+全局API 
+实例方法
   1.Vue.extend(options)
+    使用基础Vue构造器 创建一个子类 参数是一个包含组件选项的对象
+    data选项是特例 Vue.extend()中它必须是函数
+    其创建的是Vue构造器 不是平常写的组件实例
+    不可以通过new Vue({components:testExtend})直接使用
+    需要通过new Profile().$mount('#mount-point')挂载到指定元素上
   2.Vue.nextTick([callback,context])
-  3.Vue.set(target,propertyName/index,value)/Vue.delete(targets,propertyName/index)) 设置对象property/删除对象property
+    下次DOM更新循环结束后执行延迟回调
+    在修改数据之后立即使用这个方法 获取更新后的DOM
+  3.Vue.set(target,propertyName/index,value)/Vue.delete(targets,propertyName/index)) 
+    设置响应式对象property/删除响应式对象property
   4.Vue.forceUpdate 更新组件 触发beforeUpdate update生命周期钩子函数
   5.Vue.destory 销毁组件 触发beforeDestory destory生命周期钩子函数
-    1.Vue.extend(options)
-        使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。
-        data 选项是特例，需要注意 - 在 Vue.extend() 中它必须是函数
-    2.Vue.nextTick([callback,context])
-        在下次 DOM 更新循环结束之后执行延迟回调
-        在修改数据之后立即使用这个方法，获取更新后的 DOM。
-    3.Vue.set(target,propertyName/index,value)
-        返回值：设置的值。
-        用法：
-            向响应式对象中添加一个 property，并确保这个新 property 同样是响应式的，且触发视图更新。
-            它必须用于向响应式对象上添加新 property，因为 Vue 无法探测普通的新增 property 
-            (比如 this.myObject.newProperty = 'hi')
-            对象不能是 Vue 实例，或者 Vue 实例的根数据对象。
-    4.Vue.delete(targets,propertyName/index)
-        删除对象的 property。如果对象是响应式的，确保删除能触发更新视图。这个方法主要用于避开 Vue 不能检测到 property 被删除的限制，但是你应该很少会使用它。
-  实例属性：
+实例属性：
     1.vm.$el(element缩写) 获取Vue实例关联的DOM元素
-    2.vm.$root/vm.$parent/vm.children 当前组件树的根Vue实例/父实例/当前实例的直接子组件
+        提供一个在页面上已存在的DOM元素作Vue实例股灾目标 可以是CSS选择器 HTMLElement实例
+        实例挂载后 元素可以用vm.$el访问 
+        如在实例化时存在这个选项 实例将立即进入编译过程 否则 需要显式调用vm.$mount()手动开启编译
+        提供的元素只能作为挂载点 不同于Vue1.x 所有的挂载元素会被Vue生成的DOM替换
+    2.vm.$root/vm.$parent/vm.children 当前组件树的根Vue实例 没有则是自己/父实例/当前实例的直接子组件
     3.vm.$options 获取Vue实例的自定义属性 如vm.$options.methods获取Vue自定义属性methods
-    4.vm.$data/vm.$props 获取Vue实例的data选项(对象)/获取当前组件接收到的props对象)
+    4.vm.$data/vm.$props 获取Vue实例的data选项(对象)/获取当前组件接收到的props对象 Vue实例代理对其data/property对象的访问)
     5.vm.$refs 获取页面中所有含有ref属性的DOM元素
+    6.vm.$slot 用来访问被插槽分发的内容 
+    7.vm.$scopeSlots 用来访问作用域插槽 对于包括默认slot在内的每个插槽 该对象都包含一个返回相应VNODE的函数 可用于使用渲染函数开发一个组件
+    8.vm.$isServer 当前Vue实例是否运行于服务器
+    9.vm.$attrs 
+    10.vm.$listener 
 
-    1.vm.$data 获取Vue实例的data选项(对象) 
-                Vue 实例观察的数据对象。Vue 实例代理了对其 data 对象 property 的访问。
-    2.vm.$props
-            当前组件接收到的 props 对象。Vue 实例代理了对其 props 对象 property 的访问。
-    3.vm.$el(element缩写) 获取Vue实例关联的DOM元素
-            类型：string|HTMLElement|Function
-            提供一个在页面上已经存在的DOM元素作为Vue实例挂载目标 可以是CSS选择器 也可以是一个HTMLElement实例
-            实例挂载之后 元素可以用vm.$el访问
-            如果在实例化时存在这个选项 实例将立即进入编译过程 否则 需要显示调用vm.$mount()手动开启编译
-                1.提供的元素只能作为挂载点 不同于Vue1.x 所有的挂载元素会被Vue生成的DOM替换 因此。。。
-                2.。。。
-    4.vm.$options 获取Vue实例的自定义属性
-            (如vm.$options.methods获取Vue的自定义属性methods)
-            用于当前 Vue 实例的初始化选项。需要在选项中包含自定义 property 时会有用处：
-    5.vm.$parent 父实例，如果当前实例有的话。
-    6.vm.$root  当前组件树的根 Vue 实例。如果当前实例没有父实例，此实例将会是其自己。
     7.vm.children 当前实例的直接子组件。需要注意 $children 并不保证顺序，也不是响应式的。如果你发现自己正在尝试使用 $children 来进行数据绑定，考虑使用一个数组配合 v-for 来生成子组件，并且使用 Array 作为真正的来源。
     8.vm.$slot 用来访问被插槽分发的内容。每个具名插槽有其相应的 property (例如：v-slot:foo 中的内容将会在 vm.$slots.foo 中被找到)。default property 包括了所有没有被包含在具名插槽中的节点，或 v-slot:default 的内容。
         请注意插槽不是响应性的。如果你需要一个组件可以在被传入的数据发生变化时重渲染，我们建议改变策略，依赖诸如 props 或 data 等响应性实例选项。
-    9.vm.$scopeSlots    
-        用来访问作用域插槽。对于包括 默认 slot 在内的每一个插槽，该对象都包含一个返回相应 VNode 的函数。
-        vm.$scopedSlots 在使用渲染函数开发一个组件时特别有用。
     10.vm.$refs 获取页面中所有含有ref属性的DOM元素
             (如vm.$ref.hello 获取页面中含有属性ref=‘hello’
             的DOM元素 如果有多个元素 那么只返回最后一个)
             一个对象，持有注册过 ref attribute 的所有 DOM 元素和组件实例。
-    11.vm.$isServer
-        当前 Vue 实例是否运行于服务器。
+
     12.vm.$attrs
         包含了父作用域中不作为 prop 被识别 (且获取) 的 attribute 绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind="$attrs" 传入内部组件——在创建高级别的组件时非常有用。
     13.vm.$listener 包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on="$listeners" 传入内部组件——在创建更高层次的组件时非常有用。
@@ -2006,34 +2003,18 @@ vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发before
         全局Vue.set的一个别名
     3.vm.$delete(target,propertyName/index)
         这是全局 Vue.delete 的别名。
-  实例方法/事件：
-    1.vm.$on(event,callback)
+    4.vm.$on(event,callback)
         监听当前实例上的自定义事件。事件可以由 vm.$emit 触发。回调函数会接收所有传入事件触发函数的额外参数。
-    2.vm.$once(event,callback)
+    5.vm.$once(event,callback)
         监听一个自定义事件，但是只触发一次。一旦触发之后，监听器就会被移除。
-    3.vm.$off([event,callback])
+    6.vm.$off([event,callback])
         移除自定义事件监听器。
             如果没有提供参数，则移除所有的事件监听器；
             如果只提供了事件，则移除该事件所有的监听器；
             如果同时提供了事件与回调，则只移除这个回调的监听器。
-    4.vm.$emit(eventName,[...args])
+    7.vm.$emit(eventName,[...args])
         触发当前实例上的事件。附加参数都会传给监听器回调。
-  实例方法/生命周期
-    1.vm.$mount([elementOrSelector])
-        返回值：vm - 实例自身
-        用法：
-            如果 Vue 实例在实例化时没有收到 el 选项，则它处于“未挂载”状态，没有关联的 DOM 元素。可以使用 vm.$mount() 手动地挂载一个未挂载的实例。
-            如果没有提供 elementOrSelector 参数，模板将被渲染为文档之外的的元素，并且你必须使用原生 DOM API 把它插入文档中。
-            这个方法返回实例自身，因而可以链式调用其它实例方法。
-    2.vm.$forceUpdate()
-        迫使 Vue 实例重新渲染。注意它仅仅影响实例本身和插入插槽内容的子组件，而不是所有子组件。
-    3.vm.$nextTick([callback])
-        将回调延迟到下次 DOM 更新循环之后执行。在修改数据之后立即使用它，然后等待 DOM 更新。它跟全局方法 Vue.nextTick 一样，不同的是回调的 this 自动绑定到调用它的实例上。
-    4.vm.$sdestory()
-        完全销毁一个实例。清理它与其它实例的连接，解绑它的全部指令及事件监听器。
-        触发 beforeDestroy 和 destroyed 的钩子。
-        在大多数场景中你不应该调用这个方法。最好使用 v-if 和 v-for 指令以数据驱动的方式控制子组件的生命周期。
-50.Vue SSR(Service Side Render Vue服务端渲染)
+23.Vue SSR(Service Side Render Vue服务端渲染)
 (优点 更好的SEO/首屏加载更快
 缺点 开发条件限制 只支持beforeCreate/created两个钩子函数/服务器负载加重)
     服务器端渲染的 Vue.js 应用程序目的：
@@ -2069,7 +2050,7 @@ vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发before
             需要处于 Node.js server 运行环境
         2.服务器负载加重
             在 Node.js  中渲染完整的应用程序，显然会比仅仅提供静态文件的  server 更加大量占用CPU 资源 (CPU-intensive - CPU 密集)，因此如果你预料在高流量环境 ( high traffic ) 下使用，请准备相应的服务器负载，并明智地采用缓存策略。
-51.Vue项目优化
+24.Vue项目优化
         1.代码层面的优化 
             v-if 和 v-show 区分使用场景
             computed 和 watch区分使用场景
@@ -2085,7 +2066,7 @@ vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发before
             ES6 转为 ES5 的冗余代码提取公共代码模板预编译提取组件的 
             CSS优化 SourceMap构建结果输出分析Vue 项目的编译优化
         3.基础的 Web 技术的优化  开启 gzip 压缩  浏览器缓存  CDN 的使用  使用 Chrome Performance 查找性能瓶颈
-52.Vue优点
+25.Vue优点
     1.轻量级框架：只关注视图层，是一个构建数据的视图集合，大小只有几十kb；
     2.简单易学：国人开发，中文文档，不存在语言障碍 ，易于理解和学习；
     3.双向数据绑定：保留了angular的特点，在数据操作方面更为简单；
@@ -2093,7 +2074,7 @@ vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发before
     4.视图，数据，结构分离：使数据的更改更为简单，不需要进行逻辑代码的修改，只需要操作数据就能完成相关操作；
     5.虚拟DOM：dom操作是非常耗费性能的，不再使用原生的dom操作节点，极大解放dom操作，但具体操作的还是dom不过是换了另一种方式；
     6.运行速度更快:相比较与react而言，同样是操作虚拟dom，就性能而言，vue存在很大的优势。
-3.访问子组件的实例或者子元素
+26.ref访问子组件的实例或者子元素
 (this.$refs是一个对象 持有当前组件中注册过ref特性的所有DOM元素和子组件实例)
     三种用法：
     (普通元素 获取DOM元素/
@@ -2125,7 +2106,7 @@ vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发before
             <li class="item">第一个li</li>
         </ul>
         console.log(this.$refs['mydiv'].getElementsByClassName('item')[0].innerHTML)//第一个li
-6.动态组件 is用法 
+27.动态组件 is用法 
         有些HTML元素对于哪些元素出现在其内部是有严格限制的
         有些HTML元素只能出现在其他某些特定元素的内部
         会被作为无效内容提升到外部 并导致最终渲染结果出错
@@ -2133,13 +2114,67 @@ vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发before
         <ul>
             <li is="cardList"></li>
         </ul>
-7.Vue事件中使用event对象
-    ($event.currentTarget 始终指向事件所绑定的元素)
-    ($event.target        始终指向事件发生时元素)
-
-    1.@click="handleOpen" 默认第一个参数传入event对象;
-    2.@click="handleOpen(0, $event)",如果自己需要传入参数和event对象，则需要使用$event来获取event对象并传入handleOpen。
-8.修饰符(表单/事件)
+28.keep-alive
+(actived deactived keep-alive专属)
+(抽象组件 本身不会渲染一个DOM 不会出现在父组件链中)
+(使用keep-alive包裹动态组件 缓存不活动的组件实例 代替销毁)
+(组件切换 默认销毁 需求 组件切换后 不进行销毁 保留之前状态 keep-alive实现 被切换到的组件都有自己的名字)
+两个属性(字符串或者正则表达式匹配的组件name)
+(include定义缓存白名单即会缓存的组件
+exclude定义缓存黑名单即不会缓存的组件)
+(activted()钩子函数 keep-alive专属 组件激活时调用 可更新组件
+deactived()钩子函数 keep-alive专属 组件被销毁时调用)
+    1.include定义缓存白名单，会缓存的组件；
+    2.exclude定义缓存黑名单，不会缓存的组件；
+    3.以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"
+    4.匹配首先检查组件自身的 name 选项，如果 name 选项不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)。匿名组件不能被匹配；
+    5.max最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉；
+    6.不会在函数式组件中正常工作，因为它们没有缓存实例；
+    7.当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
+    服务器渲染期间不被调用
+    activited()生命周期钩子函数
+        keep-alive专属 组件被激活时调用 可更新组件
+    deactived()生命周期钩子函数
+        keep-alive专属 组件被销毁时调用
+    一般结合路由和动态组件一起使用
+29.Vue中的key
+    (VDOM DOM diff 新旧VDOM对比做辨识用)
+    (使用字符串/数值/布尔/符号等基本数据类型值作key)
+    (不适用数组index作key)
+    注意：
+        1.不要使用对象或数组之类的非基本类型值作为key，请用字符串或数值类型的值；
+        2.不要使用数组的index作为key值，因为在删除数组某一项，index也会随之变化，导致key变化，渲染会出错。
+        例：在渲染[a,b,c]
+        用index 作为 key，
+        那么在删除第二项的时候，
+        index 就会从 0 1 2 变成 0 1（而不是 0 2)，
+        随之第三项的key变成1了，
+        会误把第三项删除了。
+    作用
+        1.v-for中 使用key，会提升性能吗
+            主要看v-for渲染的是什么
+        2.可以强制替换元素/组件而不是重复使用它。在以下场景可以使用
+                1.完整地触发组件的生命周期钩子
+                2.触发过渡
+            <transition>
+            <span :key="text">{{ text }}</span>
+            </transition>
+    (Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes)
+       预期：number | string | boolean (2.4.2 新增) | symbol (2.5.12 新增)
+       key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法
+       新旧 nodes 对比时辨识 VNodes。
+       如果不使用 key，
+       Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。
+       而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+       有相同父元素的子元素必须有独特的 key。重复的 key 会造成渲染错误。
+       最常见的用例是结合 v-for：
+       <ul>
+        <li v-for="item in items" :key="item.id">...</li>
+        </ul>
+        用于强制替换元素/组件而不是重复使用它。当你遇到如下场景时它可能会很有用：
+            1.完整地触发组件的生命周期钩子
+            2.触发过渡
+30.修饰符(表单/事件)
     (修饰符 为更纯粹数据逻辑 Vue提供很多事件修饰符 代替处理一些DOM事件细节 顺序很重要)
     事件修饰符
     (.stop 防止事件冒泡 等同JS中event.stopPropagation)
@@ -2190,98 +2225,12 @@ vm.$destory() 销毁一个实例 不能清理实例的DOM和data 会触发before
     .down
     .left
     .right
-10.scoped
-    (Vue通过在DOM结构以及CSS样式上加上唯一标志 保证唯一 达到样式私有化 不污染全局)
-    (如果一个项目所有style标签都加上scoped属性 相当于实现了样式的模块化)
-    (在公共组件中使用 修改公共组件样式需要用/deep/)
-    (样式穿透 deep 深度作用选择器 >>>别名 
-    一个选择器能影响子组件 像SASS之类预处理器无法正确解析>>> 使用/deep/操作符代替)
+7.Vue事件中使用event对象
+    ($event.currentTarget 始终指向事件所绑定的元素)
+    ($event.target        始终指向事件发生时元素)
 
-19.keep-alive
-(actived deactived keep-alive专属)
-(抽象组件 本身不会渲染一个DOM 不会出现在父组件链中)
-(使用keep-alive包裹动态组件 缓存不活动的组件实例 代替销毁)
-(组件切换 默认销毁 需求 组件切换后 不进行销毁 保留之前状态 keep-alive实现 被切换到的组件都有自己的名字)
-两个属性(字符串或者正则表达式匹配的组件name)
-(include定义缓存白名单即会缓存的组件
-exclude定义缓存黑名单即不会缓存的组件)
-(activted()钩子函数 keep-alive专属 组件激活时调用 可更新组件
-deactived()钩子函数 keep-alive专属 组件被销毁时调用)
-    1.include定义缓存白名单，会缓存的组件；
-    2.exclude定义缓存黑名单，不会缓存的组件；
-    3.以上两个参数可以是逗号分隔字符串、正则表达式或一个数组,include="a,b"、:include="/a|b/"、:include="['a', 'b']"
-    4.匹配首先检查组件自身的 name 选项，如果 name 选项不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)。匿名组件不能被匹配；
-    5.max最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉；
-    6.不会在函数式组件中正常工作，因为它们没有缓存实例；
-    7.当组件在内被切换，它的activated和deactivated这两个生命周期钩子函数将会被对应执行。
-    服务器渲染期间不被调用
-    activited()生命周期钩子函数
-        keep-alive专属 组件被激活时调用 可更新组件
-    deactived()生命周期钩子函数
-        keep-alive专属 组件被销毁时调用
-    一般结合路由和动态组件一起使用
-20.Vue中的key
-    (VDOM DOM diff 新旧VDOM对比做辨识用)
-    (使用字符串/数值/布尔/符号等基本数据类型值作key)
-    (不适用数组index作key)
-    注意：
-        1.不要使用对象或数组之类的非基本类型值作为key，请用字符串或数值类型的值；
-        2.不要使用数组的index作为key值，因为在删除数组某一项，index也会随之变化，导致key变化，渲染会出错。
-        例：在渲染[a,b,c]
-        用index 作为 key，
-        那么在删除第二项的时候，
-        index 就会从 0 1 2 变成 0 1（而不是 0 2)，
-        随之第三项的key变成1了，
-        会误把第三项删除了。
-    作用
-        1.v-for中 使用key，会提升性能吗
-            主要看v-for渲染的是什么
-        2.可以强制替换元素/组件而不是重复使用它。在以下场景可以使用
-                1.完整地触发组件的生命周期钩子
-                2.触发过渡
-            <transition>
-            <span :key="text">{{ text }}</span>
-            </transition>
-    (Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes)
-       预期：number | string | boolean (2.4.2 新增) | symbol (2.5.12 新增)
-       key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法
-       新旧 nodes 对比时辨识 VNodes。
-       如果不使用 key，
-       Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。
-       而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
-       有相同父元素的子元素必须有独特的 key。重复的 key 会造成渲染错误。
-       最常见的用例是结合 v-for：
-       <ul>
-        <li v-for="item in items" :key="item.id">...</li>
-        </ul>
-        用于强制替换元素/组件而不是重复使用它。当你遇到如下场景时它可能会很有用：
-            1.完整地触发组件的生命周期钩子
-            2.触发过渡
-21.Vue 的父组件和子组件生命周期钩子函数执行顺序/
-            (加载渲染/子组件更新/父组件更新/销毁)
-            1.加载渲染过程 
-                父 beforeCreate -> 
-                父 created -> 
-                父 beforeMount -> 
-                子 beforeCreate -> 
-                子 created -> 
-                子 beforeMount -> 
-                子 mounted -> 
-                父 mounted  
-            2.子组件更新过程 
-                父 beforeUpdate -> 
-                子 beforeUpdate -> 
-                子 updated -> 
-                父 updated  
-            3.父组件更新过程
-                 父 beforeUpdate -> 
-                 父 updated  
-            4.销毁过程 
-                父 beforeDestroy -> 
-                子 beforeDestroy -> 
-                子 destroyed -> 
-                父 destroyed
-
+    1.@click="handleOpen" 默认第一个参数传入event对象;
+    2.@click="handleOpen(0, $event)",如果自己需要传入参数和event对象，则需要使用$event来获取event对象并传入handleOpen。
 24.模板语法
     1.Vue.js 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。
         所有 Vue.js 的模板都是合法的 HTML，所以能被遵循规范的浏览器和 HTML 解析器解析。
@@ -2374,17 +2323,6 @@ deactived()钩子函数 keep-alive专属 组件被销毁时调用)
         1.通过在父组件上自定义一个监听事件<myComponent @diy="handleDiy"></myComponent>,在子组件用this.$emit('diy',data)来触发这个diy事件，其中data为子组件向父组件通信的数据,在父组件中监听diy个事件时，可以通过$event访问data这个值。
         2.通过在父组件上用修饰符.sync绑定一个数据<myComponent :show.sync="show"></myComponent>,在子组件用this.$emit('update:show',data)来改变父组件中show的值。
         3.通过v-model。
-28.Vue中操作data中数组的方法中哪些可以触发视图更新，哪些不可以，不可以的话有什么解决办法？
-    触发视图更新：
-    1.push()、pop()、shift()删除、unshift()添加、splice()、sort()、reverse()这些方法会改变被操作的数组；
-    2.filter()、concat()、slice()这些方法不会改变被操作的数组，返回一个新的数组；
-    不触发视图更新：
-        1.利用索引直接设置一个数组项，例：this.array[index] = newValue
-        2.直接修改数组的长度，例：this.array.length = newLength
-    解决方法：
-        1.this.$set(this.array,index,newValue)
-          this.array.splice(index,1,newValue)解决方法1
-        2.this.array.splice(newLength)解决方法2
 29.mixin混入
 (全局混入 main.js中引入 会影响每一个之后创建的Vue实例组件
 局部混入 a.vue中引入 只影响a.vue文件中创建的Vue实例)
@@ -2464,6 +2402,12 @@ deactived()钩子函数 keep-alive专属 组件被销毁时调用)
         作用域插槽要求，在slot上面绑定数据
         父组件只需要提供一套样式（在确实用作用域插槽绑定的数据的前提下）。
         数据使用的都是子组件插槽自己绑定的那个数组
+31.scoped
+    (Vue通过在DOM结构以及CSS样式上加上唯一标志 保证唯一 达到样式私有化 不污染全局)
+    (如果一个项目所有style标签都加上scoped属性 相当于实现了样式的模块化)
+    (在公共组件中使用 修改公共组件样式需要用/deep/)
+    (样式穿透 deep 深度作用选择器 >>>别名 
+    一个选择器能影响子组件 像SASS之类预处理器无法正确解析>>> 使用/deep/操作符代替)
 35.Vue中的component
     (组件是可复用的 Vue 实例，且带有一个名字：)
     (el是根实例特有的选项)
@@ -2806,23 +2750,6 @@ prop:
     10.区分开发环境打包跟生产环境打包
 56.shim()
     shim是一个小型库，可透明地截取API，更改传递的参数，处理操作本身，或将操作重定向到别处。垫片通常在API的行为发生变化时出现，从而导致仍依赖旧功能的旧应用程序出现兼容性问题。在这些情况下，较新的代码之上的较薄的兼容层仍然可以支持较旧的API。垫片也可以用于在不同的软件平台上运行程序，而不是开发它们。
-57.Vue中的模板语法
-    Vue.js使用了基于HTML的模板语法 
-    允许开发者声明式的将DOM绑定至底层Vue实例的数据
-    所有Vue.js的模板都是合法的HTML 
-    所以能被遵循规范的浏览器和HTML解析器解析
-
-    在底层的实现上
-    Vue将模板编译成虚拟DOM渲染函数
-    结合响应系统 
-    Vue能智能计算出最少需要重新渲染多少组件
-
-59.Vue中template编译的理解
-    先转化成AST树 将得到的render函数返回VNode(Vue的虚拟DOM节点)
-    1.首先通过compile编译器把template编译成AST语法树
-    (abstract syntax tree 源代码的抽象语法结构的树状表现形式)
-    complie是createCompiler的返回值 createCompiler是用以创建编译器的 另外compiler还负责合并option
-    2.AST经过generate(将AST语法树转化成render function字符串的过程)得到render函数 render的返回值是VNode VNode是Vue的虚拟DOM节点 里面有(标签名/子节点/文本等)
 
 1.强制刷新组件
     1.this.$forceUpdate()。
