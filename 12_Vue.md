@@ -825,6 +825,21 @@ location.href
         我们可以使用import导入组件
     3.require.ensure
         这种模式可以通过参数中的webpackChunkName将js分开打包
+    路由懒加载
+        function load(component) {
+            //return resolve => require([`views/${component}`], resolve);
+            return () => import(`views/${component}`);
+        }
+        const routes = [
+            {
+                path: '/home',
+                name: 'home',
+                component: load('home'),
+                meta: {
+                    title: '首页'
+                },
+            },
+        ]
 11.
 $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
 $router(vue-router实例对象 包括路由跳转方法/钩子函数)
@@ -843,6 +858,42 @@ $router(vue-router实例对象 包括路由跳转方法/钩子函数)
             $route.router 路由规则所属的路由器
             $route.matchd 数组，包含当前匹配的路径中所包含的所有片段所对象的配置参数对象
             $route.name 当前路由的名字，如果没有使用具体路径，则名字为空
+12.vue-router三种传参方式
+    1.meta：路由元信息，写在routes配置文件中。
+        {
+            path: '/home',
+            name: 'home',
+            component: load('home'),
+            meta: {
+                title: '首页'
+            },
+        },
+        获取方式this.$route.meta.title获取
+    2.query
+        this.$route.push({
+            path:'/home',
+            query:{
+                userId:123
+            }
+        })
+        浏览器地址：http://localhost:8036/home?userId=123 
+        获取方式：this.$route.query.userId
+    3.params：这种方式比较麻烦。
+        1.首先要在地址上做配置
+            {
+                path: '/home/:userId',
+                name: 'home',
+                component: load('home'),
+                meta: {
+                    title: '首页'
+                },
+            },
+        2.访问传参
+        const userId = '123'
+        this.$router.push({ name: 'home', params: { userId } })
+        注：用params传参，只能用命名的路由（用name访问），如果用path，params不起作用。 this.$router.push({ path: '/home', params: { userId }})不生效。
+        浏览器地址：http://localhost:8036/home/123
+        获取方式：this.$route.params.userId
 12.vue-router使用
 query(path引入 接参 this.$route.query.name 类似get传参 参数地址栏显示 拼接在url后面的参数，没有也没关系 不设置 没关系)
 params(name引入 接参 this.$route.params.name 类似post传参 参数地址栏不显示 是路由的一部分 必须要有 不设置 刷新页面或者返回参数会丢失)
@@ -861,21 +912,24 @@ params(name引入 接参 this.$route.params.name 类似post传参 参数地址�
             params一旦设置在路由，params就是路由的一部分，如果这个路由有params传参，但是在跳转的时候没有传这个参数，会导致跳转失败或者页面会没有内容。
         4.params、query不设置也可以传参，params不设置的时候，刷新页面或者返回参数会丢失 query则不会有这个问题        
 13.
-Vue-router(SPA single page application的路径管理器 WebApp的链接路径管理系统)
+Vue-router
+(SPA single page application的路径管理器 WebApp的链接路径管理系统)
 
 Vue-router hash模式(浏览器环境) history模式 abstract模式(Nodejs环境)
 SPA(hash模式/history模式)
+
 (Vue的单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来)
+
 (SPA核心之一 更新视图而不重新请求页面)
 (SPA加载页面时 不会加载整个页面 而是只更新某个指定的容器中内容)
 (传统的页面应用 超链接实现页面切换跳转 vue-router单页面应用/路径/组件的切换)
 (路由模块本质 建立起URL和页面之间映射关系)
+
 (vue-router 实现SPA单页面前端路由 提供两种方式 mode参数决定：
     Hash模式 Vue-router模式/
     History模式 依赖H5 History API&服务器配置
+
 (abstract 支持所有JS运行环境 如Node.js服务器端 如果发现没有浏览器API 路由会强制进入这个模式)
-(Vue在实现单页面前端路由时 提供两种方式 hash/history)
-(Vue-router比SPA多一个模式 abstract)
 
 (Hash模式 原理onhashchange事件 window对象上监听这个事件)
 (Vue-router默认模式)
@@ -907,9 +961,9 @@ SPA(hash模式/history模式)
     会向history 栈添加一个新的记录 点击浏览器的返回按钮时可以看到之前的页面。
     不会向 history 添加新记录，而是替换掉当前的 history 记录，即当replace跳转到的网页后，‘后退’按钮不能查看之前的页面。
 )
+
 (abstract 支持所有JavaScript运行环境 如Node.js服务器端 如果发现没有浏览器的API 路由会强制进入这个模式)
-(vue-router在实现单页面前端路由时，提供两种方式
-Vue路由有三种模式 比SPA多了一个abstract)
+
 (不能用a标签 Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。)
     1.url组成
         协议部分、域名部分、端口部分、虚拟目录部分、文件名部分、参数部分、锚部分
@@ -928,81 +982,88 @@ Vue路由有三种模式 比SPA多了一个abstract)
             1.改变URL且不让浏览器向服务器发出请求
             2.检测URL的改变
             3.截获URL地址, 并解析出需要的信息来匹配路由规则)
-    2.hash模式(使用URL hash值来做路由 支持所有浏览器 包括不支持HTML5 History API的浏览器)
-        使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载。 
-        hash（#）是URL 的锚点，代表的是网页中的一个位置，单单改变#后的部分，浏览器只会滚动到相应位置，不会重新加载网页，也就是说hash 出现在 URL 中，但不会被包含在 http 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面；同时每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用”后退”按钮，就可以回到上一个位置；所以说Hash模式通过锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。hash 模式的原理是 onhashchange 事件(监测hash值变化)，可以在 window 对象上监听这个事件。
-
-        0.Location接口的hash属性返回一个USVString其中包含 #和后面URL片段标识符被称为hash
-        特点：
-            1.在第一个#后面出现的任何字符 都会被浏览器解读为位置标识符 即这些字符都不会被发送到服务器端
-            2.单单改变#后的部分 浏览指挥滚动到相应位置 不会重新加载网页
-            3.每一次改变#后的部分 都会在浏览器的访问历史中增加一个记录 使用后退按钮就可以返回上一个位置
-            4.可通过window.location.hash属性读取hash值 并且window.location.hash这个属性可读可写
-            5.使用window.addEventListener('hashchange',fun)可以监听hash变化
+    2.hash模式
+        1.原理 onhashchange事件 可以在window对象上监听这个事件)
+        2.可以通过window.location.hash属性读取hash值 且该属性可读可写
+        3.可使用window.addEventListener('hashchange',fun)监听hash变化
+        4.#和后面的URL片段标识符被称为hash 会被浏览器解读为位置标识符 这些字符不会被发送到服务器端 改变只会滚动到相应位置)
+        5.使用URL hash值来做路由 支持所有浏览器 包括不支持HTML5 History API的浏览器)
+        6.#/URL锚点/hash 代表网页中一个位置 改变#后数值 浏览器只会滚动到相应位置 不会重新加载网页)
+        7.hash出现在URL中 但不会被包含在HTTP请求中 对后端没有影响)
+        8.hash改变会触发hashchange事件 浏览器进退也能对其控制 H5之前基本都是使用hash实现前端路由 每一次改变#后的部分 都会在浏览器访问历史中增加一个记录 使用后退按钮 可以回到上一个位置)
+        9.Hash模式通过锚点的改变 据不同的值 渲染指定DOM位置的不同数据)
+        实现原理
+            早期的前端路由实现就是基于location.hash实现的
+            location.hash的值就是URL中#后面的内容
         vue-router源码对/src/history/hash.js的处理
             1.使用window.addEventListener('hashchange',fun)监听路由的变化 然后使用transitionTo方法更新视图
             2.vue-router 的2个主要API push 和 replace 也是简单处理了下 hash , 然后调用 transitionTo 方法更新视图
-        1.hash表示的是地址栏URL中#符号(也称作为锚点), hash虽然会出现在URL中, 但是不会被包含在Http请求中, 因此hash值改变不会重新加载页面.
-        2.由于hash值变化不会引起浏览器向服务器发出请求, 而且hash改变会触发hashchange事件, 浏览器的进后退也能对其进行控制, 所以在HTML5之前, 基本都是使用hash来实现前端路由.
-        实现原理:
-                早期的前端路由的实现就是基于 location.hash 来实现的。其实现原理很简单，location.hash 的值就是 URL 中 # 后面的内容。比如下面这个网站，它的 location.hash 的值为 '#search'：
     3.history模式(依赖HTML5 History API和服务器配置)
         HTMLHistory基本知识:
+            (使用back() forward() go()方法完成在用户历史记录中向后和向前的跳转
+            H5中引入了history.pushState()添加历史记录/history.replaceState()修改历史记录
+            解决hash传参体积问题 不带# 更美观
+            通过JS操作window.history改变浏览器地址栏参数 没有发起HTTP请求)
             1.History 接口允许操作浏览器的曾经在标签页或者框架里访问的会话历史记录。
             2.使用 back(),  forward()和  go() 方法来完成在用户历史记录中向后和向前的跳转。
             3.HTML5引入了 history.pushState() 和 history.replaceState() 方法，它们分别可以添加和修改历史记录条目。
         vue-router源码对/src/history/html5.js处理
             1.处理逻辑和 hash 相似，使用 window.addEventListener("popstate", fun) 监听路由的变化,
             2.使用 transitionTo 方法更新视图
-        1.利用了HTML5新增的pushState()和replaceState()两个api, 通过这两个api完成URL跳转不会重新加载页面
+        1.利用了HTML5新增的pushState()和replaceState()两个API, 通过这两个api完成URL跳转不会重新加载页面
         2.同时history模式解决了hash模式存在的问题. hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
-    4.abstract(支持所有JavaScript运行环境 如Node.js服务器端 如果发现没有浏览器的API 路由会强制进入这个模式)
+        注意:
+            404问题 history模式下 只是动态的通过JS操作window.history改变浏览器地址栏里的路径
+            并没有发起HTTP请求 当直接在浏览器里输入这个地址的时候 就一定要对服务器发起http请求
+            但是该目标在服务器上不存在 所以会返回404
+        解决:
+            在Ngnix中将所有请求都转发到index.html上就可以了。
+    4.abstract
+        (支持所有JavaScript运行环境 如Node.js服务器端 如果发现没有浏览器的API 路由会强制进入这个模式)
         对/src/history/abstract.js处理
         首先定义了2个变量，stack 来记录调用的记录， index 记录当前的指针位置
         首先定义了2个变量，stack 来记录调用的记录， index 记录当前的指针位置
     5.SPA(更新视图但不重新请求页面)单页面应用路由有两种模式 hash和history 
         单一页面应用程序，只有一个完整的页面；它在加载页面时，不会加载整个页面，而是只更新某个指定的容器中内容。
-        单页面应用(SPA)的核心之一是: 更新视图而不重新请求页面
-        vue-router在实现单页面前端路由时，提供了两种方式：Hash模式和History模式；根据mode参数来决定采用哪一种方式。
+        单页面应用(SPA)的核心之一是: 
+            更新视图而不重新请求页面
+        vue-router在实现单页面前端路由时 提供了两种方式：
+            Hash模式和History模式；根据mode参数来决定采用哪一种方式。
         Vue路由有三种模式 比SPA多了一个abstract
-        Vue-router中通过mode这个参数修改路由模式
-        默认使用的是 hash 模式，当设置为 history 时，如果不支持 history 方法，也会强制使用 hash 模式。 当不在浏览器环境，比如 node 中时，直接强制使用 abstract 模式。
-    5.1SPA Vue单页面应用 和传统页面应用的区别
-        vue的单页面应用是基于路由和组件的，路由用于设定访问路径，并将路径和组件映射起来。传统的页面应用，是用一些超链接来实现页面切换和跳转的。
-        在vue-router单页面应用中，则是路径之间的切换，也就是组件的切换
-        路由模块的本质 就是建立起url和页面之间的映射关系。
-    6.hash模式/history模式实现Vue-router跳转API区别
+        Vue-router
+            中通过mode这个参数修改路由模式
+            默认使用的是 hash 模式 设置为 history 时 如果不支持 history 方法，也会强制使用 hash 模式
+             当不在浏览器环境，比如 node 中时，直接强制使用 abstract 模式。
+    5.SPA Vue单页面应用 和传统页面应用的区别
+        (路由模式的本质就是建立起URL和页面之间的映射关系)
+        vue的SPA单页面应用是基于路由和组件的
+        路由用于设定访问路径 并将路径和组件映射起来
+        SPA中通过路径的切换 即组件的切换 实现页面切换和跳转
+
+        传统的页面应用 用一些超链接来实现页面切换和跳转的。
     7.总结：
-        1.hash 和 history 的使用方式差不多，hash 中路由带 # ，但是使用简单，不需要服务端配合，站在技术角度讲，这个是配置最简单的模式，本人感觉这也是 hash 被设为默认模式的原因
-        2.history 模式需要服务端配合处理404的情况(在路由跳转的时候，就会出现访问不到静态资源而出现 404 的情况，这时候就需要服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面)，但是路由中不带 # ，比 hash 美观一点。
-        3.abstract 模式没有使用浏览器api，可以放到node环境或者桌面应用中， 本人感觉是对 spa应用 的兜底和能力扩展。
+        1.hash 和 history 的使用方式差不多，hash 中路由带 # ，但是使用简单，不需要服务端配合，站在技术角度讲，这个是配置最简单的模式，
+        2.history 模式需要服务端配合处理404的情况
+        (在路由跳转的时候，就会出现访问不到静态资源而出现 404 的情况，这时候就需要服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面) 路由中不带 # ，比 hash 美观一点。
+        3.abstract 模式没有使用浏览器api 可以放到node环境或者桌面应用中
     8.可以使用vue-router的history模式 url不带#
         new Router({
             mode: 'history',
             routes: [ ]
         })    
     9.为啥不能用a标签
-        用Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，这里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。
-14.Vue路由守卫哪些/如何设置/使用场景
-    常用的两个路由守卫
-        router.beforeEach/router.afterEach
-    每个守卫方法接收三个参数
-        to:Route:即将要进入的目标 路由对象
-        from:Route:当前导航正要离开的路由
-        next:Function:一定要调用该方法来resolve这个钩子
-    项目中 
-    一般在beforeEach这个钩子函数中进行路由跳转的一些信息判断
-    判断是否登录 是否拿到对应的路由权限
-14.导航守卫
-64.Vue-Router导航守卫
-    官方
-        vue-router提供的导航守卫主要用来通过跳转或取消的方式守卫导航
-    实际
-        导航守卫就是路由跳转过程中的一些钩子函数
+        用Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，这里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。    
+14.Vue-Router导航守卫
+        路由跳转过程中的一些钩子函数
         路由跳转是一个大过程 
         这个大过程分跳转前中后等细小过程
         每一个过程都有一个函数
         可以让你操作一些其他的事的时机
+    常用的两个路由守卫
+        router.beforeEach/router.afterEach
+    项目中
+        一般在beforeEach这个钩子函数中进行路由跳转一些信息判断
+        判断是否登录 是否拿到对应路由权限
     导航守卫全解析
         一个钩子函数执行后输出的顺序
             全局前置守卫:beforeEach
@@ -1015,20 +1076,19 @@ Vue路由有三种模式 比SPA多了一个abstract)
             组件生命周期beforeMount
             组件生命周期mounted
             组件路由守卫beforeRouteEnter的next回调
-    导航守卫分三种
-        1.全局的(beforeEach/beforeResolve/afterEach)
+        1.全局的(beforeEach路由跳转前触发/beforeResolve路由跳转前触发/afterEach路由跳转完成后触发)
             路由实例上直接操作的钩子函数 
             特点:
                 所有路由配置的组件都会触发
                 即触发路由就会触发这些钩子函数
                 钩子函数按执行顺序包括
-                    beforeEach
+                    beforeEach 全局前置守卫
                         路由跳转前触发
                         参数 to from next
                         主要用作登录验证 
                         即路由还没跳转提前告知
                         免得跳转后再告知晚了
-                    beforeResolve
+                    beforeResolve 全局解析守卫
                         路由跳转前触发
                         参数 to from next
                         区别：
@@ -1036,14 +1096,15 @@ Vue路由有三种模式 比SPA多了一个abstract)
                             同时再所有组件内守卫和异步路由组件被解析之后 解析守卫被调用
                         在beforeEach和组件内beforeRouteEnter之后 
                         afterEach之前调用
-                    afterEach
+                    afterEach 全局后置守卫
+                        (afterEach钩子中不可以使用next() 不接受next的参数)
                         与beforeEach相反
                         路由跳转完成后触发
                         参数
                             to from
                         在beforeEach和beforeResolve之后
                         beforeRouteEnter(组件内守卫)之前
-        2.单个路由独享的(beforeEnter)
+        2.单个路由独享的(beforeEnter 紧随beforeEach后)
             单个路由配置时 也可设置的钩子函数
             目前只有一个钩子函数
                 beforeEnter
@@ -1051,16 +1112,20 @@ Vue路由有三种模式 比SPA多了一个abstract)
                     如果都设置则在beforeEach之后紧随执行
                     参数:
                         to from next
-        3.组件内(beforeRouteEnter/beforeRouteUpdate/beforeRouteLeave)
+        3.组件内(beforeRouteEnter渲染该组件对应路由被确认前/beforeRouteUpdate组件被复用/beforeRouteLeave导航离开该组件)
             组件内执行的钩子函数 
             类似于组件内的生命周期
             相当于为配置路由的组件添加的生命周期钩子函数
             钩子函数按执行顺序包括
             beforeRouteEnter
+                进入对应路由的组件创建前被调用
                 渲染该组件对应路由被comfirm前调用
                 不能获取组件实例this
                 因为当守卫执行前 组件实例还没被创建
+                可以通过传一个回调给next来访问组件实例
+                在导航被确认时执行回调 并把组件实例作为回调函数的参数
             beforeRouteUpdate
+                重用的组件中被调用 如包含<router-view/>的组件
                 在当前路由改变 但是该组件被复用时调用
                 举例来说 对于一个带有动态参数的路径
                 /foo/:id 在/foo/1和/foo/2之间跳转
@@ -1072,9 +1137,12 @@ Vue路由有三种模式 比SPA多了一个abstract)
                 导航离开该组件的对应路由调用
                 可以访问组件实例this
         导航守卫回调参数
-            to:目标路由对象
-            from:即将要离开的路由对象
+            to:目标路由对象 即将进入路由对象
+            from:即将要离开的路由对象 当前导航正要离去路由对象
             next:最重要一个参数 单凡涉及到next参数的钩子 必须调用next才能继续往下执行下一个钩子
+                next()：进入下一个路由。
+                next(false)：中断当前的导航。
+                next('/')或next({ path: '/' }) : 跳转到其他路由，当前导航被中断，进行新的一个导航。
             PS:
                 1.但凡涉及到有next参数的钩子 必须调用next()才能继续往下执行下一个钩子 否则路由跳转会停止
                 2.如果要中断当前的导航要调用next(false)如果浏览器的URL改变了(可能是用户手动或浏览器后退按钮)则URL地址会重置到from路由对应的地址
@@ -1083,6 +1151,7 @@ Vue路由有三种模式 比SPA多了一个abstract)
                 4.在beforeRouteEnter钩子中next((vm)=>{})内接受的回调函数参数为当前组件的实例vm 这个回调函数在生命周期mounted之后调用 即它是所有导肮守卫和生命周期函数最后执行的那个钩子
                 5.next(errror) 如果传入next的参数是一个Error实例 则导航会被终止且该错误会被传递给router.onError()注册过的回调
     总结：
+        路由导航守卫都是在Vue实例生命周期钩子函数之前执行的。
         切换路由时：
             beforeRouterLeave->
             beforeEach->
@@ -1097,52 +1166,6 @@ Vue路由有三种模式 比SPA多了一个abstract)
             beforeRouteEnter的next回调
         路由更新时:
             beforeRouteUpdate
-
-    定义：
-        导航守卫就是路由跳转过程中的一些钩子函数
-        路由跳转是一个大的过程
-        这个大的过程分为跳转前中后等等细小的过程
-        每一个过程中都有一函数
-        这个函数能让你操作一些其他的事儿的时机
-    导航守卫全解析：
-        1.全局前置导航守卫 beforeEach
-        2.路由beforeEnter守卫
-        3.组件路由守卫 beforeRouteEnter 此时this并不指向该组件
-        4.全局解析守卫 beforeResolve
-        5.全局后置守卫 afterEach
-
-        6.组件生命周期beforeCreate
-        7.组件生命周期created
-        8.组件生命周期beforeMount
-        9.组件生命周期mounted
-        
-        10.组件路由守卫beforeRouteEnter的next回调
-    常用的两个路由守卫
-        全局前置导航守卫 router.beforeEach
-        全局后置导航守卫 router.afterEach
-    分类：
-    (路由守卫分类
-    1.全局
-    2.单个路由独享
-    3.组件内)
-        全局的
-            是指路由实例上直接操作的钩子函数，他的特点是所有路由配置的组件都会触发，直白点就是触发路由就会触发这些钩子函数，如下的写法。钩子函数按执行顺序包括beforeEach、beforeResolve（2.5+）、afterEach三个（以下的钩子函数都是按执行顺序讲解的）：
-            const router = new VueRouter({ ... })
-
-            router.beforeEach((to, from, next) => {
-            // ...
-            })
-            [beforeEach]：在路由跳转前触发，参数包括to,from,next（参数会单独介绍）三个，这个钩子作用主要是用于登录验证，也就是路由还没跳转提前告知，以免跳转了再通知就为时已晚。
-
-            [beforeResolve]（2.5+）：这个钩子和beforeEach类似，也是路由跳转前触发，参数也是to,from,next三个，和beforeEach区别官方解释为：
-
-            区别是在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，解析守卫就被调用。
-            即在 beforeEach 和 组件内beforeRouteEnter 之后，afterEach之前调用。
-
-            [afterEach]：和beforeEach相反，他是在路由跳转完成后触发，参数包括to,from没有了next（参数会单独介绍）,他发生在beforeEach和beforeResolve之后，beforeRouteEnter（组件内守卫，后讲）之前。
-        单个路由独享的
-            是指在单个路由配置的时候也可以设置的钩子函数，其位置就是下面示例中的位置，也就是像Foo这样的组件都存在这样的钩子函数。目前他只有一个钩子函数beforeEnter：
-        组件内
     完整的导航守卫流程
         导航被触发。
         在失活的组件里调用离开守卫beforeRouteLeave(to,from,next)。
@@ -1160,34 +1183,6 @@ Vue路由有三种模式 比SPA多了一个abstract)
             next(vm => {
                 //通过vm访问组件实例
             })
-        },
-    6.路由导航守卫都是在Vue实例生命周期钩子函数之前执行的。
-    7.讲一下导航守卫的三个参数的含义？
-        to：即将要进入的目标 路由对象。
-        from：当前导航正要离开的路由对象。
-        next：函数，必须调用，不然路由跳转不过去。
-
-        next()：进入下一个路由。
-        next(false)：中断当前的导航。
-        next('/')或next({ path: '/' }) : 跳转到其他路由，当前导航被中断，进行新的一个导航。
-    8.在afterEach钩子中不可以使用next() 不接受next的参数。
-    9.全局导航守卫有哪些？怎么使用？
-        1.router.beforeEach：全局前置守卫。
-        2.router.beforeResolve：全局解析守卫。
-        3.router.afterEach：全局后置钩子。
-    10.什么是路由独享的守卫，怎么使用？
-        什么是路由独享的守卫，怎么使用？
-    11.在组件内使用的导航守卫有哪些？怎么使用？
-        beforeRouteLeave：在失活的组件里调用离开守卫。
-        beforeRouteUpdate：在重用的组件里调用,比如包含<router-view />的组件。
-        beforeRouteEnter：在进入对应路由的组件创建前调用。
-    12.在beforeRouteEnter导航守卫中不可以用this
-        为守卫在导航确认前被调用,因此即将登场的新组件还没被创建。
-        可以通过传一个回调给next来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数。
-        beforeRouteEnter(to, from, next) {
-            next(vm => {
-                console.log(vm)
-            })
         }
 15.Router-link和Router-view
     router-link和router-view在同一个Vue文件中
@@ -1203,7 +1198,20 @@ Vue路由有三种模式 比SPA多了一个abstract)
         不会刷新页面
         router-view相当于router-link的承载页面
         用于显示router-link的内容
+    router-link
+        <router-link>是Vue-Router的内置组件，在具有路由功能的应用中作为声明式的导航使用。
+        <router-link>8个prop
+            1.to：必填，表示目标路由的链接。当被点击后，内部会立刻把to的值传到router.push()，所以这个值可以是一个字符串或者是描述目标位置的对象。
+            注意path存在时params不起作用，只能用query
+            2.replace：默认值为false，若设置的话，当点击时，会调用router.replace()而不是router.push()，于是导航后不会留下 history 记录。
+            3.append：设置 append 属性后，则在当前 (相对) 路径前添加基路径。
+            4.tag：让<router-link>渲染成tag设置的标签，如tag:'li,渲染结果为<li>foo</li>。
+            5.active-class：默认值为router-link-active,设置链接激活时使用的 CSS 类名。默认值可以通过路由的构造选项 linkActiveClass 来全局配置。
+            6.exact-active-class：默认值为router-link-exact-active,设置链接被精确匹配的时候应该激活的 class。默认值可以通过路由构造函数选项 linkExactActiveClass 进行全局配置的。
+            7.exact：是否精确匹配，默认为false。
+            8.event：声明可以用来触发导航的事件。可以是一个字符串或是一个包含字符串的数组，默认是click。
 15.编程式导航&声明式导航
+    实现路由跳转的两种方式
     声明式导航：
         直接渲染到页面
         <router-link to="/url">
@@ -1256,6 +1264,104 @@ Vue路由有三种模式 比SPA多了一个abstract)
             1.将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
             2.在配置路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
             3.加一个首屏 loading 图，提升用户体验；
+47.vue-router源码
+    仅展示关键方法 细节处不讨论
+    目录结构
+    vue-router
+        components #存放vue-router两个核心组件
+            link.js
+            view.js
+        history     #存放浏览器跳转相关逻辑
+            base.js
+            hash.js
+        create-matcher.js #创建匹配器
+        create-route-map.js #创建路由映射表
+        index.js        #引用时的入口函数
+        install.js      #install方法
+48.Vue-router
+    1.重定向页面
+        1.const router = new VueRouter({
+            routes: [
+                { path: '/a', redirect: '/b' }
+            ]
+        })
+        2.const router = new VueRouter({
+            routes: [
+                { path: '/a', redirect: { name: 'foo' }}
+            ]
+        })
+        3.const router = new VueRouter({
+            routes: [
+                { 
+                    path: '/a', 
+                    redirect: to =>{
+                        const { hash, params, query } = to
+                        if (query.to === 'foo') {
+                            return { path: '/foo', query: null }
+                        }else{
+                        return '/b' 
+                        }
+                    }
+                    
+                }
+            ]
+        })
+    3.切换路由时 实现保存草稿的功能
+        <keep-alive :include="include">
+            <router-view></router-view>
+        </keep-alive>
+        include可以是个数组，数组内容为路由的name选项的值。
+    
+    组件中监听路由参数变化两种方法
+        有两种方法可以监听路由参数的变化，但是只能用在包含<router-view />的组件内。
+        1.watch: {
+                '$route'(to, from) {
+                    //这里监听
+                },
+            },
+        2.
+            beforeRouteUpdate (to, from, next) {
+                //这里监听
+            },
+    15.切换路由后，新页面要滚动到顶部或保持原先的滚动位置怎么做呢？
+        滚动顶部
+        const router = new Router({
+            mode: 'history',
+            base: process.env.BASE_URL,
+            routes,
+            scrollBehavior(to, from, savedPosition) {
+                if (savedPosition) {
+                    return savedPosition;
+                } else {
+                    return { x: 0, y: 0 };
+                }
+            }
+        });
+        滚动原先位置
+
+    17.什么是命名视图，举个例子说明一下？
+        。。。
+    19.路由组件和路由为什么解耦，怎么解耦？
+        因为在组件中使用 $route 会使之与其对应路由形成高度耦合，从而使组件只能在某些特定的 URL 上使用，限制了其灵活性，所有要解耦。
+        耦合如以下代码所示。Home组件只有在http://localhost:8036/home/123URL上才能使用。
+        使用 props 来解耦
+        props为true，route.params将会被设置为组件属性。
+        props为对象，则按原样设置为组件属性。
+        props为函数，http://localhost:8036/home?id=123,会把123传给组件Home的props的id。
+    20.active-class是哪个组件的属性？
+        <router-link/>组件的属性，设置链接激活时使用的 CSS 类名。默认值可以通过路由的构造选项 linkActiveClass 来全局配置。
+    22.怎样动态加载路由？
+        使用Router的实例方法addRoutes来实现动态加载路由，一般用来实现菜单权限。
+        使用时要注意，静态路由文件中不能有404路由，而要通过addRoutes一起动态添加进去。
+    Vue路由怎么跳转打开新窗口？
+        const obj = {
+            path: xxx,//路由地址
+            query: {
+            mid: data.id//可以带参数
+            }
+        };
+        const {href} = this.$router.resolve(obj);
+        window.open(href, '_blank');
 17.Vuex
     设计思想
         Vuex 借鉴了Flux Redux 将数据存放到全局的store
@@ -2514,185 +2620,6 @@ prop:
    	{'active-click': clicked && actived}
   ]"></div>
     4.对象和计算属性(推荐)
-47.vue-router源码
-    仅展示关键方法 细节处不讨论
-    目录结构
-    vue-router
-        components #存放vue-router两个核心组件
-            link.js
-            view.js
-        history     #存放浏览器跳转相关逻辑
-            base.js
-            hash.js
-        create-matcher.js #创建匹配器
-        create-route-map.js #创建路由映射表
-        index.js        #引用时的入口函数
-        install.js      #install方法
-48.Vue-router
-    1.重定向页面
-        1.const router = new VueRouter({
-            routes: [
-                { path: '/a', redirect: '/b' }
-            ]
-        })
-        2.const router = new VueRouter({
-            routes: [
-                { path: '/a', redirect: { name: 'foo' }}
-            ]
-        })
-        3.const router = new VueRouter({
-            routes: [
-                { 
-                    path: '/a', 
-                    redirect: to =>{
-                        const { hash, params, query } = to
-                        if (query.to === 'foo') {
-                            return { path: '/foo', query: null }
-                        }else{
-                        return '/b' 
-                        }
-                    }
-                    
-                }
-            ]
-        })
-    2.配置404页面
-        const router = new VueRouter({
-            routes: [
-                {
-                    path: '*', redirect: {path: '/'}
-                }
-            ]
-        })
-    3.切换路由时 实现保存草稿的功能
-        <keep-alive :include="include">
-            <router-view></router-view>
-        </keep-alive>
-        include可以是个数组，数组内容为路由的name选项的值。
-    13.router-link
-        <router-link>是Vue-Router的内置组件，在具有路由功能的应用中作为声明式的导航使用。
-        <router-link>有8个props，其作用是：
-            1.to：必填，表示目标路由的链接。当被点击后，内部会立刻把to的值传到router.push()，所以这个值可以是一个字符串或者是描述目标位置的对象。
-            注意path存在时params不起作用，只能用query
-            2.replace：默认值为false，若设置的话，当点击时，会调用router.replace()而不是router.push()，于是导航后不会留下 history 记录。
-            3.append：设置 append 属性后，则在当前 (相对) 路径前添加基路径。
-            4.tag：让<router-link>渲染成tag设置的标签，如tag:'li,渲染结果为<li>foo</li>。
-            5.active-class：默认值为router-link-active,设置链接激活时使用的 CSS 类名。默认值可以通过路由的构造选项 linkActiveClass 来全局配置。
-            6.exact-active-class：默认值为router-link-exact-active,设置链接被精确匹配的时候应该激活的 class。默认值可以通过路由构造函数选项 linkExactActiveClass 进行全局配置的。
-            7.exact：是否精确匹配，默认为false。
-            8.event：声明可以用来触发导航的事件。可以是一个字符串或是一个包含字符串的数组，默认是click。
-    14.怎么在组件中监听路由参数的变化？
-        有两种方法可以监听路由参数的变化，但是只能用在包含<router-view />的组件内。
-        1.watch: {
-                '$route'(to, from) {
-                    //这里监听
-                },
-            },
-        2.
-            beforeRouteUpdate (to, from, next) {
-                //这里监听
-            },
-    15.切换路由后，新页面要滚动到顶部或保持原先的滚动位置怎么做呢？
-        滚动顶部
-        const router = new Router({
-            mode: 'history',
-            base: process.env.BASE_URL,
-            routes,
-            scrollBehavior(to, from, savedPosition) {
-                if (savedPosition) {
-                    return savedPosition;
-                } else {
-                    return { x: 0, y: 0 };
-                }
-            }
-        });
-        滚动原先位置
-    16.在什么场景下会用到嵌套路由？
-        做个管理系统，顶部栏和左侧菜单栏是全局通用的，那就应该放在父路由，而右下的页面内容部分放在子路由。
-        。。。
-    17.什么是命名视图，举个例子说明一下？
-        。。。
-    18.如何获取路由传过来的参数？
-        路由有三种传参方式，获取方式各不相同。
-            1.meta：路由元信息，写在routes配置文件中。
-                {
-                    path: '/home',
-                    name: 'home',
-                    component: load('home'),
-                    meta: {
-                        title: '首页'
-                    },
-                },
-                获取方式this.$route.meta.title获取
-            2.query
-                this.$route.push({
-                    path:'/home',
-                    query:{
-                        userId:123
-                    }
-                })
-                浏览器地址：http://localhost:8036/home?userId=123 
-                获取方式：this.$route.query.userId
-            3.params：这种方式比较麻烦。
-                1.首先要在地址上做配置
-                    {
-                        path: '/home/:userId',
-                        name: 'home',
-                        component: load('home'),
-                        meta: {
-                            title: '首页'
-                        },
-                    },
-                2.访问传参
-                const userId = '123'
-                this.$router.push({ name: 'home', params: { userId } })
-                注：用params传参，只能用命名的路由（用name访问），如果用path，params不起作用。 this.$router.push({ path: '/home', params: { userId }})不生效。
-                浏览器地址：http://localhost:8036/home/123
-                获取方式：this.$route.params.userId
-    19.路由组件和路由为什么解耦，怎么解耦？
-        因为在组件中使用 $route 会使之与其对应路由形成高度耦合，从而使组件只能在某些特定的 URL 上使用，限制了其灵活性，所有要解耦。
-        耦合如以下代码所示。Home组件只有在http://localhost:8036/home/123URL上才能使用。
-        使用 props 来解耦
-        props为true，route.params将会被设置为组件属性。
-        props为对象，则按原样设置为组件属性。
-        props为函数，http://localhost:8036/home?id=123,会把123传给组件Home的props的id。
-    20.active-class是哪个组件的属性？
-        <router-link/>组件的属性，设置链接激活时使用的 CSS 类名。默认值可以通过路由的构造选项 linkActiveClass 来全局配置。
-    21.在vue组件中通过this.$route获取到当前的路由信息 
-    22.怎样动态加载路由？
-        使用Router的实例方法addRoutes来实现动态加载路由，一般用来实现菜单权限。
-        使用时要注意，静态路由文件中不能有404路由，而要通过addRoutes一起动态添加进去。
-    23.怎么实现路由懒加载呢？
-        function load(component) {
-            //return resolve => require([`views/${component}`], resolve);
-            return () => import(`views/${component}`);
-        }
-
-        const routes = [
-            {
-                path: '/home',
-                name: 'home',
-                component: load('home'),
-                meta: {
-                    title: '首页'
-                },
-            },
-        ]
-    24.路由之间是怎么跳转的？有哪些方式？
-        1.声明式  通过使用内置组件<router-link :to="/home">来跳转
-        2.编程式  通过调用router实例的push方法router.push({ path: '/home' })或replace方法router.replace({ path: '/home' })
-    25.如果vue-router使用history模式，部署时要注意什么？
-        要注意404的问题，因为在history模式下，只是动态的通过js操作window.history来改变浏览器地址栏里的路径，并没有发起http请求，当直接在浏览器里输入这个地址的时候，就一定要对服务器发起http请求，但是这个目标在服务器上又不存在，所以会返回404。
-        所以要在Ngnix中将所有请求都转发到index.html上就可以了。
-    26.Vue路由怎么跳转打开新窗口？
-        const obj = {
-            path: xxx,//路由地址
-            query: {
-            mid: data.id//可以带参数
-            }
-        };
-        const {href} = this.$router.resolve(obj);
-        window.open(href, '_blank');
 53.Vue和React和jQuery区别
     Vue和React：
         1.数据流
