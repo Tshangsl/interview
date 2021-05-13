@@ -64,6 +64,7 @@ mini-css-extract-plugin)
         静态的JavaScript、CSS、图片等文件开启CDN和缓存，并且文件名带上HASH值
         为了并行加载不阻塞，把不同的静态资源分配到不同的CDN服务器上
 3.webpack执行过程
+(初始化Compiler-开始编译(调用compiler的run方法)-确定入口-编译模板-完成编译模板-输出资源-输出完成)
     1.初始化compiler:new Compiler(config) config就是webpack.config.js文件
     2.开始编译 调用compiler的run方法开始编译
     3.确定入口 根据config的entry找到所有入口文件
@@ -71,6 +72,24 @@ mini-css-extract-plugin)
     5.完成模块编译：在经过第4步使用Loader编译完所有模块后，得到每个模块编译的内容和它们的依赖关系
     6.输出资源：根据入口和模块之间的依赖关系，组装成一个个包含多个模块的Chunk，再把每个chunk转换成单独的文件加入到输出列表。（这步是可以修改输出内容的最后机会）。
     7.输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统。
+4.webpack打包优化
+(优化图片/分离第三方包/分离CSS文件压缩CSS文件/压缩JS文件/压缩HTML)
+    1.优化图片 使用url-loader优化 将小图片转化为base64压缩 防止小图片太多请求次数太多
+    2.分离第三方包
+        打包后的bundle.js文件夹较大 所以每次加载时 请求比较慢 所以有必要 将第三方包分离出来
+        使用CommonsChunkPlugin插件进行配置
+    3.分离CSS文件并压缩CSS文件(extract-text-webpack-plugin)
+        使用extract-text-webpack-pulgin插件将CSS文件分离出来
+        为了使项目加载时尽早优先加载CSS样式 也为了解决JS文件体积过大问题
+    4.压缩JS文件(uglifyjs-webpack-plugin)
+        使用uglifyjs-webpack-plugin将JS压缩 减少打包后的vendor.js bundle.js等JS文件大小
+    5.压缩HTML(html-webpack-plugin)
+        为减少打包后的文件体积 使性能更好 效率更高 提高加载速度 打包时有必要进行压缩
+        使用html-webpack-plugin进行压缩
+5.webpack分包策略
+webpack ensure 有人称它为异步加载，也有人称为代码切割，
+他其实就是将 js 模块给独立导出一个.js 文件，然后使用这个模块的时候，再创建一个 script 对象，
+加入到 document.head 对象中，浏览器会自动帮我们发起请求，去请求这个 js 文件，然后写个回调函数，让请求到的 js 文件做一些业务操作。
 0.webpack.config.js
     模式 mode
         development production(上线 压缩) 默认production

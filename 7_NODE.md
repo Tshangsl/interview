@@ -77,6 +77,43 @@
         浏览器和Node环境下 microtask任务队列的执行时机不同
         1.Node端 microtask在事件循环的各个阶段之间执行
         2.浏览器端 microtask在事件循环的macrotask执行完之后执行
+2.Node.js多线程支持
+    nodejs在v10.5.0新增了多线程的支持 并且在v11中不需要再加实验特性后缀即可直接使用
+    核心API
+        isMainTread:true,
+        MessageProt:[Function:MessageProt],
+        MessageChannel:[Function:MessageChannel],
+        threadId:0,
+        Worker:[Function:Worker],
+        parentPort:null
+    使用流程
+    (isMainTread判断是否主线程/提供的Worker构造函数启动 WorkerData传递数据/线程通信 worker_threads包括MessageChannel和MessagePort类)
+        1.类似cluster多进程模式需要判断当前是否主进程 这边也提供了类似的API 通过isMainThread即可
+        2.启动多线程 需要提供的Worker构造函数去启动 且主线程也可以通过WorkerData去传递数据给工作线程
+        Worker构造函数第一个参数默认是执行的js文件路径，或者当第二个可选参数eval为true时，可以行内执行。
+        3.线程通信 和进程通信类似
+            worker_threads模块还有MessageChannel和MessagePort类(继承于EventEmitter)
+            MessageChannel类(创建自定义通信频道)
+                包含两个已经互相能够跨线程通信的Message类型对象 可用于创建自定义的通信频道 实例化后包含两个属性port1和port2 MessagePort类型对象 可将其一个发到工作线程后通过该对象实现自定义跨线程通信
+            MessagePort(跨线程通信的句柄)
+                用于跨线程通信的句柄 继承了EventEmitter 包括close message事件用于接受对象关闭和发送的消息 以及close postMessage等操作
+3.Node egg
+    阿里开源的企业级Node.js框架egg
+4.Node Koa 洋葱模型
+    Koa被认为是第二代Node Web framework
+    它最大的特点是独特的中间件流程控制 是一个典型的洋葱模型
+    Koa和Koa2中间件的思路是一样的 但是实现方式有所区别
+    Koa2在Node7.6之后 可以使用async/await代替generator使用中间件 
+    Koa实现有几个最重要的点
+        1.context的保存和传递
+        2.中间件的管理和next的实现
+5.如何保证Node高可用性
+    把数据放到redis/数据库中
+    再加一个可以优雅重启应用服务的HTTP前端
+6.Node如何发布
+    1.注册自己的npm账户
+    2.添加用户名到npm环境中
+    3.发布node项目
 1. 什么是nodejs？我们在哪里使用它？
     Nodejs是服务器端的一门技术，而非语言，它是基于Google V8 JavaScrit引擎而开发的，用来开发可扩展的服务器端程序
     Google V8 JavaScrit引擎:

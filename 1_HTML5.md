@@ -230,9 +230,32 @@ HTML5
             直到将该资源加载 编译 执行完毕 图片和框架等也如此
             类似于将所指向资源应用到当前内容
             这也是为什么建立把js脚本放在底部而不是头部的原因
+15.viewpoint/H5移动端meta标签中viewpoint简洁
+    width:
+        控制viewport的大小 pixel_value标识可以指定一个值或特殊的值 device-width为设备的宽度(单位为缩放为100%时的CSS像素)
+    height:
+        和width相对应 指定高度
+    target-densitydpi
+        一个屏幕像素密度由屏幕分辨率决定 通常定义为每英寸点的数量 
+        Android支持三种屏幕像素密度
+            1.低像素密度
+            2.中像素密度
+            3.高像素密度
+    value  
+        指定一个具体的API值为target dpi 这个值范围在70-400之间
+    initial-scale
+        初始缩放 页面初始缩放程度 是一个浮点数 页面大小的一个乘数
+        如设置缩放为1.0 web页面显示时 会以target density分辨率1:1展示
+        设置缩放为2.0 这个也买你会放大为2倍
+    user-scalable
+        用户调整缩放 即用户是否能改变也买你缩放程度 yes允许 no不允许 默认值yes 将其设置为no minimum-scale和maximum-scale根本不可能缩放
+    (设置屏幕宽度为设备宽度，禁止用户手动调整缩放)
 
+     <meta name="viewport" content="width=device-width,user-scalable=no" />
 
+    (设置屏幕密度为高频，中频，低频自动缩放，禁止用户手动调整缩放)
 
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
 
 
