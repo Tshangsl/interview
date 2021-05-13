@@ -1,4 +1,15 @@
 1.Vue事件驱动
+    Observer 观察者
+        Vue通过Observer构造函数 为响应式变量添加访问和赋值的get set回调
+        批量为obj上的key添加get和set回调
+        数据获取和修改会触发这里的get和set
+    Watcher 订阅者
+        Vue中的组件在挂载前
+        都会基于组件的render函数
+        生成一个Watcher实例
+        并执行render函数进行渲染
+    Dep 订阅收集者和发布者
+        框架需要处理变量和更新DOM的Watcher的依赖关系
     (依赖收集 核心思想 事件发布订阅模式)
     (目的是将观察者Watcher对象存放到当前闭包的订阅者Dep的subs中)
     (形成这样一个关系 Object->Dep->Watcher1/Watcher2-->视图1/2)
@@ -263,7 +274,7 @@
         在访问或修改对象的某个属性时 通过一段代码拦截这个行为 进行额外的操作或修改返回结果 
         数据劫持最典型的应用 双向的数据绑定 
     3.比较
-        Proxy优点:
+        Proxy优点:(可以直接监听对象而非属性/可以直接监听数组的变化/Proxy有多达13种拦截方法/存在兼容性问题 所以在Vue3.x中才重写)
             1.Proxy 可以直接监听对象而非属性；
             2.Proxy 可以直接监听数组的变化；
             3.Proxy 有多达 13 种拦截方法,不限于 apply、ownKeys、deleteProperty、has 等等是 Object.defineProperty 不具备的；
@@ -919,6 +930,7 @@ location.href
     将不同路由对应的组件分割成不同的代码块
     当路由被访问时 才加载对应组件
     1.Vue异步组件
+        Vue允许以一个工厂函数的方式定义组件 这个工厂函数会解析组件定义 Vue只在这个组件需要被渲染时才会触发该工厂函数
         Vue允许以一个工厂函数的方式定义你的组件
         这个工厂函数会异步解析你的组件定义
         Vue只在这个组件需要被渲染时才会触发该工厂函数
@@ -1232,6 +1244,10 @@ SPA(hash模式/history模式)
     9.为啥不能用a标签
         用Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，这里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。    
 14.Vue-Router导航守卫
+    1.全局的(beforeEach路由跳转前触发/beforeResolve路由跳转前触发/afterEach路由跳转完成后触发)
+    2.单个路由独享的(beforeEnter 紧随beforeEach后)
+    3.组件内(beforeRouteEnter渲染该组件对应路由被确认前/beforeRouteUpdate组件被复用/beforeRouteLeave导航离开该组件)
+
         路由跳转过程中的一些钩子函数
         路由跳转是一个大过程 
         这个大过程分跳转前中后等细小过程
@@ -1362,7 +1378,7 @@ SPA(hash模式/history模式)
                 //通过vm访问组件实例
             })
         }
-15.Router-link和Router-view
+15.Router-link(设置路由跳转)和Router-view(根据路由显示组件)
     router-link和router-view在同一个Vue文件中
     router-link
         设置路由跳转
@@ -1436,8 +1452,8 @@ SPA(hash模式/history模式)
             6.初次加载耗时多 页面复杂度提高很多
                 为实现单页 Web 应用功能及显示效果，需要在加载页面的时候将 JavaScript、CSS 统一加载，部分页面按需加载；
         优化：(减少app.bundle大小
-                (将公用的JS库通过script标签引入/
-                配置路由时页面和组件使用懒加载方式引入)
+            (将公用的JS库通过script标签引入/
+            配置路由时页面和组件使用懒加载方式引入)
               /加一个首屏loading图提升用户体验)
             1.将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
             2.在配置路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
@@ -2805,9 +2821,9 @@ vm.$mount([elementOrSelector]) 返回vm实例本身 可链式调用其他实例�
 42.shim()
     shim是一个小型库，可透明地截取API，更改传递的参数，处理操作本身，或将操作重定向到别处。
     垫片通常在API的行为发生变化时出现，从而导致仍依赖旧功能的旧应用程序出现兼容性问题。在这些情况下，较新的代码之上的较薄的兼容层仍然可以支持较旧的API。垫片也可以用于在不同的软件平台上运行程序，而不是开发它们。
-
-
-
+43.如何看待前端框架选型
+    1.技术选型的策略
+    。。。。
 
 
 
