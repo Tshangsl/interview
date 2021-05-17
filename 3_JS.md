@@ -1629,7 +1629,8 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
         脚本执行
         DOMContentLoaded
             当初始的HTML文档被完全加载和解析完成后 DOMContentLoaded事件被触发 而无需等待样式表 图像 和子框架的完全加载
-
+65.实现页面加载进度条
+    1.CSS实现
 
 
 

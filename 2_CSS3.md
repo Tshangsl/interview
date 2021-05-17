@@ -883,8 +883,36 @@ CSS提供方式/CSS等页面下载完加载 同步/CSS2.1提出IE5以上识别/�
         PS：若使用垂直方向上的padding撑开父元素
             则不需要触发BFC
     如果需求是制作相对视口高度自适应的正方形 使用vh单位
-
-
+37.移动端1像素边框问题
+    问题产生
+    。。。。。
+    如何解决
+    1.媒体查询利用设备像素比缩放 设置小数像素
+        缺点:对设备有要求 小数像素目前兼容性较差
+    2.viewport+rem方案
+        对上述方案的优化 利用viewport+rem+js动态修改页面的缩放比例 实现小于1像素的显示
+        缺点:缩放涉及全局的rem单位 比较适合新项目 对于老项目可能要涉及到比较多的改动
+    3.设置border-image方案
+        缺点:需要制作图片 圆角可能出现模糊
+    4.background-image渐变实现
+        缺点:因为每个边框都是线性渐变颜色实现 因此无法实现圆角
+    5.box-shadow方案
+        阴影实现
+        优点:没有圆角问题
+        缺点:颜色不好控制
+    6.transform:scale(0.5)方案 推荐:很灵活
+    7.媒体查询+transform对方案1优化
+38.栅格布局
+    CSS栅格布局最重要的两个元素是wrapper(parent)和items(children)
+    wrapper栅格
+    items栅格里面的元素
+        1.让一个div标签成为栅格 只需将他display属性设置为grid
+        2.需要为这个容器定义行和列 将这个容器分为两行三列
+            需用到grid-template-row和grid-template-column属性
+        3.items 栅格系统中元素如何放置
+            重新定位并调整这些元素的大小 
+            要对该元素使用grid-column和grid-row属性
+            
 
 
 

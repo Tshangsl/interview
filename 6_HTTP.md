@@ -2522,27 +2522,78 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
         4.该DNS客户机最终会收到一份回答报文，其中包含有该主机名对应的IP地址
         5.一旦该浏览器收到来自DNS的IP地址，就可以向该IP地址定位的HTTP服务器发起TCP连接
 28.HTTP报文头部字段
-    通用头部字段
-    Cache-Control
-        缓存
-    Connection:close/keep-alive
-    Transfer-Encoding 报文传输过程中采用的编码格式
-    Via 追踪请求和响应报文测传输路径
-    请求头部字段
-    Accept 通知服务器用户代理能处理的媒体类型及该媒体类型对应的优先级
-    Accept-Encoding 告知服务器，客户端这边可支持的内容编码以及相应内容编码的优先级, 下方就是Accept-Encoding的用法
-    Accept-Language 告知服务器，客户端可处理的自然语言集，以及对应语言集的优先级。
-    User-Agent:Wget/1.12(linux-gnu)
-        表示客户端使用的程序是Wget
-    Authorization
-        告知服务器用户端的认证信息，下方就是连接公司内部SVN系统时需要认证时的请求头部信息。
-    If-Match 与If-None-Match
-If-Modified-Since与If-Unmodified-Since
-    User-Agent
+    HTTP协议的请求和响应报文中必定包含HTTP首部
+    首部内容为客户端和服务器分别处理请求和响应提供所需的信息
+    请求和响应中都会存在首部字段 它们为浏览器和服务器 
+    传递额外重要信息 通常HTTP首部字段由首部字段名和字段值 
+    中间以:分割
+    如 Request Method:GET
+    字段值对应单个HTTP首部字段可以有多个值
+     cache-control:public,max-age=0
+    首部字段类型
+    (据实际用途分为四种类型)
+    通用首部字段:
+    请求报文和响应报文两方都会使用到的首部
+    Cache-Control 控制缓存行为
+    Connection  逐跳首部 连接的管理
+    Date    创建报文的日期时间
+    Pragma  报文指令
+    Transfer-Encoding   指定报文传输主体的编码方式
+    Upgrade 升级为其他协议
+    Via     代理服务器的相关信息
+    Warning   错误通知   
 
-    Host:www.baidu.com
-        表示目标主机 HTTP请求中必须包含的头部字段
-    
+    请求首部字段:
+    客户端向服务端发送请求时使用
+    补充请求附加内容 客户端信息 响应内容等优先级信息
+    Accept  用户代理可以处理的媒体类型
+    Accept-Charset  优先的字符集
+    Accept-Encoding 优先的内容编码
+    Authorization   Web认证信息
+    Except  期待服务器的特定行为
+    Host    请求资源所在服务器
+    if-Match    比较实体标记 ETag
+    if-Modified-Since 比较资源的更新时间
+    Range 实体的字节范围请求
+    Refer 实体的字节范围请求
+    TE  传输编码的优先级
+    User-Agent HTTP客户端程序的信息
+
+    响应首部字段:
+    服务端向客户端返回响应报文使用
+    补充响应时的附加内容 也会要求客户端附加额外的内容信息
+    Accept-Ranges 是否接受字节范围请求
+    Age 推算资源创建经过的时间
+    ETag 资源的匹配信息
+    Location    令客户端重定向至指定UPI
+    Proxy-Authenticate 代理服务器对客户端的认证信息
+    WWW-Authenticate 服务器对客户端的认证信息
+    Server HTTP服务器的安装信息
+    Vary    代理服务器的管理信息
+
+    实体首部字段:
+    针对请求报文和响应报文的实体部分使用到了的
+        通用头部字段
+        Cache-Control
+            缓存
+        Connection:close/keep-alive
+        Transfer-Encoding 报文传输过程中采用的编码格式
+        Via 追踪请求和响应报文测传输路径
+        请求头部字段
+        Accept 通知服务器用户代理能处理的媒体类型及该媒体类型对应的优先级
+        Accept-Encoding 告知服务器，客户端这边可支持的内容编码以及相应内容编码的优先级, 下方就是Accept-Encoding的用法
+        Accept-Language 告知服务器，客户端可处理的自然语言集，以及对应语言集的优先级。
+        User-Agent:Wget/1.12(linux-gnu)
+            表示客户端使用的程序是Wget
+        Authorization
+            告知服务器用户端的认证信息，下方就是连接公司内部SVN系统时需要认证时的请求头部信息。
+        If-Match 与If-None-Match
+    If-Modified-Since与If-Unmodified-Since
+        User-Agent
+
+        Host:www.baidu.com
+            表示目标主机 HTTP请求中必须包含的头部字段
+        
 
 
 

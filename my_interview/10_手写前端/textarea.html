@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #textarea{
+            width: 300px;
+            min-height: 150px;
+            max-height: 300px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            overflow: auto;
+            outline:none;
+        }
+    </style>
+</head>
+<body>
+    <!-- contenteditable 内容可编辑 -->
+    <!-- 设置min-height max-height对高度进行设定
+    通过设置padding outline font-size overflow美化细节 -->
+    <div id="textarea" contenteditable="true"></div>
+</body>
+</html>

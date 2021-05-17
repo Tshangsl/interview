@@ -256,11 +256,46 @@ HTML5
     (设置屏幕密度为高频，中频，低频自动缩放，禁止用户手动调整缩放)
 
     <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+16.input和textarea区别
+    <input type="text">标签
+        单行文本框 不会换行
+        size属性指定显示字符的长度
+        PS:当使用CSS限定宽高 则size属性不再起作用
+        value属性 指定初始值 
+        Maxlength属性 指定文本框可以输入的最长长度
+        可以通过width和height设置宽高
+        但是也不会增加行数
+    <textarea>标签
+        多行文本输入框 文本区中可容纳无限数量的文本
+        文本的默认字体是等宽字体
+        cols和rows属性规定textarea的尺寸
+        最好使用css的width和height属性
+17.移动设备忽略将页面中的数字识别为电话号码的方法
+    H5 IOS中
+    1.标准的电话号码格式 <a href="tel:1-408-555-5555">1-408-555-5555</a>
+    点击后会自动打开电话功能
+    2.有时不是电话号码的数字也会被浏览器自动解析为电话号码
+    并把数字的颜色和样式都进行改变
+    3.忽略 页面中数字识别为电话号码 把这个默认行为关闭
+        <meta name="format-detection" content="telephone=no">
+    4.这个关闭不影响真正电话号码的识别
 
-
-
-
-
+    format-dectection
+        格式检测 用来检测HTML中的一些格式 关于meta的format-dection属性主要有以下几个设置
+        <meta name="format-detection" content="telephone=no">
+        <meta name="format-detection" content="email=no">
+        <meta name="format-detection" content="address=no">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+    telephone
+        telephone=no 禁止把数字转化为拨号链接
+        telephone=yes 开启把数字转化为拨号链接 默认开启
+    email
+        告诉设备不识别邮箱 点击之后不主动发送
+        email=no 禁止作为邮箱地址
+        email=yes 开启把文字默认为邮箱地址 默认开启
+    address
+        adress=no 禁止跳转到地图
+        adress=yes 开启点击地址直接跳转至地图的功能 默认开启
 
 
 
