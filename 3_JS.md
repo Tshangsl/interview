@@ -1579,7 +1579,7 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
     2.<script async src="example.js"></script>
         有了async属性 
         表示后续文档的加载和渲染与JS脚本的加载和执行是并行进行的 即异步执行
-        async
+        async 百度统计
             1.设置
                 会使script脚本异步的加载并在允许的情况下执行
             2.执行
@@ -1590,7 +1590,7 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
         PS：async执行是加载完成后就会去执行
             不像defer要等待所有脚本加载完后 按顺序执行
     3.<script async src="example.js"></script>
-        有了defer属性
+        有了defer属性 评论框/代码语法高亮
         加载后续文档的过程和JS脚本的加载(此时仅加载不执行)是并行进行的(异步)
         JS脚本的执行需要等到文档所有元素解析完成之后
         DOMContentLoaded事件触发执行之前
