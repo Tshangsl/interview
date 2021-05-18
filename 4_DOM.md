@@ -305,5 +305,108 @@ e.screenX e.screenY
             DOM加载和保存模块（DOM Load and Save）：引入了以统一方式加载和保存文档的方法
             DOM验证模块（DOM Validation）：定义了验证文档的方法
             DOM核心的扩展（DOM Style）：支持XML 1.0规范，涉及XML Infoset、XPath和XML Base
+20.事件与事件流 事件模型 事件对象
+    观察者模式/发布订阅者模式(Publish/Subscribe)
+        可以让多个观察者对象同时监听某一个主题对象
+        这个主题对象的状态变化时会通知所有的订阅者
+        使得他们能做出反应
+        JS的事件模型就是一种观察者模式的体现
+        当对应事件被触发时 监听该事件的所有监听函数都会被调用
+    事件与事件流
+        事件:
+            与浏览器或文档交互的瞬间 如点击按钮 填写表格等 它是JS与HTML之间交互的桥梁
+        事件流:(描述页面中接受事件的顺序)
+            描述页面中接受事件的顺序
+            DOM是树形结构 如果同时给父子节点都绑定事件时
+            当触发子节点时 这两个事件的发生顺序如何决定
+        事件流分两种
+            事件冒泡
+            事件捕获
+    事件模型
+        (JS事件模型就是一种观察者模式的体现)
+        DOM0级模型
+            又称原始事件模型 在该模型中 事件不会传播
+            即没有事件流的概念
+            事件绑定监听函数比较简单 
+            有两种方式
+            HTML代码中直接绑定
+                <input type="button" onclick="fun()">
+            通过JS代码指定属性值
+                var btn = document.getElementById('.btn');
+                btn.onclick = fun;
+            移除监听函数
+                btn.onclick = null;
+        IE事件模型
+            有两个过程
+            1.事件处理阶段(target phase)
+                事件到达目标元素 触发目标元素的监听函数
+            2.事件冒泡阶段(bubbling phase)
+                事件从目标元素冒泡到document
+                依次检查经过的节点是否绑定了事件监听函数
+                如果有则执行
+            事件绑定监听函数的方式如下:
+                attachEvent(eventType, handler)
+            事件移除监听函数的方式如下:
+                detachEvent(eventType, handler)
+            参数说明
+                eventType指定事件类型(注意加on)
+                handler是事件处理函数
+        DOM2级模型
+            属于W3C标准模型 现代浏览器(除IE6-8之外的浏览器)都支持该模型 在该事件模型中 一次事件共有三个过程
+            1.事件捕获阶段(capturing phase)
+                事件从document一直向下传播到目标元素 依次检查经过的节点是否绑定了事件监听函数 如果有则执行
+            2.事件处理函数(target phase)
+                事件到达目标元素 触发目标元素的监听函数
+            3.事件冒泡阶段(bubbling phase)
+                事件从目标元素冒泡到document 依次检查经过的节点是否绑定了事件监听函数 如果有则执行
+            事件绑定监听函数的方式如下:
+                addEventListener(eventType, handler, useCapture)
+            事件移除监听函数的方式如下:
+                removeEventListener(eventType, handler, useCapture)
+            参数说明
+                eventType指定事件类型(不要加on)
+                handler是事件处理函数
+                useCapture是一个boolean用于指定是否在捕获阶段进行处理，一般设置为false与IE浏览器保持一致。
+    事件对象
+        当一个事件被触发时 会创建一个事件对象(Event Object) 
+        这个对象里面包含了与该事件相关的属性或方法 
+        该对象会作为第一个参数传递给监听函数
+        DOM事件模型中事件对象常用属性
+            type    用于获取事件类型
+            target  获取事件目标
+            stopPropagation 阻止事件冒泡
+            preventDefault 阻止事件默认行为
+        IE事件模型中事件对象续航用属性:
+            type    用于获取事件类型
+            srcElement  获取事件目标
+            cancelBubble  阻止事件冒泡
+            returnValue  阻止事件默认行为
+    Event Wrapper
+        由于事件模型的差异以及Event对象的不同
+        为了达到兼容各个浏览器的目的
+        我们可以增加一个Event Wrapper
+        它对各个浏览器应当提供一致的事件操作接口
+    自定义事件
+        JS中已经内置了很多事件，如click, mouseover等等
+        但是内置事件毕竟有限，有时候我们想自己定义一些事件
+        例如三连击，threeclick 实现
+        1.创建一个事件 可以使用以下方式
+            var event = new Event('threeclick', {"bubbles":true, "cancelable":false});
+        2.为事件注册监听函数
+            target.addEventListener('threeclick', hello, false);
+        3.最后我们要在合适的时机触发该事件
+        可以使用dispatchEvent函数
+        该方法在当前节点触发指定事件 从而触发监听函数执行
+        该方法返回一个布尔值 只要有一个监听函数调用了Event.preventDefault(), 则返回false, 否则返回true。
+            target.dispatchEvent(event);
+
+
+
+
+
+
+
+
+
 
 
