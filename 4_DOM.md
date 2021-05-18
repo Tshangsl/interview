@@ -273,11 +273,37 @@ e.offsetX e.offsetY
     只有IE事件有这两个属性 标准事件没有对应的属性
 e.screenX e.screenY
     鼠标相对于用户显示器屏幕左上角的X,Y坐标。标准事件和IE事件都定义了这2个属性
-
-
-
-
-
-
+19.DOM0 DOM1 DOM2 DOM3
+    DOM0
+        JS在早期版本中提供了查询和操作Web文档的内容API(如 图像和表单) 在JS中定义了images forms 因此可以
+        document.images[0]
+        document.forms['user']
+        这实际上是未形成标准的试验性质的初级阶段的DOM 现在习惯上被称为DOM0 即第0代DOM 由于DOM0在W3C进行标准备化之前出现，还处于未形成标准的初期阶段 这时Netscape和Microsoft各自推出自己的第四代浏览器，自此DOM开始出各种问题。
+    DOM0和DHTML
+        Netscape Navigator 4和IE4分别发布于1997年的6月和10月，这两种浏览器都大幅扩展了DOM，使JavaScript的功能大大增加，而此时也开始出现一个新名词：DHTML。
+        DHTML是Dynamic HTML（动态HTML）的简称。DHTML并不是一项新技术，而是将HTML、CSS、JavaScript技术组合的一种描述即：
+            利用HTML把网页标记为各种元素
+            利用CSS设置元素样式及其显示位置
+            利用JavaScript操控页面元素和样式
+        利用DHTML，看起来可以很容易的控制页面元素，并实现一此原本很复杂的效果（如：通过改变元素位置实现动画）。
+        但事实并非如此，因为没有规范和标准，两种浏览器对相同功能的实现确完全不一样。
+        为了保持程序的兼容性，程序员必须写一些探查代码以检测JavaScript是运行于哪种浏览器之下，并提供与之对应的脚本。
+        JavaScript陷入了前所未有的混乱，DHTML也因此在人们心中留下了很差的印象。
+    DOM1的出现
+        在浏览器厂商进行浏览器大站的同时，W3C结合大家的优点推出了一个标准化的DOM，并于1998年10月完成了第一级 DOM，即：DOM1。W3C将DOM定义为一个与平台和编程语言无关的接口，通过这个接口程序和脚本可以动态的访问和修改文档的内容、结构和样式。
+        DOM1级主要定义了HTML和XML文档的底层结构。
+        在DOM1中，DOM由两个模块组成：DOM Core（DOM核心）和DOM HTML。
+        其中，DOM Core规定了基于XML的文档结构标准，通过这个标准简化了对文档中任意部分的访问和操作。
+        DOM HTML则在DOM核心的基础上加以扩展，添加了针对HTML的对象和方法，如：JavaScript中的Document对象
+    DOM2与DOM3
+        在DOM1的基础上DOM2和DOM3引入了更多的交互能力，也支持了更高级的XML特性。DOM2和DOM3将DOM分为更多具有联系的模块。DOM2级在原来DOM的基础上又扩充了鼠标、用户界面事件、范围、遍历等细分模块，而且通过对象接口增加了对CSS的支持。DOM1级中的DOM核心模块也经过扩展开始支持XML命名空间。在DOM2中引入了下列模块，在模块包含了众多新类型和新接口：
+            DOM视图（DOM Views）：定义了跟踪不同文档视图的接口
+            DOM事件（DOM Events）：定义了事件和事件处理的接口
+            DOM样式（DOM Style）：定义了基于CSS为元素应用样式的接口
+            DOM遍历和范围（DOM Traversal and Range）：定义了遍历和操作文档树的接口
+        DOM3进一步扩展了DOM，在DOM3中引入了以下模块：
+            DOM加载和保存模块（DOM Load and Save）：引入了以统一方式加载和保存文档的方法
+            DOM验证模块（DOM Validation）：定义了验证文档的方法
+            DOM核心的扩展（DOM Style）：支持XML 1.0规范，涉及XML Infoset、XPath和XML Base
 
 

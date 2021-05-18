@@ -337,6 +337,7 @@ Function.prototype.bind = function (context) {
     }
 }
 // 函数柯里化 currying 减少代码冗余 增加代码可读性
+// JS中bind函数和数组的reduce方法用到了函数柯里化
 /* 将使用多个参数的函数转换成一系列使用一个参数的函数
  使函数从一次调用传入多个参数编程多次调用每次传一个参数
  只传递给函数一部分参数来调用它 让它返回一个函数去处理剩下的参数
@@ -641,6 +642,8 @@ Array.prototype.filter = function (arr, callback) {
 // some
 
 // reduce
+// reduce方法接收一个函数作为累加器 数组中每个值(从左到右)开始缩减 最终计算为一个值
+
 //按顺序执行 最后结果汇总为一个值返回 需要判断有无初始值
 function reduce(arr, callback, initValue) {
     let flag = !Array.isArray(arr) || !arr.length || typeof callback !== 'function';
@@ -1069,6 +1072,108 @@ class _LazyMan {
 
 let lazyMan = name => new _LazyMan(name);
 lazyMan('Hank').sleep(10).eat('dinner');
+
+
+// parseInt 解析一个字符串 返回一个整数
+// string 必需 被解析字符串 
+// radix 可选 要解析的数字的基数 该值介于2-36之间
+//  如果省略该参数或其值为0 则数字将以10为基础来解析 
+// 如果它以0x/0X开头将以16作为基数
+// 如果该参数小于2或者大于36 则parseInt将返回NaN
+
+// 要求简单一些 把字符串型的数字转化为真正的数字即可 但不能使用JS原生的字符串转数字的API 如Number()
+function _parseInt(str, radix) {
+    let str_type = typeof str;
+    let res = 0;
+    if (str_type !== 'string' && str_type !== 'number') {
+        return NaN;
+    }
+    // 字符串处理
+    // trim 去除字符串的头尾空格
+    str = String(str).trim().split('.')[0];
+    let len = str.length;
+    if (!len) {
+        return NaN;
+    }
+    if (!radix) {
+        // 如果radix为0 null undefined
+        // 则转化为10
+        radix = 10;
+    }
+    if (typeof radix !== 'number' || radix < 2 || radix > 36) {
+        return NaN;
+    }
+    return res;
+}
+
+// 实现完整parseInt函数
+function l(obj){
+    return console.log(obj);
+}
+function parse_Int(str, radix) {
+    let res = 0;
+    if (typeof str != 'string' && typeof str != 'number') {
+        return NaN;
+    }
+    str = String(str).trim().split('.')[0];
+    if (!len) {
+        return NaN;
+    }
+    if (!radix) {
+        radix = 10;
+    }
+    if (typeof radix != 'number' || radix < 2 || radix > 36) {
+        return NaN;
+    }
+    for (let i = 0; i < len; i++) {
+        let arr = str.split('');
+        l(arr instanceof Array)
+        l(typeof arr)
+        // Math.floor 返回小于或等于一个给定数字的最大整数
+        // Math.pow(x,y) 返回x的y次幂的值
+        res+=Math.floor(arr[i])*Math.pow(radix,i);        
+    }
+    l(res);
+}
+
+// JS实现extend函数
+/*
+extend 为了简化类的声明 
+可以把派生子类的整个过程包装在一个extend函数 
+和其他语言的extend关键字类似
+基于一个给定的类结构创建一个新的类
+*/
+function extend(subClass,superClass){
+    var F = function(){};
+    F.prototype = superClass.prototype;
+    subClass.prototype = new F();
+    subClass.prototype.constructor = subClass;
+}
+/*
+extend实现 寄生继承的封装
+
+与原型链继承中直接使用subClass.prototype = new superClass()区别
+作为一项改进 它添加了一个空函数F 并将它创建的对象添加到原型链中 
+*/
+
+// extend函数使用场景
+function Person(name){
+    this.name = name;
+}
+Person.prototype.getName = function(){
+    return this.name;
+}
+function Author(name,books){
+    // 执行Person构造函数 获得Person对象中属性
+    Person.call(this,name);
+    this.books = books;
+}
+// 获取Person原型上的方法 实现原型继承
+extend(Author,Person);
+// 在Author原型上继续添加我们需要的方法
+Author.prototype.getBooks = function(){
+    return this.books;
+}
 
 
 

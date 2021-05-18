@@ -131,11 +131,41 @@
             1.左边浮动或者定位：右侧margin-left:宽度
             2.左右侧都浮动 左侧固定给宽度 右侧calc(100%-宽)
             3.flex布局 父级display:flex 左侧flex:0 0 200px 右侧flex：1
-
-            3.table布局
+            4.table布局
+                .wrap{
+                    display:table;
+                    width:100%;
+                }
+                .left{
+                    display:table-cell;
+                    width:200px;
+                    height:200px;
+                }
+                .right{
+                    display:table-cell;
+                    height:200px;
+                }
+            5.inline-block和calc函数
+                双float
+                .wrap{
+                    overflow:hidden;
+                    width:100%;
+                    font-size:0;
+                }
+                .left{
+                    display:inline-block;
+                    width:200px;
+                    height:200px;
+                    font-size:20px;
+                }
+                .right{
+                    display:inline-block;
+                    height:200px;
+                    width:calc(100%-200px);
+                    font-size:20px;
+                }
         第二类宽度未知：
             1.BFC方法 左侧浮动 右侧overflow:hidden
-
             3.grid布局
     三列布局(左右两侧宽度固定 中间自适应)
         1.浮动 左右浮动 中间100% 设置margin-left margin-right
@@ -384,6 +414,12 @@
         上下 左右
         上 左右 下
         上右下左
+    应用场景
+        1.给元素加上border/padding 使用border-sizing:border-box;
+        将其转为IE盒模型
+        2.表单使用方面
+        不同的表单元素在不同的浏览器都有不同的border padding
+        可以使用border-box统一样式 
 15.position属性都有哪些特点
     1.inhert：从父元素继承 position 属性的值。
     2.static：默认值 没有定位 元素出现在正常的流中
@@ -902,7 +938,98 @@ CSS提供方式/CSS等页面下载完加载 同步/CSS2.1提出IE5以上识别/�
         缺点:颜色不好控制
     6.transform:scale(0.5)方案 推荐:很灵活
     7.媒体查询+transform对方案1优化
-38.栅格布局
+38.栅格/grid/网格布局
+    1.容器与项目
+        采用网格布局的区域 成为容器 容器内部采用网格定位的子元素称为项目
+    2.行 列 单元格
+        行 容器里水平区域
+        列 容器里垂直区域
+        单元格 行列重叠出来
+    3.网格线
+        划分网格的线
+        分列的网格线 行的网格线
+    Grid和flex类似 
+    布局的属性都是分为两类
+    一类定义在容器上 称为容器属性
+    一类定义在项目上 称为项目属性
+    容器属性
+        display:grid;指定一个容器为网格布局
+        display:inline-grid;
+        grid-template-columns:用来指定列的宽度
+        grid-template-rows:用来指定行的宽度
+            可具体数值 可百分比表示
+        repeat函数 简化重复的值
+            grid-template-columns: repeat(2, 100px 20px 80px);
+            grid-template-rows: repeat(3, 100px);
+            接受两个参数 重复的次数 重复的值
+            repeat可重复某种模式
+        auto-fill
+        grid-template-columns: repeat(auto-fill, 100px)  
+            有时单元格大小固定 但是容器大小不确定 如果希望每一行或每一列都尽可能容纳更多单元格 就可以使用auto-fill自动填充
+        fr
+            为了方便表示比例关系 网格提供了fr关键字(fraction的缩写 意为片段)如果两类的宽度分别为1fr和2fr 表示后者是前者的2倍
+            grid-template-columns: 1fr 2fr 1fr;
+            fr可以和绝对长度相结合一起使用
+            grid-template-columns: 150px 1fr 2fr;
+        minmax
+            产生一个长度范围 表示长度就在这个范围之中 它接受两个参数 分别为最小值和最大值
+            grid-template-columns: 1fr 1fr minmax(100px,1fr);
+        auto
+            表示浏览器自动决定宽度
+            grid-template-columns: 100px auto 100px;
+        grid-row-gap
+            设置行与行之间的间隔
+            grid-row-gap: 10px;
+        grid-column-gap属性      
+            设置列与列之间的间隔          
+            grid-column-gap: 10px;
+        grid-gap
+            grid-gap: 10px 10px;
+            如果省略第二个值 默认第二个值等于第一个值
+        grid-auto-flow
+            划分网格 容器的子元素排列是按照先行后列 来排的
+            通过该属性 我们可以自定义排列的顺序
+            grid-auto-flow:colunm;  
+        justify-items
+            设置单元格内容的水平位置
+            justify-items: start | end | center | stretch;
+            start 对齐单元格的起始边缘
+            end    对其单元格的结束边缘
+            center  单位格内部居中
+            stretch 拉伸 占满单元格的整个宽度(默认值)
+        align-items
+            设置单元格内容的垂直位置
+            align-items: start | end | center | stretch;
+        place-items   
+            是两者的合并写法
+            place-items: <align-items> <justify-items>
+            例:place-items: start end;
+        justify-content
+            整个内容区域在容器里面的水平位置
+        align-content
+            整个内容区域在容器里的垂直位置
+        place-content
+    项目属性
+        项目的位置可以指定 具体方法就是指定项目的边框
+        分别定位在哪根网格线
+        grid-column-start属性
+            左边框所在的垂直网格线
+        grid-column-end属性
+            右边框所在的垂直网格线
+        grid-column
+            grid-column-start和grid-column-end的合并写法
+        grid-row-start属性
+            上边框所在的水平网格线
+        grid-row-end属性
+            下边框所在的水平网格线
+        grid-row
+            grid-row-start和grid-row-end的合并写法
+        .item-1 {
+            grid-column-start: 2;
+            grid-column-end: 4;
+        }
+        除了这四个属性的值 还可以使用span关键字 
+        表示占几个网格 类似table的colspan和rowspan
     CSS栅格布局最重要的两个元素是wrapper(parent)和items(children)
     wrapper栅格
     items栅格里面的元素
@@ -912,7 +1039,33 @@ CSS提供方式/CSS等页面下载完加载 同步/CSS2.1提出IE5以上识别/�
         3.items 栅格系统中元素如何放置
             重新定位并调整这些元素的大小 
             要对该元素使用grid-column和grid-row属性
-            
+39.table布局
+    父级容器 display:table
+    子级容器 display:table-cell
+        空间平均划分
+            子级容器默认是自动平分宽度沾满父级容器
+        设置其中一个table-cell为固定宽度
+            如果固定好其中一个子级容器 那么其余子级容器会自动平分宽度占满父级容器
+        设置每一个table-cell为固定宽度
+        把此元素放置在父元素的中部
+            即垂直居中 vertical-align:middle;
+        等高宽度
+            不对右侧的box设置display:table-cell
+            只对左侧设置 所以会出现左侧跟随右侧高度变化而变化
+            如果要实现不管两个box哪个高度产生变化
+            另一个跟随
+            需把右侧的box设置为display:table-cell
+    缺点:
+        1.table比其他HTML标签占更多字节 造成下载时间延迟 占用服务器更多流量资源(代码冗余) 
+        2.table会阻止浏览器渲染引擎的渲染顺序 会延迟页面的生成速度 用户等待时间长
+        3.灵活性差 一旦设计确定 后期很难通过CSS让它展现新的样貌
+        4.不利用搜索引擎抓取信息 直接影响到网站排名
+    优点
+        1.兼容性好
+        2.容易上手
+40.五种前端基本布局
+    table布局 float布局 absolute布局 flexbox布局 grid布局
+
 
 
 
