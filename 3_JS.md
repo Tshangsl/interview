@@ -26,11 +26,12 @@ JS
             返回给定的key找到的symbol 否则就是返回新创建的symbol
         Symbol(符号)这是一个标准函数而不是一个对象构造器
             标签并不能影响符号的值 只是便于调试
-        作用:(创建独一无二的值 做唯一key用于缓存等场景/
-            symbol属性不能被枚举 用于创建类的私有变量/
+        作用:(创建独一无二的值 做唯一key用于缓存等场景 做对象属性 阻止对象名冲突/
+            symbol属性不能被枚举 用于创建类对象的私有变量/
             实现Symbol.iterator迭代器 让普通对象变成可迭代对象)
             (Symbol.for('xx') 获取全局的Symbol值/
-            Symbol.toStringTag() 重置对象属性))
+            Symbol.toStringTag() 重置对象属性)/
+            Symbol诞生前 对象的键key只能是字符串)
             1.用于创建独一无二的值 可做唯一key用于缓存等场景
             2.用于创建类的私有变量 利用symbol属性不能被枚举的特性声明作为私有属性
                 符号不会被for in枚举/会被Object.keys/Object.getOwnPropertNames()/JSON.stringfy()忽略
@@ -38,8 +39,6 @@ JS
                 Symbol.iterator是一个有名的符号 被用来给对象添加一个特殊方法 使得对象可以被迭代
             4.使用Symbol.for('xxx')获取全局的symbol值
             5.用来重置对象的属性 比如Symbol.toStringTag
-        symbol被当作对象属性
-        symbol诞生之前 对象的键key只能是字符串
         定义：
             symbols 是一种无法被重建的基本类型。
             这时 symbols 有点类似与对象创建的实例互相不相等的情况，但同时 symbols 又是一种无法被改变的基本类型数据
@@ -92,7 +91,7 @@ JS
     判断引用数据类型是数组还是对象
         (B.constructor == A/A instanceof B/Object.prototype.toString.call)
         typeOf无法判断 返回都是Object
-        1.constructor
+        1.constructor(Array Object)
             constructor属性返回对创建此对象的数组函数的引用
             原本就是用来进行对象类型判断
             每一个对象实例都可以通过constructor对象访问它的构造函数
@@ -102,10 +101,10 @@ JS
             A原型链上有没有B原型
             obj instanceOf Object =>true
             obj instanceOf Array =>false
-        3.toString()
+        3.toString()([Object Array][Object Object])
             Object.prototype下的toString方法
             Object.prototype.toString.call([]) [Object Array]
-            Object.prototype.toString.call({}) [ObjectObject]
+            Object.prototype.toString.call({}) [Object Object]
     JS底层如何存储数据的类型信息/
         在变量的机器码的低位1-3存储其类型信息
             000 对象
@@ -230,7 +229,7 @@ JS
         自己的callee属性 返回正在被执行的Function对象
     修改    
         正常模式下 arguments对象允许在运行时修改的
-    应用(查看实参格式/匿名函数实现递归/遍历参数/模拟函数重载)
+    应用(查看实参个数/匿名函数实现递归/遍历参数/模拟函数重载)
         1、借用arguments.length查看实参和形参的个数是否一致
         2、借用arguments.callee来让匿名函数实现递归:
         3、遍历参数求和或者求最大值
@@ -713,8 +712,13 @@ JS
         return typeof result === 'obj'? result : obj;
     }
 17.JS如何判断一个对象是否为空
-(for-in+hasOwnProperty/Object.keys/JSON.stringfy()/
-getOwnPropertyNames/Reflet.ownKeys(object))
+不能遍历到enurable为false
+(for-in+hasOwnProperty/
+Object.keys/
+JSON.stringfy()/
+能遍历到enurable为false
+getOwnPropertyNames/
+Reflet.ownKeys(object))
     1.for-in遍历+hasOwnProperty方法确认是否存在
         某个key这种方法不能够被遍历到enurable为false属性
     2.keys方法
@@ -722,7 +726,7 @@ getOwnPropertyNames/Reflet.ownKeys(object))
       不可遍历到enurable为false的属性
     3.JSON方法
       使用JSON.stringfy()方法将对象转为字符串
-      与字符串'{}'对比 该方法同样无法获取不可遍历属性
+      与字符串'{}'对比 该方法同样无法获取不可枚举属性enurable为false属性
     4.getOwnPropertyNames方法
        使用Object的getOwnPropertyNames方法 获取所有属性名
        不可枚举属性仍然能够获取到
@@ -739,6 +743,7 @@ getOwnPropertyNames/Reflet.ownKeys(object))
     2.{}对象直接量
         new Object() 对象直接量 两种方式是创建对象的两种基本方式 他们的原型就是Object
     3.Object.create(proto, [propertiesObject])
+        (现有对象提供新建对象的proto)
         方法创建一个新对象，使用现有的对象来提供新创建的对象的proto。
         1.proto : 必须。表示新建对象的原型对象，即该参数会被赋值到目标对象(即新对象，或说是最后返回的对象)的原型上。该参数可以是null， 对象， 函数的prototype属性 （创建空的对象时需传null , 否则会抛出TypeError异常）。
         2.propertiesObject : 可选。 添加到新创建对象的可枚举属性（即其自身的属性，而不是原型链上的枚举属性）对象的属性描述符以及相应的属性名称。这些属性对应Object.defineProperties()的第二个参数。
@@ -765,7 +770,8 @@ getOwnPropertyNames/Reflet.ownKeys(object))
         PS:
             1.构造函数模式隐试的在最后返回return this 所以在缺少new的情况下，会将属性和方法添加给全局对象，浏览器端就会添加给window对象。
             2.也可以根据return this 的特性调用call或者apply指定this。这一点在后面的继承有很大帮助。
-    5.工厂模式(定义一个用于创建产品的接口，由子类决定生产什么产品。)
+    5.工厂模式(定义一个用于创建产品的接口，由子类决定生产什么产品)
+    (所有实例都指向一个原型 无法通过constructor识别对象 因为都是来自Object)
         function Person(name) {
             var o = new Object();
             o.name = name;
@@ -792,6 +798,7 @@ getOwnPropertyNames/Reflet.ownKeys(object))
         以构造函数创建的对象 在其原型上都会有一个constructor属性
         这个属性指向构造函数Person而这个属性最初是用来标识数据类型的
     6.原型模式(将一个对象作为原型，通过对其进行复制而克隆出多个和原型类似的新实例。)
+    (原型对象上的属性和方法属于公有属性和公有方法 其所有实例都可以访问到)
         function Person() {}
             Person.prototype.name = 'hanmeimei';
             Person.prototype.say = function() {
@@ -819,8 +826,7 @@ getOwnPropertyNames/Reflet.ownKeys(object))
         先创建子类的实例对象 
         再将父类的方法添加到this上)
     (ES6
-        先创建父类的实例对象this
-        (所以必须先调用父类的super方法)
+        先创建父类的实例对象this 所以必须先调用父类的super方法
         再用 子类的构造函数 修改this)
     1.ES5继承通过prototype或构造函数机制实现
         实质上是先创建子类的实例对象 
@@ -976,6 +982,10 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
             JSON.stringify()
                 将JavaScript值转换为JSON字符串
 21.JSON方法实现拷贝有什么问题 
+    (undefined/任意函数/symbol值 序列化过程中会被忽略)
+    (仅会序列化可枚举对象)
+    (NaN和Infinity格式数据及null都会被当作null)
+    (对包含循环引用的对象(对象相互引用 无限循环)抛出错误)
     json.parse(json.stringfy())
     json.stringfy()将javascript的值转换为json规则字符串
     json.parse()把json规则的字符串转换为jsonObject
@@ -1133,7 +1143,8 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
     按下onmousedown，拖拽onmousemove，弹起onmouseup
 38.js为什么需要放在body末尾(避免影响前面HTML解析 DOM渲染)
     浏览器的渲染引擎和js解析引擎的冲突
-    浏览器生成Dom树的时候是一行一行读HTML代码的，script标签放在最后面就不会影响前面的页面的渲染。
+    浏览器生成Dom树的时候是一行一行读HTML代码的
+    script标签放在最后面就不会影响前面的页面的渲染。
 39.可枚举属性 不可枚举属性
     可枚举属性
         1.是指那些内部 “可枚举” 标志设置为 true 的属性。
@@ -1554,7 +1565,7 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
     脚本加载&执行过程中
     会阻塞后续的DOM渲染
     
-    script标签提供两个属性async&await解决阻塞DOM渲染问题
+    script标签提供两个属性async&defer解决阻塞DOM渲染问题
 
     script标签存在两个属性 defer和async
     script标签的使用分为三种情况
@@ -1630,6 +1641,8 @@ Reflect.ownKeys(obj)         可枚举 Symbol 继承
         DOMContentLoaded
             当初始的HTML文档被完全加载和解析完成后 DOMContentLoaded事件被触发 而无需等待样式表 图像 和子框架的完全加载
 65.实现页面加载进度条
+    首先我们要知道的是，目前没有任何浏览器可以直接获取正在加载对象的大小。所以我们无法通过数据大小来实现0-100%的加载显示过程。
+    因此我们需要通过html代码逐行加载的特性，在整页代码的若干个跳跃行数中设置节点，进行大概的模糊进度反馈来实现进度加载的效果。大致意思是：页面每加载到指定区域，则返回(n)%的进度结果，通过设置多个节点，来达到一步一步显示加载进度的目的。
 66.普通函数和构造函数区别
     1.构造函数也是一个普通函数 创建方式和普通函数一样 但构造函数习惯上首字母大写
     2.构造函数和普通函数的区别在于

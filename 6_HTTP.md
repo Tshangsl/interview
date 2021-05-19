@@ -27,11 +27,11 @@
 HTTP常见请求方式区别用途
     GET：通用获取数据
     POST：提交数据
-    OPTIONS：列出可对资源实行的请求方法，常用于跨域    
-    HEAD：获取资源的元信息
-    PUT：修改数据
     DELETE：删除数据
     CONNECT：建立连接隧道，用于代理服务器
+    PUT：修改数据
+    HEAD：获取资源的元信息
+    OPTIONS：列出可对资源实行的请求方法，常用于跨域    
 2.get和post
         区别
         get
@@ -169,6 +169,7 @@ application/www-form-urlencoded区别
     
     所以说到POST提交数据方案 包含Content-Type和消息主题编码方式两部分
 
+    Enctype属性
     具体介绍
         1.application/x-www-form-urlencoded
             最常见的post提交数据方式
@@ -424,7 +425,7 @@ application/www-form-urlencoded区别
         如何伪装:
             源端口号+序列号
         TCP连接：
-            源IP+源端口+目的IP+目的端口号 唯一确定一个TCP连接
+            源IP+源端口+目的IP+目的端口号 一对Socket 唯一确定一个TCP连接
     TCP三次握手 
         (建立可靠通信信道 确认双方发送接收机能正常
         防止出现请求超时导致脏连接)
@@ -478,7 +479,7 @@ application/www-form-urlencoded区别
             导致正常的SYN请求因为队列满而被丢弃
             从而引起网络拥塞甚至系统瘫痪
         防范SYN攻击措施
-            降低主机的等待事件使主机尽快的释放半连接的引用
+            降低主机的等待时间使主机尽快的释放半连接的引用
             短时间受到某IP的重复SYN则丢弃后放弃后续请求
     第三次握手中，如果客户端的ACK未送达服务器，会怎样？
         Server端：
@@ -531,7 +532,7 @@ application/www-form-urlencoded区别
         TCP服务器最大并发连接数
             关于TCP服务器最大并发连接数有一种误解就是“因为端口号上限为65535
             所以TCP服务器理论上的可承载的最大并发连接数也是65535”
-            首先需要理解一条TCP连接的组成部分：客户端IP、客户端端口、服务端IP、服务端端口
+            首先需要理解一条TCP连接的组成部分：客户端IP 客户端端口 服务端IP 服务端端口
             所以对于TCP服务端进程来说，他可以同时连接的客户端数量并不受限于可用端口号，理论上一个服务器的一个端口能建立的连接数是全球的IP数*每台机器的端口数
             实际并发连接数受限于linux可打开文件数，这个数是可以配置的，可以非常大，所以实际上受限于系统性能
             通过#ulimit -n查看服务的最大文件句柄数，通过ulimit -n xxx 修改 xxx是你想要能打开的数量。也可以通过修改系统参数：
@@ -612,7 +613,7 @@ http2.0
         http1.0 中认为每台服务器都绑定一个唯一的 IP 地址，因此，请求消息中的 URL 并没有传递主机名（hostname）。
         随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机，并且它们共享一个IP地址。
         因此有了 host 字段，就可以将请求发往同一台服务器上的不同网站。
-    5.新增方法/错误管理状态码
+    5.新增方法/错误管理状态码 HTTP1.1新增方法 错误管理状态码
         PUT、HEAD、OPTIONS/
         在HTTP1.1中新增了24个错误状态响应码 
         如409(Conflict)表示请求的资源与资源的当前状态发生冲突
@@ -650,6 +651,7 @@ http2.0
         3.HTTP/2多个请求可同时在一个连接上并行执行
             某个请求任务耗时严重 不会影响到其他连接的正常执行
     HTTP2.0多路复用的好处
+        (让所有数据流共用同一个连接 可更有效地使用TCP连接 让高带宽能真正服务于HTTP性能提升)
         (HTTP性能优化不在于高带宽 在于低延迟)
         HTTP性能优化不在于高带宽 在于低延迟 
         TCP连接会随着时间进行自我调节 起初会限制连接的最大速度 如果数据成功传输 会随着时间的推移提高传输的速度
@@ -957,8 +959,8 @@ WebSocket(基于TCP协议 典型的应用层协议)
             但是建立后真正传输时不需要HTTP协议
     7.WebSocket和Socket关系
         (WebSocket(典型的应用层协议)
-        Socket(不是一个协议 是为方便使用TCP/UDP抽象出来位于应用层和传输控制层一组接口))
-        
+        Socket
+            (不是一个协议 是为方便使用TCP/UDP抽象出来位于应用层和传输控制层间的一组接口))
             其实不是一个协议 而是为了方便使用TCP/UDP而抽象出来的一层
             是位于应用层和传输控制层之间的一组接口
             Sockets是应用层和TCP/IP协议族通信的中间软件抽象层 它是一组接口 
@@ -1056,7 +1058,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
         2.HTTP请求体由：请求行 、请求头、请求数据组成的，
         3.注意：GIT请求是没有请求体的
     HTTP和HTTPS区别
-        1.https需要拿到ca证书，需要钱的
+        1.https需要拿到CA证书，需要钱
         2.端口不一样，http是80，https443
         3.http是超文本传输协议，信息是明文传输，https则是具有安全性的ssl加密传输协议。
         4.http和https使用的是完全不同的连接方式
@@ -1095,7 +1097,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
                 2.通过公式加密随机数 并把加密后的随机数传输到服务端
                 3.服务端通过私钥对随机数进行解密
                 4.服务端通过客户端传入的随机数构造对称加密算法 对返回结果内容进行加密后传输
-        为什么数据传输用对称加密
+        为什么数据传输用对称加密 
             1.非对称加密加解密效率非常低 HTTP应用场景中通常端与端之间存在大量交互 非对称加密的效率无法接收
             2.HTTPS场景中只有服务器端保存了私钥 一对公私钥只能实现单向加解密 所以HTTPS中内容传输加密采取对称加密而不是非对称加密
         为什么CA认证机构颁发证书
@@ -1745,7 +1747,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
             与服务器交互。
 7.前端鉴权方案
     常见的前端解决方案
-        1.HTTP Basic Authentication、
+        1.HTTP Basic Authentication
             概念：
                 HTTP Basic Authentication授权方式是浏览器遵守http协议实现的基本授权方式，HTTP协议进行通信的过程中，HTTP协议定义了允许HTTP服务器对客户端进行用户身份验证的方法。
             认证过程
@@ -1862,13 +1864,18 @@ WebSocket(基于TCP协议 典型的应用层协议)
         (主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)  
         (简单请求 同时满足以下两个条件
                 1.请求方法是 HEAD/GET/POST
-                2.HTTP头信息字段为 Accept/Accept-Language/Content-Language/Last-Event-ID/
-                                Content-Tyep 
-                                    application/x-www-form-urlencoded
-                                    multipart/form-data
-                                    text/plain)
+                2.HTTP头信息字段为 
+                    Accept/
+                    Accept-Language/
+                    Content-Language/
+                    Last-Event-ID/
+                    
+                    Content-Tyep 
+                        application/x-www-form-urlencoded
+                        multipart/form-data
+                        text/plain)
         (异步请求 前端分：简单请求/非简单请求(会先发送一次预检请求))
-        一个W3C标准 允许浏览器向跨院服务器 
+        一个W3C标准 允许浏览器向跨源服务器 
         发出XMLHttpRequest请求
         从而克服AJAX只能同源使用的限制
             1.浏览器会自动进行 CORS 通信，实现 CORS 通信的关键是后端。只要后端实现了 CORS，就实现了跨域。
@@ -1883,14 +1890,25 @@ WebSocket(基于TCP协议 典型的应用层协议)
                 1.1简单请求
                 只要同时满足以下两大条件 就属于简单请求
                     1.请求方法是以下三种方法之一
-                        HEAD
-                        GET
-                        POST
+                        GET 获取数据
+                        POST 提交数据
+                        HEAD 本质和GET一样 区别在于HEAD不含有呈现数据 仅仅是HTTP头部信息
                     2.HTTP头信息不超过以下几个字段
-                        Accept
+                        Accept 
+                        application/x-www-form-urlencoded
+                        multipart/form-data
+                        text/plain
+                        表示客户端支持的数据类型 或客户端希望接收到的内容类型
+                        
                         Accept-Language
+                        表示客户端支持的语言格式(不是编码格式)
+                        如中文/英文 通常浏览器直接发起请求时 浏览器会根据被设置的语言环境(默认语言) 来附加上该字段
+
                         Content-Language
+                        说明访问者希望采用的语言或语言组合 用户可根据自己偏好的语言来制定不同的内容
+
                         Last-Event-ID
+
                         Content-Type(只限于三个值)
                          application/x-www-form-urlencoded
                          multipart/form-data
@@ -1898,7 +1916,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
                 这是为了兼容表单(form)
                 因为历史上表单一直可以发出跨域请求
                 AJAX的跨域设计就是 
-                只要表单可以发 AJAX就可以直接法
+                只要表单可以发 AJAX就可以直接发
                 凡是不同时满足上面两个条件 属于非简单请求
                 浏览器对这两种请求的处理是不一样的
                 1.2简单请求基本流程
@@ -2065,7 +2083,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
     XML优点:
         1.格式统一 符合标准
         2.容易与其他系统进行远程交互 数据共享比较简单
-    XML缺点:
+    XML缺点:(庞大 解析费时 )
         1.XML文件庞大 文件格式复杂 传输占带宽
         2.服务端和客户端都需要花费大量代码解析XML 导致服务器端和客户端代码变得异常复杂且不易维护
         3.客户端不同 浏览器之间解析XML方式不同 需要重复编写很多代码
@@ -2141,6 +2159,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
     open方法打开与服务器连接|
     send方法发送请求 POST请求时 需设置额外请求头|
     监听服务器响应 接收返回值)
+    (open打开连接 send发送请求 监听服务器响应 接收返回值)
 
     1.AJAX概述 AJAX是什么
         AJAX是'Asyncchronous JavaScript And XML'缩写
@@ -2405,7 +2424,7 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
 17.单点登录 多点登录
     单点登录SSO
         一个多系统共存的环境下
-        用户的一次登录能得到其他所有系统的新人
+        用户的一次登录能得到其他所有系统的信任
     多点登录
         以微信为例
             可以PC端 phone端同时登陆/收发消息

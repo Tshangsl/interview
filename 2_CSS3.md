@@ -8,7 +8,7 @@
     FC:(formatting context)
         格式化上下文
     BFC:
-        BFC(Block formatting context)直译为“块级格式化上下文”，
+        BFC(Block formatting context)直译为“块级格式化上下文”
         它是一个独立的渲染区域。
         只有Block-level box参与 
         它规定了内部的Block-level Box如何布局 
@@ -456,8 +456,8 @@
 18.CSS伪类(没创建)伪元素(创建)
 (区别:有没有创建一个文档流外的元素)
 (伪类：弥补常规CSS选择器的不足 可以使用多个 文档树中已有 
-    :active/:focus/:hover/:link/:visited/:first-child/)
-(伪元素：创建一个有内容的虚拟容器 同时使用一个 文档树中新建 ::before ::after)
+    :active/:focus/:hover/:link/:visited/:first-child/:last-child/:nth-child(n)/:nth-of-type/)
+(伪元素：创建一个有内容的虚拟容器 同时使用一个 文档树中新建 ::before ::after ::first-letter ::first-line)
     伪类：
         (添加到选择器的关键字，指定要选择的元素的特殊状态 通过选择器，格式化DOM树以外的信息以及不能被常规CSS选择器获取到的信息。)
         是添加到选择器的关键字，指定要选择的元素的特殊状态。 例如，:hover 可被用于在用户将鼠标悬停在按钮上时改变按钮的颜色。
@@ -500,11 +500,12 @@
         可以同时使用多个伪类，而只能同时使用一个伪元素；
 19.CSS三种基本定位机制 
 (普通流/浮动/绝对定位)
-20.CSS常用布局
-    弹性布局 flex
-    容器属性
-    item属性
-    网格布局 grid
+20.CSS五种布局
+    flex布局
+    grid布局
+    table布局
+    float流
+    绝对定位
 21.
 Height
     clientHeight content+padding
@@ -538,7 +539,12 @@ Top
         单位px 可读可设置
     offsetTop:当前元素顶部距离最近父元素顶部的距离 和有没有滚动条没有关系 单位px 只读元素        
 22.CSS响应式设计适配多种设备
-(H5声明部分/相对单位/flex布局float布局/link标签media属性/媒体查询/图片自适应)
+(H5声明部分/
+相对单位/
+flex布局float布局/
+link标签media属性/
+媒体查询/
+图片自适应)
     1. <meta name="viewport" content="width=device-width, initial-scale=1" />
     2. 使用相对单位
     3. 使用流动布局 - 如果宽度太小，放不下两个元素，后面的元素会自动滚动到前面元素的下方，不会在水平方向overflow（溢出），避免了水平滚动条的出现
@@ -560,7 +566,7 @@ Top
     优点：
         1.降低服务器压力
         2.减少网络请求 页面渲染更快
-    缺点：
+    缺点：(后期维护困难/应用麻烦/使用图片有局限)
         1.后期维护困难 添加一张图片需要重新制作
         2.应用麻烦 每一张图都需要计算位置
             通过调整位置展示图片 对误差要求很严格
@@ -574,7 +580,7 @@ Top
             降低网页整体体验
 24.CSS三大特性
 (层叠性/
-继承性 与文字有关属性/
+继承性 与文字有关属性 都可以实现继承/
 优先级)
     层叠性
         1.给一个标签设置的样式发生冲突的时候即样式的覆盖
@@ -814,9 +820,11 @@ z-index:auto z-index:0/
             vertical-align:middle;
             display:table-cell;
             可实现子元素垂直居中
-    2.父元素 display:flex;
+    2.父元素 
+            display:flex;
             align-items:center            
-    3.父元素 padding
+    3.父元素 
+            padding
 33.CSS实现阴影
     box-shadow: h-shadow v-shadow blur spread color inset;
     属性值：
