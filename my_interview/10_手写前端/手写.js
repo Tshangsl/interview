@@ -145,9 +145,10 @@ function shuffle(a) {
     }
     return a;
 }
-// 7.数组乱序 Fisher-Yates洗牌算法ES6实现
+// 7.数组乱序 Fisher-Yates洗牌算法(shuffle)ES6实现
 /*
     使用ES6解构赋值新特性
+    shuffle洗牌 
 */
 function shuffle(a) {
     for (let i = a.length; i; i--) {
@@ -215,6 +216,21 @@ function throttle(fn, delay) {
         }, delay)
     }
 }
+
+function throttle(fn,delay){
+    let valid = true;
+    return function(){
+        if(!valid){
+            return false;
+        }
+        valid = false;
+        setTimeout(()=>{
+            fn()
+            valid = true;
+        },delay)
+    }
+}
+
 // 11.图片懒加载
 // 没进入可视区域时 不给<img>标签赋src属性 浏览器不发送请求
 // 可视区域的判断 元素到各个边距的距离
@@ -1107,7 +1123,7 @@ function _parseInt(str, radix) {
 }
 
 // 实现完整parseInt函数
-function l(obj){
+function l(obj) {
     return console.log(obj);
 }
 function parse_Int(str, radix) {
@@ -1131,7 +1147,7 @@ function parse_Int(str, radix) {
         l(typeof arr)
         // Math.floor 返回小于或等于一个给定数字的最大整数
         // Math.pow(x,y) 返回x的y次幂的值
-        res+=Math.floor(arr[i])*Math.pow(radix,i);        
+        res += Math.floor(arr[i]) * Math.pow(radix, i);
     }
     l(res);
 }
@@ -1143,8 +1159,8 @@ extend 为了简化类的声明
 和其他语言的extend关键字类似
 基于一个给定的类结构创建一个新的类
 */
-function extend(subClass,superClass){
-    var F = function(){};
+function extend(subClass, superClass) {
+    var F = function () { };
     F.prototype = superClass.prototype;
     subClass.prototype = new F();
     subClass.prototype.constructor = subClass;
@@ -1157,21 +1173,21 @@ extend实现 寄生继承的封装
 */
 
 // extend函数使用场景
-function Person(name){
+function Person(name) {
     this.name = name;
 }
-Person.prototype.getName = function(){
+Person.prototype.getName = function () {
     return this.name;
 }
-function Author(name,books){
+function Author(name, books) {
     // 执行Person构造函数 获得Person对象中属性
-    Person.call(this,name);
+    Person.call(this, name);
     this.books = books;
 }
 // 获取Person原型上的方法 实现原型继承
-extend(Author,Person);
+extend(Author, Person);
 // 在Author原型上继续添加我们需要的方法
-Author.prototype.getBooks = function(){
+Author.prototype.getBooks = function () {
     return this.books;
 }
 
