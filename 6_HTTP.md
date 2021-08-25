@@ -1,61 +1,61 @@
-1.HTTP(无状态)常见状态码 及 常用的请求方式，区别和用途
-1xx中间状态|
-    100请求者应当继续提出请求
-    101切换请求协议 如从HTTP切换到WebSocket
-2xx请求成功|
-    200请求成功
-    204请求被受理但没有资源可以返回
-    206客户端只是请求资源的一部分，服务器只对请求的部分资源执GET方法，相应报文中通过Content-Range指定范围的资源。
-3xx重定位重新请求|
-    301永久重定向 会缓存
-        301 代表访问的地址的资源被永久移除了，以后都不应该访问这个地址，搜索引擎抓取的时候也会用新的地址替换这个老的。可以在返回的响应的 location 首部去获取到返回的地址。
-    302临时重定向 
+1. HTTP(无状态)常见状态码 及 常用的请求方式，区别和用途
+- 1xx中间状态|
+   - 100请求者应当继续提出请求
+   - 101切换请求协议 如从HTTP切换到WebSocket
+- 2xx请求成功|
+   - 200请求成功
+   - 204请求被受理但没有资源可以返回
+   - 206客户端只是请求资源的一部分，服务器只对请求的部分资源执GET方法，相应报文中通过Content-Range指定范围的资源。
+- 3xx重定位重新请求|
+   - 301永久重定向 会缓存
+       - 301 代表访问的地址的资源被永久移除了，以后都不应该访问这个地址，搜索引擎抓取的时候也会用新的地址替换这个老的。可以在返回的响应的 location 首部去获取到返回的地址。
+    - 302临时重定向 
         这个资源只是暂时不能被访问了，但是之后过一段时间还是可以继续访问，一般是访问某个网站的资源需要权限时，会需要用户去登录，跳转到登录页面之后登录之后，还可以继续访问。
-    303与302状态码有相似功能 它希望客户端在请求一个URL时 能通过GET方法重定向到另一个URI
-    304协商缓存命中 
-    307临时重定向 与302相似 只是强制要求使用POST请求
-4xx请求报文错误|
-    400参数校验失败 
-    401未登录或token验证失败 
-    402用户已禁用(禁止该用户)
-    403禁止用户访问(禁止所有用户)
-        404资源未找到 
-5xx服务器端错误
-    500服务端错误 
-    503服务器正在忙
+    - 303与302状态码有相似功能 它希望客户端在请求一个URL时 能通过GET方法重定向到另一个URI
+    - 304协商缓存命中 
+    - 307临时重定向 与302相似 只是强制要求使用POST请求
+- 4xx请求报文错误|
+   - 400参数校验失败 
+   - 401未登录或token验证失败 
+   - 402用户已禁用(禁止该用户)
+   - 403禁止用户访问(禁止所有用户)
+   - 404资源未找到 
+- 5xx服务器端错误
+    - 500服务端错误 
+    - 503服务器正在忙
 
-HTTP常见请求方式区别用途
-    GET：通用获取数据
-    POST：提交数据
-    DELETE：删除数据
-    CONNECT：建立连接隧道，用于代理服务器
-    PUT：修改数据
-    HEAD：获取资源的元信息
-    OPTIONS：列出可对资源实行的请求方法，常用于跨域    
-2.get和post
-        区别
-        get
-            获取数据|参数有长度限制|url之后?分割url传输数据|多个参数用&连接|因读取数据 被浏览器主动缓存|参数被保存在浏览器中|产生一个TCP数据包 把HTTP Header和Data一起发送出去 服务器响应200|get数据明文传输|服务器端获取数据格式 application/json querystring
-        post
-            提交数据|参数无长度限制|数据放在http请求体|不会被浏览器主动缓存|参数不会被保存在浏览器中|产生一个TCP数据包 浏览器先发Http Header 服务器响应100 浏览器再发送Data 服务器响应200|post数据放在请求体 开发者可以抓包工具看到 也相当于明文|服务器端 application/x-www-urlencoded application/json querystring formdata
-        本质
-            都是TCP连接 由于HTTP协议和浏览器或服务器限制 使其应用过程有所不同
-2.queryString&formData&json
-    (前端向后端发送HTTP请求时三种数据交换格式 )
-    Get请求参数是被存放在QueryString中的
-    (可以通过request.getParameter()获取请求参数)
-    Post请求参数的存放位置与Content-Type有关
-        1.表单提交和Jquery异步请求
+> HTTP常见请求方式区别用途
+- GET：通用获取数据
+- POST：提交数据
+- DELETE：删除数据
+- CONNECT：建立连接隧道，用于代理服务器
+- PUT：修改数据
+- HEAD：获取资源的元信息
+- OPTIONS：列出可对资源实行的请求方法，常用于跨域    
+2. get和post
+    - 区别
+    - get
+        获取数据|参数有长度限制|url之后?分割url传输数据|多个参数用&连接|因读取数据 被浏览器主动缓存|参数被保存在浏览器中|产生一个TCP数据包 把HTTP Header和Data一起发送出去 服务器响应200|get数据明文传输|服务器端获取数据格式 application/json querystring
+    - post
+        提交数据|参数无长度限制|数据放在http请求体|不会被浏览器主动缓存|参数不会被保存在浏览器中|产生一个TCP数据包 浏览器先发Http Header 服务器响应100 浏览器再发送Data 服务器响应200|post数据放在请求体 开发者可以抓包工具看到 也相当于明文|服务器端 application/x-www-urlencoded application/json querystring formdata
+    - 本质
+        都是TCP连接 由于HTTP协议和浏览器或服务器限制 使其应用过程有所不同
+2. queryString&formData&json
+   - (前端向后端发送HTTP请求时三种数据交换格式 )
+   - Get请求参数是被存放在QueryString中的
+   - (可以通过request.getParameter()获取请求参数)
+   - Post请求参数的存放位置与Content-Type有关
+        1. 表单提交和Jquery异步请求
             POST请求参数被存放在Form Data中(可以通过request.getParameter()获取请求参数)
-        2.JS原生异步请求XMLHttpRequedt
+        2. JS原生异步请求XMLHttpRequedt
             默认Content-Type:text/plain;charset=UTF-8参数Request PayLoad(无法通过request.getParameter()请求获取参数)        
-        3.文件上传
+        3. 文件上传
             默认的Content-Type:multipart/form-data 参数存放在Request Payload
-        4.指定参数格式为JSON的POST请求
+        4. 指定参数格式为JSON的POST请求
             默认的Content-Type:application/json 参数存放在Request PayLoad(无法通过request.getParameter()获取请求参数)
-        基本的POST请求就是上述四种情况
-        最常用的就是表单的POST请求&Jquery的post异步请求
-        这种POST请求默认的
+        - 基本的POST请求就是上述四种情况
+        - 最常用的就是表单的POST请求&Jquery的post异步请求
+        - 这种POST请求默认的
         Content-Type:application/x-www-form-urlencoded也就是键值对的提交方式
         剩下的三种方式都无法通过requedt.getParamter()/框架字段映射获取参数(这三种方式的Content-Type都不为application/x-www-form-urlencoded)
         原因：
@@ -71,85 +71,83 @@ HTTP常见请求方式区别用途
             HTTP POST表单请求提交时：Content-Typeapplication/x-www-form-urlencoded，而使用原生AJAX的POST请求如果不指定请求头RequestHeader，默认使用的Content-Type是text/plain;charset=UTF-8。
 
             表单提交数据是名值对的方式，而文件上传服务器需要特殊处理，普通的post请求数据格式不固定，不一定是名值对的方式，所以服务器无法知道具体的处理方式，所以只能通过获取原始数据流的方式来进行解析。jquery在执行post请求时，会设置Content-Type为application/x-www-form-urlencoded，所以服务器能够正确解析，而使用原生ajax请求时，如果不显示的设置Content-Type，那么默认是text/plain，这时不能用request.getParameter(name)的形式获取，所以才只能通过获取原始数据流的方式来进行解析请求数据。
-2.multipart/form-data&
-application/json&
-application/www-form-urlencoded区别
-        1.application/json
-            application/x-www-form-urlencoded
-            都是表单数据发送时的编码类型
-        2.EncType
-            EncType属性规定在发送到服务器之前应该如何对表单数据进行编码
-            默认 表单数据会编码为"application/www-form-urlencoded"即发送到服务器之前 所有字符都会进行编码
-        3.application/x-www-form-urlencoded编码类型的发送和接收
-            窗体数据编码为名称/值对
-            客户端：
-                发送"test=I'm Egret"浏览器按F12 NetWork中查看发送数据   
-            服务端：
-                接收test数据
-                echo $_POST["test"]
-        4.application/json的发送和接收
-            序列化后的JSON字符串
-            客户端：
-                发送JSON格式字符串'{"test":"I'm Client"}'
-            服务端:
-                1.用file_get_contents拿到post数据 $_POST['test']取不到数据
-                2.然后使用json_decode解码 
-                3. php中json访问方式 $json->test。php中没有{test:"I'm Client"}这种格式的，$json = {test:"I'm Client"}会报错。
-                4. 返回数据时将数组json_encode编码。php中json格式没有，用数组代替。
-                使用json格式，php头部需要加上如下代码，否则会报错。
-                header('Access-Control-Allow-Headers:x-requested-with,content-type');
-        5.
+2. multipart/form-data&application/json&application/www-form-urlencoded区别
+    1. application/json
         application/x-www-form-urlencoded
-            窗体数据被编码为名称/值对 标准的编码格式
-        multipart/form-data
-            窗体数据被编码为一条信息 页面上每个控件对应消息的一个部分
-        text/plain
-            窗体数据以纯文本形式进行编码 其中不包含任何控件或格式字符
-        6.
-        form的enctype属性为编码方式
-            常用有两种：application/x-www-form-urlencoded
-                        multipart/form-data
-                   默认为application/x-www-form-urlencoded
-        当action为get时
-            浏览器用x-www-form-urlencoded编码方式把form数据转换成一个字符串(name1=value&name2=value2)然后把这个字串 append到url后面 用?分割 加载这个新的url
-        当action为post时
-            浏览器把form数据封装到http body中 然后发送到server
-        如果没有type=file的控价 
-            用默认的application/x-www-form-urlencoded即可
-        如果有type=file
-            用到multipart/form-data 浏览器会把整个表单以控件为单位分割 
-            并为每个部分都加上
-            Content-Disposition(form-data/file) 
-            Content-Type(默认为text/plain) 
-            name(控件name)等信息 
-            并加上分隔符(boundary)
-        7.application/x-www-form-urlencoded与multipart/form-data区别(提交数据时编码格式)
-            (Form元素的Enctype属性指定了表单数据向服务器提交时所采用的编码类型)
-            1.Form元素的Enctype属性指定了表单数据向服务器提交时所采用的编码类型 默认缺省值是application/x-www-form-urlencoded
-            2.向服务器发送大量文本 包含非ASCII字符的文本/二进制数据时这种编码方式效率很低
-            3.文件上载时 所使用的编码类型 应当 是 multipart/form-data 它既可以发送文本数据yy也支持二进制数据上传
-            4.Browser端<form>表单的ENCTYPE属性值为multipart/form-data 它告诉我们传输的数据要用到多媒体传输协议 由于多媒体传输的都是大量数据 所以规定上传文件必须是post方法<input>的type属性必须是file
-
-            在Form元素的语法中 EncType表明提交数据的格式用Enctype属性指定将数据回发到服务器时浏览器使用的编码类型
-            下面是说明:
-                application/x-www-form-urlencoded
-                    窗体数据被编码成名称/值对 这是标准的编码格式
-                multipart/form-data
-                    窗体数据以纯文本形式机型编码 其中不含任何控件或格式字符
-                text/plain：
-                    窗口数据以纯文本形式进行编码 其中不含任何控件或格式字符
-            补充:
-                form的ENCTYPE属性为编码方式 
-                常用的有两种         
-                    application/x-www-form-urlencoded(默认)
+        都是表单数据发送时的编码类型
+    2. EncType
+        EncType属性规定在发送到服务器之前应该如何对表单数据进行编码
+        默认 表单数据会编码为"application/www-form-urlencoded"即发送到服务器之前 所有字符都会进行编码
+    3. application/x-www-form-urlencoded编码类型的发送和接收
+        窗体数据编码为名称/值对
+        客户端：
+            发送"test=I'm Egret"浏览器按F12 NetWork中查看发送数据   
+        服务端：
+            接收test数据
+            echo $_POST["test"]
+    4. application/json的发送和接收
+        序列化后的JSON字符串
+        客户端：
+            发送JSON格式字符串'{"test":"I'm Client"}'
+        服务端:
+            1.用file_get_contents拿到post数据 $_POST['test']取不到数据
+            2.然后使用json_decode解码 
+            3. php中json访问方式 $json->test。php中没有{test:"I'm Client"}这种格式的，$json = {test:"I'm Client"}会报错。
+            4. 返回数据时将数组json_encode编码。php中json格式没有，用数组代替。
+            使用json格式，php头部需要加上如下代码，否则会报错。
+            header('Access-Control-Allow-Headers:x-requested-with,content-type');
+    5. 
+    application/x-www-form-urlencoded
+        窗体数据被编码为名称/值对 标准的编码格式
+    multipart/form-data
+        窗体数据被编码为一条信息 页面上每个控件对应消息的一个部分
+    text/plain
+        窗体数据以纯文本形式进行编码 其中不包含任何控件或格式字符
+    6. 
+    form的enctype属性为编码方式
+        常用有两种：application/x-www-form-urlencoded
                     multipart/form-data
-                当action为get时
-                    浏览器用x-www-form-urlencoded编码方式把form数据转化成一个字符串(name1=value1&name2=value2&name3=value3)然后把这个字符串append到url后面 用?分割加载这个新的url
-                当action为post时
-                    浏览器把form数据封装到http body中 然后发送到server 
-                        1.如果没有type=file的控件 用默认的的application/x-www-form-urlencoded即可
-                        2.如果有type=file 要用到multipart/form-data浏览器会把整个表单以控件为单位分割 并为每个部分加上Content-Disposition(form-data/file)Content-Type(默认为text/plain)name(控件name)等信息 并加上分割符(boundary)
-2.四种常见的POST提交数据方式 和两种GET提交数据方式
+                默认为application/x-www-form-urlencoded
+    当action为get时
+        浏览器用x-www-form-urlencoded编码方式把form数据转换成一个字符串(name1=value&name2=value2)然后把这个字串 append到url后面 用?分割 加载这个新的url
+    当action为post时
+        浏览器把form数据封装到http body中 然后发送到server
+    如果没有type=file的控价 
+        用默认的application/x-www-form-urlencoded即可
+    如果有type=file
+        用到multipart/form-data 浏览器会把整个表单以控件为单位分割 
+        并为每个部分都加上
+        Content-Disposition(form-data/file) 
+        Content-Type(默认为text/plain) 
+        name(控件name)等信息 
+        并加上分隔符(boundary)
+    7. application/x-www-form-urlencoded与multipart/form-data区别(提交数据时编码格式)
+        (Form元素的Enctype属性指定了表单数据向服务器提交时所采用的编码类型)
+        1.Form元素的Enctype属性指定了表单数据向服务器提交时所采用的编码类型 默认缺省值是application/x-www-form-urlencoded
+        2.向服务器发送大量文本 包含非ASCII字符的文本/二进制数据时这种编码方式效率很低
+        3.文件上载时 所使用的编码类型 应当 是 multipart/form-data 它既可以发送文本数据yy也支持二进制数据上传
+        4.Browser端<form>表单的ENCTYPE属性值为multipart/form-data 它告诉我们传输的数据要用到多媒体传输协议 由于多媒体传输的都是大量数据 所以规定上传文件必须是post方法<input>的type属性必须是file
+
+        在Form元素的语法中 EncType表明提交数据的格式用Enctype属性指定将数据回发到服务器时浏览器使用的编码类型
+        下面是说明:
+            application/x-www-form-urlencoded
+                窗体数据被编码成名称/值对 这是标准的编码格式
+            multipart/form-data
+                窗体数据以纯文本形式机型编码 其中不含任何控件或格式字符
+            text/plain：
+                窗口数据以纯文本形式进行编码 其中不含任何控件或格式字符
+        补充:
+            form的ENCTYPE属性为编码方式 
+            常用的有两种         
+                application/x-www-form-urlencoded(默认)
+                multipart/form-data
+            当action为get时
+                浏览器用x-www-form-urlencoded编码方式把form数据转化成一个字符串(name1=value1&name2=value2&name3=value3)然后把这个字符串append到url后面 用?分割加载这个新的url
+            当action为post时
+                浏览器把form数据封装到http body中 然后发送到server 
+                    1.如果没有type=file的控件 用默认的的application/x-www-form-urlencoded即可
+                    2.如果有type=file 要用到multipart/form-data浏览器会把整个表单以控件为单位分割 并为每个部分加上Content-Disposition(form-data/file)Content-Type(默认为text/plain)name(控件name)等信息 并加上分割符(boundary)
+2. 四种常见的POST提交数据方式 和两种GET提交数据方式
     HTTP/1.1协议 规定的HTTP请求方法有OPTIONS GET HEAD POST PUT DELETE TRACE CONNECT 这几种
     其中POST一般用来向服务端提交数据
 
@@ -169,24 +167,24 @@ application/www-form-urlencoded区别
     
     所以说到POST提交数据方案 包含Content-Type和消息主题编码方式两部分
 
-    Enctype属性
-    具体介绍
-        1.application/x-www-form-urlencoded
+    - Enctype属性
+    - 具体介绍
+        1. application/x-www-form-urlencoded
             最常见的post提交数据方式
             浏览器原生form表单 不设置ENCTYPE属性最终会以application/x-www-form-urlencoded方式提交数据
                 很多时候 我们用AJAX提交数据时也是使用这种方式
             例如JQuery和QWrap的Ajax Content-Type默认值都是
             application/x-www-form-urlencoded
-        2.multipart/form-data
+        2. multipart/form-data
             一个常见的POST数据提交方式
             使用表单上传文件时 必须让form的ENCTYPE等于这个值
             这种方式一般用来上传文件 各大服务端语言对它也有良好的支持
         PS:上面提到的这两种post数据的方式 都是浏览器原生支持的 而且现阶段原生form表单也只支持这两种方式 
         但是随着越来越多的Web站点 尤其是WebApp全部使用AJAX进行数据交互之后 我们完全可以定义新的数据提交方式 
-        3.application/json
+        3. application/json
             把它当作请求头 用来告诉服务端消息主体是序列化后的JSON字符串 由于JSON规范的流行 除了低版本IE之外的各大浏览器都原生支持JSON.stringfy 服务端语言也都有处理JSON的函数使用JSON不会遇上什么麻烦
             JSON格式支持比键值对复杂得多的结构化数据   
-        4.text/xml
+        4. text/xml
             XML-RPC(XML Remote Procedure Call)
             它是一种使用HTTP作为传输协议
             XML作为编码方式的远程调用规范
@@ -197,58 +195,64 @@ application/www-form-urlencoded区别
     GET
         application/json
         queryString   
-3.TCP滑动窗口(分两种 发送窗口 接收窗口) 作流量控制用
-    发送窗口&可用窗口
+3. TCP滑动窗口(分两种 发送窗口 接收窗口) 作流量控制用
+    - 发送窗口&可用窗口
         发送方来说 窗口内包括两部分 
         发送窗口(已经发送了但是没有收到ACK)
         可用窗口 接收端允许发送但是没有发送的部分
-    滑动窗口原理
+    - 滑动窗口原理
         在 TCP 链接中，对于发送端和接收端而言
         TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。
         而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。
         如果对方的接收缓存区满了，就不能再继续发送了。
         而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口
         TCP 滑动窗口分为两种: 发送窗口和接收窗口
-3.TCP可靠传输 拥塞控制 流量控制
-    可靠传输
-        有状态 TCP会确认发送了哪些报文/接收方收到了哪些报文保证数据包按序到达 不允许有差错/
-        可控制(流量控制) 如出现丢包/网络状态不佳 则会跳转自己的行为 减少发送的速度或重发  
-    (停止等待协议 可靠性/确认丢失和确认迟到 有状态)
-        1.停止等待协议 可靠性
-        2.确认丢失和确认迟到 有状态
+3. TCP可靠传输 拥塞控制 流量控制
+    - 可靠传输(有状态/可控制 流量控制)
+        - 有状态 TCP会确认发送了哪些报文/接收方收到了哪些报文保证数据包按序到达 不允许有差错/
+        - 可控制(流量控制) 如出现丢包/网络状态不佳 则会跳转自己的行为 减少发送的速度或重发  
+    - (停止等待协议 可靠性/确认丢失和确认迟到 有状态)
+        1. 停止等待协议 可靠性
+        2. 确认丢失和确认迟到 有状态
         PS:只要接收端没有告诉发送端收到了
             发送端就认为接收端没有收到 发送端重传
-    TCP流量控制 作用于接受者 控制发送者的发送速度从而使接收者来得及接收 防止分组丢失 滑动窗口协议实现
-    TCP拥塞避免 作用于网络 防止过多数据注入网络 导致出现网络负载过大 四种算法 慢启动/拥塞避免/快重传/快恢复
-    拥塞产生原因
-        某段时间 对网络中某一资源的需求超过了该资源能提供的可用部分 即对资源的需求>可用资源
-    拥塞控制分类
-        1.开环控制 设计网络时把因素考虑到
-        2.闭环控制 基于反馈环路 使用拥塞的信息来进行调整网络
-    TCP流量控制
-        滑动窗口机制
+    - TCP流量控制 作用于接受者 控制发送者的发送速度从而使接收者来得及接收 防止分组丢失 滑动窗口协议实现
+    - TCP拥塞避免 作用于网络 防止过多数据注入网络 导致出现网络负载过大 四种算法 
+        - 慢启动
+        - 拥塞避免
+        - 快重传
+        - 快恢复
+    - 拥塞产生原因
+        - 某段时间 对网络中某一资源的需求超过了该资源能提供的可用部分 即对资源的- 需求>可用资源
+    - 拥塞控制分类
+        1. 开环控制 设计网络时把因素考虑到
+        2. 闭环控制 基于反馈环路 使用拥塞的信息来进行调整网络
+    - TCP流量控制
+        - 滑动窗口机制
             包括
-            发送窗口(SWND)
-            接受窗口(RWND)
-            拥塞窗口(CWND)
+            - 发送窗口(SWND)
+            - 接受窗口(RWND)
+            - 拥塞窗口(CWND)
             其中 MAX(发送窗口) = MIN(CWND,RWND)
             主要包含两个过程：
-                1.受到序列i-1及以下序列 期待受到i及以后的序列
-                2.确认同意对方发送一个窗口w共j个字节 其序列号为i到i+j-1
-        滑动窗口协议：
+                1. 受到序列i-1及以下序列 期待受到i及以后的序列
+                2. 确认同意对方发送一个窗口w共j个字节 其序列号为i到i+j-1
+        - 滑动窗口协议：
             针对发送端和接收端一种流量控制策略
             某些情况下 
             接收端处理数据能力比发送端发送数据能力低很多
             或发送端数据太多
             会造成接收端队列塞满
             因此有了滑动窗口 接收端告诉发送端一次最多可以发送多少数据
+            
             已发送未收到ACK+未发送(接收端有空间)=滑动窗口
+            
             TCP头部中有一个Window Size
             这个就是接收方告诉发送方 
             我现在可接受容量大小
             发送数据流大小必须小于我这个容量
-            1.TCP协议的使用
-            2.维持发送方/接收方缓冲区 
+            1. TCP协议的使用
+            2. 维持发送方/接收方缓冲区 
                 缓冲区是用来解决网络之间数据不可靠的问题
                 例如丢包 重复包 出错 乱序
             TCP协议中
@@ -270,113 +274,112 @@ application/www-form-urlencoded区别
             有了滑动窗口
             发送端在发送完一个数据包后不用等待它的ack
             在滑动窗口大小内可以继续发送其他数据包
-    TCP拥塞控制四种算法
-        1.慢启动机制
+    - TCP拥塞控制四种算法
+        1. 慢启动机制
             新建TCP连接的时候 
             拥塞窗口以一个数据包大小(512B)为基数
             没接收一个ACK确认就会增加一个数据包发送量
             这种增加呈指数增长
-        2.拥塞避免机制
+        2. 拥塞避免机制
             让拥塞窗口缓慢增大
             每经过一个往返事件RTT
             发送方的拥塞窗口就加一
             (CWND+1 注意不是加倍)
             此时CWND呈现线性增大
-        3.快重传
+        3. 快重传
             如果接受方收到一个失序报文
             它会马上发送报告给发送方 
             告知它未收到报文 如果发送发收到
             重复的三个确认
             则会立即重传确认所期待的下一个报文
-        4.快恢复
+        4. 快恢复
     
-        流量控制/拥塞控制/滑动窗口
-            流量控制(防止分组丢失 构成TCP可靠性一部分)
-                概念:
-                    发送者发送数据过快 接收方来不及接收 
-                    会有分组丢失 为避免分组丢失
-                    控制发送者的发送速度 使得接收者来得及接收
-                    这就是流量控制 
-                    根本目的 防止分组丢失
-                    是构成TCP可靠性一部分
-                实现:
-                    由滑动窗口协议(连续ARQ协议)实现
-                    滑动窗口协议保证
-                    分组无差错 有序接收
-                    实现流量控制
-                    主要方式:
-                        接收方返回的ACK中会包含自己的接收窗口大小
-                        并利用大小控制发送方的数据发送
-            拥塞控制(作用于网络 防止过多数据注入到网络)
-                作用于网络 防止过多数据注入到网络
-                避免出现网络负荷过大的情况
-                常用算法：
-                    慢开始
-                        发送方维持一个叫做拥塞窗口cwnd的状态变量
-                        拥塞窗口的大小取决于网络的拥塞程度 并且在动态地变化
-                        发送方让自己的发送窗口等于拥塞窗口
-                        考虑到接收方的接收能力
-                        发送窗口可能小于拥塞窗口
-                        思路
-                            不要一开始就发送大量数据
-                            先检测一下网络拥塞程度
-                            即从小到大逐渐增加拥塞窗口大小
-                        一个传输轮次所经历的时间其实就是往返时间RTT 每经过一个传输轮次(transmission round)拥塞窗口cwnd就加倍
-                        防止cwnd增长过大引起网络拥塞 
-                        还需要设置一个
-                        慢开始门限ssthresh状态变量
-                        慢开始门限ssthresh用法:
-                            cwnd<ssthresh 慢开始算法
-                            cwnd>ssthresh 拥塞避免算法
-                            cwnd=ssthresh 慢开始算法 拥塞避免算法任意
-                        慢不是cwnd增长速率慢
-                        指TCP开始发送报文段时先设置cwnd=1
-                        然后逐渐增大 比按照大的cwnd一下子把许多报文段突然注入到网络中要慢得多
-                    拥塞避免
-                        让拥塞窗口缓慢增长
-                        每经过一个往返时间RTT就把发送方的拥塞窗口cwnd加1 而不是加倍
-                        这样拥塞窗口 按线性规律缓慢增长
-                        无论满开始/拥塞避免阶段
-                        只要发送方判断网络出现堵塞
-                        (根据就是没有按时收到确认
-                        虽然没有收到确认可能是其他原因的分组丢失 但是因为无法判断 都当作拥塞来处理)
-                        就把慢开始门限ssthresh设置为拥塞时发送窗口大小的一般(但不能小于2)
-                        把拥塞窗口cwdn重置为1 执行慢开始算法
-                        目的 迅速减少主机发送到网络中得分组数
-                        使得发生拥塞得路由器有足够时间把队列中
-                        积压的分组处理完毕
-                        乘法减小和加法增大常合起来成为AIMD算法
-                        拥塞避免并非能完全避免阻塞 而是使网络比较不容易出现拥塞
-                    快重传
-                        要求接收方收到一个失序报文段就发出重复确认(为了使发送及早知道有报文没有到达对方 
-                        可提高网络吞吐量约20%)而不需要等到自己发送数据时捎带确认
-                        快重传算法规定:
-                            发送方只要一连收到三个重复确认就应当立即重传对方尚未收到的报文段 而不必继续等待设置的重传计时器时间到期
-                    快恢复
-                        快重传配合快恢复算法
-                        当发送方连续收到三个重复确认时 就执行乘法减小算法 把ssthresh门限减半(为预防网络发生阻塞)
-                        但是接下来并不执行慢开始算法
-                        考虑到如果网络发生拥塞的话 
-                        就不会收到好几个重复的确认
-                        所以发送方现在认为网络可能没有出现拥塞
-                        此时不执行慢开始算法
-                        将cwnd设置为ssthresh减半后的值
-                        然后执行拥塞避免算法 使得cwnd缓慢增大
-                PS:在采用快恢复算法时
-                    慢开始算法只在TCP连接建立时
-                    和网络出现超时时才使用
-            流量控制(作用于接收者)
-                控制发送者的发送速度从而使接收者来得及接收
-                防止分组丢失 
-3.TCP和UDP(传输层协议)概念 区别 应用场景 TCP三次握手四次挥手
-    (TCP:面向连接 可靠 打电话 大部分情况下 点对点 面向字节流 首部开销较大|
-    UDP:面向非连接 不可靠 广播 实时性要求高 1/多对1/多 面向报文 首部开销较小)
-    (TCP三次握手 建立可靠通信信道 确认双方发送接收机能正常)
+    - 流量控制/拥塞控制/滑动窗口
+    1. 流量控制(防止分组丢失 构成TCP可靠性一部分)
+        概念:
+            发送者发送数据过快 接收方来不及接收 
+            会有分组丢失 为避免分组丢失
+            控制发送者的发送速度 使得接收者来得及接收
+            这就是流量控制 
+            根本目的 防止分组丢失
+            是构成TCP可靠性一部分
+        实现:
+            由滑动窗口协议(连续ARQ协议)实现
+            滑动窗口协议保证
+            分组无差错 有序接收
+            实现流量控制
+            主要方式:
+                接收方返回的ACK中会包含自己的接收窗口大小
+                并利用大小控制发送方的数据发送
+    2. 拥塞控制(作用于网络 防止过多数据注入到网络)
+        - 作用于网络 防止过多数据注入到网络 避免出现网络负荷过大的情况
+        常用算法：
+        - 慢开始
+            发送方维持一个叫做拥塞窗口cwnd的状态变量
+            拥塞窗口的大小取决于网络的拥塞程度 并且在动态地变化
+            发送方让自己的发送窗口等于拥塞窗口
+            考虑到接收方的接收能力
+            发送窗口可能小于拥塞窗口
+            思路
+                不要一开始就发送大量数据
+                先检测一下网络拥塞程度
+                即从小到大逐渐增加拥塞窗口大小
+            一个传输轮次所经历的时间其实就是往返时间RTT 每经过一个传输轮次(transmission round)拥塞窗口cwnd就加倍
+            防止cwnd(congestion window))增长过大引起网络拥塞 
+            还需要设置一个
+            慢开始门限ssthresh状态变量
+            慢开始门限ssthresh用法:
+                cwnd<ssthresh 慢开始算法
+                cwnd>ssthresh 拥塞避免算法
+                cwnd=ssthresh 慢开始算法 拥塞避免算法任意
+            慢不是cwnd增长速率慢
+            指TCP开始发送报文段时先设置cwnd=1
+            然后逐渐增大 比按照大的cwnd一下子把许多报文段突然注入到网络中要慢得多
+        - 拥塞避免
+            让拥塞窗口缓慢增长
+            每经过一个往返时间RTT就把发送方的拥塞窗口cwnd加1 而不是加倍
+            这样拥塞窗口 按线性规律缓慢增长
+            无论满开始/拥塞避免阶段
+            只要发送方判断网络出现堵塞
+            (根据就是没有按时收到确认
+            虽然没有收到确认可能是其他原因的分组丢失 但是因为无法判断 都当作拥塞来处理)
+            就把慢开始门限ssthresh设置为拥塞时发送窗口大小的一般(但不能小于2)
+            把拥塞窗口cwdn重置为1 执行慢开始算法
+            目的 迅速减少主机发送到网络中得分组数
+            使得发生拥塞得路由器有足够时间把队列中
+            积压的分组处理完毕
+            乘法减小和加法增大常合起来成为AIMD算法
+            拥塞避免并非能完全避免阻塞 而是使网络比较不容易出现拥塞
+        快重传
+            要求接收方收到一个失序报文段就发出重复确认(为了使发送及早知道有报文没有到达对方 
+            可提高网络吞吐量约20%)而不需要等到自己发送数据时捎带确认
+            快重传算法规定:
+                发送方只要一连收到三个重复确认就应当立即重传对方尚未收到的报文段 而不必继续等待设置的重传计时器时间到期
+        快恢复
+            快重传配合快恢复算法
+            当发送方连续收到三个重复确认时 就执行乘法减小算法 把ssthresh门限减半(为预防网络发生阻塞)
+            但是接下来并不执行慢开始算法
+            考虑到如果网络发生拥塞的话 
+            就不会收到好几个重复的确认
+            所以发送方现在认为网络可能没有出现拥塞
+            此时不执行慢开始算法
+            将cwnd设置为ssthresh减半后的值
+            然后执行拥塞避免算法 使得cwnd缓慢增大
+        PS:在采用快恢复算法时
+            慢开始算法只在TCP连接建立时
+            和网络出现超时时才使用
+    流量控制(作用于接收者)
+        控制发送者的发送速度从而使接收者来得及接收
+        防止分组丢失 
+3. TCP和UDP(传输层协议)概念 区别 应用场景 TCP三次握手四次挥手
+    - (TCP:面向连接 可靠 打电话 大部分情况下 点对点 面向字节流 首部开销较大|
+    - UDP:面向非连接 不可靠 广播 实时性要求高 1/多对1/多 面向报文 首部开销较小)
+    - (TCP三次握手 建立可靠通信信道 确认双方发送接收机能正常)
     (TCP两次握手 无法确认客户端的接收能力
-    (TCP三次握手：
-        1.客户端向服务端发送SYN
-        2.服务端返回SYN,ACK
-        3.客户端发送ACK    
+    - (TCP三次握手：
+        1. 客户端向服务端发送SYN
+        2. 服务端返回SYN,ACK
+        3. 客户端发送ACK    
     )
     |TCP四次握手 可以 会降低传输效率)
     (TCP四次挥手 传输层协议断开连接的过程 确定数据全部传输完毕)
@@ -393,32 +396,29 @@ application/www-form-urlencoded区别
         是与TCP相对应的协议
         它是面向非连接的协议，它不与对方建立连接，而是直接就把数据包发送过去 
         UDP适用于一次只传送少量数据、对可靠性要求不高的应用环境
-    TCP和UDP(实时性要求较高)的应用场景：
-        1.UDP 对某些实时性要求比较高的情况使用UDP，比如游戏，媒体通信，实时直播，即使出现传输错误也可以容忍；
-        2.TCP 其它大部分情况下，HTTP都是用TCP，因为要求传输的内容可靠，不出现丢失的情况
-    形容TCP和UDP：
-        1.TCP通信可看作打电话：
+    - TCP和UDP(实时性要求较高)的应用场景：
+        1. UDP 对某些实时性要求比较高的情况使用UDP，比如游戏，媒体通信，实时直播，即使出现传输错误也可以容忍；
+        2. TCP 其它大部分情况下，HTTP都是用TCP，因为要求传输的内容可靠，不出现丢失的情况
+    - 形容TCP和UDP：
+        1. TCP通信可看作打电话：
             李三(拨了个号码)：喂，是王五吗？ 王五：哎，您谁啊？ 李三：我是李三，我想给你说点事儿，你现在方便吗？ 王五：哦，我现在方便，你说吧。 甲：那我说了啊？ 乙：你说吧。 (连接建立了，接下来就是说正事了…)
-        2.UDP通信可看为学校里的广播：
+        2. UDP通信可看为学校里的广播：
             播音室：喂喂喂！全体操场集合
     概念：
-            序列号 seq 32位 Sequence Number
-                TCP会话的每一端都包含一个32位(bit)的序列号
-                该序列号用来跟踪该端发送的数据量 
-                每一个包中都包含序列号 在接收端则通过确认号用来通知发送端数据成功接收
-                当某个主机开启一个TCP会话时 它的初始化序列号是随机的 
-            确认号 ack 32位 Acknowledgement Number
-            TCP在其协议头使用大量标志位/1位布尔域控制连接状态
-            六个状态位(置1有效)(URG/ACK/PSH/RST/SYN/FIN)
-            三个状态位(ACK/SYN/FIN
-                SYN 用作建立连接时的同步信号 建立TCP连接时使用
-                FIN 表示后面没有数据发送 关闭TCP连接时使用
-                ACK 表示ack Acknowledge Number字段有效
-                    用于对收到的数据进行确认 所确认的数据由确认序列号表示
-                seq Sequence Number 发送数据包中的第一个字节的序列号 32位
-                ack Acknowledgement Number 确认序列 32位
-                RST 表示复位 用来异常的关闭连接
-    RST攻击:
+    > 序列号 seq 32位 Sequence Number
+    - TCP会话的每一端都包含一个32位(bit)的序列号 该序列号用来跟踪该端发送的数据量 每一个包中都包含序列号 在接收端则通过确认号用来通知发送端数据成功接收 当某个主机开启一个TCP会话时 它的初始化序列号是随机的 
+    > 确认号 ack 32位 Acknowledgement Number
+    - TCP在其协议头使用大量标志位/1位布尔域控制连接状态
+    > 六个状态位(置1有效)(URG/ACK/PSH/RST/SYN/FIN)
+    > 三个状态位(ACK/SYN/FIN
+    - SYN 用作建立连接时的同步信号 建立TCP连接时使用
+    - FIN 表示后面没有数据发送 关闭TCP连接时使用
+    - ACK 表示ack Acknowledge Number字段有效
+        用于对收到的数据进行确认 所确认的数据由确认序列号表示
+    - seq Sequence Number 发送数据包中的第一个字节的序列号 32位
+    - ack Acknowledgement Number 确认序列 32位
+    - RST 表示复位 用来异常的关闭连接
+    > RST攻击:
         A和服务器B之间建立TCP连接
         此时C伪造一个TCP包发给B
         使B异常断开与A之间TCP连接
@@ -426,68 +426,55 @@ application/www-form-urlencoded区别
             源端口号+序列号
         TCP连接：
             源IP+源端口+目的IP+目的端口号 一对Socket 唯一确定一个TCP连接
-    TCP三次握手 
-        (建立可靠通信信道 确认双方发送接收机能正常
-        防止出现请求超时导致脏连接)
-        TCP建立连接的过程，我们称为三次握手。
-            起初两端都处于CLOSED关闭状态
-            1.第一次握手(客户端向服务器端发送SYN) 
-                (SYN=1 seq=x 
-                Client为SYN_SENT状态)
-                Client将SYN置1
-                随机产生一个初始序列号Seq发送给Server
-                客户端进入SYN_SENT状态
-            2.第二次握手(服务器端返回SYN+ACK)
-                (SYN=1 ACK=1 ack=x+1 seq=y
-                Server为SYN_RECD)
-                Server收到Client的SYN报文段 
-                由标志为SYN=1得知Client请求建立连接
-                设置ACK(Ackonwledge Number)为x+1(Sequence Number+1) 
-                发送SYN请求信息 SYN=k 
-                服务器端将上述所有信息放到一个报文段
-                (即SYN+ACK报文段) 一并发送给客户端 
-                服务器进入SYN_RECV状态
-                此时操作系统为TCP连接分配TCP缓存和变量
-            3.第三次握手(客户端发送ACK)
-                (seq=x+1 ACK=1 ack=y+1
-                Client&Server ESTABLISHED) 
-                Client收到确认后 检查ack是否为x+1 ACK是否为1
-                如果正确 则将标志位ACK置为1 ack=y+1
-                此时操作系统为该TCP连接分配TCP缓存和变量
-                并将数据包发送给Server
-                Server检查ack是否为y+1 ACK是否为1 
-                如果正确则连接建立成功
-                Client和Server进入EATABLISHED状态
-                完成三次握手 
-                Client与Server开始传输数据
-    TCP为什么不能两次握手
-        1.不能确认客户端接收能力
-        2.防止已失效的连接请求报文段突然传送到Server 产生错误
-    TCP可以四次握手吗
+    - TCP三次握手 
+        - (建立可靠通信信道/确认双方发送接收机能正常/防止出现请求超时导致脏连接)
+        - TCP建立连接的过程，我们称为三次握手。起初两端都处于CLOSED关闭状态
+        1. 第一次握手(客户端向服务器端发送SYN) 
+            (SYN=1 seq=x Client为SYN_SENT状态)
+            Client将SYN置1 随机产生一个初始序列号Seq发送给Server
+            客户端进入SYN_SENT状态
+        2. 第二次握手(服务器端返回SYN+ACK)
+            (SYN=1 ACK=1 ack=x+1 seq=y Server为SYN_RECD)
+            Server收到Client的SYN报文段 由标志为SYN=1得知Client请求建立连接
+            设置ACK(Ackonwledge Number)为x+1(Sequence Number+1) 
+            发送SYN请求信息 SYN=k 服务器端将上述所有信息放到一个报文段
+            (即SYN+ACK报文段) 一并发送给客户端 
+            服务器进入SYN_RECV状态 此时操作系统为TCP连接分配TCP缓存和变量
+        3. 第三次握手(客户端发送ACK)
+            (seq=x+1 ACK=1 ack=y+1
+            Client&Server ESTABLISHED) 
+            Client收到确认后 检查ack是否为x+1 ACK是否为1
+            如果正确 则将标志位ACK置为1 ack=y+1
+            此时操作系统为该TCP连接分配TCP缓存和变量
+            并将数据包发送给Server
+            Server检查ack是否为y+1 ACK是否为1 
+            如果正确则连接建立成功
+            Client和Server进入EATABLISHED状态
+            完成三次握手 
+            Client与Server开始传输数据
+    - TCP为什么不能两次握手
+        1. 不能确认客户端接收能力
+        2. 防止已失效的连接请求报文段突然传送到Server 产生错误
+    - TCP可以四次握手吗
         可以 但是会降低传输效率。
-    Server端易受到SYN攻击
-        服务端Server资源分配是在二次握手时分配的
-        客户端Client资源是在完成三次握手时分配的
-        所以Server容易受到SYN洪泛攻击
-        SYN攻击概念：
-            Client短时间内伪造大量不存在的IP地址
-            并向Server不断发送SYN包
-            Server回复确认包 等待Client确认
-            由于源地址不存在 
-            因此Server需要不断重发至超时
-            这些伪造的SYN包将长时间占用未连接队列
-            导致正常的SYN请求因为队列满而被丢弃
-            从而引起网络拥塞甚至系统瘫痪
-        防范SYN攻击措施
-            降低主机的等待时间使主机尽快的释放半连接的引用
-            短时间受到某IP的重复SYN则丢弃后放弃后续请求
-    第三次握手中，如果客户端的ACK未送达服务器，会怎样？
-        Server端：
+    - Server端易受到SYN攻击
+        - 服务端Server资源分配是在二次握手时分配的
+        - 客户端Client资源是在完成三次握手时分配的
+        - Server易受到SYN洪泛攻击
+        > SYN攻击概念：
+            Client短时间内伪造大量不存在的IP地址 并向Server不断发送SYN包
+            Server回复确认包 等待Client确认 由于源地址不存在 因此Server需要不断重发至超时
+            这些伪造的SYN包将长时间占用未连接队列 导致正常的SYN请求因为队列满而被丢弃 从而引起网络拥塞甚至系统瘫痪
+        > 防范SYN攻击措施
+        1. 降低主机的等待时间使主机尽快的释放半连接的引用
+        2. 短时间受到某IP的重复SYN则丢弃后放弃后续请求
+    - 第三次握手中，如果客户端的ACK未送达服务器，会怎样？
+        - Server端：
             由于Server没有收到ACK确认
             会每隔3秒 重发之前的SYN+ACK
             （默认重发五次，之后自动关闭连接进入CLOSED状态）
             Client收到后会重新传ACK给Server。
-        Client端两种情况
+        - Client端两种情况
             1.在Server进行超时重发的过程中
                 Client向服务器发送数据，数据头部的ACK是为1的
                 服务器收到数据之后会读取 ACK number
@@ -495,174 +482,154 @@ application/www-form-urlencoded区别
             2.在Server进入CLOSED状态之后
                 如果Client向服务器发送数据
                 服务器会以RST包应答。
-    已经建立了连接 客户端出现了故障如何处理
+    - 已经建立了连接 客户端出现了故障如何处理
         服务器每收到一次客户端的请求后重新复位一个计时器 时间通常是设置为2小时
         若两小时还没有收到客户端的任何数据，服务器发送一个探测报文段
         以后每隔75秒钟发送一次
         若一连发送10个探测报文仍然没反应，服务器就认为客户端出了故障 关闭连接。
-    TCP四次挥手 
-        (传输层协议断开连接的过程 目的确定数据全部传输完毕)
+    - TCP四次挥手 
+        - (传输层协议断开连接的过程 目的确定数据全部传输完毕)
         四次挥手：
-            1.第一次挥手
-                (FIN=1 seq=u
-                Client为FIN_WAIT_1)
-                Client将FIN置为1，发送一个序列号SEQ给Server
-                Client进入FIN_WAIT_1状态 表明Client已经没有数据要发送给Server了
-            2.第二次挥手
-                (ACK=1,ack=u+1,seq=v
-                Server为CLOSE_WAIT)
-                Server收到FIN之后，发送一个ACK=1，acknowledge number=收到的序列号+1
-                Server进入CLOSE_WAIT状态
-                此时客户端已经没有要发送的数据了，但仍可以接受服务器发来的数据。
-            3.第三次挥手
-                (FIN=1 ACK=1 seq=w ack=u+1
-                Client为FIN_WAIT_2
-                Server为LAST_ACK)
-                Server将FIN置1，发送一个序列号给Client
-                Server进入LAST_ACK状态；
-            4.第四次挥手
-                (ACK=1 seq=u+1 ack=w+1
-                Client为TIME_WAIT
-                Server为CLOSED
-                Client等待2*MSL CLOSED)
-                Client收到服务器的FIN后，进入TIME_WAIT状态
-                接着将ACK置1，发送一个ACKacknowledge number=序列号+1给服务器；
-                服务器收到后 确认acknowledge number后，变为CLOSED状态，不再向客户端发送数据。
-                客户端等待2*MSL（报文段最长寿命）时间后，也进入CLOSED状态。完成四次挥手。
-        TCP服务器最大并发连接数
-            关于TCP服务器最大并发连接数有一种误解就是“因为端口号上限为65535
-            所以TCP服务器理论上的可承载的最大并发连接数也是65535”
-            首先需要理解一条TCP连接的组成部分：客户端IP 客户端端口 服务端IP 服务端端口
-            所以对于TCP服务端进程来说，他可以同时连接的客户端数量并不受限于可用端口号，理论上一个服务器的一个端口能建立的连接数是全球的IP数*每台机器的端口数
-            实际并发连接数受限于linux可打开文件数，这个数是可以配置的，可以非常大，所以实际上受限于系统性能
-            通过#ulimit -n查看服务的最大文件句柄数，通过ulimit -n xxx 修改 xxx是你想要能打开的数量。也可以通过修改系统参数：
-        为什么不能把服务器发送的ACK和FIN合并起来，变成三次挥手（CLOSE_WAIT状态意义是什么）？
-            因为服务器收到客户端断开连接的请求时
-            可能还有一些数据没有发完，这时先回复ACK，表示接收到了断开连接的请求。
-            等到数据发完之后再发FIN，断开服务器到客户端的数据传送。
-        如果第二次挥手时服务器的ACK没有送达客户端，会怎样？
-            客户端没有收到ACK确认，会重新发送FIN请求。
-        客户端TIME_WAIT状态的意义是什么(确保Server收到ACK)
-            1.保证Client发送最后一个ACK报文段能到达Server
-            2.防止已失效的连接请求报文段出现在本连接中
-            第四次挥手时，客户端发送给服务器的ACK有可能丢失，TIME_WAIT状态就是用来重发可能丢失的ACK报文
-            如果Server没有收到ACK，就会重发FIN，
-            如果Client在2*MSL的时间内收到了FIN，就会重新发送ACK并再次等待2MSL，防止Server没有收到ACK而不断重发FIN。
-        优化 可以通过修改系统参数优化服务器
-            tcp_tw_reuse: 是否重用处于TIME_WAIT状态的TCP链接 （设为true）
-            tcp_max_tw_buckets: 处于TIME_WAIT状态的SOCKET最大数目 （调大，这个参数千万不要调小了）
-            tcp_fin_timeout: 处于FIN_WAIT_2的时间 （调小）
-        TIME_WAIT状态还需要等2MSL后才能返回到CLOSED状态会有什么问题
-            通信双方建立TCP连接后，主动关闭连接的一方就会进入TIME_WAIT状态
-            TIME_WAIT状态维持时间是两个MSL时间长度，也就是在1-4分钟
-            Windows操作系统就是4分钟
-            进入TIME_WAIT状态的一般情况下是客户端
-            一个TIME_WAIT状态的连接就占用了一个本地端口
-            一台机器上端口号数量的上限是65536个
-            如果在同一台机器上进行压力测试模拟上万的客户请求
-            并且循环与服务端进行短连接通信
-            那么这台机器将产生4000个左右的TIME_WAIT Socket
-            后续的短连接就会产生address already in use : connect的异常
-            如果使用Nginx作为方向代理也需要考虑TIME_WAIT状态
-            发现系统存在大量TIME_WAIT状态的连接，通过调整内核参数解决。
-        MSL(Maximum Segment Lifetime)
-            指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。
-        为什么连接是三次握手 关闭却是四次握手
-            1.连接时
-                Server收到Client端的SYN请求报文后
-                可以直接发送SYN+ACK报文
-                ACK用来应答
-                SYN用来同步
-            2.关闭时
-                Server端收到FIN报文时
-                很可能不会立即关闭SOCKET 
-                所以只能先回复一个ACK报文
-                告诉Client端 你发的FIN报文我收到了
-                只有Server端所有报文都发送完毕
-                Server才能发送FIN报文
-                因此不能一起发送 故需要四次握手
-    关于TCP/IP与HTTP协议关系    
-            我们在传输数据时 可以只使用(传输层)TCP/IP协议 但如果没有应用层 便无法是被数据内容 如想要使传输的数据有意义 则必须使用应用层协议
-4.http1.0 
-http1.1(目前使用最为广泛的HTTP协议)
-http2.0
-    http1.0&http1.1&http2
+        1. 第一次挥手
+            (FIN=1 seq=u
+            Client为FIN_WAIT_1)
+            Client将FIN置为1，发送一个序列号SEQ给Server
+            Client进入FIN_WAIT_1状态 表明Client已经没有数据要发送给Server了
+        2. 第二次挥手
+            (ACK=1,ack=u+1,seq=v
+            Server为CLOSE_WAIT)
+            Server收到FIN之后，发送一个ACK=1，acknowledge number=收到的序列号+1
+            Server进入CLOSE_WAIT状态
+            此时客户端已经没有要发送的数据了，但仍可以接受服务器发来的数据。
+        3. 第三次挥手
+            (FIN=1 ACK=1 seq=w ack=u+1
+            Client为FIN_WAIT_2
+            Server为LAST_ACK)
+            Server将FIN置1，发送一个序列号给Client
+            Server进入LAST_ACK状态；
+        4. 第四次挥手
+            (ACK=1 seq=u+1 ack=w+1
+            Client为TIME_WAIT
+            Server为CLOSED
+            Client等待2*MSL CLOSED)
+            Client收到服务器的FIN后，进入TIME_WAIT状态
+            接着将ACK置1，发送一个ACKacknowledge number=序列号+1给服务器；
+            服务器收到后 确认acknowledge number后，变为CLOSED状态，不再向客户端发送数据。
+            客户端等待2*MSL（报文段最长寿命）时间后，也进入CLOSED状态。完成四次挥手。
+    - TCP服务器最大并发连接数
+        关于TCP服务器最大并发连接数有一种误解就是“因为端口号上限为65535
+        所以TCP服务器理论上的可承载的最大并发连接数也是65535”
+        首先需要理解一条TCP连接的组成部分：客户端IP 客户端端口 服务端IP 服务端端口
+        所以对于TCP服务端进程来说，他可以同时连接的客户端数量并不受限于可用端口号，理论上一个服务器的一个端口能建立的连接数是全球的IP数*每台机器的端口数
+        实际并发连接数受限于linux可打开文件数，这个数是可以配置的，可以非常大，所以实际上受限于系统性能
+        通过#ulimit -n查看服务的最大文件句柄数，通过ulimit -n xxx 修改 xxx是你想要能打开的数量。也可以通过修改系统参数：
+    - 为什么不能把服务器发送的ACK和FIN合并起来，变成三次挥手（CLOSE_WAIT状态意义是什么）？
+        - 因为服务器收到客户端断开连接的请求时 可能还有一些数据没有发完，这时先回复ACK，表示接收到了断开连接的请求。等到数据发完之后再发FIN，断开服务器到客户端的数据传送。
+    - 如果第二次挥手时服务器的ACK没有送达客户端，会怎样？
+        - 客户端没有收到ACK确认，会重新发送FIN请求。
+    - 客户端TIME_WAIT状态的意义是什么(确保Server收到ACK)
+        1. 保证Client发送最后一个ACK报文段能到达Server
+        2. 防止已失效的连接请求报文段出现在本连接中
+        - 第四次挥手时，客户端发送给服务器的ACK有可能丢失，TIME_WAIT状态就是用来重发可能丢失的ACK报文
+        - 如果Server没有收到ACK，就会重发FIN，
+        - 如果Client在2*MSL的时间内收到了FIN，就会重新发送ACK并再次等待2MSL，防止Server没有收到ACK而不断重发FIN。
+    - 优化 可以通过修改系统参数优化服务器
+        tcp_tw_reuse: 是否重用处于TIME_WAIT状态的TCP链接 （设为true）
+        tcp_max_tw_buckets: 处于TIME_WAIT状态的SOCKET最大数目 （调大，这个参数千万不要调小了）
+        tcp_fin_timeout: 处于FIN_WAIT_2的时间 （调小）
+    - TIME_WAIT状态还需要等2MSL后才能返回到CLOSED状态会有什么问题
+        通信双方建立TCP连接后，主动关闭连接的一方就会进入TIME_WAIT状态
+        TIME_WAIT状态维持时间是两个MSL时间长度，也就是在1-4分钟
+        Windows操作系统就是4分钟
+        进入TIME_WAIT状态的一般情况下是客户端
+        一个TIME_WAIT状态的连接就占用了一个本地端口
+        一台机器上端口号数量的上限是65536个
+        如果在同一台机器上进行压力测试模拟上万的客户请求
+        并且循环与服务端进行短连接通信
+        那么这台机器将产生4000个左右的TIME_WAIT Socket
+        后续的短连接就会产生address already in use : connect的异常
+        如果使用Nginx作为方向代理也需要考虑TIME_WAIT状态
+        发现系统存在大量TIME_WAIT状态的连接，通过调整内核参数解决。
+    - MSL(Maximum Segment Lifetime)
+        指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。
+    - 为什么连接是三次握手 关闭却是四次握手
+        1. 连接时
+            Server收到Client端的SYN请求报文后 可以直接发送SYN+ACK报文 ACK用来应答 SYN用来同步
+        2. 关闭时
+            Server端收到FIN报文时 很可能不会立即关闭SOCKET 所以只能先回复一个ACK报文 告诉Client端 你发的FIN报文我收到了只有Server端所有报文都发送完毕 Server才能发送FIN报文 因此不能一起发送 故需要四次握手
+    - 关于TCP/IP与HTTP协议关系    
+        我们在传输数据时 可以只使用(传输层)TCP/IP协议 但如果没有应用层 便无法是被数据内容 如想要使传输的数据有意义 则必须使用应用层协议
+4. http1.0/http1.1(目前使用最为广泛的HTTP协议)/http2.0
+    - http1.0&http1.1&http2
     (
-    1.连接方面
-    2.资源请求方面
-    3.缓存方面
-    4.Host头处理
-    5.新增方法
-    6.新增错误管理状态码
+    1. 连接方面
+    2. 资源请求方面
+    3. 缓存方面
+    4. Host头处理
+    5. 新增方法
+    6. 新增错误管理状态码
     )
-    1.连接方面 HTTP1.1默认持久连接 HTTP1.0默认非持久连接
-        http1.1 默认使用持久连接 
-        http1.0 默认使用非持久连接 
-        http1.1 通过使用持久连接来使多个http请求复用同一个 TCP连接 
-        避免使用非持久连接时每次需要建立连接的时延。
-    2.资源请求方面 HTTP1.1支持断点续传功能
-        http1.0 中 存在一些浪费带宽的现象 如客户端只是需要某个对象的一部分 服务器却将整个对象送过来了，不支持断点续传功能
-        http1.1 则在请求头引入了 range 头域
-        它允许只请求资源的某个部分，即返回码是 206（Partial Content），这样就方便了开发者自由的选择以便于充分利用带宽和连接。
-    3.缓存方面 HTTP1.1增加Etag If-None-Match
-        http1.0 中主要使用 header 里的 If-Modified-Since,Expires 来做为缓存判断的标准
-        http1.1 则引入了更多的缓存控制策略例如 Etag、
-        If-Unmodified-Since、If-Match、If-None-Match 等更多可供选择的缓存头来控制缓存策略。
-    4.Host头处理 HTTP1.1新增host字段指定服务器域名
-        http1.1 中新增 host 字段用来指定服务器的域名
-        http1.0 中认为每台服务器都绑定一个唯一的 IP 地址，因此，请求消息中的 URL 并没有传递主机名（hostname）。
-        随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机，并且它们共享一个IP地址。
-        因此有了 host 字段，就可以将请求发往同一台服务器上的不同网站。
-    5.新增方法/错误管理状态码 HTTP1.1新增方法 错误管理状态码
-        PUT、HEAD、OPTIONS/
+    1. 连接方面 HTTP1.1默认持久连接 HTTP1.0默认非持久连接
+        - http1.1 默认使用持久连接 
+        - http1.0 默认使用非持久连接 
+        > http1.1 通过使用持久连接来使多个http请求复用同一个 TCP连接 避免使用非持久连接时每次需要建立连接的时延。
+    2. 资源请求方面 HTTP1.1支持断点续传功能
+        - http1.0 中 存在一些浪费带宽的现象 如客户端只是需要某个对象的一部分 服务器却将整个对象送过来了，不支持断点续传功能
+        - http1.1 则在请求头引入了 range 头域 它允许只请求资源的某个部分，即返回码是 206（Partial Content），这样就方便了开发者自由的选择以便于充分利用带宽和连接。
+    3. 缓存方面 HTTP1.1增加Etag If-None-Match
+        - http1.0 中主要使用 header 里的 If-Modified-Since,Expires 来做为缓存判断的标准
+        - http1.1 则引入了更多的缓存控制策略例如 Etag、If-Unmodified-Since、If-Match、If-None-Match 等更多可供选择的缓存头来控制缓存策略。
+    4. Host头处理 HTTP1.1新增host字段指定服务器域名
+        - http1.1 中新增 host 字段用来指定服务器的域名
+        - http1.0 中认为每台服务器都绑定一个唯一的 IP 地址，因此，请求消息中的 URL 并没有传递主机名（hostname）。
+        > 随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机，并且它们共享一个IP地址。因此有了 host 字段，就可以将请求发往同一台服务器上的不同网站。
+    5. 新增方法/错误管理状态码 
+        HTTP1.1新增方法 错误管理状态码 PUT、HEAD、OPTIONS/
         在HTTP1.1中新增了24个错误状态响应码 
         如409(Conflict)表示请求的资源与资源的当前状态发生冲突
         401(Gone)表示服务器上的某个资源被永久性的删除
-    http1.x&http2.0
-    (
-        1.新的二进制格式
-        2.多路复用
-        3.header压缩
-        4.服务端推送
-    )
-    1.新的二进制格式(Binary Format)
-        (HTTP1.x解析基于文本/HTTP2.0解析采用二进制格式)
-        HTTP1.x的解析基于文本 基于文本协议的格式解析存在天然缺陷 文本表现形式有多样性 要做到健壮性考虑到的场景必然很多
-        二进制则不同 只认0和1的组合
-        HTTP2.0协议解析决定采用二进制格式 实现方便且健壮
-    2.多路复用(MultiPlexing) 
-        连接共享 每一个request都是用作连接共享机制 一个request对应一个id 这样一个连接上可以有多个request 
-        每个连接的request可以随机混杂在一起 接收方可以根据request的id将request再归属到各自不同的服务端请求
-    3.header压缩 
-        HTTP1.x的header带有大量信息 每次都要重复发送 HTTP2.0使用encoder来减少需要传输的header大小 通讯双方各自cache一份header fields表 既避免了重复header的传输 又减小了需要传输的大小
-    4.服务端推送
+    - http1.x&http2.0
+        1. 新的二进制格式
+        2. 多路复用
+        3. header压缩
+        4. 服务端推送
+    1. 新的二进制格式(Binary Format)
+        - (HTTP1.x解析基于文本/HTTP2.0解析采用二进制格式)
+        - HTTP1.x的解析基于文本 基于文本协议的格式解析存在天然缺陷 文本表现形式有多样性 要做到健壮性考虑到的场景必然很多
+        - 二进制则不同 只认0和1的组合 HTTP2.0协议解析决定采用二进制格式 实现方便且健壮
+    2. 多路复用(MultiPlexing) 
+        - 连接共享 每一个request都是用作连接共享机制 一个request对应一个id 这样一个连接上可以有多个request 
+        - 每个连接的request可以随机混杂在一起 接收方可以根据request的id将request再归属到各自不同的服务端请求
+    3. header压缩 
+        - HTTP1.x的header带有大量信息 每次都要重复发送 HTTP2.0使用encoder来减少需要传输的header大小 通讯双方各自cache一份header fields表 既避免了重复header的传输 又减小了需要传输的大小
+    4. 服务端推送
         同SPDY一样 HTTP2.0也具有Server push功能
-    HTTP2.0升级改造
-        1.HTTP2.0其实可以支持非HTTPS 但现在主流浏览器像chrome firefox 表示还是只支持基于TLS部署的HTTP2.0协议 所以要想升级到HTTP2.0还是先升级HTTS比较好
-        2.基于HTTPS 升级HTTP2.0相对简单 如果使用NGINX 只要在配置文件中启动相关协议即可
-        3.HTTP1.0完全兼容 HTTP1.X语义 对于不支持HTTP2.0浏览器 NGINX会自动向下兼容   
-    http2.0多路复用和HTTP1.x中长连接复用区别
-        1.HTTP1.* 一次请求-响应 建立一个连接 用完关闭 每一个请求都要建立一个连接
-        2.HTTP/1.1 Pipeling解决方式
+    - HTTP2.0升级改造
+        1. HTTP2.0其实可以支持非HTTPS 但现在主流浏览器像chrome firefox 表示还是只支持基于TLS部署的HTTP2.0协议 所以要想升级到HTTP2.0还是先升级HTTS比较好
+        2. 基于HTTPS 升级HTTP2.0相对简单 如果使用NGINX 只要在配置文件中启动相关协议即可
+        3. HTTP1.0完全兼容 HTTP1.X语义 对于不支持HTTP2.0浏览器 NGINX会自动向下兼容   
+    - http2.0多路复用和HTTP1.x中长连接复用区别
+        1. HTTP1.* 一次请求-响应 建立一个连接 用完关闭 每一个请求都要建立一个连接
+        2. HTTP/1.1 Pipeling解决方式
             线头阻塞
             若干个请求排队串行化单线程处理 
             后面的请求等待前面请求的返回才能获取执行机会 一旦有某请求超时 后续请求只能被阻塞 毫无办法 
             也就是人们常说的线头阻塞
-        3.HTTP/2多个请求可同时在一个连接上并行执行
+        3. TTP/2多个请求可同时在一个连接上并行执行
             某个请求任务耗时严重 不会影响到其他连接的正常执行
-    HTTP2.0多路复用的好处
-        (让所有数据流共用同一个连接 可更有效地使用TCP连接 让高带宽能真正服务于HTTP性能提升)
-        (HTTP性能优化不在于高带宽 在于低延迟)
+    - HTTP2.0多路复用的好处
+        - (让所有数据流共用同一个连接 可更有效地使用TCP连接 让高带宽能真正服务于HTTP性能提升)
+        - (HTTP性能优化不在于高带宽 在于低延迟)
         HTTP性能优化不在于高带宽 在于低延迟 
         TCP连接会随着时间进行自我调节 起初会限制连接的最大速度 如果数据成功传输 会随着时间的推移提高传输的速度
         这种被称为TCP慢启动 由于此 让原本旧具有突发性和短时性的HTTP连接变的十分低效
         HTTP/2通过让所有数据流共用同一个连接 可以更有效地使用TCP连接 让高带宽能真正服务于HTTP性能提升
-4.HTTP
-    HTTP发展史
-        HTTP/0.9 单行协议
+4. HTTP
+    - HTTP发展史
+        1. HTTP/0.9 单行协议
             HTTP于1990问世 那时HTTP十分简单 
             只支持GET方法 没有首部 只能获取纯文本
-        HTTP/1.0 搭建协议的框架
+        2. HTTP/1.0 搭建协议的框架
             1996 HTTP正式被作为标准公布
             1.0版本增加了
                 首部 
@@ -671,7 +638,7 @@ http2.0
                 缓存 
                 长连接(默认短连接)
             搭建了协议的基本框架
-        HTTP/1.1 进一步完善
+        3. HTTP/1.1 进一步完善
             1997 改进
                 默认长连接
                 支持断点续传
@@ -680,27 +647,21 @@ http2.0
                 强制客户端提供Host首部
                 管线化
                 新增错误码 请求方式
-        目前存在问题
-        (线头阻塞/多个TCP连接/ - 多路复用 header头部压缩
+        - 目前存在问题
+        - (线头阻塞/多个TCP连接/ - 多路复用 header头部压缩
         头部冗余采用文本格式 - 二进制格式/
         客户端需主动发起请求 - 服务器端推送)
-            1.线头阻塞
-                TCP连接上只能发送一个请求 
-                前面的请求未完成前
-                后续请求都在排队等待
-            2.多个TCP连接
-                虽然HTTP/1.1管线化可以支持请求并发
-                但是浏览器很难实现
-                chrome/firefox等都禁用管道化
-                HTTP/1.1请求并发依赖于多个TCP连接
-                建立TCP连接成本高 存在慢启动问题
-            3.头部冗余,采用文本格式
-                HTTP/1.x版本采用文本格式
-                首部未压缩
-                每一个请求都会带上cookie
-                user-agent等完全相同的首部
-            4.客户端需要主动请求
-        HTTP2(二进制分帧层)
+        1. 线头阻塞
+            TCP连接上只能发送一个请求 前面的请求未完成前 后续请求都在排队等待
+        2. 多个TCP连接
+            虽然HTTP/1.1管线化可以支持请求并发 但是浏览器很难实现 chrome/firefox等都禁用管道化 HTTP/1.1请求并发依赖于多个TCP连接 建立TCP连接成本高 存在慢启动问题
+        3. 头部冗余,采用文本格式
+            HTTP/1.x版本采用文本格式
+            首部未压缩
+            每一个请求都会带上cookie
+            user-agent等完全相同的首部
+        4. 客户端需要主动请求
+        > HTTP2(二进制分帧层)
             性能提升核心 二进制分帧层
             HTTP2是二进制协议 采用二进制格式传输数据
             而不是1.x的文本格式
@@ -710,22 +671,22 @@ http2.0
                 Headers首部
                 Data消息负载
             一条HTTP响应 划分了两个帧传输 并且采用二进制编码
-        三个概念
-            1.流/Stream 
+        - 三个概念
+            1. 流/Stream 
                 已建立的TCP连接上的双向字节流 
                 可以承载一个或多个消息
-            2.消息/Message 
+            2. 消息/Message 
                 一个完整的HTTP请求/响应 
                 由一个或多个帧组成 
                 特定消息的帧在同一个流上发送
                 意味着一个HTTP请求/响应
                 只能在一个流上发送
-            3.帧/Frame
+            3. 帧/Frame
                 一个TCP连接上可以有任意数量的流
-        HTTP2
+        - HTTP2
             (二进制分帧层)
             (多路复用/头部压缩/服务器端推送)
-            1.多路复用 (解决了HTTP/1.1线头阻塞/多个TCP连接问题)
+            1. 多路复用 (解决了HTTP/1.1线头阻塞/多个TCP连接问题)
             HTTP2让所有通信都在一个TCP连接上完成 真正实现了请求的并发
             具体实现
                 基于流进行传输
@@ -736,13 +697,13 @@ http2.0
                 再进行重组 
                 形成一个完整的请求/响应
                 使得所有的请求/响应都无法阻塞
-            2.头部压缩(静态字典 哈夫曼编码/动态字典)
+            2. 头部压缩(静态字典 哈夫曼编码/动态字典)
                 HTTP2采用HPACK压缩格式压缩首部
                 头部压缩需要再浏览器和服务器端之间
                     维护一份相同的静态字典
                     维护一份相同的动态字典
                     通过静态Huffman编码对传输的首部字段进行编码
-            3.服务器端推送
+            3. 服务器端推送
                 使得服务器可以预测客户端需要资源 主动推送到客户端
                 实现原理：
                     客户端发出页面请求时 
@@ -750,86 +711,83 @@ http2.0
                     主动推送到客户端缓存 
                     客户端收到原始页面请求时 
                     它需要的资源已经位于缓存        
-4.HTTP(80端口)和HTTPS(443端口)的区别 HTTPS有哪些新特性 SSL协议解决了什么，其依靠的算法有哪些
-    区别:
+4. HTTP(80端口)和HTTPS(443端口)的区别 HTTPS有哪些新特性 SSL协议解决了什么，其依靠的算法有哪些
+    - 区别:
         HTTPS = HTTP + SSL/TLS(Secure Socket Layer安全套接层)
                 TLS(Transport Layer Security 继任者传输层安全)
                     TLS和SSL在传输层对网络连接进行加密
         HTTP 无CA证书 运行在TCP上 内容明文传输 默认80端口 |
         HTTPS(SSL 身份验证|加密|完整) 防止MIMT攻击 有CA证书 运行在SSL/TLS之上 SSL/TLS运行在TCP之上 内容加密传输 默认443端口 相对于 HTTP 性能上差点 多了 SSL/TLS 的几次握手和加密解密的运算处理 加密解密的运算处理已经可以通过特有的硬件来加速处理。
-    HTTP(Hypertext transfer protocol)超文本传输协议，
-        规定了超文本传输(文本 图片 视频)所要遵守的规则。
-    优点(灵活/可靠/请求-应答/无状态)
-        1.灵活可扩展，除了规定空格分隔单词，换行分隔字段以外，其他都没有限制，不仅仅可以传输文本，还可以传输图片、视频等任意资源
-        2.可靠传输，基于 TCP/IP 所以继承了这一特性
-        3.请求-应答，有来有回
-        4.无状态，每次 HTTP 请求都是独立的，无关的、默认不需要保存上下文信息
-    缺点(明文传输不安全/复用一个TCP连接 发生对头拥塞/无状态 长连接中需保存大量上下文)
-        1.明文传输不安全
-        2.复用一个 TCP 链接，会发生对头拥塞
-        3.无状态在长连接场景中，需要保存大量上下文，以避免传输大量重复的信息
-    HTTPS新特性:(TLS/SSL内容加密|CA证书验明身份防止MIMT攻击|MD5 SHA-1等散列值防止信息篡改)
-        1.TLS/SSL内容加密
-        2.数字证书(CA)验明身份：防范中间人MIMT攻击
-        3.MD5,SHA-1等散列值方法防止信息篡改
-    HTTPS安全性(服务器身份验证|数据加密|完整)
-        1.服务器身份验证，通过服务器身份验证，用户可以明确当前它正在与对应的服务器进行通信
-        2.数据机密性，其他方无法理解发送的数据内容，因为提交的数据是加密的
-        3.数据完整性，传输会携带Message Authentication(MAC)用作验证，因此传输的数据不会被另一方更改
-    HTTPS优点缺点
-        优点：(安全)
-            1.最大限度地提高 Web 上数据和事务的安全性；
-            2.加密用户敏感或者机密信息；
-            3.提高搜索引擎中的排名
-            4.避免在浏览器中出现“不安全”的提示；
-            5.提升用户对网站的信赖。
-        缺点：
-            1.HTTPS 协议在握手阶段耗时相对较大，会影响页面整体加载速度；
-            2.在浏览器和服务器上会更多的 CPU 周期来加密/解密数据；
-            3.SSL 证书一般都需要支付一定费用来获取，并且费用往往不低；
-            4.并不是绝对意义上的安全，在网站遭受攻击，服务器被劫持时，HTTPS 基本起不到任何安全防护作用。
-    SSL(信息窃听/篡改/劫持 => 加密/完整性校验/身份校验 =>机密性/可靠性/完整性)
+    - HTTP(Hypertext transfer protocol)超文本传输协议，规定了超文本传输(文本 图片 视频)所要遵守的规则。
+    - 优点(灵活/可靠/请求-应答/无状态)
+        1. 灵活可扩展，除了规定空格分隔单词，换行分隔字段以外，其他都没有限制，不仅仅可以传输文本，还可以传输图片、视频等任意资源
+        2. 可靠传输，基于 TCP/IP 所以继承了这一特性
+        3. 请求-应答，有来有回
+        4. 无状态，每次 HTTP 请求都是独立的，无关的、默认不需要保存上下文信息
+    - 缺点(明文传输不安全/复用一个TCP连接 发生对头拥塞/无状态 长连接中需保存大量上下文)
+        1. 明文传输不安全
+        2. 复用一个 TCP 链接，会发生对头拥塞
+        3. 无状态在长连接场景中，需要保存大量上下文，以避免传输大量重复的信息
+    - HTTPS新特性:(TLS/SSL内容加密|CA证书验明身份防止MIMT攻击|MD5 SHA-1等散列值防止信息篡改)
+        1. TLS/SSL内容加密
+        2. 数字证书(CA)验明身份：防范中间人MIMT攻击
+        3. MD5,SHA-1等散列值方法防止信息篡改
+    - HTTPS安全性(服务器身份验证|数据加密|完整)
+        1. 服务器身份验证，通过服务器身份验证，用户可以明确当前它正在与对应的服务器进行通信
+        2. 数据机密性，其他方无法理解发送的数据内容，因为提交的数据是加密的
+        3. 数据完整性，传输会携带Message Authentication(MAC)用作验证，因此传输的数据不会被另一方更改
+    - HTTPS优点缺点
+        - 优点：(安全)
+            1. 最大限度地提高 Web 上数据和事务的安全性；
+            2. 加密用户敏感或者机密信息；
+            3. 提高搜索引擎中的排名
+            4. 避免在浏览器中出现“不安全”的提示；
+            5. 提升用户对网站的信赖。
+        - 缺点：
+            1. HTTPS 协议在握手阶段耗时相对较大，会影响页面整体加载速度；
+            2. 在浏览器和服务器上会更多的 CPU 周期来加密/解密数据；
+            3. SSL 证书一般都需要支付一定费用来获取，并且费用往往不低；
+            4. 并不是绝对意义上的安全，在网站遭受攻击，服务器被劫持时，HTTPS 基本起不到任何安全防护作用。
+    - SSL(信息窃听/篡改/劫持 => 加密/完整性校验/身份校验 =>机密性/可靠性/完整性)
     原有风险 现有优势
-        1.信息窃听  信息加密
-        2.信息篡改  完整性校验
-        3.信息劫持  身份验证
-    SSL协议提供的安全通道有以下三个特性：
-        1.机密性：SSL协议使用密钥加密通信数据。
-        2.可靠性：服务器和客户都会被认证，客户的认证是可选的。
-        3.完整性：SSL协议会对传送的数据进行完整性检查。
-    主要包含两部分
-        1.Record记录协议
-            使用对称加密短发来解决通讯消息加密的部分
-        2.Handshake握手协议
-            为了完成对称加密，需要通过握手协议来传递密匙  
-    加密算法分为两大类：
-        1.对称加密算法
+    1. 信息窃听  信息加密
+    2. 信息篡改  完整性校验
+    3. 信息劫持  身份验证
+    - SSL协议提供的安全通道有以下三个特性：
+    1. 机密性：SSL协议使用密钥加密通信数据。
+    2. 可靠性：服务器和客户都会被认证，客户的认证是可选的。
+    3. 完整性：SSL协议会对传送的数据进行完整性检查。
+    - 主要包含两部分
+        1. Record记录协议 使用对称加密转发来解决通讯消息加密的部分
+        2. Handshake握手协议 为了完成对称加密，需要通过握手协议来传递密匙  
+    - 加密算法分为两大类：
+        1. 对称加密算法
             数据加解密使用同一份密钥，加解密速度快，效率高，缺点是密钥的管理难度大，一旦密钥传输泄露，那就没啥用处了。
-        2.非对称加密算法
+        2. 非对称加密算法
             数据加解密使用公钥和私钥，公钥用于传输，私钥自己保存，安全性较高，但加解密速度偏慢。
-    公钥和私钥的概念
-        1.私钥（放在服务器上，用于公钥加密过的数据），不会放在互联网上传输；
-        2.公钥（放在互联网上，所有人都能拿到的一串加密的字符串，这个加密的字符串是来加密我们的字符信息的。当加密的数据传到服务器上，只有服务器通过私钥解密，才能把公钥加密的数据拿出来）
-    SSL握手三个目的：
+    - 公钥和私钥的概念
+        1. 私钥（放在服务器上，用于公钥加密过的数据），不会放在互联网上传输；
+        2. 公钥（放在互联网上，所有人都能拿到的一串加密的字符串，这个加密的字符串是来加密我们的字符信息的。当加密的数据传到服务器上，只有服务器通过私钥解密，才能把公钥加密的数据拿出来）
+    - SSL握手三个目的：
         (客户端服务端确认算法/确认算法所使用加密密匙/选择对客户端进行认证)
-        1.客户端与服务端需要就一组用于保护的算法达成一致
-        2.它们需要确立一组由那些算法所使用的加密密匙
-        3.握手还可以选择对客户端进行认证
-    SSL握手过程
-        (1.客户端 --支持算法列表 一个用作产生密匙的随机数-->服务器
-        2.服务器 --算法列表中选择一种加密算法+服务器公钥+一个用于产生密匙的随机数 -->客户端
-        3.客户端 --对服务器证书验证 过程类似数字签名+抽取服务器公匙+产生一个pre_master_secret随机密码串+服务端公钥加密 -->服务端
-        4.客户端&服务端 根据pre_master_secret&随机数 独立计算出加密和MAC密匙
-        5.客户端 -- 所有握手信息的MAC -->服务器
-        6.服务器 -- 所有握手信息的MAC -->客户端)
+        1. 客户端与服务端需要就一组用于保护的算法达成一致
+        2. 它们需要确立一组由那些算法所使用的加密密匙
+        3. 握手还可以选择对客户端进行认证
+    - SSL握手过程
+        1. 客户端 --支持算法列表 一个用作产生密匙的随机数-->服务器
+        2. 服务器 --算法列表中选择一种加密算法+服务器公钥+一个用于产生密匙的随机数 -->客户端
+        3. 客户端 --对服务器证书验证 过程类似数字签名+抽取服务器公匙+产生一个pre_master_secret随机密码串+服务端公钥加密 -->服务端
+        4. 客户端&服务端 根据pre_master_secret&随机数 独立计算出加密和MAC密匙
+        5. 客户端 -- 所有握手信息的MAC -->服务器
+        6. 服务器 -- 所有握手信息的MAC -->客户端)
         (SSL握手通过交换三个随机数 计算出主会话密匙 由于安全性 会继续扩展出更多临时密匙 保证通讯过程绝对安全)   
 
         (对方公钥加密 自己私钥解密)
-        1.客户端和服务器建立连接后 各自生成私钥和公钥
-        2.服务器返给客户端一个公钥
-        3.客户端拿着公钥把要传输的内容进行加密 连同自己的公钥一起返给服务器
-        4.服务器用自己的私钥解密密文然后把响应的数据用客户端公钥加密返回给客户端 
-        5.客户端用自己的私钥解密密文 完成数据展现
+        1. 客户端和服务器建立连接后 各自生成私钥和公钥
+        2. 服务器返给客户端一个公钥
+        3. 客户端拿着公钥把要传输的内容进行加密 连同自己的公钥一起返给服务器
+        4. 服务器用自己的私钥解密密文然后把响应的数据用客户端公钥加密返回给客户端 
+        5. 客户端用自己的私钥解密密文 完成数据展现
 
         1.客户端将它所支持的算法列表和一个用作产生密匙的随机数发送给服务器
         2.服务器从算法列表中选择一种加密算法 并将它和一份包含服务器公用密匙的整数发送给客户端
@@ -840,26 +798,26 @@ http2.0
         4.客户端与服务器端根据pre_master_secret以及客户端与服务器的随机数值独立计算出加密和MAC密匙(参考DH密匙交换算法)
         5.客户端将所有握手消息的MAC发送给服务器
         6.服务器将所有握手消息的MAC值发送给客户端
-4.keep-alive标签
-    HTTP1.0中(默认使用Connection:close)
+4. keep-alive标签
+    - HTTP1.0中(默认使用Connection:close)
         早期在HTTP1.0协议中附加keep-alive字段
         connection:keep-alive
         客户端发送HTTP包含一个keep-alive端
         服务器端识别并返回一个keep-alive
         这样一个保持的连接就建立了
-    HTTP1.1中(默认使用Connection:keep-alive)
+    - HTTP1.1中(默认使用Connection:keep-alive)
         所有连接都默认被保持
         这时客户端发送一个connection:close关闭连接
-    HTTP中的keep-alive和TCP中的keep-alive
-        HTTP中
+    - HTTP中的keep-alive和TCP中的keep-alive
+        - HTTP中
             相当于保存了一个连接池
             使用完之后不会立即销毁而是放在池子中
-        TCP中
+        - TCP中
             保活机制 防止对面服务器挂掉
             浪费这个连接 如果挂掉之后会返回rst
-    如果一个连接是不会断开 多个请求如何区分 即浏览器如何知道当前请求已经完成
+    - 如果一个连接是不会断开 多个请求如何区分 即浏览器如何知道当前请求已经完成
         HTTP在header中添加一个Content-Length字段
-    Content-Length
+    - Content-Length
         表示实体内容长度
         浏览器通过该字段判断当前请求的数据是否已经完全接收
         浏览器请求的是一个静态资源时
@@ -868,63 +826,60 @@ http2.0
         浏览器请求动态的页面或数据
         Content-Length无法解决
         需要用到Transfer-Encodeing字段
-    Transfer-Encoding
+    - Transfer-Encoding
         Transfer-Encoding是指传输编码，还有一个类似的字段叫做：Content-Encoding。两者的区别是Content-Encoding用于对实体内容的压缩编码，比如Content-Encoding: gzip；Transfer-Encoding则改变了报文的格式，比如上面的问题中，当服务端无法知道实体内容的长度时，就可以通过指定Transfer-Encoding: chunked来告知浏览器当前的编码是将数据分成一块一块传递的。当然, 还可以指定Transfer-Encoding: gzip, chunked表明实体内容不仅是gzip压缩的，还是分块传递的。最后，当浏览器接收到一个长度为0的chunked时， 知道当前请求内容已全部接收。
-4.WebSocket
-    WebSocket H5一种新协议 实现浏览器和服务器全双工通信 一开始握手需借助HTTP请求完成 请求成功 单独建立一条TCP通信信道进行数据传输 被用作即时通讯 代替轮询
-    WebSocket协议本质上是一个基于TCP的协议
-    WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。
-    使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。
-    在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
-    在 WebSocket API 中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。
-    长轮询和短轮询，WebSocket 是长轮询。
+4. WebSocket
+    - WebSocket H5一种新协议 实现浏览器和服务器全双工通信 一开始握手需借助HTTP请求完成 请求成功 单独建立一条TCP通信信道进行数据传输 被用作即时通讯 代替轮询
+    - WebSocket协议本质上是一个基于TCP的协议
+    - WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。
+    -  使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。
+    - 在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
+    - WebSocket 是长轮询。
+    - 长轮询和短轮询
         具体比如在一个电商场景，商品的库存可能会变化，所以需要及时反映给用户，所以客户端会不停的发请求，然后服务器端会不停的去查变化，不管变不变，都返回，这个是短轮询。
         而长轮询则表现为如果没有变，就不返回，而是等待变或者超时（一般是十几秒）才返回，如果没有返回，客户端也不需要一直发请求，所以减少了双方的压力。
-4.WebSocket与Ajax的区别
-    本质不同
-        Ajax（Asynchronous Javascript And XML） 即异步 JavaScript 和 XML。
-        是一种创建交互式网页的应用的网页开发技术
-        websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
-    生命周期不同：
+4. WebSocket与Ajax的区别
+    - 本质不同
+        Ajax（Asynchronous Javascript And XML） 即异步 JavaScript 和 XML。是一种创建交互式网页的应用的网页开发技术 websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
+    - 生命周期不同：
         websocket 是长连接，会话一直保持
         ajax 发送接收之后就会断开
-    适用范围：
+    - 适用范围：
         websocket 用于前后端实时交互数据    
         ajax 非实时
-    发起人：
+    - 发起人：
         AJAX 客户端发起 
         WebSocket 服务器端和客户端相互推送    
-4.即时通讯的实现 
-短轮询/长轮询/SSE(基于HTTP协议) 
-WebSocket(基于TCP协议 典型的应用层协议)
-区别
+4. 即时通讯的实现
+    - 短轮询/长轮询/SSE(基于HTTP协议) WebSocket(基于TCP协议 典型的应用层协议)
+    区别
     (目的都是实现客户端/服务器端一个即时通讯)
-    1.短轮询的基本思路(基于HTTP协议)
-        实现原理：
-            浏览器每隔一段时间向浏览器发送 HTTP 请求，
-            服务器端在收到请求后，不论是否有数据更新，都直接进行响应。
-            这种方式实现的即时通信，本质上还是浏览器发送请求，服务器接受请求的一个过程，
-            通过让客户端不断的进行请求，使得客户端能够模拟实时地收到服务器端的数据的变化。
-        优点：
-            比较简单，易于理解。
-        缺点：
-            该方式由于需要不断的建立 HTTP 连接
-            严重浪费了服务器端和客户端的资源。
-            当用户增加时，服务器端的压力就会变大，这是很不合理的。
-    2.长轮询的基本思路(基于HTTP协议)
-        实现原理:(服务器不会直接进行响应而是先将这个请求挂起 判断服务器端数据是否有更新)
-            首先由客户端向服务器发起请求，当服务器收到客户端发来的请求后，服务器端不会直接进行响应，而是先将这个请求挂起
-            判断服务器端数据是否有更新。
+    1. 短轮询的基本思路(基于HTTP协议)
+    实现原理：
+        浏览器每隔一段时间向浏览器发送 HTTP 请求，
+        服务器端在收到请求后，不论是否有数据更新，都直接进行响应。
+        这种方式实现的即时通信，本质上还是浏览器发送请求，服务器接受请求的一个过程，
+        通过让客户端不断的进行请求，使得客户端能够模拟实时地收到服务器端的数据的变化。
+    优点：
+        比较简单，易于理解。
+    缺点：
+        该方式由于需要不断的建立 HTTP 连接
+        严重浪费了服务器端和客户端的资源。
+        当用户增加时，服务器端的压力就会变大，这是很不合理的。
+    2. 长轮询的基本思路(基于HTTP协议)
+        - 实现原理:
+            (服务器不会直接进行响应而是先将这个请求挂起 判断服务器端数据是否有更新)
+            首先由客户端向服务器发起请求，当服务器收到客户端发来的请求后，服务器端不会直接进行响应，而是先将这个请求挂起 判断服务器端数据是否有更新。
             如果有更新，则进行响应，如果一直没有数据，则到达一定的时间限制才返回。
             客户端 JavaScript 响应处理函数会在处理完服务器返回的信息后，再次发出请求，重新建立连接。
         长轮询和短轮询相比
-        优点：
+        - 优点：
             明显减少了很多不必要的 HTTP 请求次数，相比之下节约了资源。
-        缺点：
+        - 缺点：
             连接挂起也会导致资源的浪费。
-    3.SSE(基于HTTP协议 单向 服务端=>客户端)
+    3. SSE- Server-sent Events (基于HTTP协议 单向 数据流如视频播放 服务端=>客户端)
         (服务端向客户端声明接下来要发送的是流信息 发送的不是一次性的数据包 而是一个数据流 如视频播放)
-        实现原理:
+        - 实现原理:
             服务器使用流信息向服务器推送信息。严格地说，HTTP1.x 协议无法做到服务器主动推送信息。
             有一种变通方法，就是服务器向客户端声明，接下来要发送的是流信息。
             也就是说，发送的不是一次性的数据包，而是一个数据流，会连续不断地发送过来。
@@ -932,36 +887,36 @@ WebSocket(基于TCP协议 典型的应用层协议)
             SSE 就是利用这种机制，使用流信息向浏览器推送信息。它基于HTTP协议目前除了 IE/Edge，其他浏览器都支持。
         优点:   
             它相对于前面两种方式来说，不 需要建立过多的 http 请求，相比之下节约了资源。
-    4.WebSocket(基于TCP协议 全双工 双向)
-            上面三种方式本质上都是基于HTTP协议的.
-            我们还可以使用 WebSocket 协议来实现。
-            WebSocket 是 Html5 定义的一个新协议，与传统的 http 协议不同，该协议允许由服务器主动的向客户端推送信息。
+    4. WebSocket
+        (H5新定义的一个协议 基于TCP协议 全双工 双向 该协议允许服务器主动向客户端推送信息)
+        上面三种方式本质上都是基于HTTP协议的.我们还可以使用 WebSocket 协议来实现。
+        WebSocket 是 Html5 定义的一个新协议，与传统的 http 协议不同，该协议允许由服务器主动的向客户端推送信息。
         缺点：
             服务器端的配置比较复杂。
         WebSocket与SSE区别：    
-            WebSocket 是一个全双工的协议，也就是通信双方是平等的，可以相互发送消息
-            而 SSE 的方式是单向通信的，只能由服务器端向客户端推送信息，如果客户端需要发送信息就是属于下一个HTTP请求了。
-    4.WebSocket和SSE
+        WebSocket 是一个全双工的协议，也就是通信双方是平等的，可以相互发送消息
+        而 SSE 的方式是单向通信的，只能由服务器端向客户端推送信息，如果客户端需要发送信息就是属于下一个HTTP请求了。
+    4. WebSocket和SSE
         (WebSocket一个全双工协议 通信双方平等 可以互发消息)
         (SSE服务器端向浏览器端单向通信 如用户需要发送信息 属于下一个HTTP请求)
-    5.WebSocket和HTTP
+    5. WebSocket和HTTP
         (相同 一样基于TCP都是可靠性传输协议/应用层协议)
         (不同 WebSocket双向通信协议 模拟Socket协议 可双向发送或接收请求 HTTP单向/WebSocket需握手进行建立连接)
         (联系 WebSocket协议建立握手时 数据通过HTTP传输 建立后真正传输不需要HTTP协议)
         相同点：
-            1.都是一样基于TCP都是可靠性传输协议
-            2.都是应用层协议
+        1. 都是一样基于TCP都是可靠性传输协议
+        2. 都是应用层协议
         不同点:
-            1.Websocket是双向通信协议 模拟Socket协议 可以双向发送或接受请求 HTTP是单向的
-            2.WebSocket需要握手进行建立连接
+        1. Websocket是双向通信协议 模拟Socket协议 可以双向发送或接受请求 HTTP是单向的
+        2. WebSocket需要握手进行建立连接
         联系:
-            1.WebSocket协议在建立握手时 数据是通过HTTP传输的
-            但是建立后真正传输时不需要HTTP协议
-    7.WebSocket和Socket关系
+        1. WebSocket协议在建立握手时 数据是通过HTTP传输的
+        但是建立后真正传输时不需要HTTP协议
+    6. WebSocket和Socket关系
         (WebSocket(典型的应用层协议)
-        Socket
+        Socket:
+            (不是一个协议 是为了方便使用TCB/UDP抽象出来的一层)
             (不是一个协议 是为方便使用TCP/UDP抽象出来位于应用层和传输控制层间的一组接口))
-            其实不是一个协议 而是为了方便使用TCP/UDP而抽象出来的一层
             是位于应用层和传输控制层之间的一组接口
             Sockets是应用层和TCP/IP协议族通信的中间软件抽象层 它是一组接口 
             在设计模式中Socket其实就是一个门面模式 它把复杂的TCP/IP协议族隐藏在Socket接口后面
@@ -975,33 +930,33 @@ WebSocket(基于TCP协议 典型的应用层协议)
         总结：
             Socket是传输控制层协议
             WebSocket是引用层协议
-    8.WebSocket和HTML5的关系
+    7. WebSocket和HTML5的关系
         (WebSocket API是H5标准一部分 WebSocket不必一定要用在HTML/基于浏览器应用程序中)
         (许多语言/框架 服务器都提供WebSocket支持)
         WebSocket API是HTML5标准的一部分 
         但这不代表WebSocket一定要用在HTML中
         或者只能在基于浏览器中的应用程序中使用
         实际上许多语言 框架 服务器都提供了WebSocket支持
-4.WebSocket Socket(套接字) HTTP HTTPS
-    WebSocket
+4. WebSocket Socket(套接字) HTTP HTTPS
+    - WebSocket
         通常应用层协议都是完全基于网络层协议TCP/UDP实现 例如HTTP SMTP POP3 
         而WebSocket是同时基于HTTP与TCP实现
             先用带有 Upgrade:Websocket头Header的特殊HTTP request来实现与服务端握手HandShake;
             握手成功后，协议升级成Websocket，进行长连接通讯；
             整个过程可理解为：小锤抠缝，大锤搞定。
-    (Socket 长连接 客户端和服务器端互相连接 一旦建立不会主动挂掉 一个Socket由一个IP地址和一个端口号唯一确定)
+    - (Socket 长连接 客户端和服务器端互相连接 一旦建立不会主动挂掉 一个Socket由一个IP地址和一个端口号唯一确定)
         一个Socket 源IP+源端口+目的IP+目的端口)
-        1.网络上的两个程序通过一个双向的通讯连接实现数据的交换，这个双向链路的一端称为一个Socket。
+        1. 网络上的两个程序通过一个双向的通讯连接实现数据的交换，这个双向链路的一端称为一个Socket。
             Socket通常用来实现客户方和服务方的连接。
             Socket是TCP/IP协议的一个十分流行的编程界面，
             一个Socket由一个IP地址和一个端口号唯一确定。
-        2.Socket所支持的协议种类也不光TCP/IP、UDP，
+        2. Socket所支持的协议种类也不光TCP/IP、UDP，
             因此两者之间是没有必然联系的。
             在Java环境下，Socket编程主要是指基于TCP/IP协议的网络编程。
-        3.socket连接就是所谓的长连接，
+        3. Socket连接就是所谓的长连接，
             客户端和服务器需要互相连接，
             理论上客户端和服务器端一旦建立起连接将不会主动断掉的，但是有时候网络波动还是有可能的
-        4.Socket偏向于底层
+        4. Socket偏向于底层
             一般很少直接使用Socket来编程，框架底层使用Socket比较多，
             了解到TCP/IP只是一个协议栈 就像操作系统的运行机制一样 
             必须要具体实现 同时还要提供对外的操作接口 
@@ -1013,13 +968,13 @@ WebSocket(基于TCP协议 典型的应用层协议)
             其对TCP/IP进行抽象 形成几个最基本的函数接口
             比如create listen accept connect read和write
             不同语言都有对应的建立Socket服务端和客户端的库
-    Socket和WebSocket关系
+    - Socket和WebSocket关系
         Socket是传输控制层协议
         WebSocket是应用层协议
         Socket其实不是一个协议 
         是为了方便使用TCP/UDP而抽象出来的一层 
         是位于应用层和传输控制层之间的一组接口      
-    HTTP(应用层)
+    - HTTP(应用层)
         Http协议是对客户端和服务器端之间数据之间实现可靠性的传输文字/图片/音频/视频等超文本数据的规范
         格式简称为“超文本传输协议”
 
@@ -1048,55 +1003,50 @@ WebSocket(基于TCP协议 典型的应用层协议)
         4xx:一般表示客户端有错误 请求无法实现
         5xx:一般是服务器端的错误
 
-    Socket和http的区别和应用场景
-        1.Socket连接就是所谓的长连接，理论上客户端和服务器端一旦建立起连接将不会主动断掉；
-        2.Socket适用场景：网络游戏，银行持续交互，直播，在线视屏等。
-        3.http连接就是所谓的短连接，即客户端向服务器端发送一次请求，服务器端响应后连接即会断开等待下次连接
-        4.http适用场景：公司OA服务，互联网服务，电商，办公，网站等等等等
-    HTTP请求体
-        1.HTTP请求体是我们请求数据时先发送给服务器的数据，毕竟我向服务器那数据，先要表明我要什么吧
-        2.HTTP请求体由：请求行 、请求头、请求数据组成的，
-        3.注意：GIT请求是没有请求体的
-    HTTP和HTTPS区别
-        1.https需要拿到CA证书，需要钱
-        2.端口不一样，http是80，https443
-        3.http是超文本传输协议，信息是明文传输，https则是具有安全性的ssl加密传输协议。
-        4.http和https使用的是完全不同的连接方式
+    - Socket和http的区别和应用场景
+        1. Socket连接就是所谓的长连接，理论上客户端和服务器端一旦建立起连接将不会主动断掉；
+        2. Socket适用场景：网络游戏，银行持续交互，直播，在线视屏等。
+        3. http连接就是所谓的短连接，即客户端向服务器端发送一次请求，服务器端响应后连接即会断开等待下次连接
+        4. http适用场景：公司OA服务，互联网服务，电商，办公，网站等等等等
+    - HTTP请求体
+        1. HTTP请求体是我们请求数据时先发送给服务器的数据，毕竟我向服务器那数据，先要表明我要什么吧
+        2. HTTP请求体由：请求行 、请求头、请求数据组成的，
+        3. GIT请求是没有请求体的
+    - HTTP和HTTPS区别
+        1. https需要拿到CA证书，需要钱
+        2. 端口不一样，http是80，https443
+        3. http是超文本传输协议，信息是明文传输，https则是具有安全性的ssl加密传输协议。
+        4. http和https使用的是完全不同的连接方式
         （http的连接很简单，是无状态的；HTTPS 协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全）
-    HTTPS开发主要目的
-        提供对网站服务器的身份认证
-        保护交换数据的隐私与完整性
+    - HTTPS开发主要目的(加密 身份认证 完整性)
+        - 提供对网站服务器的身份认证
+        - 保护交换数据的隐私与完整性
         其实就是
-        HTTP+加密+身份认证+完整性保护
-        为兼顾安全与效率
-        HTTPS同时使用对称加密和非对称加密
-        要传输的数据使用了对称加密 
-        对称加密的过程需要客户端一个密钥
-        为确保能把该安全传输到服务器端
-        讲该秘钥进行非对称加密
-        总结：
-            数据进行对称加密 
-            对称加密使用的秘钥进行了非对称加密
+        - HTTP+加密+身份认证+完整性保护
+        - 为兼顾安全与效率 HTTPS同时使用对称加密和非对称加密
+        - 要传输的数据使用了对称加密 对称加密的过程需要客户端一个密钥 为确保能把该安全传输到服务器端 讲该秘钥进行非对称加密
+        > 总结：数据进行对称加密 对称加密使用的秘钥进行了非对称加密
+
         (对方公钥加密 自己私钥解密)
-        1.客户端和服务器建立连接后 各自生成私钥和公钥
-        2.服务器返给客户端一个公钥
-        3.客户端拿着公钥把要传输的内容进行加密 连同自己的公钥一起返给服务器
-        4.服务器用自己的私钥解密密文然后把响应的数据用客户端公钥加密返回给客户端 
-        5.客户端用自己的私钥解密密文 完成数据展现
+        1. 客户端和服务器建立连接后 各自生成私钥和公钥
+        2. 服务器返给客户端一个公钥
+        3. 客户端拿着公钥把要传输的内容进行加密 连同自己的公钥一起返给服务器
+        4. 服务器用自己的私钥解密密文然后把响应的数据用客户端公钥加密返回给客户端 
+        5. 客户端用自己的私钥解密密文 完成数据展现
         (数据进行对称加密 对称加密使用的密匙进行非对称加密)
-    HTTPS原理
+    - HTTPS原理
         HTTPS在内容传输的加密上使用的是对称加密
         非对称加密只作用于证书验证阶段
         HTTPS整体过程
-            1.证书验证
-                1.浏览器发起HTTPS请求
-                2.服务器返回HTTPS证书
-                3.客户端验证证书是否合法不合法则提示告警
-            2.数据传输阶段
-                1.当证书验证合法后 在本地生成随机数
-                2.通过公式加密随机数 并把加密后的随机数传输到服务端
-                3.服务端通过私钥对随机数进行解密
-                4.服务端通过客户端传入的随机数构造对称加密算法 对返回结果内容进行加密后传输
+        1. 证书验证
+            1.浏览器发起HTTPS请求
+            2.服务器返回HTTPS证书
+            3.客户端验证证书是否合法不合法则提示告警
+        2. 数据传输阶段
+            1.当证书验证合法后 在本地生成随机数
+            2.通过公式加密随机数 并把加密后的随机数传输到服务端
+            3.服务端通过私钥对随机数进行解密
+            4.服务端通过客户端传入的随机数构造对称加密算法 对返回结果内容进行加密后传输
         为什么数据传输用对称加密 
             1.非对称加密加解密效率非常低 HTTP应用场景中通常端与端之间存在大量交互 非对称加密的效率无法接收
             2.HTTPS场景中只有服务器端保存了私钥 一对公私钥只能实现单向加解密 所以HTTPS中内容传输加密采取对称加密而不是非对称加密
@@ -1223,7 +1173,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
         如果空闲队列里面没有，且正在运行的队列长度小于配置的连接池资源的数量，就新建一个长连接到正在运行的队列去
         如果正在运行的不下于配置的资源池长度，则这个请求进入到等待队列去。
         当一个正在运行的Socket完成了请求，就从正在运行的队列移到空闲的队列，并触发等待请求队列去获取空闲资源，如果有等待的情况。
-5.Cookie Session Token JWT(基于token实现)
+5. Cookie Session Token JWT(基于token实现)
         (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 
         Cookie/Session/Token/JWT        
         用于客户端和服务器端进行会话验证的凭证 )
@@ -1652,7 +1602,7 @@ WebSocket(基于TCP协议 典型的应用层协议)
             6.JWT 适合一次性的命令认证，颁发一个有效期极短的JWT
                 即使暴露了危险也很小 由于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
             7.为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。      
-6.localStorage(Document源对象 本地存储 除非手动清除否则一直有效)和 
+6. localStorage(Document源对象 本地存储 除非手动清除否则一直有效)和 
     sessionStorage(session Storage对象 会话存储 会话结束时清除 浏览器关闭前有效)
     ---解决了cookie存储空间不足问题 
     (5M|同源策略跨域无法访问|仅存储在客户端|以key和value形式存储数据)
@@ -2381,13 +2331,15 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
         4.HTTP头中自定义属性并验证
         5.验证HTTP Referer字段
         6. 在表单中预先植入一些加密信息，验证请求是此表单发送
-15.sql注入(SQL injection)
-    未授权情况下 非法访问数据库信息
-    防范(参数转义)
-        1.杜绝用户提交的参数入库且执行
-        2.代码层 不准出现SQL语句
-        3.web输入参数处 对所有参数做sql转义
-        4.上线测试 需要使用sql自动注入工具进行所有页面sql注入脚本
+15. sql注入(SQL injection)
+    - 原理：
+        通过把sql命令插入到Web表单递交或输入域名或页面请求的查询字符串 最终达到欺骗服务器执行恶意SQL命令  
+        未授权情况下 非法访问数据库信息
+    - 防范(参数转义)
+        1. 杜绝用户提交的参数入库且执行
+        2. 代码层 不准出现SQL语句
+        3. web输入参数处 对所有参数做sql转义
+        4. 上线测试 需要使用sql自动注入工具进行所有页面sql注入脚本
 16.MITM(Man-in-the-MiddleAttck-中间人攻击)攻击
 (HTTPS/不使用公共网络发送敏感信息/不点击恶意链接和电子邮件)
         流程：
