@@ -1734,6 +1734,54 @@ Token/JWT为什么能避免CSRF攻击(服务器端验证header中的token信息 
                   第二步：当用户点击授权并登陆后，授权服务器将生成一个用户凭证（code）。这个用户凭证会附加在重定向的地址redirect_uri的后面；
                   第三步：用户再去请求时携带用户凭证（code），验证服务器返回一个访问令牌（Access Token）；
                   第四步：再去拿着令牌请求资源时，就会得到受保护的资源信息。
+1. Nodejs解决跨域问题9种方案
+    > 什么是跨域
+    - 一个域下的文档或脚本尝试去请求另一个域下的资源 这里跨域是广义的
+    > 广义的跨域
+    1. 资源跳转: A链接 重定向 表单提交
+    2. 资源嵌入: <link><script><img><frame>等dom标签 还有央视中background:url(),@font-face()等文件外链
+    3. 脚本请求: JS发起的AJAX请求 dom和js对象的跨域操作
+    > 狭义
+    - 通常所说的跨域是狭义的 是由浏览器同源策略限制的一类请求场景
+    > 同源策略/SOP(Same origin policy)是一种约定 由NetScape公司1995年引入浏览器 它是浏览器最核心也最基本的安全功能 如果缺少了同源策略 浏览器很容易瘦到XSS CSRF攻击 
+    - 同源是指协议+域名+端口 
+    > 同源策略限制行为
+    1. Cookie LocalStorage 和IndexDB无法读取
+    2. DOM和JS对象无法获得
+    3. AJAX请求不能发送
+    > axios发起请求
+    ```
+    axios.get('http://127.0.0.1:3000/user').then(res=>{
+        console.log(res.sata)
+    }).catch(err=>{
+        console.log(err);
+    })
+    ```
+    > 跨域常用解决方案
+    1. 通过JSONP跨域
+        - 通常为了减轻web服务器负载 把js css html等静态资源分离到另一台独立域名的服务器上 在html页面中再通过相应的标签从不同的域名下加载静态资源 二倍浏览器允许
+        - 基于此 可以通过动态创建script 再请求一个带参数网址实现跨域通信
+        - axois最新版本已经不支持jsonp了
+    2. 跨域资源共享(CORS最常用)
+    3. nginx代理跨域
+        - 实现原理类似node中间件代理 需要搭建一个中转nginx服务器 用于转发请求
+        - 使用nginx反向代理实现跨域是最简单的跨域方式 只要修改nginx的配置即可解决跨域问题 支持所有浏览器 支持session 不需要修改任何代码 并且不会影响服务器性能
+        - 实现思路：通过nginx配置一个代理服务器(域名与domain1相同 端口不同)做跳板机 反向代理访问domain2接口 并且可以顺便修改cookie中domain信息 方便当前域cookie写入 实现跨域登录
+    4. node中间件代理跨域
+        - 实现原理
+        - 同源策略是浏览器要遵循的标准 如果是服务器向服务器请求就无需遵循同源策略 代理服务器 需要做以下几个步骤
+        1. 接受客户端请求
+        2. 将请求转发给服务器
+        3. 拿到服务器响应数据
+        4. 将响应转发给客户端
+
+    1. document.domain+iframe(只有在主域相同的时候才能使用该方法)
+    2. 动态创建script标签(script标签不受同源策略限制)
+    3. location.hash+iframe(利用location.hash来进行传值)
+    4. window.name+iframe(name值在不同的页面加载后依旧存在 并且可以支持非常长的name值(2MB))
+    5. postMessage(HTML5中的XMLHttpRequest Level2中的API)
+    6. Web Socket(WebSocket是一种浏览器的API 它的目标是在一个单独的持久连接上提供全双工 双向通信(同源策略对web sockets不适用))
+
 8. 跨域相关(主要用来防止CSRF攻击)
     1. JSONP:(需服务器端配合|利用script标签没有限制跨域的漏洞|兼容性好实现简单|只支持get请求|容易受到XSS攻击)
     2. CORS(主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)
@@ -1802,6 +1850,8 @@ Token/JWT为什么能避免CSRF攻击(服务器端验证header中的token信息 
                 虽然因为同源策略的影响，不能通过XMLHttpRequest请求不同域上的数据（Cross-origin reads）。
                 但是，在页面上引入不同域上的js脚本文件却是可以的（Cross-origin embedding）。因此在js文件载入完毕之后，触发回调，可以将需要的data作为参数传入。
                 利用script标签没有跨域限制的漏洞，使得网页可以得到从其他来源动态产生的JSON数据（前提是服务器支持）。
+            - 不支持post原因：
+                - script标签只支持get请求
             实现方式(需前后端配合):
             优点:兼容性好（兼容低版本IE）,实现简单
             缺点：
@@ -2598,5 +2648,14 @@ Token/JWT为什么能避免CSRF攻击(服务器端验证header中的token信息 
     - 为保证服务可用性 接口性能 数据安全 后端开发往往要考虑缓存 限流 降级 鉴权等 这些功能并不和某个特定业务强关联 并且在各个服务中都是通用的
     - 按照分层架构的思想 将这些功能放在单独一层分为网关 提供功能的服务 称为网关服务
 
+    > 技术选型选择Node
+    > 优点
+    1. 异步非阻塞的编程模型 async/await语法让开发者用同步写法写出异步代码 本身适合IO密集型场景 
+    2. 不需要太多前置知识就能写出性能较高的代码
+    3. TS的推广 使得类型系统被应用在大型JS项目中
+    > 缺点
+    1. 单线程瓶颈限制
+    2. Nodejs进行数据计算性能非常低
+    3. 相较于Java 官方没有支持高级的数据结构和算法
 
 

@@ -271,25 +271,5 @@
 20. saas
 21. toB toC
 22. 列权限
-23. git工作流 
-    1. 之前的git工作流
-    2. rebase做什么 一般解决什么问题
-        - 可以对某一段先行提交历史 进行编辑 删除 复制 粘贴 因此 合理使用rebase命令可以使我们的提交历史干净简洁
-        - 不要通过rebase对任何已提交到公共仓库的commit进行修改
-        - 使用git log 可以按s向下翻log
-        - git log -oneline 可以一行展现
-    3. 如何合并多个commit
-    4. 具体操作 
-        - 本地仓库提交多次 在把本地提交push进公共仓库之前 为了让提交记录更简洁明了 把如下分支B C D三个提交记录合并成一个完整的提交 然后push到公共仓库
-        ```
-        git rebase -i [startpoint] [endpoint]
-        ```
-        - -i的意思是--interactive 即弹出交互式的界面让用户编辑完成合并操作 [startpoint][endpoint]指定一个编辑区间 如果不指定[endpoint]则该区间的终点默认是当前分支HEAD所指向的commmit(该区间指定的是一个前开后闭的区间) 在查看到了log日志后 运行以下命令
-        ```
-        git rebase -i 36224db
-        ```
-        ```
-        git rebase -i HEAD-3
-        ```
 
 https://xin-tan.com/2020-10-08-duo-ji-huan-cun/

@@ -854,6 +854,16 @@
         5. componenDidUpdate()
     3. 卸载组件 由ReactDOM.unmountComponentAtNode()触发
         1. componentWillUnmount()
+    > 什么时候会用到componentWillreceiveprops
+    1. 执行场景
+        - 在已经挂载的组件(mounted component)接收到新prop时触发
+        - 在除了第一次生命周期(componentWillMount->render->componentDidMount)之后的生命周期中出发
+    2. 解释
+        - 如果需要在props发生变化(或新传入的props)来更新state 可能需要比较this.prosp和nextProps 然后使用this.setState()方法来该改变this.state
+    3. 注意
+        1. React可能会在props传入时及时没有发生变化时也发生重新渲染 所以如果想自己处理改变 确保比较props 当前值和下一次值 这可能会造成组件重新渲染
+        2. 如果指示调用this.setState()而不是从外部传入props 那么不会触发componentWillReceiveProps(nextprops)函数 
+
 18. react router
     > 声明式路由 函数式路由
     1. 声明式  <NavLink to='/products'/>
