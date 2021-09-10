@@ -228,6 +228,19 @@
         4. 输出模块的exports属性
     3. 加载模块时 为何每个模块都有__dirname __filename new Module时 没有这两个属性
         - 每个module里面都会传入__filename __dirname 这两个参数不是module本身就有的 是外界传入的
+    > 常见模块
+    1. fs(文件系统)模块
+        - 可以对文件或文件夹读写创建操作 权限控制
+    2. node child_process(子进程)模块
+        - Nodejs是一个单线程语言 不能像java那样创建多线程来并发执行 不能充分利用CPU多核机制 可通过child_process创建多个进程来充分利用CPU多核 完成多进程操作
+    3. cluster(集群)模块
+        - 单个Nodejs实例运行在单个线程中 为了充分利用多核系统 有时需要启用一组Nodejs进程去处理负载任务
+        - cluster模块可以创建共享服务器端口的子进程 而这一组的服务进程的总称就叫做集群 
+        - 服务集群通常运用在nginx大型服务部署上 为了保证服务的正常稳定运行 所以会启动多个服务(也就是一个服务集群)
+    4. dgram(数据报)
+        - dgram模块提供了UDP数据包socket的实现
+    5. net(网络)
+        - net模块用于创建基于流的TCB或IPC的服务器
 4. 模块系统
     - 为了让Nodejs中的文件可以相互调用 Nodejs提供了一个简单的模块系统
     - 模块是Nodejs应用程序的基本组成部分 文件和模块是一一对应的 换言之 一个Nodejs文件就是一个模块 这个文件可能是JS代码 JSON 或者编译过的C/C++扩展
@@ -328,6 +341,10 @@
         }
     }).listen(3000)
     ```
+
+    > 网络编程
+    - 利用Node可以十分方便地搭建网络服务器 不需要专门的Wbe服务器作为容器 仅仅需要几行代码就可以构建服务器
+    - Node提供了net dgram http https四个模块 分别用于处理 TCP UDP HTTP HTTPS适用于服务端和客户端
 5. libuv
     > libuv和linux
     1. 单以linux平台来看 liuc主要工作可以简单划分为两部分
@@ -390,6 +407,16 @@
         5. check阶段：执行setImmediate()的回调
         6. close callbacks阶段 执行socket的colse事件回调
         - 每个阶段都有一个先入先出(FIFO)的用于执行回调的队列 事件循环运行到每个阶段 都会从对应的回调队列中取出回调函数去执行 直到队列当中的内容耗尽 或者执行的回调数量达到了最大
+    
+    > 异步处理与domain
+    > 异步异常捕获
+    - 由于node的回调异步特性 无法通过try catch来捕获所有的异常
+    - 如果
+    > domain
+    - node v0.8+版本时 发布了一个模块domain 这个模块做的就是try catch无法做到的 捕获异步回调中出现的异常
+    - domain虽然捕获到了一场 但是还是由于一场儿导致的堆栈丢失会导致内存泄漏 所以出现这种情况还是要重启这个线程
+    > domain解析
+    - domain自身其实也是Event模块一个典型的应用 它通过事件的方式来传递捕获的错误
 7. 进程通信
     > Node的多进程框架
     - 面对Node单线程对多核CPU使用不足的情况 Node提供了child_process模块 实现进程的复制 node的多进程架构是主从模式
@@ -432,7 +459,102 @@
             包含两个已经互相能够跨线程通信的Message类型对象 可用于创建自定义的通信频道 实例化后包含两个属性port1和port2 MessagePort类型对象 可将其一个发到工作线程后通过该对象实现自定义跨线程通信
         MessagePort(跨线程通信的句柄)
             用于跨线程通信的句柄 继承了EventEmitter 包括close message事件用于接受对象关闭和发送的消息 以及close postMessage等操作
-13. NPM
+8. Global对象
+    - 所有属性都可以在程序的任何地方被访问 即全局变量
+    - JS中 通常Window是全局变量 而Node.js的全局变量是global 所有全局变量都是global对象的属性 如console processs等
+    > 全局对象与全局变量
+    - globa最根本的作用是作为全局变量的宿主 满足一下条件成为全局变量
+    1. 在最外层定义的变量
+    2. 全局对象的属性
+    3. 隐式定义的变量(未定义直接赋值的变量)
+    - Node.js中不可能在最外层定义变量 因为所有的用户代码都是属于当前模块的 而模块本身不是最外层上下文 Node.js中也不提倡自定义全局变量
+    > Node.js提供以下几个全局变量 它们是所有模块都可以调用的
+    1. global: 表示Node所在的全局变量 类似浏览器的window对象 
+        - 如果在浏览器中声明了一个全局变量 实际上是声明了一个全局对象的属性
+        - Node中不是这样 至少在模块中不是这样 REPL环境的行为和浏览器一致 
+        - 在模块文件中 声明var x = 1 该变量不是global对象的属性 global.x等于undefined 这时因为模块的全局变量都是该模块私有的 其他模块无法取到
+    2. process: 该对象表示Node所处的当前进程 允许开发者与该进程互动
+    3. console: 指向Node内置的console模块 提供命令行环境中的标准输入 标准输出功能
+    > Node提供一些全局函数
+    1. setTimeout:
+    2. clearTimeout
+    3. setInterval
+    4. clearInterval
+    5. require()用于加载模块
+    6. Buffer()用于操作二进制数据
+    > 伪全局变量
+    1. _filename: 指向当前运行的脚本文件名
+    2. _dirname: 指向当前运行的脚本所在目录
+9. Buffer缓冲区
+    - JS语言自身只有字符串数据类型 没有二进制数据类型
+    - 但在处理TCP流或文件流时 必须使用到二进制数据 因此在Node.js中 定义了一个Buffer类 该类用来创建一个专门存放二进制数据的缓冲区
+    - 在Nodejs中 Buffer类是随Node内核一起发布的核心库 Buffer库为Nodejs带来了一种存储原始数据的方法 可以让Node.js处理二进制数据 每当需要在Nodejs中处理I/O操作中移动的数据时 就有可能使用Buffer库 
+    - 原始数据存储在Buffer类的实例中 一个Buffer类似于一个整数数组 但它对应于V8堆内存之外的一块原始内存
+    ```
+    // buffer: 八位字节组成数组 可以有效的在js中存储二进制数据
+    //创建
+    const buf1 = Buffer.alloc(10);
+    console.log(buf1);
+    // 通过数据创建
+    const buf2 = Buffer.from('hello world');
+    console.log(buf2);
+    
+    const buf3 = Buffer.from([1,2,3]);
+    console.log(buf3)
+    // 写入
+    buf1.write('hello buffer');
+    console.log(buf1)
+
+    // 读取
+    console.log(buf2.toString());
+    console.log(buf2.toString('base64'))
+
+    // 合并
+    const buf4 = Buffer.concat([buf1,buf2]);
+    console.log(buf4.toString());
+    ```
+    > Buffer
+    - 在Nodejs中 Buffer类是随Node内核一起发布的核心库
+    - Buffer库为Nodejs带来一种存储原始数据的方法 可以让Nodejs处理二进制数据
+    > 小结
+    - Buffer是一个典型的JS和C++结合的模块 性能相关部分用C++实现 非性能相关部分用JS实现
+    - Node在进程启动时 Buffer就已经加装进了内存 并将其放入全局变量 因此无需require
+    - Buffer内存分配 Buffer对象的内存分配不是在V8的堆内存中 在Node的C++层面实现内存的申请
+
+    > Buffer模块
+    1. 新建Buffer会占用v8分配的内存吗
+        - 不会 Buffer属于堆外内存 不是V8分配的
+    2. Buffer.alloc和Buffer.allocUnsafe的区别
+        - Buffer.allocUnsafe创建的Buffer实例的底层内存是未初始化的 新创建的Buffer的内容是未知的 可能包含敏感数据 
+        - 使用Buffer.alloc是可以创建以0初始化的Buffer实例
+    3. Buffer的内存分配机制
+        - 为了高效使用申请来的内存 Node采用slab分配机制 slab是一种动态的内存管理机制 Node以8kb为界限来区分Buffer为大对象还是小对象
+        - 如果超过8kb 直接用C++底层地宫的SlowBuffer来给Buffer对象提供空间
+    4. Buffer乱码问题
+        - rs.setEncoding('utf8')
+10. Stream流
+    > 管道流
+    - 管道提供了一个输出流到输入流的机制 通常用于从一个流中获取数据并将数据传递到另外一个流中
+    - 以下实例通过读取一个文件内容并将内容写入另外一个文件中
+    ```
+    const fs = require('fs');
+    // 创建可读流
+    const readerStream = fs.createReadStream('./package.json');
+    // 创建可写流
+    const writerStream = fs.createWriteStream('./test.txt')
+    // 设置编码为utf-8
+    renderStream.pipe(writeStream)
+    ```
+    > 链式流
+    - 链式是通过连接输出流到另外一个流并创建多个流操作链机制 链式流一般用于管道操作
+    - 以下实例为用管道和链式来压缩和解压文件
+    ```
+    const fs = require('fs');
+    const zlib = require('zlib');
+    //压缩test.txt为test.zip
+    fs.createReadStream('./test.txt').pipe(zlib.createGzip()).pipe(fs.createWriteStream('test.zip'))
+    ```
+11. NPM
     > 简介
     - npm全称Node Package Manager 是一个基于Nodejs的包管理器 是整个Nodejs社区最流行 支持的第三方模块最多的包管理器
     > npm初衷
@@ -443,18 +565,6 @@
     > npm工作原理
     1. 包和模块
     > 包是描述一个文件或一个目录 一个包的配置通常由以下构成
-
-16. 
-        err ctx.status即是response.status
-            ctx被翻译成上下文context 
-        只是koa这个框架用到的一个名词 同时封装了request和response中这些属性
-        express框架中没有ctx这个概念
-           web开发中主要两个名词 request response
-        request 客户端浏览器向服务器端发送的请求 Request Headers
-        隐式 显式(传送的数据) 可以通过request.xxx 获得请求数据
-        做了一个简化
-        Response Body
-        隐式 显式 数据
 
 18. node中cluster是怎么开启多线程的 并且一个端口可以被多个进程监听吗
     - nodejs是单线程的模式 不能充分利用服务器的多核资源
@@ -490,33 +600,6 @@
 
 
 
-6. Global对象
-    - 所有属性都可以在程序的任何地方被访问 即全局变量
-    - JS中 通常Window是全局变量 而Node.js的全局变量是global 所有全局变量都是global对象的属性 如console processs等
-    > 全局对象与全局变量
-    - globa最根本的作用是作为全局变量的宿主 满足一下条件成为全局变量
-    1. 在最外层定义的变量
-    2. 全局对象的属性
-    3. 隐式定义的变量(未定义直接赋值的变量)
-    - Node.js中不可能在最外层定义变量 因为所有的用户代码都是属于当前模块的 而模块本身不是最外层上下文 Node.js中也不提倡自定义全局变量
-    > Node.js提供以下几个全局变量 它们是所有模块都可以调用的
-    1. global: 表示Node所在的全局变量 类似浏览器的window对象 
-        - 如果在浏览器中声明了一个全局变量 实际上是声明了一个全局对象的属性
-        - Node中不是这样 至少在模块中不是这样 REPL环境的行为和浏览器一致 
-        - 在模块文件中 声明var x = 1 该变量不是global对象的属性 global.x等于undefined 这时因为模块的全局变量都是该模块私有的 其他模块无法取到
-    2. process: 该对象表示Node所处的当前进程 允许开发者与该进程互动
-    3. console: 指向Node内置的console模块 提供命令行环境中的标准输入 标准输出功能
-    > Node提供一些全局函数
-    1. setTimeout:
-    2. clearTimeout
-    3. setInterval
-    4. clearInterval
-    5. require()用于加载模块
-    6. Buffer()用于操作二进制数据
-    > 伪全局变量
-    1. _filename: 指向当前运行的脚本文件名
-    2. _dirname: 指向当前运行的脚本所在目录
-
 
 8. timer解读
     - 主要分为JS层面的实现和libuv层面的实现
@@ -525,13 +608,6 @@
     > Generators
     - 迭代器模式是很常见的设计模式 但是实现起来 很多东西是程序化的 当迭代规则比较复杂时 维护迭代器内的状态是比较麻烦的
     - Generators: a better way to build Iterators
-10. Buffer
-    - 在Nodejs中 Buffer类是随Node内核一起发布的核心库
-    - Buffer库为Nodejs带来一种存储原始数据的方法 可以让Nodejs处理二进制数据
-    > 小结
-    - Buffer是一个典型的JS和C++结合的模块 性能相关部分用C++实现 非性能相关部分用JS实现
-    - Node在进程启动时 Buffer就已经加装进了内存 并将其放入全局变量 因此无需require
-    - Buffer内存分配 Buffer对象的内存分配不是在V8的堆内存中 在Node的C++层面实现内存的申请
 11. Event
     - 这是Node.js官网对自身的介绍 明确强调了Nodejs使用额一个事件驱动 非阻塞式I/O的模型 使其轻量又高效
     - Node中大量核心模块都使用了Event的机制 
@@ -547,29 +623,10 @@
         - 通常被调用一次 无论操作是成功还是失败
     > 小结
     1. Event模式是观察者设计模式的典型应用 同时也是Reactive Programming的精髓所在
-12. 异步处理与domain
-    > 异步异常捕获
-    - 由于node的回调异步特性 无法通过try catch来捕获所有的异常
-    - 如果
-    > domain
-    - node v0.8+版本时 发布了一个模块domain 这个模块做的就是try catch无法做到的 捕获异步回调中出现的异常
-    - domain虽然捕获到了一场 但是还是由于一场儿导致的堆栈丢失会导致内存泄漏 所以出现这种情况还是要重启这个线程
-    > domain解析
-    - domain自身其实也是Event模块一个典型的应用 它通过事件的方式来传递捕获的错误
 
 
 4. exports和module.export
-7. Buffer模块
-    1. 新建Buffer会占用v8分配的内存吗
-        - 不会 Buffer属于堆外内存 不是V8分配的
-    2. Buffer.alloc和Buffer.allocUnsafe的区别
-        - Buffer.allocUnsafe创建的Buffer实例的底层内存是未初始化的 新创建的Buffer的内容是未知的 可能包含敏感数据 
-        - 使用Buffer.alloc是可以创建以0初始化的Buffer实例
-    3. Buffer的内存分配机制
-        - 为了高效使用申请来的内存 Node采用slab分配机制 slab是一种动态的内存管理机制 Node以8kb为界限来区分Buffer为大对象还是小对象
-        - 如果超过8kb 直接用C++底层地宫的SlowBuffer来给Buffer对象提供空间
-    4. Buffer乱码问题
-        - rs.setEncoding('utf8')
+
 
 9. 中间件
     > 中间件
@@ -665,19 +722,6 @@
     > 缓存
     - 由于Nodejs不擅长处理复杂逻辑(JS本身执行效率较低) 如果要用Nodejs做接入层 应避免复杂的逻辑 想要快速处理数据并返回 一个至关重要的点: 使用缓存
 
-1. fs(文件系统)模块
-    - 可以对文件或文件夹读写创建操作 权限控制
-2. node child_process(子进程)模块
-    - Nodejs是一个单线程语言 不能像java那样创建多线程来并发执行 不能充分利用CPU多核机制 可通过child_process创建多个进程来充分利用CPU多核 完成多进程操作
-3. cluster(集群)模块
-    - 单个Nodejs实例运行在单个线程中 为了充分利用多核系统 有时需要启用一组Nodejs进程去处理负载任务
-    - cluster模块可以创建共享服务器端口的子进程 而这一组的服务进程的总称就叫做集群 
-    - 服务集群通常运用在nginx大型服务部署上 为了保证服务的正常稳定运行 所以会启动多个服务(也就是一个服务集群)
-4. dgram(数据报)
-    - dgram模块提供了UDP数据包socket的实现
-5. net(网络)
-    - net模块用于创建基于流的TCB或IPC的服务器
-
 
 
 1. require
@@ -723,56 +767,6 @@
     1. 第一个实例在文件读取完后才执行完程序 第二个实例不需要等待文件读取玩 可在文件读取同时执行接下来的代码 提高代码性能
     2. 阻塞是按顺序执行 非阻塞不需要按顺序 如果需要处理回调函数的参数 就需要卸载回调函数内
 
-5. Buffer缓冲区
-    - JS语言自身只有字符串数据类型 没有二进制数据类型
-    - 但在处理TCP流或文件流时 必须使用到二进制数据 因此在Node.js中 定义了一个Buffer类 该类用来创建一个专门存放二进制数据的缓冲区
-    - 在Nodejs中 Buffer类是随Node内核一起发布的核心库 Buffer库为Nodejs带来了一种存储原始数据的方法 可以让Node.js处理二进制数据 每当需要在Nodejs中处理I/O操作中移动的数据时 就有可能使用Buffer库 
-    - 原始数据存储在Buffer类的实例中 一个Buffer类似于一个整数数组 但它对应于V8堆内存之外的一块原始内存
-    ```
-    // buffer: 八位字节组成数组 可以有效的在js中存储二进制数据
-    //创建
-    const buf1 = Buffer.alloc(10);
-    console.log(buf1);
-    // 通过数据创建
-    const buf2 = Buffer.from('hello world');
-    console.log(buf2);
-    
-    const buf3 = Buffer.from([1,2,3]);
-    console.log(buf3)
-    // 写入
-    buf1.write('hello buffer');
-    console.log(buf1)
-
-    // 读取
-    console.log(buf2.toString());
-    console.log(buf2.toString('base64'))
-
-    // 合并
-    const buf4 = Buffer.concat([buf1,buf2]);
-    console.log(buf4.toString());
-    ```
-6. Stream流
-    > 管道流
-    - 管道提供了一个输出流到输入流的机制 通常用于从一个流中获取数据并将数据传递到另外一个流中
-    - 以下实例通过读取一个文件内容并将内容写入另外一个文件中
-    ```
-    const fs = require('fs');
-    // 创建可读流
-    const readerStream = fs.createReadStream('./package.json');
-    // 创建可写流
-    const writerStream = fs.createWriteStream('./test.txt')
-    // 设置编码为utf-8
-    renderStream.pipe(writeStream)
-    ```
-    > 链式流
-    - 链式是通过连接输出流到另外一个流并创建多个流操作链机制 链式流一般用于管道操作
-    - 以下实例为用管道和链式来压缩和解压文件
-    ```
-    const fs = require('fs');
-    const zlib = require('zlib');
-    //压缩test.txt为test.zip
-    fs.createReadStream('./test.txt').pipe(zlib.createGzip()).pipe(fs.createWriteStream('test.zip'))
-    ```
 
 
 - 进程
@@ -906,13 +900,6 @@
 4. Nodejs可以创建线程吗
 5. 开发过程中如何实现进程守护
 6. 除了使用第三方模块 是否自己封装过一个多线程架构
-
-
-1. 网络编程
-    - 利用Node可以十分方便地搭建网络服务器 不需要专门的Wbe服务器作为容器 仅仅需要几行代码就可以构建服务器
-    - Node提供了net dgram http https四个模块 分别用于处理 TCP UDP HTTP HTTPS适用于服务端和客户端
-
-
 
 1. 开发框架
     1. ExpressJS
