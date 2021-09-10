@@ -206,10 +206,10 @@
                 e.target和e.currentTarget 
                 e.target表示当前受到点击的真实元素 
                 e.currentTarget()表示被触发的这个函数所属的元素   
-        优点:
-            1.可以节省大量内存占用 减少事件注册
+        - 优点:
+            1. 可以节省大量内存占用 减少事件注册
                 比如在ul上代理所有li的click事件
-            2.可以实现当新增子元素无需对其再次进行绑定
+            2. 可以实现当新增子元素无需对其再次进行绑定
         IE event对象有srcElement属性 没有target属性
         Firefox event对象有target属性 没有srcElement属性
 13. 不能直接给数组绑定事件 只能对具体元素绑定事件
@@ -397,6 +397,8 @@
         该方法在当前节点触发指定事件 从而触发监听函数执行
         该方法返回一个布尔值 只要有一个监听函数调用了Event.preventDefault(), 则返回false, 否则返回true。
             target.dispatchEvent(event);
+21. document.write和document.innerHTML
+- innerHTML&innerText
 
 
 

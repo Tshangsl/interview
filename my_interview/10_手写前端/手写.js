@@ -217,19 +217,6 @@ function throttle(fn, delay) {
     }
 }
 
-function throttle(fn,delay){
-    let valid = true;
-    return function(){
-        if(!valid){
-            return false;
-        }
-        valid = false;
-        setTimeout(()=>{
-            fn()
-            valid = true;
-        },delay)
-    }
-}
 
 // 11.图片懒加载
 // 没进入可视区域时 不给<img>标签赋src属性 浏览器不发送请求

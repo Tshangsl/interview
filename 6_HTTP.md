@@ -7,7 +7,7 @@
    - 204请求被受理但没有资源可以返回
    - 206客户端只是请求资源的一部分，服务器只对请求的部分资源执GET方法，相应报文中通过Content-Range指定范围的资源。
 - 3xx重定位重新请求|
-   - 301永久重定向 会缓存
+    - 301永久重定向 会缓存
        - 301 代表访问的地址的资源被永久移除了，以后都不应该访问这个地址，搜索引擎抓取的时候也会用新的地址替换这个老的。可以在返回的响应的 location 首部去获取到返回的地址。
     - 302临时重定向 
         这个资源只是暂时不能被访问了，但是之后过一段时间还是可以继续访问，一般是访问某个网站的资源需要权限时，会需要用户去登录，跳转到登录页面之后登录之后，还可以继续访问。
@@ -867,35 +867,35 @@
         严重浪费了服务器端和客户端的资源。
         当用户增加时，服务器端的压力就会变大，这是很不合理的。
     2. 长轮询的基本思路(基于HTTP协议)
-        - 实现原理:
-            (服务器不会直接进行响应而是先将这个请求挂起 判断服务器端数据是否有更新)
-            首先由客户端向服务器发起请求，当服务器收到客户端发来的请求后，服务器端不会直接进行响应，而是先将这个请求挂起 判断服务器端数据是否有更新。
-            如果有更新，则进行响应，如果一直没有数据，则到达一定的时间限制才返回。
-            客户端 JavaScript 响应处理函数会在处理完服务器返回的信息后，再次发出请求，重新建立连接。
-        长轮询和短轮询相比
-        - 优点：
-            明显减少了很多不必要的 HTTP 请求次数，相比之下节约了资源。
-        - 缺点：
-            连接挂起也会导致资源的浪费。
+    - 实现原理:
+        (服务器不会直接进行响应而是先将这个请求挂起 判断服务器端数据是否有更新)
+        首先由客户端向服务器发起请求，当服务器收到客户端发来的请求后，服务器端不会直接进行响应，而是先将这个请求挂起 判断服务器端数据是否有更新。
+        如果有更新，则进行响应，如果一直没有数据，则到达一定的时间限制才返回。
+        客户端 JavaScript 响应处理函数会在处理完服务器返回的信息后，再次发出请求，重新建立连接。
+    长轮询和短轮询相比
+    - 优点：
+        明显减少了很多不必要的 HTTP 请求次数，相比之下节约了资源。
+    - 缺点：
+        连接挂起也会导致资源的浪费。
     3. SSE- Server-sent Events (基于HTTP协议 单向 数据流如视频播放 服务端=>客户端)
-        (服务端向客户端声明接下来要发送的是流信息 发送的不是一次性的数据包 而是一个数据流 如视频播放)
-        - 实现原理:
-            服务器使用流信息向服务器推送信息。严格地说，HTTP1.x 协议无法做到服务器主动推送信息。
-            有一种变通方法，就是服务器向客户端声明，接下来要发送的是流信息。
-            也就是说，发送的不是一次性的数据包，而是一个数据流，会连续不断地发送过来。
-            这时，客户端不会关闭连接，会一直等着服务器发过来的新的数据流，视频播放就是这样的例子。
-            SSE 就是利用这种机制，使用流信息向浏览器推送信息。它基于HTTP协议目前除了 IE/Edge，其他浏览器都支持。
-        优点:   
-            它相对于前面两种方式来说，不 需要建立过多的 http 请求，相比之下节约了资源。
+    (服务端向客户端声明接下来要发送的是流信息 发送的不是一次性的数据包 而是一个数据流 如视频播放)
+    - 实现原理:
+        服务器使用流信息向服务器推送信息。严格地说，HTTP1.x 协议无法做到服务器主动推送信息。
+        有一种变通方法，就是服务器向客户端声明，接下来要发送的是流信息。
+        也就是说，发送的不是一次性的数据包，而是一个数据流，会连续不断地发送过来。
+        这时，客户端不会关闭连接，会一直等着服务器发过来的新的数据流，视频播放就是这样的例子。
+        SSE 就是利用这种机制，使用流信息向浏览器推送信息。它基于HTTP协议目前除了 IE/Edge，其他浏览器都支持。
+    优点:   
+        它相对于前面两种方式来说，不 需要建立过多的 http 请求，相比之下节约了资源。
     4. WebSocket
-        (H5新定义的一个协议 基于TCP协议 全双工 双向 该协议允许服务器主动向客户端推送信息)
-        上面三种方式本质上都是基于HTTP协议的.我们还可以使用 WebSocket 协议来实现。
-        WebSocket 是 Html5 定义的一个新协议，与传统的 http 协议不同，该协议允许由服务器主动的向客户端推送信息。
-        缺点：
-            服务器端的配置比较复杂。
-        WebSocket与SSE区别：    
-        WebSocket 是一个全双工的协议，也就是通信双方是平等的，可以相互发送消息
-        而 SSE 的方式是单向通信的，只能由服务器端向客户端推送信息，如果客户端需要发送信息就是属于下一个HTTP请求了。
+    (H5新定义的一个协议 基于TCP协议 全双工 双向 该协议允许服务器主动向客户端推送信息)
+    上面三种方式本质上都是基于HTTP协议的.我们还可以使用 WebSocket 协议来实现。
+    WebSocket 是 Html5 定义的一个新协议，与传统的 http 协议不同，该协议允许由服务器主动的向客户端推送信息。
+    缺点：
+        服务器端的配置比较复杂。
+    WebSocket与SSE区别：    
+    WebSocket 是一个全双工的协议，也就是通信双方是平等的，可以相互发送消息
+    而 SSE 的方式是单向通信的，只能由服务器端向客户端推送信息，如果客户端需要发送信息就是属于下一个HTTP请求了。
     4. WebSocket和SSE
         (WebSocket一个全双工协议 通信双方平等 可以互发消息)
         (SSE服务器端向浏览器端单向通信 如用户需要发送信息 属于下一个HTTP请求)
@@ -1174,434 +1174,434 @@
         如果正在运行的不下于配置的资源池长度，则这个请求进入到等待队列去。
         当一个正在运行的Socket完成了请求，就从正在运行的队列移到空闲的队列，并触发等待请求队列去获取空闲资源，如果有等待的情况。
 5. Cookie Session Token JWT(基于token实现)
-        (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 
-        Cookie/Session/Token/JWT        
-        用于客户端和服务器端进行会话验证的凭证 )
-        (Cookie 存储在客户端 只能存储字符串数据 可设置任意时间有效 cookie.setMaxAge() 不超过4k 不可跨域 CSRF
-        |Session(基于Cookie实现) 存储在服务器端 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 占用服务端资源 服务器集群状态下 无法轻易做到资源共享)
-        (Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session
-            1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
-            2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
-            3.当客户端再次访问服务器端时，请求会自动判断该域名下是否存在Cookie信息，如果有则发给服务器端，服务器端会从Cookie中拿到SessionID，再根据SessionID找到对应的Session，如果有对应的Session则通过，继续执行请求，否则就中断
-        )
-        (Token 访问API所需资源凭证 不需存储服务端 服务端只需根据客户端传来的Token进行合法验证
-            需要对服务器端数据库进行查询)
-        (JWT header(Base64URL).payload(Base64URL).signature(header中alg指定算法加密)
-            不需要查询数据库 服务器端密钥进行解密 signature验证
-                服务器端获取header中的JWT 用Base64URL算法解码各部分
-                服务端使用同样的密钥和算法生成signature 如与JWT中的signature相同 则JWT合法
+    (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 
+    Cookie/Session/Token/JWT        
+    用于客户端和服务器端进行会话验证的凭证 )
+    (Cookie 存储在客户端 只能存储字符串数据 可设置任意时间有效 cookie.setMaxAge() 不超过4k 不可跨域 CSRF
+    |Session(基于Cookie实现) 存储在服务器端 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 占用服务端资源 服务器集群状态下 无法轻易做到资源共享)
+    (Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session
+        1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
+        2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
+        3.当客户端再次访问服务器端时，请求会自动判断该域名下是否存在Cookie信息，如果有则发给服务器端，服务器端会从Cookie中拿到SessionID，再根据SessionID找到对应的Session，如果有对应的Session则通过，继续执行请求，否则就中断
+    )
+    (Token 访问API所需资源凭证 不需存储服务端 服务端只需根据客户端传来的Token进行合法验证
+        需要对服务器端数据库进行查询)
+    (JWT header(Base64URL).payload(Base64URL).signature(header中alg指定算法加密)
+        不需要查询数据库 服务器端密钥进行解密 signature验证
+            服务器端获取header中的JWT 用Base64URL算法解码各部分
+            服务端使用同样的密钥和算法生成signature 如与JWT中的signature相同 则JWT合法
 
-            基于Token实现 流程 客户端收到后会存储在cookie/loacalStorage
-            1.客户端发送用户信息给服务端请求登录
-            2.服务端验证用户信息，验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie 或 localStorage 中
-            3.客户端继续第二次业务请求，请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
-            4.服务端根据 headers 中的 Token 进行验证，验证通过后返回业务请求的数据
-        )
-        (
-        Session/Token/JWT 
-        Session 一种记录服务器和客户端会话状态的机制，使服务端有状态化，可以记录会话信息。
-        Token 令牌，访问资源接口（API）时所需要的资源凭证 使服务端无状态化，不会存储会话信息。)
-        JWT:存放在cookie/localStorage中 服务端验证客户端发来的token信息要进行数据的查询操作；
-        JWT验证客户端发来的token信息不用 在服务端使用密钥校验就可以 不用数据库的查询
-        )
-        Token和JWT区别：
-            1.Token需要查数据库验证Token是否有效
-              令牌 是访问资源的凭证 
-            2.JWT
-            包含三部分
-                Header 头部
-                Payload 负载
-                Signature 签名
-                由三部分生成token 三部分之间用.作分割
-            不用查数据库/少查询数据库 直接在服务器端进行校验 并且不用查库
-            因为用户的信息及加密信息在第二部分payload负载和第三部分signature签证中已经生成 
-            只要在服务端进行校验就行 校验也是JWT自己实现的
-        Token认证流程
-            1，用户输入用户名 密码 发送给服务器
-            2.服务器验证用户名和密码 正确则返回一个签名过的Token(Token可以认为就是个长字符串 浏览器客户端拿到这个Token)
-            3.后续每次请求中 
-            浏览器会把Token作为Http Header发送给服务器 
-            服务器验证签名是否有效 
-            如果有效则认证成功 可以返回客户端请求的数据
-            PS：这种方式的特点就是客户端的Token自己保留大量信息 服务器没有存储这些信息
-        JWT
-            JWT JSON Web Token缩写 
-            将用户信息加密到Token中 
-            服务器不保存任何内部信息
-            服务器通过使用保存的密匙验证Token的正确性 
-            只要正确即通过验证
-        JWT组成(Header/PayLoad/Signature)
-            三个部分
-            Header头部
-            Payload负载
-            Signature签名
-            由三部分生成Token 三部分之间用.分割
-
-        Cookie Session存在意义
-        (HTTP无状态协议 浏览器不会保留任何会话信息 服务端无法确定访问者 用于客户端和服务端进行会话验证的凭证)
-        (Cookie里可以存储JSON格式的数据 JSON格式数据其实就是符合key-value键值对的字符串格式数据)
-        (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 浏览器和服务端会进行一个会话跟踪，在进行一些特殊用户权限才有的操作时，将用户状态用Cookie或Session保存起来 用于客户端和服务器端进行会话验证的凭证 )
-
-        1.Cookie/Session对比
-        共同点:保存用户状态 客户端和服务端进行会话验证的凭证
-        (Cookie 存储在客户端 只能存储字符串数据 cookie.setMaxAge()可以设置任意时间有效 不超过4k cookie不可跨域 会受到CSRF攻击 收到跨域限制
-        |Session(基于Cookie实现) 存储在服务器端 占用资源 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 服务器集群情况下 无法轻易做到共享 需要借助缓存
-        由于是借助cookie实现的 可能会受到CSRF攻击 基于cookie实现 不可跨域)
-        2.Session/Token对比
-        (Session 一种记录服务器和客户端会话状态的机制 占用服务端资源 使服务器端有状态化 可以存储会话信息 服务器集群需要用到缓存做资源共享 会受到CSRF攻击 基于cookie实现有跨域问题 多点登录
-        |Token 令牌 访问API所需资源凭证 不占用服务端资源 使服务器端无状态化 不会存储会话信息 不会受到CSRF攻击 不受同源策略限制 单点登录)
-        3.Token/JWT
-        (Token: 访问API所需资源凭证 令牌 不需存储在服务器端 服务端验证客户端发来的token信息 要进行数据的查询操作 完全由应用管理 避开同源策略 避免受到CSRF攻击
-            服务器端验证方法：查询服务器端数据库
-        |JWT验证客户端发来的token信息 服务端使用密钥校验 不用数据库的查询 存放在cookie/localStorage中 存放在localStorage中 完全由应用管理 完全避开同源策略 避免受到CSRF攻击
-            服务器端验证方法：
-                服务器端获取header中的JWT 用Base64URL算法解码各部分
-                服务端使用同样的密钥和算法生成signature 如与JWT中的signature相同 则JWT合法)
-        
-        1.(Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session认证流程
-            1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
-            2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
-            3.当客户端再次访问服务器端时，请求会自动判断该域名下是否存在Cookie信息，如果有则发给服务器端，服务器端会从Cookie中拿到SessionID，再根据SessionID找到对应的Session，如果有对应的Session则通过，继续执行请求，否则就中断
-        )
-        2.(JWT:基于token实现 流程
-            1.客户端发送用户信息给服务端请求登录
-            2.服务端验证用户信息，验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie/localStorage 中
-            3.客户端继续第二次业务请求，请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
-            4.服务端根据 headers 中的 Token 进行验证，验证通过后返回业务请求的数据
-                JWT机制和/Session机制十分相似
-        )
-    Cookie
-        cookie不可跨域 每个cookie都会绑定单一的域名 无法在别的域名下获取使用 一级域名和二级域名之间是允许共享使用的
-        cookie跨域问题产生
-            一个cookie从一个服务器产生 在另一个服务器需要用到 由于浏览器安全策略 cookie只能在同一域名产生和使用
-        cookie组成
-            1.Name Value name=value String 键值对,字符串类型，用于设置Cookie 的名称和值
-            2.Expires 符合 HTTP-date 规范的时间戳 指定Cookie 的生存期，用于设置Cookie的过期时间
-            3.max-age non-zero-digit 在 cookie 失效之前需要经过的秒数,与expires功能相似
-            4.Domain 
-                域名String 指定Cookie 所属的域名，默认为当前域名
-                指cookie的域名 当访问localhost的接口时会自动携带cookie
-            5.Path URL 路径 指定 cookie 在哪个路径（路由）下生效，默认是 '/'
-            Size
-            HTTP
-        cookie创建方式
-            1.客户端通过js设置，举例，用一个js-cookies库 已封装好document.cookie方法
-            2.服务器端通过在HTTP响应头设置Set-Cookie
-                服务器端设置后，客户端再次同一服务端发起请求时，就会携带这个Cookie并发到服务端上
-                在域名相同(端口号不同的跨域)的情况下，Cookie是可以共享的，而其他跨域情况则无法共享
-        cookie跨域解决方案
-        (Nginx代理服务器 将两个服务器域名统一到一个反向代理服务器/
-        设置域名 使用二级域名共享cookie需两个域名二级域名必须相同)
-        1.设置Nginx代理服务器 
-            将两个服务器域名统一到一个反向代理服务器
-        2.设置域名 顶级域名与二级域名
-            (使用二级域名共享cookie需
-            两个域名的二级域名必须相同)
-            通过设置domain
-            顶级域名服务器与二级域名服务器之间那个设置都能生效
-            设置完毕后写回到客户端 
-            用另一个服务器即可访问此cookie
-        cookie跨域解决方案
-            1.服务端将cookie写到客户端后 客户端对cookie进行解析 
-            将token解析出来 此后请求都把这个Token带上即可
-            2.多个域名共享cookie 在写到客户端的时候设置cookie的domain
-            3.将Token保存在SessionStorage中
-            (不依赖cookie就没有跨域问题)
-    Session
-        基于Cookie实现的另一种记录服务器端和客户端会话状态的机制
-        Session缺点
-            1.当服务器访问量增加时 会存在很多Session 
-            如果没有设置超时或销毁的话 
-            很容易造成服务器崩溃等状况
-            2.服务端为集群或分布式时 
-            用户登陆其中一台服务器
-            会将session保存到该服务器的内存中 
-            但是当用户访问到其他服务器时
-            会无法访问
-            通常采用缓存一致性技术来保证可以共享
-            或者采用第三方缓存来保存session
-            会不方便
-        解决方案：
-            存储在Tomcat容器中的
-            如果后端机器多台
-            多个机器间无法共享Session
-            使用Spring提供的分布式Session的解决方案将Session放在Redis中
-    Token：
-        三种：
-            1.自定义的 token：开发者根据业务逻辑自定义的 token
-            2.JWT：JSON Web Token，定义在 RFC 7519 中的一种 token 规范
-            3.Oauth2.0：定义在 RFC 6750 中的一种授权规范，其实并不是一种 token，只是其中也有用到 token。
-        (访问API所需资源凭证 
-        不需存储服务端 
-        服务端只需根据客户端传来的token进行合法验证)
-        访问资源接口
-        (API-Application Programming Interface)
-        所需要的资源凭证
-    简单token组成
-        UID用户唯一的身份标识
-        time当前时间的时间戳
-        sign
-        (签名 token的前几位以哈希算法压缩成的一定长度的十六进制字符串)
-    引入：
-        Token是在客户端频繁向服务端请求数据 
-        服务端频繁去数据库查询用户名和密码并进行对比
-        判断用户名和密码正确与否 
-        并作出相应提示
-    使用Token目的：
-        减轻服务器压力
-        减少频繁的查询数据库
-        使服务器更加健壮    
-    是什么：
-        token是一种身份验证的机制 
-        初始时用户提交账号数据给服务端
-        服务端采用一定策略生成一个字符串token
-        token字符串包含少量用户信息
-        并有一定期限
-        服务端会把token字符串传给客户端
-        客户端保存token字符串
-        并在接下来的请求中带上这个字符串
-    Token机制
-        1.服务端如何根据token获取用户信息
-            服务端生成token时 加入少量用户信息 比如用户id
-            服务端接收到token之后 可以解析出这些数据
-            从而将token和用户关联起来
-        2.如何确保识别伪造的token
-            (代指token不是经过服务端来生成)
-            一般情况下 建议放入token中的数据是不敏感的数据
-            这样只要服务端使用私钥对数据生成签名 然后和数据拼接起来 作为token一部分即可
-            如JWT
-            另一种模式 基于加密的算法
-                对数据进行加密 把加密的结果作为token
-        3.如何应对冒充情况
-            1.加干扰码
-            2.有效期
-            3.token刷新
-        非法客户端拦截合法客户端的token
-        然后使用这个token向服务端发送请求
-        冒充合法客户端
-    Token身份验证流程
-        对称加密算法
-        加密
-            将登录凭证做数字签名
-            加密后得到字符串作为token
-        解密
-            拿到token串 做解密和签名认证
-            判断其有效性
-    Token有效期问题
-        如果这个Token在服务端持久化(如存入数据库)
-        它就是一个永久的身份令牌
-        解决操作过程中不能让用户感到Token失效问题
-        1.在服务器端保存Token状态 
-            用户每次操作都会自动刷新(推迟)Token过期时间
-            Session就是采用这种策略保持用户登陆状态
-            前后端分离 SPA 每秒可能发起很多次请求
-            每次刷新过期时间代价大
-            为提升效率 减少消耗
-            把Token过期时间保存在缓存/内存中
-        2.使用Refresh Token 可以避免频繁的读写操作
-            服务端不需要刷新Token过期时间
-            一旦Token过期 反馈给前端
-            前端使用Refresh Token
-            申请一个全新的Token继续使用
-            服务器端只需在客户端请求更新Token时
-            对Refresh Token有效性检查
-            Refresh Token也有有效期 
-            不过长一点
-    Refresh Token
-        Refresh Token及过期时间是存储在服务器的数据库中
-        只有在申请新的AccessToken时才会验证 
-        不会对业务接口响应时间造成影响
-        也不需要向Session一样
-        一致保存在内存中应对大量请求
-
-        专用于刷新 access token 的 token
-        Access Token的有效期比较 短
-        当 Acesss Token 由于过期而失效时
-        使用 Refresh Token 就可以获取到新的 Token
-        如果 Refresh Token过期就只能重新登陆了
-    Token无状态
-        如果把所有状态信息都附加在Token上 服务器就可以不保存
-        但服务端仍然要认证Token有效
-        只要服务端能确认是自己签发的Token 
-        且其信息未被改动过 就可认为Token有效
-        签名可以实现上述所说
-        此处签发和验证都是同一方
-        (非同一方 非对称加密算法)
-        对称加密算法即可达到要求
-        对称加密算法比非对称算法快得多
-    Token单点登录
-        Token无状态后 单点登录就相对容易
-        前端拿到一个有效的Token 
-        它就可以在任何同一体系的服务上认证通过
-        只要它们使用相同的密钥和算法来认证Token的有效性
-    拦截验证
-        客户端每一次请求 
-        必须携带token UA 
-        拦截器会对敏感资源的访问进行拦截
-        然后根据UA解析Token
-        解析不成功 
-        表示Token与UA不匹配
-        解析成功之后
-        判断Token是否已过期
-        如果是 拒绝服务
-        所有都通过情况下
-        拦截器方向 
-        请求传达到业务服务者
-    Token服务器端有效性校验
-        服务器端利用算法生成token
-        并将token存储在高并发的数据库中
-        并设置过期时间
-    Token优点(与Session相比)
-        1.不需要存储数据在服务端
-        服务端只需要根据客户端传来的token进行合法验证
-        通过后返回请求资源
-        减轻服务器端的资源占用压力
-        目前最流行的JWT(JSON WEB TOKEN)就是基于token实现
-        以下以JWT标准介绍token
-        2.服务端不用存放token数据
-        用解析token的计算时间换取session的存储空间
-        从而减轻服务器的压力
-        减少频繁查询数据库
-    Token特点
-        1.服务端无状态化 可扩展性好
-        2.支持移动端设备
-        3.安全
-        4.支持跨程序调用
-    Token用处
-        1.防止表单重复提交
-        2.反CSRF
-        3.身份验证 单点登录
-    如果你的用户数据可能需要和第三方共享
-    或允许第三方调用API接口 用Token
+        基于Token实现 流程 客户端收到后会存储在cookie/loacalStorage
+        1.客户端发送用户信息给服务端请求登录
+        2.服务端验证用户信息，验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie 或 localStorage 中
+        3.客户端继续第二次业务请求，请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
+        4.服务端根据 headers 中的 Token 进行验证，验证通过后返回业务请求的数据
+    )
+    (
+    Session/Token/JWT 
+    Session 一种记录服务器和客户端会话状态的机制，使服务端有状态化，可以记录会话信息。
+    Token 令牌，访问资源接口（API）时所需要的资源凭证 使服务端无状态化，不会存储会话信息。)
+    JWT:存放在cookie/localStorage中 服务端验证客户端发来的token信息要进行数据的查询操作；
+    JWT验证客户端发来的token信息不用 在服务端使用密钥校验就可以 不用数据库的查询
+    )
+    Token和JWT区别：
+        1.Token需要查数据库验证Token是否有效
+            令牌 是访问资源的凭证 
+        2.JWT
+        包含三部分
+            Header 头部
+            Payload 负载
+            Signature 签名
+            由三部分生成token 三部分之间用.作分割
+        不用查数据库/少查询数据库 直接在服务器端进行校验 并且不用查库
+        因为用户的信息及加密信息在第二部分payload负载和第三部分signature签证中已经生成 
+        只要在服务端进行校验就行 校验也是JWT自己实现的
+    Token认证流程
+        1，用户输入用户名 密码 发送给服务器
+        2.服务器验证用户名和密码 正确则返回一个签名过的Token(Token可以认为就是个长字符串 浏览器客户端拿到这个Token)
+        3.后续每次请求中 
+        浏览器会把Token作为Http Header发送给服务器 
+        服务器验证签名是否有效 
+        如果有效则认证成功 可以返回客户端请求的数据
+        PS：这种方式的特点就是客户端的Token自己保留大量信息 服务器没有存储这些信息
     JWT
-        JSON Web Token
-        目前最流行的跨域认证解决方案
-        一种认证授权机制
-        一种基于 JSON 的开放标准
-    JWT自包含
-        负载payload中可以包含所需的所有用户部分的信息
-        可以避免对服务端数据库的多次查询
-    服务器端JWT如何认证自身有效
-        服务端获取header中的JWT 
-        用base64URL算法解码各部分内容
-        并在服务端用同样的密钥和算法生成signature
-        与传过来的signature对比 验证JWT是否合法
-    三个部分
-        组成：
-        一个 JWT token 是一个字符串，它由头部、载荷与签名三部分组成，中间用 . 分隔，形式如下：
-        base64(header).base64(json payload).signature
-        Header 头部
-            一个JSON对象 描述JWT的元数据
-            {"alg":"HS256","typ":"JWT"}
-            alg属性:(algorithm)
-                签名的算法 默认是HMAC SHA256(写成HS256)
-                或RSA
-            typ属性:(type)
-                这个令牌(token)的类型(type)
-                JWT令牌统一写成JWT
-            最后 将上面的JSON对象使用Base64URL转成字符串
-        Payload 负载
-            一个JSON对象 用来存放实际要传递的数据
-            JWT规定了7个官方字段 供选用
-            iss(issuer):签发人
-            exp (expiration time)：过期时间
-            sub (subject)：主题
-            aud (audience)：受众
-            nbf (Not Before)：生效时间
-            iat (Issued At)：签发时间
-            jti (JWT ID)：编号
-            除了官方字段 还可以在这个部分定义私有字段
-            { "sub": "1234567890", "name": "sssssss", "admin": true }
-            JWT默认是不加密的 任何人都可以读到 不要把秘密信息放在这个部分
-            这个JSON对象也要使用Base64URL算法转成字符串
-        Signature 签名
-            JWT的第三部分是一个签证信息
-            该签证信息由三部分组成
-            header(base64后)
-            payload(base64后)
-            secret(服务器端自定义的一个秘钥)
-            这个部分需要base64加密后的header
-            base64加密后的payload使用连接组成的字符串
-            以及秘钥secret构成一个组合
-            通过header中声明的加密方式对这个组合进行加密
-            构成了jwt的第三部分
-        PS：
-            secret是保存在服务器端的
-            JWT的签发生成也是在服务器端的
-            secret就是用来进行JWT的签发和JWT的验证
-            它就是服务端的私钥 
-            任何场景都不应该泄漏出去
-            一旦客户端得知这个secret
-            意味着客户端是可以自我签发JWT
-        写成一行就是
-        Header.Payload.Signature
-    使用方式：
-        1、存放在cookie中
-        当用户希望访问一个受保护的路由或者资源的时候，可以把它放在 Cookie 里面自动发送，但是这样不能跨域。
-        2、存放在localstorage中，添加到header中发送
-        请求时放在 HTTP 请求头信息的 Authorization 字段里，使用 Bearer 模式添加 JWT Authorization: Bearer <token>
-        3、通过接口参数
-        可以把 JWT 放在 POST 请求的数据体里，或者通过 URL 的 queryString 传输。
-    认证流程：
-        1.POST/user/login 输入用户名密码进行登录
-        2.服务器端使用密钥创建JWT
-        3.把JWT返回给浏览器
-        4.客户端将token保存在本地(通常使用localStorage/cookie)
-        当用户希望访问一个受保护的路由或资源时 需要请求头的Authorization字段使用Bearer模式添加JWT
-        4.在发给服务器的请求头中发送JWT
-        服务端保护路由将检查请求头Authorization中的JWT信息
-        5.检查JWT的签名 从JWT获取用户信息 减少查询数据库需要
-        6.把响应发送给客户端
-        因为JWT是自包含的(内部包含了一些会话信息)
-        因此减少了查询数据库的需求
-    Token/JWT优点：
-        (完全由应用管理 避开同源策略/避免CSRF攻击/实现无状态服务器 能在多个服务器间使用 可扩展性好)
-        1.完全由应用管理，可以避开同源策略
-        2.避免 CSRF(Cross Site Request Forgery) 跨站请求伪造 攻击
-        3.实现无状态服务端，能够在多个服务间使用，可扩展性好
-    Token/JWT为什么能避免CSRF攻击(服务器端验证header中的token信息 而非cookie信息)
-        用户发请求给服务端时
-        前端使用JS将JWT放在header中手动发送给服务端
-        服务端验证header中的JWT字段
-        而非cookie信息 这样就避免了CSRF漏洞攻击
-    自定义Token和JWT 的关系：
-        相同点： 
-            都是访问资源的令牌，都可以记录用户的信息，都是使服务端无状态化，都是只有验证成功后，客户端才能访问服务端上受保护的资源
-        区别：
-            服务端验证客户端发来的token信息要进行数据的查询操作；
-            JWT验证客户端发来的token信息就不用， 在服务端使用密钥校验就可以，不用数据库的查询。
-    各种鉴权方式注意点
-        使用 cookie 注意点(移动端一般不支持cookie session基于cookie实现用的也不多 移动端一般用token)
-            1.因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
-            2.不要存储敏感数据，比如用户密码，账户余额
-            3.使用 httpOnly 在一定程度上提高安全性
-            4.尽量减少 cookie 的体积，能存储的数据量不能超过 4kb设置正确的 domain 和 path，减少数据传输
-            5.cookie 无法跨域，子域名可以访问父域名
-            6.一个浏览器针对一个网站最多存 20 个Cookie，浏览器一般只允许存放 300 个Cookie
-            7.移动端对 cookie 的支持不是很好，而 session 一般基于 cookie 实现，所以移动端常用的是 token
-        使用 session 注意点(sessionId可以跟在url参数后面即重写url session不一定非得靠cookie实现)
-            1.用户同时在线量较多时，session 存储在服务器会占据较多内存，需要定期清理过期的session
-            2.当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。因为 session是由单个服务器创建的，处理用户请求的服务器不一定是 那个创建 session 的服务器，那么该服务器就无法拿到之前已经放入到 session 中的登录凭证之类的信息了。
-            3.当多个应用要共享 session时，因为不同的应用可能部署的主机不一样需要在各个应用做好 cookie 跨域的处理。
-            4.sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie ，一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现
-        使用 token 注意点
-            1.如果你认为用数据库来存储 token会导致查询时间太长，可以选择放在 内存当中，比如 redis(数据结构服务器) 很适合你对 token 查询的需求。
-            2.token 完全由应用管理，所以它可以避开同源策略
-            3.token 可以避免 CSRF 攻击(因为不需要 cookie 了)
-            4.移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
-        使用 JWT 时需要考虑的问题(默认不加密 可以生成原始Token后再用密钥加密一次)
-            1.JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
-            2.JWT 不加密的情况下，不能将秘密数据写入 JWT。
-            3.JWT 不仅可以用于认证，也可以用于交换信息 有效使用 JWT，可以降低服务器查询数据库的次数。
-            4.JWT 最大的优势是服务器不再需要存储Session 使得服务器认证鉴权业务可以方便扩展
-                这也是 JWT 最大的缺点：由于服务器不需要存储 Session 状态
-                因此使用过程中无法废弃某个 Token 或者更改 Token 的权限
-                也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。
-            5.JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限
-                为了减少盗用，JWT的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
-            6.JWT 适合一次性的命令认证，颁发一个有效期极短的JWT
-                即使暴露了危险也很小 由于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
-            7.为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。      
+        JWT JSON Web Token缩写 
+        将用户信息加密到Token中 
+        服务器不保存任何内部信息
+        服务器通过使用保存的密匙验证Token的正确性 
+        只要正确即通过验证
+    JWT组成(Header/PayLoad/Signature)
+        三个部分
+        Header头部
+        Payload负载
+        Signature签名
+        由三部分生成Token 三部分之间用.分割
+
+    Cookie Session存在意义
+    (HTTP无状态协议 浏览器不会保留任何会话信息 服务端无法确定访问者 用于客户端和服务端进行会话验证的凭证)
+    (Cookie里可以存储JSON格式的数据 JSON格式数据其实就是符合key-value键值对的字符串格式数据)
+    (HTTP无状态协议 浏览器不会保存任何会话信息 服务器端无法确定访问者 浏览器和服务端会进行一个会话跟踪，在进行一些特殊用户权限才有的操作时，将用户状态用Cookie或Session保存起来 用于客户端和服务器端进行会话验证的凭证 )
+
+    1.Cookie/Session对比
+    共同点:保存用户状态 客户端和服务端进行会话验证的凭证
+    (Cookie 存储在客户端 只能存储字符串数据 cookie.setMaxAge()可以设置任意时间有效 不超过4k cookie不可跨域 会受到CSRF攻击 收到跨域限制
+    |Session(基于Cookie实现) 存储在服务器端 占用资源 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 服务器集群情况下 无法轻易做到共享 需要借助缓存
+    由于是借助cookie实现的 可能会受到CSRF攻击 基于cookie实现 不可跨域)
+    2.Session/Token对比
+    (Session 一种记录服务器和客户端会话状态的机制 占用服务端资源 使服务器端有状态化 可以存储会话信息 服务器集群需要用到缓存做资源共享 会受到CSRF攻击 基于cookie实现有跨域问题 多点登录
+    |Token 令牌 访问API所需资源凭证 不占用服务端资源 使服务器端无状态化 不会存储会话信息 不会受到CSRF攻击 不受同源策略限制 单点登录)
+    3.Token/JWT
+    (Token: 访问API所需资源凭证 令牌 不需存储在服务器端 服务端验证客户端发来的token信息 要进行数据的查询操作 完全由应用管理 避开同源策略 避免受到CSRF攻击
+        服务器端验证方法：查询服务器端数据库
+    |JWT验证客户端发来的token信息 服务端使用密钥校验 不用数据库的查询 存放在cookie/localStorage中 存放在localStorage中 完全由应用管理 完全避开同源策略 避免受到CSRF攻击
+        服务器端验证方法：
+            服务器端获取header中的JWT 用Base64URL算法解码各部分
+            服务端使用同样的密钥和算法生成signature 如与JWT中的signature相同 则JWT合法)
+    
+    1.(Session认证过程 客户端请求 服务端创建返回 客户端收到存储 再次访问带上 服务端从Cookie中找SessionId找对应Session认证流程
+        1.客户端第一次发送请求到服务端，服务端根据信息创建对应的Session，并在响应头返回SessionID(Set-Cookie)
+        2.客户端接收到服务器端返回的SessionID后，会将此信息存储在Cookie上，同时会记录这个SessionID属于哪个域名
+        3.当客户端再次访问服务器端时，请求会自动判断该域名下是否存在Cookie信息，如果有则发给服务器端，服务器端会从Cookie中拿到SessionID，再根据SessionID找到对应的Session，如果有对应的Session则通过，继续执行请求，否则就中断
+    )
+    2.(JWT:基于token实现 流程
+        1.客户端发送用户信息给服务端请求登录
+        2.服务端验证用户信息，验证通过后签发一个 Token 返回给客户端，客户端收到后会存储在 Cookie/localStorage 中
+        3.客户端继续第二次业务请求，请求头的 Authorization 字段携带这个 Token或者直接放在 Cookie(但是这样就不能跨域了)
+        4.服务端根据 headers 中的 Token 进行验证，验证通过后返回业务请求的数据
+            JWT机制和/Session机制十分相似
+    )
+Cookie
+    cookie不可跨域 每个cookie都会绑定单一的域名 无法在别的域名下获取使用 一级域名和二级域名之间是允许共享使用的
+    cookie跨域问题产生
+        一个cookie从一个服务器产生 在另一个服务器需要用到 由于浏览器安全策略 cookie只能在同一域名产生和使用
+    cookie组成
+        1.Name Value name=value String 键值对,字符串类型，用于设置Cookie 的名称和值
+        2.Expires 符合 HTTP-date 规范的时间戳 指定Cookie 的生存期，用于设置Cookie的过期时间
+        3.max-age non-zero-digit 在 cookie 失效之前需要经过的秒数,与expires功能相似
+        4.Domain 
+            域名String 指定Cookie 所属的域名，默认为当前域名
+            指cookie的域名 当访问localhost的接口时会自动携带cookie
+        5.Path URL 路径 指定 cookie 在哪个路径（路由）下生效，默认是 '/'
+        Size
+        HTTP
+    cookie创建方式
+        1.客户端通过js设置，举例，用一个js-cookies库 已封装好document.cookie方法
+        2.服务器端通过在HTTP响应头设置Set-Cookie
+            服务器端设置后，客户端再次同一服务端发起请求时，就会携带这个Cookie并发到服务端上
+            在域名相同(端口号不同的跨域)的情况下，Cookie是可以共享的，而其他跨域情况则无法共享
+    cookie跨域解决方案
+    (Nginx代理服务器 将两个服务器域名统一到一个反向代理服务器/
+    设置域名 使用二级域名共享cookie需两个域名二级域名必须相同)
+    1.设置Nginx代理服务器 
+        将两个服务器域名统一到一个反向代理服务器
+    2.设置域名 顶级域名与二级域名
+        (使用二级域名共享cookie需
+        两个域名的二级域名必须相同)
+        通过设置domain
+        顶级域名服务器与二级域名服务器之间那个设置都能生效
+        设置完毕后写回到客户端 
+        用另一个服务器即可访问此cookie
+    cookie跨域解决方案
+        1.服务端将cookie写到客户端后 客户端对cookie进行解析 
+        将token解析出来 此后请求都把这个Token带上即可
+        2.多个域名共享cookie 在写到客户端的时候设置cookie的domain
+        3.将Token保存在SessionStorage中
+        (不依赖cookie就没有跨域问题)
+Session
+    基于Cookie实现的另一种记录服务器端和客户端会话状态的机制
+    Session缺点
+        1.当服务器访问量增加时 会存在很多Session 
+        如果没有设置超时或销毁的话 
+        很容易造成服务器崩溃等状况
+        2.服务端为集群或分布式时 
+        用户登陆其中一台服务器
+        会将session保存到该服务器的内存中 
+        但是当用户访问到其他服务器时
+        会无法访问
+        通常采用缓存一致性技术来保证可以共享
+        或者采用第三方缓存来保存session
+        会不方便
+    解决方案：
+        存储在Tomcat容器中的
+        如果后端机器多台
+        多个机器间无法共享Session
+        使用Spring提供的分布式Session的解决方案将Session放在Redis中
+Token：
+    三种：
+        1.自定义的 token：开发者根据业务逻辑自定义的 token
+        2.JWT：JSON Web Token，定义在 RFC 7519 中的一种 token 规范
+        3.Oauth2.0：定义在 RFC 6750 中的一种授权规范，其实并不是一种 token，只是其中也有用到 token。
+    (访问API所需资源凭证 
+    不需存储服务端 
+    服务端只需根据客户端传来的token进行合法验证)
+    访问资源接口
+    (API-Application Programming Interface)
+    所需要的资源凭证
+简单token组成
+    UID用户唯一的身份标识
+    time当前时间的时间戳
+    sign
+    (签名 token的前几位以哈希算法压缩成的一定长度的十六进制字符串)
+引入：
+    Token是在客户端频繁向服务端请求数据 
+    服务端频繁去数据库查询用户名和密码并进行对比
+    判断用户名和密码正确与否 
+    并作出相应提示
+使用Token目的：
+    减轻服务器压力
+    减少频繁的查询数据库
+    使服务器更加健壮    
+是什么：
+    token是一种身份验证的机制 
+    初始时用户提交账号数据给服务端
+    服务端采用一定策略生成一个字符串token
+    token字符串包含少量用户信息
+    并有一定期限
+    服务端会把token字符串传给客户端
+    客户端保存token字符串
+    并在接下来的请求中带上这个字符串
+Token机制
+    1.服务端如何根据token获取用户信息
+        服务端生成token时 加入少量用户信息 比如用户id
+        服务端接收到token之后 可以解析出这些数据
+        从而将token和用户关联起来
+    2.如何确保识别伪造的token
+        (代指token不是经过服务端来生成)
+        一般情况下 建议放入token中的数据是不敏感的数据
+        这样只要服务端使用私钥对数据生成签名 然后和数据拼接起来 作为token一部分即可
+        如JWT
+        另一种模式 基于加密的算法
+            对数据进行加密 把加密的结果作为token
+    3.如何应对冒充情况
+        1.加干扰码
+        2.有效期
+        3.token刷新
+    非法客户端拦截合法客户端的token
+    然后使用这个token向服务端发送请求
+    冒充合法客户端
+Token身份验证流程
+    对称加密算法
+    加密
+        将登录凭证做数字签名
+        加密后得到字符串作为token
+    解密
+        拿到token串 做解密和签名认证
+        判断其有效性
+Token有效期问题
+    如果这个Token在服务端持久化(如存入数据库)
+    它就是一个永久的身份令牌
+    解决操作过程中不能让用户感到Token失效问题
+    1.在服务器端保存Token状态 
+        用户每次操作都会自动刷新(推迟)Token过期时间
+        Session就是采用这种策略保持用户登陆状态
+        前后端分离 SPA 每秒可能发起很多次请求
+        每次刷新过期时间代价大
+        为提升效率 减少消耗
+        把Token过期时间保存在缓存/内存中
+    2.使用Refresh Token 可以避免频繁的读写操作
+        服务端不需要刷新Token过期时间
+        一旦Token过期 反馈给前端
+        前端使用Refresh Token
+        申请一个全新的Token继续使用
+        服务器端只需在客户端请求更新Token时
+        对Refresh Token有效性检查
+        Refresh Token也有有效期 
+        不过长一点
+Refresh Token
+    Refresh Token及过期时间是存储在服务器的数据库中
+    只有在申请新的AccessToken时才会验证 
+    不会对业务接口响应时间造成影响
+    也不需要向Session一样
+    一致保存在内存中应对大量请求
+
+    专用于刷新 access token 的 token
+    Access Token的有效期比较 短
+    当 Acesss Token 由于过期而失效时
+    使用 Refresh Token 就可以获取到新的 Token
+    如果 Refresh Token过期就只能重新登陆了
+Token无状态
+    如果把所有状态信息都附加在Token上 服务器就可以不保存
+    但服务端仍然要认证Token有效
+    只要服务端能确认是自己签发的Token 
+    且其信息未被改动过 就可认为Token有效
+    签名可以实现上述所说
+    此处签发和验证都是同一方
+    (非同一方 非对称加密算法)
+    对称加密算法即可达到要求
+    对称加密算法比非对称算法快得多
+Token单点登录
+    Token无状态后 单点登录就相对容易
+    前端拿到一个有效的Token 
+    它就可以在任何同一体系的服务上认证通过
+    只要它们使用相同的密钥和算法来认证Token的有效性
+拦截验证
+    客户端每一次请求 
+    必须携带token UA 
+    拦截器会对敏感资源的访问进行拦截
+    然后根据UA解析Token
+    解析不成功 
+    表示Token与UA不匹配
+    解析成功之后
+    判断Token是否已过期
+    如果是 拒绝服务
+    所有都通过情况下
+    拦截器方向 
+    请求传达到业务服务者
+Token服务器端有效性校验
+    服务器端利用算法生成token
+    并将token存储在高并发的数据库中
+    并设置过期时间
+Token优点(与Session相比)
+    1.不需要存储数据在服务端
+    服务端只需要根据客户端传来的token进行合法验证
+    通过后返回请求资源
+    减轻服务器端的资源占用压力
+    目前最流行的JWT(JSON WEB TOKEN)就是基于token实现
+    以下以JWT标准介绍token
+    2.服务端不用存放token数据
+    用解析token的计算时间换取session的存储空间
+    从而减轻服务器的压力
+    减少频繁查询数据库
+Token特点
+    1.服务端无状态化 可扩展性好
+    2.支持移动端设备
+    3.安全
+    4.支持跨程序调用
+Token用处
+    1.防止表单重复提交
+    2.反CSRF
+    3.身份验证 单点登录
+如果你的用户数据可能需要和第三方共享
+或允许第三方调用API接口 用Token
+JWT
+    JSON Web Token
+    目前最流行的跨域认证解决方案
+    一种认证授权机制
+    一种基于 JSON 的开放标准
+JWT自包含
+    负载payload中可以包含所需的所有用户部分的信息
+    可以避免对服务端数据库的多次查询
+服务器端JWT如何认证自身有效
+    服务端获取header中的JWT 
+    用base64URL算法解码各部分内容
+    并在服务端用同样的密钥和算法生成signature
+    与传过来的signature对比 验证JWT是否合法
+三个部分
+    组成：
+    一个 JWT token 是一个字符串，它由头部、载荷与签名三部分组成，中间用 . 分隔，形式如下：
+    base64(header).base64(json payload).signature
+    Header 头部
+        一个JSON对象 描述JWT的元数据
+        {"alg":"HS256","typ":"JWT"}
+        alg属性:(algorithm)
+            签名的算法 默认是HMAC SHA256(写成HS256)
+            或RSA
+        typ属性:(type)
+            这个令牌(token)的类型(type)
+            JWT令牌统一写成JWT
+        最后 将上面的JSON对象使用Base64URL转成字符串
+    Payload 负载
+        一个JSON对象 用来存放实际要传递的数据
+        JWT规定了7个官方字段 供选用
+        iss(issuer):签发人
+        exp (expiration time)：过期时间
+        sub (subject)：主题
+        aud (audience)：受众
+        nbf (Not Before)：生效时间
+        iat (Issued At)：签发时间
+        jti (JWT ID)：编号
+        除了官方字段 还可以在这个部分定义私有字段
+        { "sub": "1234567890", "name": "sssssss", "admin": true }
+        JWT默认是不加密的 任何人都可以读到 不要把秘密信息放在这个部分
+        这个JSON对象也要使用Base64URL算法转成字符串
+    Signature 签名
+        JWT的第三部分是一个签证信息
+        该签证信息由三部分组成
+        header(base64后)
+        payload(base64后)
+        secret(服务器端自定义的一个秘钥)
+        这个部分需要base64加密后的header
+        base64加密后的payload使用连接组成的字符串
+        以及秘钥secret构成一个组合
+        通过header中声明的加密方式对这个组合进行加密
+        构成了jwt的第三部分
+    PS：
+        secret是保存在服务器端的
+        JWT的签发生成也是在服务器端的
+        secret就是用来进行JWT的签发和JWT的验证
+        它就是服务端的私钥 
+        任何场景都不应该泄漏出去
+        一旦客户端得知这个secret
+        意味着客户端是可以自我签发JWT
+    写成一行就是
+    Header.Payload.Signature
+使用方式：
+    1、存放在cookie中
+    当用户希望访问一个受保护的路由或者资源的时候，可以把它放在 Cookie 里面自动发送，但是这样不能跨域。
+    2、存放在localstorage中，添加到header中发送
+    请求时放在 HTTP 请求头信息的 Authorization 字段里，使用 Bearer 模式添加 JWT Authorization: Bearer <token>
+    3、通过接口参数
+    可以把 JWT 放在 POST 请求的数据体里，或者通过 URL 的 queryString 传输。
+认证流程：
+    1.POST/user/login 输入用户名密码进行登录
+    2.服务器端使用密钥创建JWT
+    3.把JWT返回给浏览器
+    4.客户端将token保存在本地(通常使用localStorage/cookie)
+    当用户希望访问一个受保护的路由或资源时 需要请求头的Authorization字段使用Bearer模式添加JWT
+    4.在发给服务器的请求头中发送JWT
+    服务端保护路由将检查请求头Authorization中的JWT信息
+    5.检查JWT的签名 从JWT获取用户信息 减少查询数据库需要
+    6.把响应发送给客户端
+    因为JWT是自包含的(内部包含了一些会话信息)
+    因此减少了查询数据库的需求
+Token/JWT优点：
+    (完全由应用管理 避开同源策略/避免CSRF攻击/实现无状态服务器 能在多个服务器间使用 可扩展性好)
+    1.完全由应用管理，可以避开同源策略
+    2.避免 CSRF(Cross Site Request Forgery) 跨站请求伪造 攻击
+    3.实现无状态服务端，能够在多个服务间使用，可扩展性好
+Token/JWT为什么能避免CSRF攻击(服务器端验证header中的token信息 而非cookie信息)
+    用户发请求给服务端时
+    前端使用JS将JWT放在header中手动发送给服务端
+    服务端验证header中的JWT字段
+    而非cookie信息 这样就避免了CSRF漏洞攻击
+自定义Token和JWT 的关系：
+    相同点： 
+        都是访问资源的令牌，都可以记录用户的信息，都是使服务端无状态化，都是只有验证成功后，客户端才能访问服务端上受保护的资源
+    区别：
+        服务端验证客户端发来的token信息要进行数据的查询操作；
+        JWT验证客户端发来的token信息就不用， 在服务端使用密钥校验就可以，不用数据库的查询。
+各种鉴权方式注意点
+    使用 cookie 注意点(移动端一般不支持cookie session基于cookie实现用的也不多 移动端一般用token)
+        1.因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
+        2.不要存储敏感数据，比如用户密码，账户余额
+        3.使用 httpOnly 在一定程度上提高安全性
+        4.尽量减少 cookie 的体积，能存储的数据量不能超过 4kb设置正确的 domain 和 path，减少数据传输
+        5.cookie 无法跨域，子域名可以访问父域名
+        6.一个浏览器针对一个网站最多存 20 个Cookie，浏览器一般只允许存放 300 个Cookie
+        7.移动端对 cookie 的支持不是很好，而 session 一般基于 cookie 实现，所以移动端常用的是 token
+    使用 session 注意点(sessionId可以跟在url参数后面即重写url session不一定非得靠cookie实现)
+        1.用户同时在线量较多时，session 存储在服务器会占据较多内存，需要定期清理过期的session
+        2.当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。因为 session是由单个服务器创建的，处理用户请求的服务器不一定是 那个创建 session 的服务器，那么该服务器就无法拿到之前已经放入到 session 中的登录凭证之类的信息了。
+        3.当多个应用要共享 session时，因为不同的应用可能部署的主机不一样需要在各个应用做好 cookie 跨域的处理。
+        4.sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie ，一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现
+    使用 token 注意点
+        1.如果你认为用数据库来存储 token会导致查询时间太长，可以选择放在 内存当中，比如 redis(数据结构服务器) 很适合你对 token 查询的需求。
+        2.token 完全由应用管理，所以它可以避开同源策略
+        3.token 可以避免 CSRF 攻击(因为不需要 cookie 了)
+        4.移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+    使用 JWT 时需要考虑的问题(默认不加密 可以生成原始Token后再用密钥加密一次)
+        1.JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
+        2.JWT 不加密的情况下，不能将秘密数据写入 JWT。
+        3.JWT 不仅可以用于认证，也可以用于交换信息 有效使用 JWT，可以降低服务器查询数据库的次数。
+        4.JWT 最大的优势是服务器不再需要存储Session 使得服务器认证鉴权业务可以方便扩展
+            这也是 JWT 最大的缺点：由于服务器不需要存储 Session 状态
+            因此使用过程中无法废弃某个 Token 或者更改 Token 的权限
+            也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。
+        5.JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限
+            为了减少盗用，JWT的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
+        6.JWT 适合一次性的命令认证，颁发一个有效期极短的JWT
+            即使暴露了危险也很小 由于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
+        7.为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。      
 6. localStorage(Document源对象 本地存储 除非手动清除否则一直有效)和 
     sessionStorage(session Storage对象 会话存储 会话结束时清除 浏览器关闭前有效)
     ---解决了cookie存储空间不足问题 
@@ -1625,23 +1625,23 @@
             localStorage.removeItem("userInfo);
         清空：
             localStorage.clear();
-    1.简介
-        1.sessionStorage 和 localStorage 是 HTML5 新增的两个特性，这两个特性主要是用来作为会话存储和本地存储来使用的，解决了 cookie 存储空间不足的问题；
-        2.sessionStorage 属性允许你访问一个 session Storage 对象，用于存储当前会话的数据，存储在 sessionStorage 里面的数据在页面会话结束时会被清除。
+    1. 简介
+        1. sessionStorage 和 localStorage 是 HTML5 新增的两个特性，这两个特性主要是用来作为会话存储和本地存储来使用的，解决了 cookie 存储空间不足的问题；
+        2. sessionStorage 属性允许你访问一个 session Storage 对象，用于存储当前会话的数据，存储在 sessionStorage 里面的数据在页面会话结束时会被清除。
         页面会话在浏览器打开期间一直保持，并且重新加载或恢复页面仍会保持原来的页面会话。
-        3.localStorage 属性允许你访问一个 Document 源(origin)的对象 Storage 用于存储当前源的数据，除非用户人为清除(调用 localStorage api 或则清除浏览器数据)， 否则存储在 localStorage 的数据将被长期保留。
+        3. localStorage 属性允许你访问一个 Document 源(origin)的对象 Storage 用于存储当前源的数据，除非用户人为清除(调用 localStorage api 或则清除浏览器数据)， 否则存储在 localStorage 的数据将被长期保留。
     2. 相同点
-        1.存储大小一般均为5M左右
-        2.都有同源策略限制，跨域无法访问
-        3.数据仅在客户端进行存储，并不参与和服务器的通信(不会随着 http 请求发送到服务器)
-        4.以 key 和 value 的形式进行存储数据， value 值必须为字符串，不为字符串会自动转型( value 如果是对象则需要转为 json 进行存储)
-    3.不同点
-        1.生命周期
-            1.localStorage 存储的数据是永久性的，除非用户人为删除否则会一直存在(调用 localStorage api 或则清除浏览器数据)。
-            2.sessionStorage 存储的数据在当前会话结束时会被清除，一旦窗口或者标签页被关闭，那么所有通过 sessionStorage 存储的数据也会被删除。
-        2.作用域
-            1.localStorage: 在同一个浏览器内，同源文档之间共享 localStorage 数据，可以互相读取、覆盖、清除(同浏览器限制、同源限制)
-            2.sessionStorage: 与 localStorage 一样需要同一浏览器同源文档这一条件。除此之外 sessionStorage 的作用域还被限定在了窗口中，也就是说，只有同一浏览器、同一窗口的同源文档才能共享数据(同浏览器限制、同源限制、同标签页限制)
+        1. 存储大小一般均为5M左右
+        2. 都有同源策略限制，跨域无法访问
+        3. 数据仅在客户端进行存储，并不参与和服务器的通信(不会随着 http 请求发送到服务器)
+        4. 以 key 和 value 的形式进行存储数据， value 值必须为字符串，不为字符串会自动转型( value 如果是对象则需要转为 json 进行存储)
+    3. 不同点
+        1. 生命周期
+            1. localStorage 存储的数据是永久性的，除非用户人为删除否则会一直存在(调用 localStorage api 或则清除浏览器数据)。
+            2. sessionStorage 存储的数据在当前会话结束时会被清除，一旦窗口或者标签页被关闭，那么所有通过 sessionStorage 存储的数据也会被删除。
+        2. 作用域
+            1. localStorage: 在同一个浏览器内，同源文档之间共享 localStorage 数据，可以互相读取、覆盖、清除(同浏览器限制、同源限制)
+            2. sessionStorage: 与 localStorage 一样需要同一浏览器同源文档这一条件。除此之外 sessionStorage 的作用域还被限定在了窗口中，也就是说，只有同一浏览器、同一窗口的同源文档才能共享数据(同浏览器限制、同源限制、同标签页限制)
     4.操作
         sessionStorage localStorage 在操作上没什么区别，下面以 sessionStorage 为例：
             1. 新增、修改
@@ -1657,37 +1657,35 @@
                 2.通过对象的形式移除指定数据
                 3.移除当前作用域下所有数据  
                 6.Cookie、sessionStorage、localStorage区别
-    5.cookie(在浏览器和服务器间来回传递) sessionStorage localStorage(不会自动把数据发给服务器，仅在本地保存)对比
-    如何获取浏览器在网站的cookie
+    5. cookie(在浏览器和服务器间来回传递) sessionStorage localStorage(不会自动把数据发给服务器，仅在本地保存)对比
+        如何获取浏览器在网站的cookie
         获得浏览器在网站的cookie
         可以使不通过浏览器访问 也能使用自己的账号进行在浏览器上的操作
-        1.浏览器请求看
+        1. 浏览器请求看
             控制台->network标签->doc分类
             name上点击右键 勾选domain 
             需domain和所访问网页域名相同
             点击域名相同的一个 弹出的小窗拉到中间 
             可以看见cookie的值
-        2.控制器用代码看
+        2. 控制器用代码看
             控制台输入document.cookie 
             可输出cookie的值
-        3.resource查看
+        3. resource查看
             点击resource标签 找到下面的cookies
             点击本网站域名的cookie 该地方适合查看不适合复制
     共同点：
         都是保存在浏览器端，且同源的。 
-    区别：
-        （1）cookie数据始终在同源的http请求中携带，即cookie在浏览器和服务器间来回传递。
+    - 区别：
+        1. cookie数据始终在同源的http请求中携带，即cookie在浏览器和服务器间来回传递。
             sessionStorage和localStorage不会自动把数据发给服务器，仅在本地保存。
-        （2）cookie数据不能超过4k(适合保存小数据)。 
+        2. cookie数据不能超过4k(适合保存小数据)。 
         sessionStorage和localStorage容量较大，
-        （3）数据有效期不同。
+        3. 数据有效期不同。
             sessionStorage：仅在当前浏览器窗口关闭前有效。
             localStorage：始终有效，窗口或浏览器关闭也一直保存，需手动清除；
             cookie只在设置的cookie过期时间之前一直有效，即使窗口或浏览器关闭。
-        （4）作用域不同。
-            sessionStorage不在不同的浏览器窗口中共享；
-            localStorage 在所有同源窗口中都是共享的；
-            cookie也是在所有同源窗口中都是共享的。
+        4. 作用域不同。
+            - sessionStorage不在不同的浏览器窗口中共享；localStorage 在所有同源窗口中都是共享的；cookie也是在所有同源窗口中都是共享的。
     应用场景：
         localStorage：
             常用于长期登录（+判断用户是否已登录），适合长期保存在本地的数据。
@@ -1695,7 +1693,7 @@
             敏感账号一次性登录；
         cookies：
             与服务器交互。
-7.前端鉴权方案
+7. 前端鉴权方案
     常见的前端解决方案
         1.HTTP Basic Authentication
             概念：
@@ -1736,19 +1734,19 @@
                   第二步：当用户点击授权并登陆后，授权服务器将生成一个用户凭证（code）。这个用户凭证会附加在重定向的地址redirect_uri的后面；
                   第三步：用户再去请求时携带用户凭证（code），验证服务器返回一个访问令牌（Access Token）；
                   第四步：再去拿着令牌请求资源时，就会得到受保护的资源信息。
-8.跨域相关(主要用来防止CSRF攻击)
-    1.JSONP:(需服务器端配合|利用script标签没有限制跨域的漏洞|兼容性好实现简单|只支持get请求|容易受到XSS攻击)
-    2.CORS(主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)
-    3.Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
-    4.nginx反向代理 类似Node中间件服务器，通过nginx代理服务器实现。 实现方法：下载安装nginx，修改配置。
-    5.postMessage(H5新增) 使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源)
-    (无论怎样的跨域资源获取方案 本质上都需要服务器端的支持)
-    (JSONP CORS Node中间件代理 nginx反向代理 postMessage)
-    cookie跨域解决方案
-        1.服务端将cookie写到客户端后 客户端对cookie进行解析 
+8. 跨域相关(主要用来防止CSRF攻击)
+    1. JSONP:(需服务器端配合|利用script标签没有限制跨域的漏洞|兼容性好实现简单|只支持get请求|容易受到XSS攻击)
+    2. CORS(主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)
+    3. Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
+    4. nginx反向代理 类似Node中间件服务器，通过nginx代理服务器实现。 实现方法：下载安装nginx，修改配置。
+    5. postMessage(H5新增) 使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源)
+    - (无论怎样的跨域资源获取方案 本质上都需要服务器端的支持)
+    - (JSONP CORS Node中间件代理 nginx反向代理 postMessage)
+    - cookie跨域解决方案
+        1. 服务端将cookie写到客户端后 客户端对cookie进行解析 
         将token解析出来 此后请求都把这个Token带上即可
-        2.多个域名共享cookie 在写到客户端的时候设置cookie的domain
-        3.将Token保存在SessionStorage中
+        2. 多个域名共享cookie 在写到客户端的时候设置cookie的domain
+        3. 将Token保存在SessionStorage中
         (不依赖cookie就没有跨域问题)
     跨域cookie解决方案
         cookie跨域问题产生
@@ -1779,23 +1777,23 @@
         目的：
             主要是用来防止 CSRF(Cross-site Request forgery跨站请求伪造) 攻击的。
             简单点说，CSRF 攻击是利用用户的登录态发起恶意请求。
-    2.什么情况才算作跨域？
+    2. 什么情况才算作跨域？
         非同源请求，均为跨域。
-    3.同源
+    3. 同源
         源(origin) = 协议(protocol)+端口(port)+主机/域名(host)
-    4.为什么有跨域需求
+    4. 为什么有跨域需求
         场景 —— 工程服务化后，不同职责的服务分散在不同的工程中，往往这些工程的域名是不同的，但一个需求可能需要对应到多个服务，这时便需要调用不同服务的接口，因此会出现跨域。
 
        (跨域的五种实现方式  
-        1.JSONP:(需服务器端配合|利用script标签没有限制跨域的漏洞|兼容性好实现简单|只支持get请求|容易受到XSS攻击)
-        2.CORS(主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持POST请求/所有HTTP请求)
-        3.Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
-        4.nginx反向代理 类似Node中间件服务器，通过nginx代理服务器实现。 实现方法：下载安装nginx，修改配置。
-        5.postMessage(H5新增) 使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源)
+        1. JSONP:(需服务器端配合|利用script标签没有限制跨域的漏洞|兼容性好实现简单|只支持get请求|容易受到XSS攻击)
+        2. CORS(主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持POST请求/所有HTTP请求)
+        3. Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
+        4. nginx反向代理 类似Node中间件服务器，通过nginx代理服务器实现。 实现方法：下载安装nginx，修改配置。
+        5. postMessage(H5新增) 使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源)
 
-    5.五种跨域方法 JSONP CORS Node中间件代理 nginx反向代理 postMessage(H5新增)
+    5. 五种跨域方法 JSONP CORS Node中间件代理 nginx反向代理 postMessage(H5新增)
         无论怎样的跨域资源获取方案 本质上都需要服务器端的支持
-        1.JSONP(JSON with padding)--需要服务器端配合
+        1. JSONP(JSON with padding)--需要服务器端配合
             JSONP:
                 (需服务器端配合|利用script标签没有限制跨域的漏洞|兼容性好实现简单|只支持get请求|容易受到XSS攻击)
                 应用JSON的一种新方法，JSONP看起来和JSON差不多，
@@ -1810,144 +1808,144 @@
                 1.JSONP只支持GET请求；
                 2.XMLHttpRequest相对于JSONP有着更好的错误处理机制       
                 3.容易受到XSS(跨站脚本)攻击 
-        2.CORS Cross-origin resource sharing 跨域资源共享
+        2. CORS Cross-origin resource sharing 跨域资源共享
         (主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)  
         (简单请求 同时满足以下两个条件
-                1.请求方法是 HEAD/GET/POST
-                2.HTTP头信息字段为 
-                    Accept/
-                    Accept-Language/
-                    Content-Language/
-                    Last-Event-ID/
-                    
-                    Content-Tyep 
-                        application/x-www-form-urlencoded
-                        multipart/form-data
-                        text/plain)
+        1. 请求方法是 HEAD/GET/POST
+        2. HTTP头信息字段为 
+            Accept/
+            Accept-Language/
+            Content-Language/
+            Last-Event-ID/
+            
+            Content-Tyep 
+                application/x-www-form-urlencoded
+                multipart/form-data
+                text/plain)
         (异步请求 前端分：简单请求/非简单请求(会先发送一次预检请求))
         一个W3C标准 允许浏览器向跨源服务器 
         发出XMLHttpRequest请求
         从而克服AJAX只能同源使用的限制
-            1.浏览器会自动进行 CORS 通信，实现 CORS 通信的关键是后端。只要后端实现了 CORS，就实现了跨域。
-            2.服务端设置 Access-Control-Allow-Origin 就可以开启 CORS。
-            3.该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。
-            4.虽然设置 CORS 和前端没什么关系，但是通过这种方式解决跨域问题的话，会在发送请求时出现两种情况，分别为简单请求和复杂请求。
-            原理：
-                服务器端设置Access-Control-Allow-Origin以开启CORS。该属性表示哪些域名可以访问资源，如设置通配符则表示所有网站均可访问。
-            CORS 是W3C 推荐的一种新的官方方案，能使服务器支持 XMLHttpRequest 的跨域请求。CORS 实现起来非常方便，只需要增加一些 HTTP 头，让服务器能声明允许的访问来源。
-            值得注意的是，通常使用CORS时，
-            异步请求会被分为
-                1.1简单请求
-                只要同时满足以下两大条件 就属于简单请求
-                    1.请求方法是以下三种方法之一
-                        GET 获取数据
-                        POST 提交数据
-                        HEAD 本质和GET一样 区别在于HEAD不含有呈现数据 仅仅是HTTP头部信息
-                    2.HTTP头信息不超过以下几个字段
-                        Accept 
-                        application/x-www-form-urlencoded
-                        multipart/form-data
-                        text/plain
-                        表示客户端支持的数据类型 或客户端希望接收到的内容类型
-                        
-                        Accept-Language
-                        表示客户端支持的语言格式(不是编码格式)
-                        如中文/英文 通常浏览器直接发起请求时 浏览器会根据被设置的语言环境(默认语言) 来附加上该字段
+        1. 浏览器会自动进行 CORS 通信，实现 CORS 通信的关键是后端。只要后端实现了 CORS，就实现了跨域。
+        2. 服务端设置 Access-Control-Allow-Origin 就可以开启 CORS。
+        3. 该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。
+        4. 虽然设置 CORS 和前端没什么关系，但是通过这种方式解决跨域问题的话，会在发送请求时出现两种情况，分别为简单请求和复杂请求。
+        原理：
+            服务器端设置Access-Control-Allow-Origin以开启CORS。该属性表示哪些域名可以访问资源，如设置通配符则表示所有网站均可访问。
+        CORS 是W3C 推荐的一种新的官方方案，能使服务器支持 XMLHttpRequest 的跨域请求。CORS 实现起来非常方便，只需要增加一些 HTTP 头，让服务器能声明允许的访问来源。
+        值得注意的是，通常使用CORS时，
+        - 异步请求会被分为
+            1.1简单请求
+            只要同时满足以下两大条件 就属于简单请求
+            1. 请求方法是以下三种方法之一
+                GET 获取数据
+                POST 提交数据
+                HEAD 本质和GET一样 区别在于HEAD不含有呈现数据 仅仅是HTTP头部信息
+            2. HTTP头信息不超过以下几个字段
+                Accept 
+                application/x-www-form-urlencoded
+                multipart/form-data
+                text/plain
+                表示客户端支持的数据类型 或客户端希望接收到的内容类型
+                
+                Accept-Language
+                表示客户端支持的语言格式(不是编码格式)
+                如中文/英文 通常浏览器直接发起请求时 浏览器会根据被设置的语言环境(默认语言) 来附加上该字段
 
-                        Content-Language
-                        说明访问者希望采用的语言或语言组合 用户可根据自己偏好的语言来制定不同的内容
+                Content-Language
+                说明访问者希望采用的语言或语言组合 用户可根据自己偏好的语言来制定不同的内容
 
-                        Last-Event-ID
+                Last-Event-ID
 
-                        Content-Type(只限于三个值)
-                         application/x-www-form-urlencoded
-                         multipart/form-data
-                         text/plain
-                这是为了兼容表单(form)
-                因为历史上表单一直可以发出跨域请求
-                AJAX的跨域设计就是 
-                只要表单可以发 AJAX就可以直接发
-                凡是不同时满足上面两个条件 属于非简单请求
-                浏览器对这两种请求的处理是不一样的
-                1.2简单请求基本流程
-                对于简单请求 浏览器直接发出CORS请求
-                具体来说就是在头信息中 添加一个Origin字段
-                Origin字段用来说明
-                    本次请求来自哪个源
-                    (协议+域名+端口)
-                服务器根据这个值 决定是否同意这次请求
+                Content-Type(只限于三个值)
+                    application/x-www-form-urlencoded
+                    multipart/form-data
+                    text/plain
+            这是为了兼容表单(form)
+            因为历史上表单一直可以发出跨域请求
+            AJAX的跨域设计就是 
+            只要表单可以发 AJAX就可以直接发
+            凡是不同时满足上面两个条件 属于非简单请求
+            浏览器对这两种请求的处理是不一样的
+            1.2简单请求基本流程
+            对于简单请求 浏览器直接发出CORS请求
+            具体来说就是在头信息中 添加一个Origin字段
+            Origin字段用来说明
+                本次请求来自哪个源
+                (协议+域名+端口)
+            服务器根据这个值 决定是否同意这次请求
 
-                如果Origin指定的源 不在许可范围内 服务器会返回一个正常的HTTP回应
-                浏览器发现 这个回应的头信息没有包含Access-Control-Allow-Origin字段
-                知道出错 从而抛出一个错误被XMLHttpRequest的onerror回调函数捕获
-                PS:这种错误无法通过状态码识别 因为HTTP回应的状态码可能是200
+            如果Origin指定的源 不在许可范围内 服务器会返回一个正常的HTTP回应
+            浏览器发现 这个回应的头信息没有包含Access-Control-Allow-Origin字段
+            知道出错 从而抛出一个错误被XMLHttpRequest的onerror回调函数捕获
+            PS:这种错误无法通过状态码识别 因为HTTP回应的状态码可能是200
 
-                如果Origin指定的域名在许可范围内 服务器返回的响应 会多出几个头信息字段
-                上面头信息中 有三个与CORS请求相关的字段 
-                都以Access-Control开头
+            如果Origin指定的域名在许可范围内 服务器返回的响应 会多出几个头信息字段
+            上面头信息中 有三个与CORS请求相关的字段 
+            都以Access-Control开头
 
-                    1.Access-Control-Allow-Origin
-                    该字段必须 
-                    数值要么是请求时Origin字段的值
-                    要么是一个*表示接受任意域名的请求
+                1.Access-Control-Allow-Origin
+                该字段必须 
+                数值要么是请求时Origin字段的值
+                要么是一个*表示接受任意域名的请求
 
-                    2.Access-Control-Allow-Credentials
-                    该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。
+                2.Access-Control-Allow-Credentials
+                该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。
 
-                    3.Access-Control-Expose-Headers
-                    该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。
-                1.3
-                    CORS请求默认不发送Cookie和HTTP认证信息
-                    如果要把Cookie发到服务器 
-                    一方面要服务器同意 
-                        指定Access-Control-Allow-Credentials字段
-                    另一方面开发者必须在AJAX请求中打开withCredentials属性
-                    否则即使服务器同意发送Cookie 浏览器也不会发送
-                    或者 服务器要求设置Cookie 浏览器也不会处理   
-                    PS：如果发送Cookie Access-Control-Allow-Origin不能设为星号
-                    必须指定明确的 与请求网页一致的域名
-                    同时Cookie依然遵循同源策略
-                    只有用服务器域名设置的cookie才会上传
-                    其他域名的cookie不会上传
-                    且原网页代码中的document.cookie也无法读取服务器域名下的cookie
-                2.非简单/复杂请求 
-                    2.1预检请求
-                    是那种对服务器有特殊要求的请求 比如请求方法是PUT/DELETE 或者Content-Type字段类型是application/json
+                3.Access-Control-Expose-Headers
+                该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。
+            1.3
+                CORS请求默认不发送Cookie和HTTP认证信息
+                如果要把Cookie发到服务器 
+                一方面要服务器同意 
+                    指定Access-Control-Allow-Credentials字段
+                另一方面开发者必须在AJAX请求中打开withCredentials属性
+                否则即使服务器同意发送Cookie 浏览器也不会发送
+                或者 服务器要求设置Cookie 浏览器也不会处理   
+                PS：如果发送Cookie Access-Control-Allow-Origin不能设为星号
+                必须指定明确的 与请求网页一致的域名
+                同时Cookie依然遵循同源策略
+                只有用服务器域名设置的cookie才会上传
+                其他域名的cookie不会上传
+                且原网页代码中的document.cookie也无法读取服务器域名下的cookie
+            2.非简单/复杂请求 
+                2.1预检请求
+                是那种对服务器有特殊要求的请求 比如请求方法是PUT/DELETE 或者Content-Type字段类型是application/json
 
-                    非简单请求的CORS请求 会在正式通信之前 增加一次HTTP查询请求 称为预检请求
+                非简单请求的CORS请求 会在正式通信之前 增加一次HTTP查询请求 称为预检请求
 
-                    浏览器先询问服务器 
-                    当前网页所在域名是否在服务器许可名单之中 以及可以使用哪些HTTP动词和头信息字段 
-                    只有得到肯定答复 
-                    浏览器才会发出正式的XMLHttpRequest请求
-                    否则就报错
+                浏览器先询问服务器 
+                当前网页所在域名是否在服务器许可名单之中 以及可以使用哪些HTTP动词和头信息字段 
+                只有得到肯定答复 
+                浏览器才会发出正式的XMLHttpRequest请求
+                否则就报错
 
-                    预检请求用的请求方法是OPTIONS 表示这个请求是用来询问的 
-                    头信息中 关键字段是Origin 表示请求来自哪个源
-                    除了Origin字段 预检请求的头信息包含两个特殊字段
-                    1.Access-Control-Request-Method
-                        必须的 用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。
-                    2.Access-Control-Request-Headers
-                        该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。
-                2.2预检请求回应
-                    服务器受到预检请求以后
-                    检查Origin Access-Control-Request-Method         
-                    Access-Control-Request-Header
-                    字段后
-                    确认允许跨域请求 就可以做出回应
-                    
-                    上面的HTTP回应中 关键的是Access-Control-Allow-Origin字段
-                    表示http://api.bob.com可以请求数据
-                    该字段也可以设为* 表示同意任何跨院请求
+                预检请求用的请求方法是OPTIONS 表示这个请求是用来询问的 
+                头信息中 关键字段是Origin 表示请求来自哪个源
+                除了Origin字段 预检请求的头信息包含两个特殊字段
+                1.Access-Control-Request-Method
+                    必须的 用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。
+                2.Access-Control-Request-Headers
+                    该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。
+            2.2预检请求回应
+                服务器受到预检请求以后
+                检查Origin Access-Control-Request-Method         
+                Access-Control-Request-Header
+                字段后
+                确认允许跨域请求 就可以做出回应
+                
+                上面的HTTP回应中 关键的是Access-Control-Allow-Origin字段
+                表示http://api.bob.com可以请求数据
+                该字段也可以设为* 表示同意任何跨院请求
 
-                    如果服务器否定了预检请求 会返回一个正常的HTTP回应 但是没有任何CORS相关的头信息字段 这时 浏览器就会认定 服务器不同意预检请求 因此触发一个错误 被XMLHttpRequest对象的onerror回调函数捕获
-                    。。。
-                2.3浏览器的正常请求和回应
-                    一旦服务器通过了预检请求
-                    以后每次浏览器正常的CORS请求
-                    都与简单请求一样
-                    会有一个Origin头信息字段
-                    服务器回应 也都会有一个Access-Control-Allow-Origin信息字段
+                如果服务器否定了预检请求 会返回一个正常的HTTP回应 但是没有任何CORS相关的头信息字段 这时 浏览器就会认定 服务器不同意预检请求 因此触发一个错误 被XMLHttpRequest对象的onerror回调函数捕获
+                。。。
+            2.3浏览器的正常请求和回应
+                一旦服务器通过了预检请求
+                以后每次浏览器正常的CORS请求
+                都与简单请求一样
+                会有一个Origin头信息字段
+                服务器回应 也都会有一个Access-Control-Allow-Origin信息字段
 
             优缺点
                 1.使用简单方便，更为安全
@@ -1959,17 +1957,17 @@
                   CORS支持所有类型的HTTP请求
                 3.JSONP优势在于支持老式浏览器
                   以及可以向不支持CORS的网站请求数据
-        3.Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
+        3. Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
             原理：
                 同源策略仅是浏览器需要遵循的策略，故搭建中间件服务器转发请求与响应，达到跨域目的。
                 类似于将跨域请求交给第三方，第三方去访问指定的网络，获取数据然后返回
-        4.nginx反向代理 类似Node中间件服务器，通过nginx代理服务器实现。 实现方法：下载安装nginx，修改配置。
+        4. nginx反向代理 类似Node中间件服务器，通过nginx代理服务器实现。 实现方法：下载安装nginx，修改配置。
                 正向代理：隐藏了客户端
                 反向代理：隐藏了服务端(如VPN)
             原理：
             类似Node中间件服务器，通过nginx代理服务器实现。
             实现方法：下载安装nginx，修改配置。
-        5.postMessage(H5新增) 使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源
+        5. postMessage(H5新增) 使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源
             1.window.postMessage(message,targetOrigin) 方法是html5新引进的特性
             2.可以使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源
             3.目前IE8+、FireFox、Chrome、Opera等浏览器都已经支持window.postMessage方法。
@@ -1977,7 +1975,7 @@
             该方法的第一个参数message为要发送的消息，类型只能为字符串
             第二个参数targetOrigin用来限定接收消息的那个window对象所在的域，如果不想限定域，可以使用通配符* 
             需要接收消息的window对象，可是通过监听自身的message事件来获取传过来的消息，消息内容储存在该事件对象的data属性中。
-        6.WebSocket
+        6. WebSocket
             webSocket本身不存在跨域问题 可以利用webSocket进行非同源之间的通信
             原理：
                 利用webSocket的API 
@@ -1989,36 +1987,58 @@
                 利用send向客户端发送数据
 
                 JS创建了web socket之后，会有一个HTTP请求发送到浏览器以发起连接。取得服务器响应后，建立的连接会使用HTTP升级从HTTP协议交换为web sockt协议。
-9.axios是什么 底层是如何实现的
-        是一个基于Promise的HTTP库 可以用在浏览器和node.js中
-        是基于Promise的用于浏览器和Nodejs的HTTP客户端
-        特点：
-            1.从浏览器中创建XMLHttpRequests
-            2.从node.js创建http请求
-            3.支持Promsie API
-            4.拦截请求和响应
-            5.转换请求数据和响应数据
-            6.取消请求
-            7.自动转换JSON数据
-            8.客户端支持防御XSRF
-        使用方法:
-            1.执行get数据请求
-            2.执行post数据请求
-            3.axios API通过相关配置传递给axios完成请求
-            4.axios的并发 axios.all axios.spread
-            5.axios包含所有请求方式函数的封装
-        初步封装一个类似于axios的函数
-            1.执行返回一个promise
-            2.能够通过create方法配置初始化参数
-            3.包含所有的AJAX方法并返回Promise对象
-            4.支持Promise.all并能用spread处理
-        安装：
-            使用npm
-                npm install axios
-        实现原理：
-            1.axios原理还是属于XMLHttpRequest 因此需要实现一个AJAX
-            2.需要一个Promise对象对结果进行处理
-10.XML与JSON
+9. axios是什么 底层是如何实现的
+    - 一个基于Promise的HTTP库 可以用在浏览器和node.js中
+    - 本质是XMLHttpRequests请求 即AJAX请求
+    - 基于Promise的用于浏览器和Nodejs的HTTP客户端
+
+    > 特点：
+    1. 从浏览器中创建XMLHttpRequests
+    2. 从node.js创建http请求
+    3. 支持Promsie API
+    4. 拦截请求和响应
+    5. 转换请求数据和响应数据
+    6. 取消请求
+    7. 自动转换JSON数据
+    8. 客户端支持防御XSRF
+    
+    > 浏览器支持
+    - 支持IE8及以上的浏览器
+
+    > 基本使用
+    - axios提供了两种不同的形式来发送HTTP请求
+    1. 通过axios()方法
+    2. 分别通过axios对象提供的与HTTP对应的方法发起请求
+        1. axios.get(url)
+
+    > 使用方法:
+    1. 执行get数据请求
+    2. 执行post数据请求
+    3. axios API通过相关配置传递给axios完成请求
+    4. axios的并发 axios.all axios.spread
+    5. axios包含所有请求方式函数的封装
+    
+    > 初步封装一个类似于axios的函数
+    1. 执行返回一个promise
+    2. 能够通过create方法配置初始化参数
+    3. 包含所有的AJAX方法并返回Promise对象
+    4. 支持Promise.all并能用spread处理
+    安装：
+        使用npm
+            npm install axios
+    实现原理：
+        1.axios原理还是属于XMLHttpRequest 因此需要实现一个AJAX
+        2.需要一个Promise对象对结果进行处理
+
+    > axios api的使用
+    - axios方法接收一个对象 这个对象包含了一些对请求的配置 axios会根据这些配置来发送对应的HTTP请求
+    - 最基本的配置项应该包括
+    1. method 请求的方法(可选值 get post等)
+    2. url 请求的地址(必须项)
+    3. data请求发送的数据(post的部分请求需要)
+    - PS：默认的请求方法是get所以如果是get请求可以不设置method
+    - 请求响应的处理在then和catch回调中 请求正常会进入then 请求一场则会进catch
+10. XML与JSON
     XML定义
         扩展标记语言 EXtensible Markup Language XML
         用于标记电子文件使其具有结构性的标记语言 
@@ -2030,21 +2050,21 @@
         一种轻量级数据交换格式
         具有良好的可读和便于快速编写的特性
         可在不同平台之间进行数据交换
-    XML优点:
-        1.格式统一 符合标准
-        2.容易与其他系统进行远程交互 数据共享比较简单
-    XML缺点:(庞大 解析费时 )
-        1.XML文件庞大 文件格式复杂 传输占带宽
-        2.服务端和客户端都需要花费大量代码解析XML 导致服务器端和客户端代码变得异常复杂且不易维护
-        3.客户端不同 浏览器之间解析XML方式不同 需要重复编写很多代码
-    JSON优点(数据格式简单/易于解析/支持多种语言/同时被服务器端代码使用)
-        1.数据格式比较简单 易于读写 格式都是压缩的 占用带宽小
-        2.易于解析 客户端JS可简单通过eval()进行JSON数据读取
-        3.支持多种语言 包括ActionScript C Java JavaScript Perl PHP Python Ruby等服务器端语言 便于服务器端解析
-        4.JSON格式能直接为服务器端代码使用 大大简化了服务器端和客户端的代码开发量 且完成任务不变 易于维护
-    JSON缺点(没有XML那么通用)
-        1.没有XML格式这么推广的深入人心和喜用广泛，没有XML那么通用性
-        2.JSON格式目前在Web Service中推广还属于初级阶段
+    - XML优点:
+        1. 格式统一 符合标准
+        2. 容易与其他系统进行远程交互 数据共享比较简单
+    - XML缺点:(庞大 解析费时 )
+        1. XML文件庞大 文件格式复杂 传输占带宽
+        2. 服务端和客户端都需要花费大量代码解析XML 导致服务器端和客户端代码变得异常复杂且不易维护
+        3. 客户端不同 浏览器之间解析XML方式不同 需要重复编写很多代码
+    - JSON优点(数据格式简单/易于解析/支持多种语言/同时被服务器端代码使用)
+        1. 数据格式比较简单 易于读写 格式都是压缩的 占用带宽小
+        2. 易于解析 客户端JS可简单通过eval()进行JSON数据读取
+        3. 支持多种语言 包括ActionScript C Java JavaScript Perl PHP Python Ruby等服务器端语言 便于服务器端解析
+        4. JSON格式能直接为服务器端代码使用 大大简化了服务器端和客户端的代码开发量 且完成任务不变 易于维护
+    - JSON缺点(没有XML那么通用)
+        1. 没有XML格式这么推广的深入人心和喜用广泛，没有XML那么通用性
+        2. JSON格式目前在Web Service中推广还属于初级阶段
     XML与JSON优缺点对比
     (可读性/可扩展性/解析手段)
     (JSON编码难度较低/JSON解析难度基本为0/JSON数据体积更小/数据交互更方便/传输速度较快)
@@ -2102,7 +2122,7 @@
         2.XPath包含一个标准数据库
         3.XPath是XSLT中的主要元素
         4.XPath是一个W3C标准
-11.AJAX(一种实现无页面刷新获取服务器资源的混合技术)
+11. AJAX(一种实现无页面刷新获取服务器资源的混合技术)
         Ajax一种能够实现局部网页刷新的技术 使网页异步刷新
     实现
     (创建XMLhttpRequest核心对象|
@@ -2111,7 +2131,7 @@
     监听服务器响应 接收返回值)
     (open打开连接 send发送请求 监听服务器响应 接收返回值)
 
-    1.AJAX概述 AJAX是什么
+    1. AJAX概述 AJAX是什么
         AJAX是'Asyncchronous JavaScript And XML'缩写
         (即异步的JS和XML)
         一种实现无页面刷新获取服务器数据的混合技术
@@ -2146,10 +2166,10 @@
                 PS:明白AJAX并不只是操作XMLHttpRequest对象 对初学者而言十分必要
             DRY
                 Don't Repeat Yourself
-        AJAX意义：
-            1.使浏览器在不刷新页面的情况下获取服务器响应
-            2.大大提升互联网用户使用体验
-            3.AJAX请求获取的是数据而不是HTML文档 节省网络带宽
+        - AJAX意义：
+            1. 使浏览器在不刷新页面的情况下获取服务器响应
+            2. 大大提升互联网用户使用体验
+            3. AJAX请求获取的是数据而不是HTML文档 节省网络带宽
         AJAX获取数据
             通常使用API与各式各样的数据库交互 服务器
             AJAX技术核心--XMLHttpRequest对象
@@ -2218,11 +2238,11 @@
         AJAX请求时 如何解释json数据
             字符串形式的JSON：eval("("+ajax.response+")")
             本地的JSON文件：JSON.parse(data)
-12.Form表单提交和AJAX提交区别
+12. Form表单提交和AJAX提交区别
     (安全性一样 安全性与提交文件的业务处理有关 与提交方式无关)
     (AJAX网页局部刷新 异步请求/Form放弃本页面 新建一个页面
     AJAX必须使用JS实现 由JS引擎解释/Form浏览器自带 使用JS与否都可以提交表单)
-    1.使用场景
+    1. 使用场景
         安全性一样 都是发送HTTP协议 
         安全性与提交文件的业务处理(格式检测 防注入)有关
         与提交方式无关
@@ -2255,14 +2275,14 @@
         AJAX可以在获取到元素内部用程序判断 
         Form表单的属性中有校验的字段
         easyui jeecg等中都封装 用户只需添加正则表达式的校验规则
-13.XSS
-(Web页面中插入恶意代码 用户浏览该页面 恶意代码被执行)
-(漏洞关键 寻找参数未过滤的输出函数)
-(反射型XSS 非持久化 不存储在服务器 用户点击链接触发
-存储型XSS 持久化 存储在服务器 用户浏览触发 非常危险 容易造成蠕虫大量盗取cookie
-DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
-(cookie设置HttpOnly标签/过滤标签/转义编码)
-    1.定义
+13. XSS
+    (Web页面中插入恶意代码 用户浏览该页面 恶意代码被执行)
+    (漏洞关键 寻找参数未过滤的输出函数)
+    (反射型XSS 非持久化 不存储在服务器 用户点击链接触发
+    存储型XSS 持久化 存储在服务器 用户浏览触发 非常危险 容易造成蠕虫大量盗取cookie
+    DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
+    (cookie设置HttpOnly标签/过滤标签/转义编码)
+    1. 定义
         跨站脚本攻击
             (通过PHP输出函数将JS代码输出到HTML页面)
             恶意攻击者往Web页面里插入恶意Script代码 用户浏览该页时 嵌入其中Web里面的Script代码被执行 从而达到恶意攻击用户的目的
@@ -2271,8 +2291,8 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
                 通过用户本地浏览器执行的
                 xss漏洞关键寻找参数未过滤的输出函数。
             常见的输出函数 echo printf print print_r sprintf die var-dump var_export.
-    2.三类
-        1.反射型XSS
+    2. 三类
+        1. 反射型XSS
             (非持久化 不存储在服务器 用户点击链接触发)
             攻击者事先制作好攻击链接 需要欺骗用户自己去点击链接才能触发XSS代码
             （服务器中没有这样的页面和内容）
@@ -2284,7 +2304,7 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
             防范：
                 htmlentities()函数对用户输入的<>做了转义处理 恶意代码当然也就没法执行了。
                 还有其他过滤函数
-        2.存储型XSS(持久化)(一次提交之后，每当有用户访问这个页面都会受到XSS攻击，危害巨大。)
+        2. 存储型XSS(持久化)(一次提交之后，每当有用户访问这个页面都会受到XSS攻击，危害巨大。)
             代码是存储在服务器中的
             如在个人信息或发表文章等地方，加入代码，如果没有过滤或过滤不严，那么这些代码将储存到服务器中，每当有用户访问该页面的时候都会触发代码执行，这种XSS非常危险，容易造成蠕虫，大量盗窃cookie（虽然还有种DOM型XSS，但是也还是包括在存储型XSS内）。
                 原理：
@@ -2300,7 +2320,7 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
                     htmlentities() :把预定义的字符 "<" （小于）和 ">" （大于）转换为 HTML 实体
                     htmlspecialchars和htmlentities的区别：
                         htmlspecialchars 只转义 & 、" 、' 、< 、> 这几个html代码，而 htmlentities 却会转化所有的html代码，连同里面的它无法识别的中文字符也会转化。
-        3.DOM型XSS(该种XSS用的相对较少 由于其特殊性 常见的漏扫工具都无法检测出来)
+        3. DOM型XSS(该种XSS用的相对较少 由于其特殊性 常见的漏扫工具都无法检测出来)
             基于文档对象模型Document Objeet Model，DOM)的一种漏洞
             DOM是一个与平台、编程语言无关的接口，它允许程序或脚本动态地访问和更新文档内容、结构和样式，处理后的结果能够成为显示页面的一部分
             DOM中有很多对象，其中一些是用户可以操纵的，如uRI ，location，refelTer等
@@ -2308,15 +2328,15 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
             它不依赖于提交数据到服务器端，而从客户端获得DOM中的数据在本地执行，如果DOM中的数据没有经过严格确认，就会产生DOM XSS漏洞。
         解释
             HttpOnly是加在cookie上的一个标识 用于告诉浏览器不要向客户端脚本(document.cookie/其他)暴露cookie
-        防范
-            1.设置HttpOnly避免cookie劫持危险
-            2.过滤 对诸如<script><img><a>等标签进行过滤
-            3.转义编码 一些常见的符号 如<>在输入时要对其进行转换编码
-            4.限制 对一些可以预期的输入可以通过限制长度强行截断进行防御
+        - 防范
+            1. 设置HttpOnly避免cookie劫持危险
+            2. 过滤 对诸如<script><img><a>等标签进行过滤
+            3. 转义编码 一些常见的符号 如<>在输入时要对其进行转换编码
+            4. 限制 对一些可以预期的输入可以通过限制长度强行截断进行防御
         总结：
             XSS漏洞原理和相关函数 eval() assert() preg_replace() 回调函数 动态执行函数
             XSS漏洞的防范
-14.CSRF(Cross Site Request Forgery(伪造))
+14. CSRF(Cross Site Request Forgery(伪造))
 (XSS 利用合法用户获取其信息)
 (CSRF 伪装成合法用户发起请求 原理和XSS正好相反)
 (防范：post修改信息/不让第三方网站访问cookie/请求时附带验证信息 token 验证码)
@@ -2340,7 +2360,7 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
         2. 代码层 不准出现SQL语句
         3. web输入参数处 对所有参数做sql转义
         4. 上线测试 需要使用sql自动注入工具进行所有页面sql注入脚本
-16.MITM(Man-in-the-MiddleAttck-中间人攻击)攻击
+16. MITM(Man-in-the-MiddleAttck-中间人攻击)攻击
 (HTTPS/不使用公共网络发送敏感信息/不点击恶意链接和电子邮件)
         流程：
             1.服务器向客户端发送公钥 攻击者截获公钥 保留在自己手上
@@ -2373,11 +2393,11 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
             7.不要点击恶意链接或电子邮件
             8.时不要下载盗版内容
             9.将安全工具正确安装在系统上
-17.单点登录 多点登录
-    单点登录SSO
+17. 单点登录 多点登录
+    - 单点登录SSO
         一个多系统共存的环境下
         用户的一次登录能得到其他所有系统的信任
-    多点登录
+    - 多点登录
         以微信为例
             可以PC端 phone端同时登陆/收发消息
             但是一个端只能登录一个实例 
@@ -2385,12 +2405,12 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
         同一个账号可以在不同终端同时登录 同时收发信息
         禁止用户多点在线
         一个端同一个账号只能登录一个实例  
-18.JSON和JSONP
-    JSON(JavaScript Object Notation)
+18. JSON和JSONP
+    - JSON(JavaScript Object Notation)
         一种轻量级的数据交换格式
-    JSONP(JavaScript With Padding) 被包裹的JSON
+    - JSONP(JavaScript With Padding) 被包裹的JSON
         一个非官方的协议 它允许在服务器端集成Scripttags返回至客户端 通过JavaScript callback形式实现跨域访问
-19.计算机网络体系结构
+19. 计算机网络体系结构
     OSI(Open System Interconnection 开放式系统互连)七层协议
         应用层：允许访问OSI环境的手段
     　　表示层：对数据进行翻译、加密和压缩
@@ -2410,15 +2430,15 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
         网络层
         数据链路层
         物理层
-20.Fetch API与传统Request的区别
-    1.fetch 符合关注点分离，使用 Promise，API 更加丰富，支持 Async/Await 
-    2.语意简单，更加语意化
-    3.可以使用 isomorphic-fetch ，同构方便
+20. Fetch API与传统Request的区别
+    1. fetch 符合关注点分离，使用 Promise，API 更加丰富，支持 Async/Await 
+    2. 语意简单，更加语意化
+    3. 可以使用 isomorphic-fetch ，同构方便
     传统AJAX时代 进行API等网络请求都是通过XMLHttpRequest或者封装后的框架进行网络请求 然而配置和调用方式混乱 对新手不友好
-    Fetch优点
-        1.语法简介 更加语义化 业务逻辑更清晰
-        2.基于标准Promise实现 支持async/await
-        3.同构方便 使用isomorphic-fetch
+    - Fetch优点
+        1. 语法简介 更加语义化 业务逻辑更清晰
+        2. 基于标准Promise实现 支持async/await
+        3. 同构方便 使用isomorphic-fetch
     Promise简介
         Fetch API是基于Promise设计的
     fetch方法返回一个Promise对象 根据Promise API特性 
@@ -2431,24 +2451,24 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
         1.fetch请求本地文本数据
         2.fetch请求本地JSON数据
         3.fetch请求网络接口
-21.在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
+21. 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
     keep-alive标签的原理 有什么功能
     在 HTTP 中响应体的 Connection 字段指定为 keep-alive
-22.HTTP 如何实现长连接？在什么时候会超时？
+22. HTTP 如何实现长连接？在什么时候会超时？
     通过在头部（请求和响应头）设置 Connection: keep-alive，HTTP1.0协议支持，但是默认关闭，从HTTP1.1协议以后，连接默认都是长连接
         。。。
     实际上 HTTP 没有长短链接，只有 TCP 有，TCP 长连接可以复用一个 TCP 链接来发起多次 HTTP 请求，这样可以减少资源消耗，比如一次请求 HTML，可能还需要请求后续的 JS/CSS/图片等
-24.HTTP的options方法作用
+24. HTTP的options方法作用
     1.检测服务器所支持的请求方法
         (比如'/user'路由支持那些方法 get post delete)
     2.CORS中的预检请求(检测某个接口是否支持跨域)
-13.get方式
+13. get方式
     点击超链接/地址栏输入地址跳转页面 都是get方式
         get方式 传参 两种
         1.？+键值对(?blogid=3)
         3.命名传参 (:blogId)
 
-25.后端接口设计
+25. 后端接口设计
     一个后端接口大致分为四个部分
         接口地址 URL
         接口请求方式 get/post
@@ -2465,14 +2485,14 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
         ctx.body={
             state:'success'/'fail'
         }
-26.keep-aliveHTTP1.x和多路复用HTTP2区别
+26. keep-aliveHTTP1.x和多路复用HTTP2区别
     并发情况下 HTTP2有多路复用机制 无论多少个HTTP请求
     都只暂用一个TCP 不会有请求阻塞
     HTTP2基于流进行数据请求 几百个请求都可以基于一个TCP连接传递 然后通过流id进行拼接返回到每个请求上 不存在线头阻塞 且只用到一个TCP 对服务器的并发量提高了6倍
     HTTP2还有头部压缩 对状态行和头信息进行哈夫曼编码压缩
         静态字典动态字典相关技术处理节省头信息优化传输浪费流量
     HTTP1.1同域请求限制6个TCP连接建立 但是HTTP1.1每个TCP都是线头阻塞的
-27.DNS原理
+27. DNS原理
     网络通讯大部分是基于TCP/IP 而TCP/IP是基于IP地址的
     所以计算机在网络上进行通讯时只能识别IP地址 而不能认知域名
     DNS
@@ -2564,7 +2584,19 @@ DOM型XSS 使用相对较少 特殊 常见的漏扫工具都无法检测出来)
 
         Host:www.baidu.com
             表示目标主机 HTTP请求中必须包含的头部字段
-        
+30. content-length是干什么的 gzip后 content-length怎嘛孙
+31. https如何防止内容被窃听 https证书作用
+
+1. 网关
+    > 三层CS架构
+    > 客户端 服务端 数据层
+    - 随着多端设备的兴起 多端开发逐渐成为主流 虽然处于不同端 但相同的业务都会使用同一份数据
+    - 当不同端请求走到后台 后台去数据库查询数据 并且将数据拼接返回给前端
+
+    > 四层CS架构
+    > 客户端 网关层 服务层 数据层
+    - 为保证服务可用性 接口性能 数据安全 后端开发往往要考虑缓存 限流 降级 鉴权等 这些功能并不和某个特定业务强关联 并且在各个服务中都是通用的
+    - 按照分层架构的思想 将这些功能放在单独一层分为网关 提供功能的服务 称为网关服务
 
 
 

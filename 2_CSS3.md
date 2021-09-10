@@ -1,8 +1,8 @@
 0. CSS CSS3是什么
     > CSS: 
-        > 层叠样式表 Cascading Style Sheets 一种用来表现HTML或XML等文件样式的计算机语言
+    - 层叠样式表 Cascading Style Sheets 一种用来表现HTML或XML等文件样式的计算机语言
     > CSS3:
-        > 最新的CSS标准
+    - 最新的CSS标准
 1. BFC(块级格式化上下文规则)和IFC(行级格式化上下文) BFC是什么 有哪几种实现方式 分别适用于哪些场景
     > FC:(formatting context)格式化上下文
     > BFC(Block formatting context)直译为“块级格式化上下文” 它是一个独立的渲染区域。只有Block-level box参与 它规定了内部的Block-level Box如何布局 并且和这个区域外部毫不相干
@@ -32,12 +32,9 @@
     > BFC布局规则：(BFC的区域不会和float box重叠)
     1. 内部的Box会在垂直方向 一个接一个地放置
     2. Box垂直方向的距离由margin决定 属于同一个BFC的两个相邻Box的margin会发生重叠
-    3. 每个盒子（块盒与行盒）的margin box的左边，
-        > 与包含块border box的左边相接触 (对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
-    4. BFC的区域不会与float box重叠，
-        > 计算BFC的高度时，浮动元素也参与计算
-    5. BFC是页面上的一个隔离的独立容器，
-        > 容器里面的子元素不会影响到外面的元素。反之也如此。
+    3. 每个盒子（块盒与行盒）的margin box的左边，与包含块border box的左边相接触 (对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
+    4. BFC的区域不会与float box重叠， 计算BFC的高度时，浮动元素也参与计算
+    5. BFC是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。
     > 如何创建BFC：
     1. float的值不是none。
     2. position的值不是static或者relative。
@@ -52,17 +49,17 @@
         2. BFC的区域不会与float box重叠。overflow:hidden 触发main生成BFC
         3. 清除浮动……
     > 总结：
-        > BFC就是页面上的一个隔离的独立容器 容器里面的子元素不会影响到外面的元素 反之也是如此
-        > 因为BFC内部的元素和外部的元素绝对不会互相影响，因此， 当BFC外部存在浮动时，它不应该影响BFC内部Box的布局，BFC会通过变窄，而不与浮动有重叠。
-        > 同样的，当BFC内部有浮动时，为了不影响外部元素的布局，BFC计算高度时会包括浮动的高度。避免margin重叠也是这样的一个道理。
-        > 当一个元素具备了触发新块格式化上下文的条件，并且挨着一个浮动元素时，它就会忽略自己的边界必须接触自己的包含块边界的规则此时这个元素会收缩到适当大小 不仅行盒子如此 所有盒子都如此
+    - BFC就是页面上的一个隔离的独立容器 容器里面的子元素不会影响到外面的元素 反之也是如此
+    - 因为BFC内部的元素和外部的元素绝对不会互相影响，因此， 当BFC外部存在浮动时，它不应该影响BFC内部Box的布局，BFC会通过变窄，而不与浮动有重叠。
+    - 同样的，当BFC内部有浮动时，为了不影响外部元素的布局，BFC计算高度时会包括浮动的高度。避免margin重叠也是这样的一个道理。
+    - 当一个元素具备了触发新块格式化上下文的条件，并且挨着一个浮动元素时，它就会忽略自己的边界必须接触自己的包含块边界的规则此时这个元素会收缩到适当大小 不仅行盒子如此 所有盒子都如此
 2. CSS水平垂直居中 div充满整个屏幕 css九宫格实现
     > 五种方法，前三种定位，一种flex，弹性盒子实现，一种用javascript实现。
-        该方法需要知道子元素具体宽高
+    - 该方法需要知道子元素具体宽高
     1. 父元素相对定位，子元素绝对定位，top:-50%,left:-50%,margin-left:-width/2,margin-top:-height/2;
-        > 该方法需要子元素有宽高
+    - 该方法需要子元素有宽高
     2. 父元素相对定位，子元素绝对定位，top:0,right:0,bottom:0,left:0,margin:auto;
-        > 该方法不需要子元素有宽高，但是不兼容
+    - 该方法不需要子元素有宽高，但是不兼容
     3. 父元素相对定位，子元素绝对定位，使用CSS中transform:translate(-50%,-50%)
     4. Flex 父元素display:flex; justify-content:center; align-columns:center;
     5. JavaScript 
@@ -70,8 +67,8 @@
     1. margin:0 相对100%
     2. margin 绝对定位 top right bottom left
 
-    ul标签+li标签+calc函数 利用flex布局实现
-    具体设置
+    - ul标签+li标签+calc函数 利用flex布局实现
+    - 具体设置
         ul width:100% display:flex flex-wrap:wrap
         li calc(calc(100%/3)-10px) 
             box-sizing:border-box 将content-box转化成border-box
@@ -86,10 +83,10 @@
     > 父元素设置高度)
     > 解决方法：
     1. 额外标签法(最后一个标签后/新加一个标签/给其设置clear:both) 不推荐使用
-        > 在最后一个浮动标签后，新加一个标签，给其设置clear:both     
-        > 本质:闭合浮动，让父盒子闭合出口和入口，不让子盒子出来
-        > 优点：通俗易懂，方便
-        > 缺点：添加无意义标签，语义化差
+        - 在最后一个浮动标签后，新加一个标签，给其设置clear:both     
+        - 本质:闭合浮动，让父盒子闭合出口和入口，不让子盒子出来
+        - 优点：通俗易懂，方便
+        - 缺点：添加无意义标签，语义化差
     2. 父级添加overflow属性（父元素添加overflow:hidden）不推荐使用
         > 优点：代码简洁
         > 缺点：内容增多的时候容易造成不会自动换行导致内容被隐藏掉，无法显示要溢出的元素
@@ -109,9 +106,9 @@
     5. 父级同时浮动(需要给父级同级元素添加浮动)
     6. 给浮动元素父级设置高度
 4. css两列布局，右侧自适应/三列布局，中间自适应
-    > 两列布局：
-    > BFC+float float + 负 margin flex 实现两栏布局
-    > 左側固定，右侧自适应的几种方法
+    - 两列布局：
+    - BFC+float float + 负 margin flex 实现两栏布局
+    - 左側固定，右侧自适应的几种方法
     > 第一类宽度已知
     1. 左边浮动或者定位：右侧margin-left:宽度
     2. 左右侧都浮动 左侧固定给宽度 右侧calc(100%-宽)
@@ -792,17 +789,17 @@
 36. 如何实现一个自适应的正方形
 (margin padding的百分比数值相对父元素宽度计算)
 (
-1.使用vw相对单位
-2.设置垂直方向padding撑开容器
-3.利用伪元素margin/padding-top撑开容器)
-    1.使用vw相对单位
+1. 使用vw相对单位
+2. 设置垂直方向padding撑开容器
+3. 利用伪元素margin/padding-top撑开容器)
+    1. 使用vw相对单位
         .placeholder{
             width:100%;
             height:100vw;
         }
         优点:简洁方便
         缺点：浏览器兼容性不好
-    2.设置垂直方向padding撑开容器
+    2. 设置垂直方向padding撑开容器
         CSS盒模型中 
         margin padding的百分比数值相对父元素宽度计算
         .placeholder{
@@ -819,7 +816,7 @@
         优点：简洁明了 兼容性好
         缺点：填充内容后会出现问题
             可能碰上max-height不收缩
-    3.利用伪元素的margin(padding)-top撑开容器
+    3. 利用伪元素的margin(padding)-top撑开容器
         .placeholder{
             width:100%;
         }
