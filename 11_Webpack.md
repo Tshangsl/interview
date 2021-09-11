@@ -24,13 +24,13 @@
     1. 读取Webpack配置参数
     2. 启动Webpack 创建Compiler对象并开始解析项目
     3. 从入口文件(entry)开始解析 并找到其导入的依赖模块 递归遍历分析 形成依赖关系树
-        - 文件的解析与构建是一个比较复杂的过程 在webpack源码中主要依赖compiler和compilication两个核心对象实现
+        - 文件的解析与构建是一个比较复杂的过程 在webpack源码中主要依赖compiler和complication(并发)两个核心对象实现
         1. compiler对象是一个全局单例 它负责把控整个webpack打包的构建流程
         2. compilation对象是每一次构建的上下文对象 它包含当次构建所需的所有信息 每次热更新和重新构建 compiler都会重新生成一个新的compilation对象 负责此次更新的构建过程
         3. 每个模块间的依赖关系 依赖于AST语法树 每个模块文件在通过loader解析完成之后 会通过acron库生成模块代码的AST语法书 通过语法书就可以分析这个模块是否还有依赖的模块 进而继续循环执行下一个模块的编译解析
         4. 最终webpack打包出来的bundle文件是一个IIFE的执行函数
-    4. 对不同文件类型的依赖模块文件使用对应的Loeader进行编译 最终转为JS文件
-    5. 整个过程中webpack会通过发布订阅模式 向外抛出一些hooks webpack的插件即可通过监听这些关键的事件节点 执行插件任务进而达到干预输出结果的目的
+    4. 对不同文件类型的依赖模块文件使用对应的Loader进行编译 最终转为JS文件
+    5. 整个过程中webpack会通过发布订阅模式 向外抛出一些hooks webpack的插件plugin即可通过监听这些关键的事件节点 执行插件任务进而达到干预输出结果的目的
 
     1. Webpack启动后会在entry里配置的module开始递归解析entry所依赖的所有module
     2. 每找到一个module就会根据配置的loader去找相应的转换规则
@@ -106,7 +106,7 @@
     ```
     - 针对每个文件类型 loader是支持以数组形式配置多个
     - 因此当Webpack转换该文件类型时 会按顺序链式调用每一个loader
-    - 前一个loader返回的内容会作为下一个loader的如惨 
+    - 前一个loader返回的内容会作为下一个loader的入参
     - 因此loader开发需要遵循一些规范 比如返回值必须是标准的JS代码字符串
     - 以保证下一个loader能正常工作
     - 同时在开发上要严格遵循单一职责 只关心loader输出以及对应的输出
