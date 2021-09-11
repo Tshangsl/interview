@@ -877,44 +877,61 @@
 9. location.href与Vue-router路由跳转区别
     > (Vue-router pushState
     1. 进行路由更新 静态跳转 页面不会重新加载/
+        - 使用router跳转和使用history.pushState()没有差别
     2. 同一个页面跳转
     3. 异步加载 this.$nextTick(()=>{获取URL})
     4. 使用diff算法 实现按需加载 减少DOM操作/
     > location.href 
-    1. 触发浏览器 页面重新加载/
+    1. 触发浏览器 页面重新加载一次/
     2. 不同页面间跳转
     3. 同步加载)
-    1.vue-router使用pushState进行路由更新 静态跳转 页面不会重新加载 
-    location.href会触发浏览器 页面重新加载一次
+
+    1. vue-router使用pushState进行路由更新 静态跳转 页面不会重新加载 location.href会触发浏览器 页面重新加载一次
     (使用router跳转和使用history.pushState()没有差别
     vue-router用了history.pushState()尤其是在history模式下)
-    2.vue-router使用diff算法 实现按需加载 减少DOM操作
-    3.vue-router是路由跳转或同一个页面跳转 location.href是不同页面间跳转
-    4.vue-router是异步加载this.$nextTick(()=>{获取URL}) location.href是同步加载
+    2. vue-router使用diff算法 实现按需加载 减少DOM操作
+    3. vue-router是路由跳转或同一个页面跳转 location.href是不同页面间跳转
+    4. vue-router是异步加载this.$nextTick(()=>{获取URL}) location.href是同步加载
 
-    Location href属性
-        href属性是一个可读可写的字符串 
-        可设置或返回当前显示的文档的完整URL
-    语法
-        location.href
-    兼容性
-        所有主要浏览器都支持href属性
-    location.href几种用法
-        1.当前页面打开URL
-            1.self.location.href
-            2.window.location.href
-            3.this.location.href
-            4.location.href
-        2.父页面打开新页面
-            parent.location.href
-        3.顶层页面打开新页面
-            top.location.href
+    > Location href属性
+    - href属性是一个可读可写的字符串 可设置或返回当前显示的文档的完整URL
+    
+    > 语法 location.href
+    > 兼容性
+    - 所有主要浏览器都支持href属性
+    
+    >location.href几种用法
+    1. 当前页面打开URL
+        1. self.location.href
+        2. window.location.href
+        3. this.location.href
+        4. location.href
+    2. 父页面打开新页面
+        - parent.location.href
+    3. 顶层页面打开新页面
+        - top.location.href
 
-        1.使用location.href实现页面div块的快速定位
-        2.location.href可直接获取当前路径
-        3.parent.location.href跳转到上一层页面
-        4.top.location.href跳转到最外层页面
+    1. 使用location.href实现页面div块的快速定位
+    2. location.href可直接获取当前路径
+    3. parent.location.href跳转到上一层页面
+    4. top.location.href跳转到最外层页面
 10. Vue路由懒加载(异步加载组件)
+    > 路由懒加载
+    - 对于SPA单页面应用 当打包构建时 JS包会变得非常大 影响页面加载速度
+    - 将不同路由对应的组件分割成不同的代码块 当路由被访问时 才加载对应组件
+    1. Vue异步组件
+        - Vue允许以一个工厂函数的方式定义组件 这个工厂函数会解析组件定义 Vue只在这个组件需要被渲染时才会触发该工厂函数
+        - 且会把结果缓存起来供未来重新渲染 这个工厂函数会收到一个resolve回调 这个回调函数会在你从服务器得到组件定义时被调用
+    2. 动态import/ES6的import
+        - vue-router在官网提供了一种方法 可以理解也是为通过Promise的resolve机制 因为Promise函数返回的Promise为resolve组件本身 有可以用import导入组件
+    3. webpack提供的require.ensure
+        - 这种方式可以通过参数中的webpackChunkName将js分开打包
+    - resolve
+    - 主要使用了resolve异步机制 用require代替import实现按需加载
+    
+    - 官网方法
+    - vue-router在官网提供一种方法 可以理解为通过Promise的resolve机制 因为Promise函数返回的Promise为resolve组件本身 我们可以使用import导入组件
+
     > 三种方式
     1. Vue异步组件
         - 主要是使用了resolve的异步机制 用require代替了import实现按需加载
@@ -964,58 +981,33 @@
             ]
         })
         ```
-    - 对于SPA单页面应用 当打包构建时 JS包会变得非常大 影响页面加载速度
-    - 将不同路由对应的组件分割成不同的代码块 当路由被访问时 才加载对应组件
-    1. Vue异步组件
-        - Vue允许以一个工厂函数的方式定义组件 这个工厂函数会解析组件定义 Vue只在这个组件需要被渲染时才会触发该工厂函数
-        - 且会把结果缓存起来供未来重新渲染 这个工厂函数会收到一个resolve回调 这个回调函数会在你从服务器得到组件定义时被调用
-    2. 动态import
-    3. webpack提供的require.ensure
-
-    > 构建项目比较大时 懒加载可以分割代码 提高页面初始加载效率
-    - 几种常见Vue中路由懒加载方法
-    1. resolve
-        主要使用了resolve异步机制 用require代替import实现按需加载
-    2. 官网方法
-        vue-router在官网提供一种方法 
-        可以理解为通过Promise的resolve机制
-        因为Promise函数返回的Promise为resolve组件本身
-        我们可以使用import导入组件
-    3. require.ensure
-        这种模式可以通过参数中的webpackChunkName将js分开打包
-    路由懒加载
-        function load(component) {
-            //return resolve => require([`views/${component}`], resolve);
-            return () => import(`views/${component}`);
-        }
-        const routes = [
-            {
-                path: '/home',
-                name: 'home',
-                component: load('home'),
-                meta: {
-                    title: '首页'
-                },
-            },
-        ]
-11. 
+11. $route&$router
     1. $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数) 
     2. $router(vue-router实例对象 包括路由跳转方法/钩子函数)
-        $router(vue-router实例对象 包括路由跳转方法 钩子函数)
-            为 VueRouter 实例，想要导航到不同 URL，则使用 $router.push
-            是VueRouter的一个对象，通过Vue.use(VueRouter)和Vu构造函数得到一个router的实例对象，这个对象中是一个全局的对象，他包含了所有的路由，包含了许多关键的对象和属性。
+        - $router(vue-router实例对象 包括路由跳转方法 钩子函数)
+            - 为 VueRouter 实例，想要导航到不同 URL，则使用 $router.push
+            - 是VueRouter的一个对象，通过Vue.use(VueRouter)和Vu构造函数得到一个router的实例对象，这个对象中是一个全局的对象，他包含了所有的路由，包含了许多关键的对象和属性。
             以history对象来举例：
-            $router.push({path:'home'})，本质是向history栈中添加一个路由，在我们看来是切换路由，但本质是在添加一个history记录 
-        $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数)
-            $route是一个跳转的路由对象，每一个路由都会有一个$route对象，是一个局部的对象，可以获取对应的name，path，params，query等 
+            - $router.push({path:'home'})，本质是向history栈中添加一个路由，在我们看来是切换路由，但本质是在添加一个history记录 
+        - $route(路由信息对象 包括path params hash query fullPath matched name等路由信息参数)
+            - $route是一个跳转的路由对象，每一个路由都会有一个$route对象，是一个局部的对象，可以获取对应的name，path，params，query等 
             为当前 router 跳转对象里面可以获取 name 、 path 、 query 、 params 等
-            $route.path 字符串，等于当前路由对象的路径，会被解析为绝对路径，如/home/ews
-            $route.params 对象，含路有种的动态片段和全匹配片段的键值对，不会拼接到路由的url后面
-            $route.query 对象，包含路由中查询参数的键值对。会拼接到路由url后面
-            $route.router 路由规则所属的路由器
-            $route.matchd 数组，包含当前匹配的路径中所包含的所有片段所对象的配置参数对象
-            $route.name 当前路由的名字，如果没有使用具体路径，则名字为空
+            - $route.path 字符串，等于当前路由对象的路径，会被解析为绝对路径，如/home/ews
+            - $route.params 对象，含路有种的动态片段和全匹配片段的键值对，不会拼接到路由的url后面
+            - $route.query 对象，包含路由中查询参数的键值对。会拼接到路由url后面
+            - $route.router 路由规则所属的路由器
+            - $route.matchd 数组，包含当前匹配的路径中所包含的所有片段所对象的配置参数对象
+            - $route.name 当前路由的名字，如果没有使用具体路径，则名字为空
 12. vue-router三种传参方式
+    1. meta 路由元信息 写在routes配置文件中
+    2. query 
+        - path引入 this.$route.query.xxx获取
+        - 类似get 参数显示在地址栏
+        - 浏览器地址 http://localhost:8036/home?userId=123 
+    3. params
+        - name引入 this.$route.params.xxx获取
+        - 类似post 参数不显示在地址栏
+        - 浏览器地址 http://localhost:8036/home/123
     1. meta：路由元信息，写在routes配置文件中。
         {
             path: '/home',
@@ -1040,7 +1032,7 @@
     3. params：这种方式比较麻烦。
         - name引入 this.$route.params.xx
         - 类似post 参数不显示在地址栏
-        1.首先要在地址上做配置
+        1. 首先要在地址上做配置
             {
                 path: '/home/:userId',
                 name: 'home',
@@ -1049,10 +1041,12 @@
                     title: '首页'
                 },
             },
-        2.访问传参
+        2. 访问传参
+        ```
         const userId = '123'
         this.$router.push({ name: 'home', params: { userId } })
-        注：用params传参，只能用命名的路由（用name访问），如果用path，params不起作用。 this.$router.push({ path: '/home', params: { userId }})不生效。
+        ```
+        - 注：用params传参，只能用命名的路由（用name访问），如果用path，params不起作用。 this.$router.push({ path: '/home', params: { userId }})不生效。
         浏览器地址：http://localhost:8036/home/123
         获取方式：this.$route.params.userId
 12. vue-router使用
@@ -1060,21 +1054,28 @@
     2. params(name引入 接参 this.$route.params.name 类似post传参 参数地址栏不显示 是路由的一部分 必须要有 不设置 刷新页面或者返回参数会丢失)
     > 传参区别
     1. 用法上(接收参数的时候，已经是$route而不是$router)
-        query要用path来引入，params要用name来引入
-        接收参数都是类似的，分别是
-        this.$route.query.name和
-        this.$route.params.name。
-        注：接收参数的时候，已经是$route而不是$router
+        - query要用path来引入，params要用name来引入
+        - 接收参数都是类似的，分别是
+        1. this.$route.query.name和
+        2. this.$route.params.name。
+        - 注：接收参数的时候，已经是$route而不是$router
     2. 展示上
-        query更加类似于我们ajax中get传参
-        params则类似于post，说的再简单一点，前者在浏览器地址栏中显示参数，后者则不显示
-    3. params是路由的一部分,必须要有。
-        query是拼接在url后面的参数，没有也没关系。
-        params一旦设置在路由，params就是路由的一部分，如果这个路由有params传参，但是在跳转的时候没有传这个参数，会导致跳转失败或者页面会没有内容。
+        - query更加类似于我们ajax中get传参
+        - params则类似于post，说的再简单一点，前者在浏览器地址栏中显示参数，后者则不显示
+    3. params是路由的一部分,必须要有。query是拼接在url后面的参数，没有也没关系。
+        - params一旦设置在路由，params就是路由的一部分，如果这个路由有params传参，但是在跳转的时候没有传这个参数，会导致跳转失败或者页面会没有内容。
     4. params、query不设置也可以传参，params不设置的时候，刷新页面或者返回参数会丢失 query则不会有这个问题        
 12. Vue-router源码
-    Vue-Router是Vue.js官方的路由管理器 它和Vue.js可信深度集成 使构建SPA更容易
-    目录结构
+    
+    - VueRouter 原型上定义了一系列的函数
+    - 我们日常经常会使用到 主要有go/push/replace/back/forward
+    - 以及一些导航守护beforeEach/beforeResolve/afterEach 等等
+    - html 中使用到的 router-view 
+    - 以及经常用到的 router-link 则存在 src/components 目录下。
+    
+    - Vue-Router是Vue.js官方的路由管理器 它和Vue.js可深度集成 使构建SPA更容易
+    > 目录结构
+    ```
     vue-router
         components #存放vue-router两个核心组件
             link.js
@@ -1112,172 +1113,160 @@
             --route.js 路由
             --scroll.js 处理滚动
             --warn.js 打印一些警告
-    使用Vue-router时 主要有以下几步(安装插件 创建router对象 挂载router)
+    ```
+    - 使用Vue-router时 主要有以下几步(安装插件 创建router对象 挂载router)
+        ```
         <div id="app">
             <!-- 路由匹配到的组件将渲染在这里 -->
             <router-view></router-view>
         </div>    
+        ```
         1. 安装 插件
+        ```
         Vue.use(VueRouter);
+        ```
         2. 创建router对象
+        ```
         const router = new VueRouter({
             routes // 路由列表 eg: [{ path: '/foo', component: Foo }]
         });
+        ```
         3. 挂载router
+        ```
         const app = new Vue({
             router
         }).$mount('#app');
+        ```
+        - 其中 VueRouter 对象，就在vue-router 的入口文件 src/index.js
+13. Vue-router
+    - (SPA single page application的路径管理器 WebApp的链接路径管理系统)
 
-        其中 VueRouter 对象，就在vue-router 的入口文件 src/index.js
+    > Vue-router 
+    - 实现SPA单页面前端路由
+    1. hash模式(浏览器环境) Vue-router模式 原理onhashchange事件 window对象上监听这个事件
+    2. history模式 依赖H5 History API&服务器配置
+    3. abstract模式(Nodejs环境) 支持所有JS运行环境 如Nodejs服务器端 如果没有发现浏览器API 路由会强制进入这个模式
+    - (Vue的单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来)
+    - (传统的页面应用 超链接实现页面切换跳转 vue-router单页面应用/路径/组件的切换)
+    - (路由模块本质 建立起URL和页面之间映射关系)
+    
+    > hash模式 Vue-router默认模式
+    1. URL的hash模拟一个完整URL URL改变 页面不重新加载 hash(#)是URL锚点 代表网页中一个位置)
+    2. Hash出现在URL中 不会被包含在HTTP中 对后端没有影响 改变Hash不会重新加载页面(原因) 会在浏览器访问历史中增加一个记录)
+    3. Hash通过锚点值的改变 根据不同的值 渲染指定DOM位置不同数据)
 
-        VueRouter 原型上定义了一系列的函数
-        我们日常经常会使用到
-        主要有go/push/replace/back/forward
-        以及一些导航守护beforeEach/beforeResolve/afterEach 等等
-        上面html 中使用到的 router-view 
-        以及经常用到的 router-link 则存在 src/components 目录下。
-13. 
-    Vue-router
-    (SPA single page application的路径管理器 WebApp的链接路径管理系统)
-
-    Vue-router hash模式(浏览器环境) history模式 abstract模式(Nodejs环境)
-    SPA(hash模式/history模式)
-
-    (Vue的单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来)
-
-    (SPA核心之一 更新视图而不重新请求页面)
-    (SPA加载页面时 不会加载整个页面 而是只更新某个指定的容器中内容)
-    (传统的页面应用 超链接实现页面切换跳转 vue-router单页面应用/路径/组件的切换)
-    (路由模块本质 建立起URL和页面之间映射关系)
-
-    (vue-router 实现SPA单页面前端路由 提供两种方式 mode参数决定：
-    Hash模式 Vue-router模式/
-    History模式 依赖H5 History API&服务器配置
-
-    (abstract 支持所有JS运行环境 如Node.js服务器端 如果发现没有浏览器API 路由会强制进入这个模式)
-
-    (Hash模式 原理onhashchange事件 window对象上监听这个事件)
-    (Vue-router默认模式)
-    (1.URL的hash模拟一个完整URL URL改变 页面不重新加载 hash(#)是URL锚点 代表网页中一个位置)
-    (2.Hash出现在URL中 不会被包含在HTTP中 对后端没有影响 改变Hash不会重新加载页面(原因) 会在浏览器访问历史中增加一个记录)
-    (3.Hash通过锚点值的改变 根据不同的值 渲染指定DOM位置不同数据)
-
-    (History模式 利用了H5 API新增的pushState()方法和replaceState方法 提供对历史记录修改功能) 
-    (1.利用H5 History Interface中新增pushState()和replaceState()方法 用于浏览器记录栈
+    > History模式 利用了H5 API新增的pushState()方法和replaceState方法 提供对历史记录修改功能) 
+    1. 利用H5 History Interface中新增pushState()和replaceState()方法 用于浏览器记录栈
     在当前已有back() forward() go()基础上 提供对历史记录修改)
-    (2.需要后端配置支持 服务器添加一个覆盖所有情况的候选项 URL匹配不到静态资源 则返回一个index.html页面)
-    (3.解决Hash模式存在问题 Hash传参基于URL 如要传递复杂数据 会有体积限制 history模式可在UR里传参/可将数据存放到一个特定对象)    
+    2. 需要后端配置支持 服务器添加一个覆盖所有情况的候选项 URL匹配不到静态资源 则返回一个index.html页面)
+    3. 解决Hash模式存在问题 Hash传参基于URL 如要传递复杂数据 会有体积限制 history模式可在UR里传参/可将数据存放到一个特定对象)    
 
-    (vue-router使用路由模块实现页面跳转三种方式
-    1.直接修改地址栏
-    2.编程式的导航 this.$router.push(‘路由地址’)
-    3.声明式的导航 <router-link to="路由地址"></router-link>
-    )
-    (vue-router参数传递
-    1.name-params/path-query传递参数
-        路由文件src/router/index.js里配置name属性
-        模板里(src/App.vue)用$route.name来接收 比如：<p>{{ $route.name}}</p>
-    2.<router-link> 标签中的to传参
+    > $router.push和$router.replace的区别：
+    1. $router.push 会向history 栈添加一个新的记录 点击浏览器的返回按钮时可以看到之前的页面。
+    2. $router.replace 不会向 history 添加新记录，而是替换掉当前的 history 记录，即当replace跳转到的网页后，‘后退’按钮不能查看之前的页面。
+
+    > vue-router使用路由模块实现页面跳转三种方式
+    1. 直接修改地址栏
+    2. 编程式的导航 this.$router.push(‘路由地址’)
+    3. 声明式的导航 <router-link to="路由地址"></router-link>
+    
+    > vue-router参数传递
+    1. name-params/path-query传递参数
+        - 路由文件src/router/index.js里配置name属性
+        - 模板里(src/App.vue)用$route.name来接收 比如：<p>{{ $route.name}}</p>
+    2. <router-link> 标签中的to传参
+        ```
         <router-link :to="{name:xxx,params:{key:value}}">valueString</router-link>
-        ...
-    3.利用url传参----在配置文件里以冒号的形式设置参数。   
-    )
-    ($router.push和$router.replace的区别：
-    会向history 栈添加一个新的记录 点击浏览器的返回按钮时可以看到之前的页面。
-    不会向 history 添加新记录，而是替换掉当前的 history 记录，即当replace跳转到的网页后，‘后退’按钮不能查看之前的页面。
-    )
+        ```
+    3. 利用url传参----在配置文件里以冒号的形式设置参数。   
 
-    (abstract 支持所有JavaScript运行环境 如Node.js服务器端 如果发现没有浏览器的API 路由会强制进入这个模式)
+    > 不能用a标签
+    - 用Vue做的都是单页应用
+    - 当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，
+    - 这里面只有静态资源和一个index.html页面 所以你写的标签是不起作用的，你必须使用vue-router来进行管理。    
 
-    (不能用a标签 Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。)
-    1.url组成
-        协议部分、域名部分、端口部分、虚拟目录部分、文件名部分、参数部分、锚部分
-        url的锚部分是从“#”开始到最后，都是锚部分。锚部分不是url的必需部分。
-        url的参数部分是从“？”开始到“#”为止之间的部分。参数部分也不是url的必需部分。
-    1. 前端路由(vue-router)
-        vue-router 此处的路由不是指我们平时所说的硬件路由器 是SPA（单页应用）的路径管理器
-        WebApp的链接路径管理系统。
-        使用Vue+vue-router创建单页应用SPA十分简单
-        router是Vue.js官方的路由插件，它和vue.js是深度集成的，适合用于构建单页面应用。
-        vue-router提供的功能是将组件映射到路由, 然后渲染出来. 
-        (Vue-router两个需求
-            1.记录当前页面的状态
-            2.可以使用浏览器的前进后退功能
-        Vue-router为了满足以上两个需求实现以下三个功能
-            1.改变URL且不让浏览器向服务器发出请求
-            2.检测URL的改变
-            3.截获URL地址, 并解析出需要的信息来匹配路由规则)
-    2. hash模式
-        1.原理 onhashchange事件 可以在window对象上监听这个事件)
-        2.可以通过window.location.hash属性读取hash值 且该属性可读可写
-        3.可使用window.addEventListener('hashchange',fun)监听hash变化
-        4.#和后面的URL片段标识符被称为hash 会被浏览器解读为位置标识符 这些字符不会被发送到服务器端 改变只会滚动到相应位置)
-        5.使用URL hash值来做路由 支持所有浏览器 包括不支持HTML5 History API的浏览器)
-        6.#/URL锚点/hash 代表网页中一个位置 改变#后数值 浏览器只会滚动到相应位置 不会重新加载网页)
-        7.hash出现在URL中 但不会被包含在HTTP请求中 对后端没有影响)
-        8.hash改变会触发hashchange事件 浏览器进退也能对其控制 H5之前基本都是使用hash实现前端路由 每一次改变#后的部分 都会在浏览器访问历史中增加一个记录 使用后退按钮 可以回到上一个位置)
-        9.Hash模式通过锚点的改变 据不同的值 渲染指定DOM位置的不同数据)
-        实现原理
-            早期的前端路由实现就是基于location.hash实现的
-            location.hash的值就是URL中#后面的内容
-        vue-router源码对/src/history/hash.js的处理
-            1.使用window.addEventListener('hashchange',fun)监听路由的变化 然后使用transitionTo方法更新视图
-            2.vue-router 的2个主要API push 和 replace 也是简单处理了下 hash , 然后调用 transitionTo 方法更新视图
-    3. history模式(依赖HTML5 History API和服务器配置)
-        HTMLHistory基本知识:
-            (使用back() forward() go()方法完成在用户历史记录中向后和向前的跳转
-            H5中引入了history.pushState()添加历史记录/history.replaceState()修改历史记录
-            解决hash传参体积问题 不带# 更美观
-            通过JS操作window.history改变浏览器地址栏参数 没有发起HTTP请求)
-            1.History 接口允许操作浏览器的曾经在标签页或者框架里访问的会话历史记录。
-            2.使用 back(),  forward()和  go() 方法来完成在用户历史记录中向后和向前的跳转。
-            3.HTML5引入了 history.pushState() 和 history.replaceState() 方法，它们分别可以添加和修改历史记录条目。
-        vue-router源码对/src/history/html5.js处理
-            1.处理逻辑和 hash 相似，使用 window.addEventListener("popstate", fun) 监听路由的变化,
-            2.使用 transitionTo 方法更新视图
-        1.利用了HTML5新增的pushState()和replaceState()两个API, 通过这两个api完成URL跳转不会重新加载页面
-        2.同时history模式解决了hash模式存在的问题. hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
-        注意:
-            404问题 history模式下 只是动态的通过JS操作window.history改变浏览器地址栏里的路径
-            并没有发起HTTP请求 当直接在浏览器里输入这个地址的时候 就一定要对服务器发起http请求
-            但是该目标在服务器上不存在 所以会返回404
-        解决:
-            在Ngnix中将所有请求都转发到index.html上就可以了。
-    4. abstract
-        (支持所有JavaScript运行环境 如Node.js服务器端 如果发现没有浏览器的API 路由会强制进入这个模式)
-        对/src/history/abstract.js处理
-        首先定义了2个变量，stack 来记录调用的记录， index 记录当前的指针位置
-        首先定义了2个变量，stack 来记录调用的记录， index 记录当前的指针位置
-    5. SPA(更新视图但不重新请求页面)单页面应用路由有两种模式 hash和history 
-        单一页面应用程序，只有一个完整的页面；它在加载页面时，不会加载整个页面，而是只更新某个指定的容器中内容。
-        单页面应用(SPA)的核心之一是: 
-            更新视图而不重新请求页面
-        vue-router在实现单页面前端路由时 提供了两种方式：
-            Hash模式和History模式；根据mode参数来决定采用哪一种方式。
-        Vue路由有三种模式 比SPA多了一个abstract
-        Vue-router
-            中通过mode这个参数修改路由模式
-            默认使用的是 hash 模式 设置为 history 时 如果不支持 history 方法，也会强制使用 hash 模式
-                当不在浏览器环境，比如 node 中时，直接强制使用 abstract 模式。
-    5. SPA Vue单页面应用 和传统页面应用的区别
-        (路由模式的本质就是建立起URL和页面之间的映射关系)
-        vue的SPA单页面应用是基于路由和组件的
-        路由用于设定访问路径 并将路径和组件映射起来
-        SPA中通过路径的切换 即组件的切换 实现页面切换和跳转
-
-        传统的页面应用 用一些超链接来实现页面切换和跳转的。
-    7. 总结：
-        1.hash 和 history 的使用方式差不多，hash 中路由带 # ，但是使用简单，不需要服务端配合，站在技术角度讲，这个是配置最简单的模式，
-        2.history 模式需要服务端配合处理404的情况
-        (在路由跳转的时候，就会出现访问不到静态资源而出现 404 的情况，这时候就需要服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面) 路由中不带 # ，比 hash 美观一点。
-        3.abstract 模式没有使用浏览器api 可以放到node环境或者桌面应用中
-    8. 可以使用vue-router的history模式 url不带#
-        new Router({
-            mode: 'history',
-            routes: [ ]
-        })    
-    9. 为啥不能用a标签
-        用Vue做的都是单页应用（当你的项目准备打包时，运行npm run build时，就会生成dist文件夹，这里面只有静态资源和一个index.html页面），所以你写的标签是不起作用的，你必须使用vue-router来进行管理。    
+    > SPA
+    - (SPA核心之一 更新视图而不重新请求页面)
+    - (SPA加载页面时 不会加载整个页面 而是只更新某个指定的容器中内容)
+    1. hash模式
+    2. history模式
+    - 单一页面应用程序，只有一个完整的页面；它在加载页面时，不会加载整个页面，而是只更新某个指定的容器中内容。
+    
+    > 单页面应用(SPA)的核心之一是: 
+    - 更新视图而不重新请求页面
+     
+    > SPA Vue单页面应用 和传统页面应用的区别
+    - 路由模式的本质就是建立起URL和页面之间的映射关系
+    - Vue的SPA单页面应用是基于路由和组件的 路由用于设定访问路径 并将路径和组件映射起来
+    - SPA中通过路径的切换 即组件的切换 实现页面切换和跳转
+    - 传统的页面应用 用一些超链接来实现页面切换和跳转的。
+    
+    > 前端路由(vue-router)
+    - vue-router 此处的路由不是指我们平时所说的硬件路由器 是SPA（单页应用）的路径管理器
+    - WebApp的链接路径管理系统。
+    - 使用Vue+vue-router创建单页应用SPA十分简单
+    - router是Vue.js官方的路由插件，它和vue.js是深度集成的，适合用于构建单页面应用。
+    - vue-router提供的功能是将组件映射到路由, 然后渲染出来. 
+    - (Vue-router两个需求
+        1. 记录当前页面的状态
+        2. 可以使用浏览器的前进后退功能
+    - Vue-router为了满足以上两个需求实现以下三个功能
+        1. 改变URL且不让浏览器向服务器发出请求
+        2. 检测URL的改变
+        3. 截获URL地址, 并解析出需要的信息来匹配路由规则)
+    > url组成
+    - 协议部分、域名部分、端口部分、虚拟目录部分、文件名部分、参数部分、锚部分
+    - url的锚部分是从“#”开始到最后，都是锚部分。锚部分不是url的必需部分。
+    - url的参数部分是从“？”开始到“#”为止之间的部分。参数部分也不是url的必需部分。
+    
+    > Vue-Router
+    1. hash模式
+        1. 原理 onhashchange事件 可以在window对象上监听这个事件)
+        2. 可以通过window.location.hash属性读取hash值 且该属性可读可写
+        3. 可使用window.addEventListener('hashchange',fun)监听hash变化
+        4. #和后面的URL片段标识符被称为hash 会被浏览器解读为位置标识符 这些字符不会被发送到服务器端 改变只会滚动到相应位置)
+        5. 使用URL hash值来做路由 支持所有浏览器 包括不支持HTML5 History API的浏览器)
+        6. #/URL锚点/hash 代表网页中一个位置 改变#后数值 浏览器只会滚动到相应位置 不会重新加载网页)
+        7. hash出现在URL中 但不会被包含在HTTP请求中 对后端没有影响)
+        8. hash改变会触发hashchange事件 浏览器进退也能对其控制 H5之前基本都是使用hash实现前端路由 每一次改变#后的部分 都会在浏览器访问历史中增加一个记录 使用后退按钮 可以回到上一个位置)
+        9. Hash模式通过锚点的改变 据不同的值 渲染指定DOM位置的不同数据)
+        > 实现原理
+        - 早期的前端路由实现就是基于location.hash实现的 location.hash的值就是URL中#后面的内容
+        > vue-router源码对/src/history/hash.js的处理
+        1. 使用window.addEventListener('hashchange',fun)监听路由的变化 然后使用transitionTo方法更新视图
+        2. vue-router 的2个主要API push 和 replace 也是简单处理了下 hash , 然后调用 transitionTo 方法更新视图
+    2. history模式(依赖HTML5 History API和服务器配置)
+        > HTMLHistory基本知识:
+        - (使用back() forward() go()方法完成在用户历史记录中向后和向前的跳转
+        - H5中引入了history.pushState()添加历史记录/history.replaceState()修改历史记录
+        - 解决hash传参体积问题 不带# 更美观
+        - 通过JS操作window.history改变浏览器地址栏参数 没有发起HTTP请求)
+        1. History 接口允许操作浏览器的曾经在标签页或者框架里访问的会话历史记录。
+        2. 使用 back(),  forward()和  go() 方法来完成在用户历史记录中向后和向前的跳转。
+        3. HTML5引入了 history.pushState() 和 history.replaceState() 方法，它们分别可以添加和修改历史记录条目。
+        > vue-router源码对/src/history/html5.js处理
+        1. 处理逻辑和 hash 相似，使用 window.addEventListener("popstate", fun) 监听路由的变化,
+        2. 使用 transitionTo 方法更新视图
+        
+        1. 利用了HTML5新增的pushState()和replaceState()两个API, 通过这两个api完成URL跳转不会重新加载页面
+        2. 同时history模式解决了hash模式存在的问题. hash的传参是基于URL的, 如果要传递复杂的数据, 会有体积限制, 而history模式不仅可以在URL里传参, 也可以将数据存放到一个特定的对象中
+        
+        > 404问题 
+        - history模式下 只是动态的通过JS操作window.history改变浏览器地址栏里的路径
+        - 并没有发起HTTP请求 当直接在浏览器里输入这个地址的时候 就一定要对服务器发起http请求 但是该目标在服务器上不存在 所以会返回404
+        
+        > 解决:
+        - 在Ngnix中将所有请求都转发到index.html上就可以了。
+    3. abstract
+        - (支持所有JavaScript运行环境 如Node.js服务器端 如果发现没有浏览器的API 路由会强制进入这个模式)
+        > 对/src/history/abstract.js处理
+        1. 首先定义了2个变量，stack 来记录调用的记录， index 记录当前的指针位置
+        2. 首先定义了2个变量，stack 来记录调用的记录， index 记录当前的指针位置
+    > 小结
+    1. hash 和 history 的使用方式差不多，hash 中路由带 # ，但是使用简单，不需要服务端配合，站在技术角度讲，这个是配置最简单的模式，
+    2. history 模式需要服务端配合处理404的情况
+    (在路由跳转的时候，就会出现访问不到静态资源而出现 404 的情况，这时候就需要服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面) 路由中不带 # ，比 hash 美观一点。
+    3. abstract 模式没有使用浏览器api 可以放到node环境或者桌面应用中   
 14. Vue-Router导航守卫 
     1. 全局的(beforeEach路由跳转前触发/beforeResolve路由跳转前触发/afterEach路由跳转完成后触发)
     2. 单个路由独享的(beforeEnter 紧随beforeEach后)
@@ -1287,18 +1276,19 @@
     - 路由跳转过程中的一些钩子函数 路由跳转是一个大过程 这个大过程分跳转前中后等细小过程 每一个过程都有一个函数 可以让你操作一些其他的事的时机
     
     > 常用的两个路由守卫
-    - router.beforeEach/router.afterEach
+    1. router.beforeEach
+    2. router.afterEach
     
     > 项目中
     - 一般在beforeEach这个钩子函数中进行路由跳转一些信息判断 判断是否登录 是否拿到对应路由权限
 
     > 导航守卫全解析
-    一个钩子函数执行后输出的顺序
-        全局前置守卫:beforeEach
-        路由beforeEnter守卫
-        组件路由守卫beforeRouterEnter 此时this并不指向该组件实例
-        全局解析守卫beforeResolve
-        全局后置守卫afterEach
+    - 一个钩子函数执行后输出的顺序
+        1. 全局前置守卫:beforeEach
+        2. 路由beforeEnter守卫
+        3. 组件路由守卫beforeRouterEnter 此时this并不指向该组件实例
+        4. 全局解析守卫beforeResolve
+        5. 全局后置守卫afterEach
         
         组件生命周期beforeCreate
         组件生命周期created
@@ -1366,37 +1356,38 @@
         beforeRouteLeave
             导航离开该组件的对应路由调用
             可以访问组件实例this
-    导航守卫回调参数
-        to:目标路由对象 即将进入路由对象
-        from:即将要离开的路由对象 当前导航正要离去路由对象
-        next:最重要一个参数 单凡涉及到next参数的钩子 必须调用next才能继续往下执行下一个钩子
-            next()：进入下一个路由。
-            next(false)：中断当前的导航。
-            next('/')或next({ path: '/' }) : 跳转到其他路由，当前导航被中断，进行新的一个导航。
-        PS:
-            1.但凡涉及到有next参数的钩子 必须调用next()才能继续往下执行下一个钩子 否则路由跳转会停止
-            2.如果要中断当前的导航要调用next(false)如果浏览器的URL改变了(可能是用户手动或浏览器后退按钮)则URL地址会重置到from路由对应的地址
-            (主要用于登录验证不通过的处理)
-            3.next可以这样使用 next('/')/next({path:'/'})跳转到一个不同的地址 意思是当前导航被中断 然后进行一个新的导航 可传递的参数和router.push()选项一致
-            4.在beforeRouteEnter钩子中next((vm)=>{})内接受的回调函数参数为当前组件的实例vm 这个回调函数在生命周期mounted之后调用 即它是所有导肮守卫和生命周期函数最后执行的那个钩子
-            5.next(errror) 如果传入next的参数是一个Error实例 则导航会被终止且该错误会被传递给router.onError()注册过的回调
-    总结：
-        路由导航守卫都是在Vue实例生命周期钩子函数之前执行的。
-        切换路由时：
-            beforeRouterLeave->
-            beforeEach->
-            beforeEnter->
-            beforeRouteEnter->
-            beforeResolve->
-            afterEach->
-            beforeCreate->
-            created->
-            beforeMount->
-            mounted->
-            beforeRouteEnter的next回调
-        路由更新时:
-            beforeRouteUpdate
-    完整的导航守卫流程
+    > 导航守卫回调参数
+    1. to:目标路由对象 即将进入路由对象
+    2. from:即将要离开的路由对象 当前导航正要离去路由对象
+    3. next:最重要一个参数 单凡涉及到next参数的钩子 必须调用next才能继续往下执行下一个钩子
+        next()：进入下一个路由。
+        next(false)：中断当前的导航。
+        next('/')或next({ path: '/' }) : 跳转到其他路由，当前导航被中断，进行新的一个导航。
+    > PS:
+    1. 但凡涉及到有next参数的钩子 必须调用next()才能继续往下执行下一个钩子 否则路由跳转会停止
+    2. 如果要中断当前的导航要调用next(false)如果浏览器的URL改变了(可能是用户手动或浏览器后退按钮)则URL地址会重置到from路由对应的地址
+    (主要用于登录验证不通过的处理)
+    3. next可以这样使用 next('/')/next({path:'/'})跳转到一个不同的地址 意思是当前导航被中断 然后进行一个新的导航 可传递的参数和router.push()选项一致
+    4. 在beforeRouteEnter钩子中next((vm)=>{})内接受的回调函数参数为当前组件的实例vm 这个回调函数在生命周期mounted之后调用 即它是所有导肮守卫和生命周期函数最后执行的那个钩子
+    5. next(errror) 如果传入next的参数是一个Error实例 则导航会被终止且该错误会被传递给router.onError()注册过的回调
+    
+    > 小结：
+    - 路由导航守卫都是在Vue实例生命周期钩子函数之前执行的。
+    - 切换路由时：
+        beforeRouterLeave->
+        beforeEach->
+        beforeEnter->
+        beforeRouteEnter->
+        beforeResolve->
+        afterEach->
+        beforeCreate->
+        created->
+        beforeMount->
+        mounted->
+        beforeRouteEnter的next回调
+    - 路由更新时:
+        beforeRouteUpdate
+    - 完整的导航守卫流程
         导航被触发。
         在失活的组件里调用离开守卫beforeRouteLeave(to,from,next)。
         调用全局的beforeEach( (to,from,next) =>{} )守卫。
@@ -1431,6 +1422,7 @@
     
     > router-link
     - <router-link>是Vue-Router的内置组件，在具有路由功能的应用中作为声明式的导航使用。
+
     <router-link>8个prop
     1. to：必填，表示目标路由的链接。当被点击后，内部会立刻把to的值传到router.push()，所以这个值可以是一个字符串或者是描述目标位置的对象。
     注意path存在时params不起作用，只能用query
@@ -1467,10 +1459,10 @@
     - 编程式导航写在JS函数中 通过this.$router.push(xxx)触发            
 16. SPA 单页面的理解 优缺点 优化首屏加载速度慢的问题
     > SPA（ single-page application ）
-    - (仅在Web页面初始化时加载/页面加载完成后/利用路由机制实现HTML内容变换)
-    - 仅在 Web 页面初始化时加载相应的 HTML、JavaScript 和 CSS。
-    - 一旦页面加载完成，SPA 不会因为用户的操作而进行页面的重新加载或跳转；
-    - 取而代之的是利用路由机制实现 HTML 内容的变换，UI 与用户的交互，避免页面的重新加载。
+    1. 仅在Web页面初始化时加载
+    2. 页面加载完成后 利用路由机制实现HTML内容变换
+
+    - 仅在 Web 页面初始化时加载相应的 HTML、JavaScript 和 CSS。 一旦页面加载完成，SPA 不会因为用户的操作而进行页面的重新加载或跳转； 取而代之的是利用路由机制实现 HTML 内容的变换，UI 与用户的交互，避免页面的重新加载。
     
     > 优点：(良好的用户体验/良好的前后端工作分离模式/减轻服务器压力)
     1. 良好的交互体验
@@ -1484,20 +1476,45 @@
     4. SEO(Search Engine Optimization搜索引擎优化)难度较高
         - 由于所有的内容都在一个页面中动态替换显示，所以在 SEO 上其有着天然的弱势。
     5. 导航不可用
-        - 由于单页应用在一个页面中显示所有的内容
-        所以不能使用浏览器的前进后退功能
-        所有的页面切换需要自己建立堆栈管理；
+        - 由于单页应用在一个页面中显示所有的内容 所以不能使用浏览器的前进后退功能 所有的页面切换需要自己建立堆栈管理；
     6. 初次加载耗时多 页面复杂度提高很多
         - 为实现单页 Web 应用功能及显示效果，需要在加载页面的时候将 JavaScript、CSS 统一加载，部分页面按需加载；
     
-    > 优化：(减少app.bundle大小
-        (将公用的JS库通过script标签引入/
-        配置路由时页面和组件使用懒加载方式引入)
-            /加一个首屏loading图提升用户体验)
+    > 优化：
+    1. (将公用的JS库通过script标签引入 (减少app.bundle大小/
+    2. 配置路由时页面和组件使用懒加载方式引入)
+    3. /加一个首屏loading图提升用户体验)
+    
     1. 将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
     2. 在配置路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
     3. 加一个首屏 loading 图，提升用户体验；
 17. Vuex
+    > 定义:
+    - 一个专为 Vue.js 应用程序开发的状态管理插件。每一个 Vuex 应用的核心就是 store（仓库）。
+    - “store” 基本上就是一个容器，它包含着你的应用中大部分的状态 ( state )。它采用集中式存储管理应用的所有组件的状态 更改状态的唯一方法是提交mutation，
+    - 例this.$store.commit('SET_VIDEO_PAUSE', video_pause，SET_VIDEO_PAUSE为mutations属性中定义的方法
+    - Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相
+
+    > 包括以下几个模块：
+    1. State：
+        - 定义了应用状态的数据结构，可以在这里设置默认的初始状态。
+    2. Getter：
+        - 允许组件从 Store 中获取数据，mapGetters 辅助函数仅仅是将 store 中的 getter 映射到局部计算属性。
+    3. Mutation：
+        - 是唯一更改 store 中状态的方法，且必须是同步函数。
+    4. Action：
+        - 用于提交 mutation，而不是直接变更状态，可以包含任意异步操作。
+    5. Module：
+        - 允许将单一的 Store 拆分为多个 store 且同时保存在单一的状态树中。
+    
+    > 解决问题:
+    1. 多个组件依赖于同一状态时，对于多层嵌套的组件的传参将会非常繁琐，并且对于兄弟组件间的状态传递无能为力。
+    2. 来自不同组件的行为需要变更同一状态。以往采用父子组件直接引用或者通过事件来变更和同步状态的多份拷贝。以上的这些模式非常脆弱，通常会导致无法维护的代码。
+
+    > 应用场景:
+    1. 多个组件依赖于同一状态时。
+    2. 来自不同组件的行为需要变更同一状态。
+
     > 设计思想
     - Vuex 借鉴了Flux Redux 将数据存放到全局的store
     - 再将store挂载到每个Vue实例组件中 利用Vue.js的细粒度数据响应机制来进行高效的状态更新
@@ -1513,93 +1530,78 @@
     3. vuexInit方法实现了store注入vue组件实例
     4. 并注册了vuex store的引用属性$store
     
-    > Vuex的state和getters如何映射到各个组件实例中响应式更新状态
-    store实现的源码在src/store.js
-    1.源码中找到resetStoreVM核心方法
-        Vuex的state状态是响应式的
-        借助Vue的data是响应式的
-        将state存入vue实例组件的data中
-        
-        Vuex的getters借助Vue的计算属性
-        computed实现数据实时监听
+    > Vuex的state和getters如何映射到各个组件实例中响应式更新状态 store实现的源码在src/store.js
+    1. 源码中找到resetStoreVM核心方法
+        - Vuex的state状态是响应式的 借助Vue的data是响应式的 将state存入vue实例组件的data中
+        - Vuex的getters借助Vue的计算属性 computed实现数据实时监听
 
         computed计算属性监听data数据变更主要经历以下几个过程
     > 小结
     - Vuex通过全局注入store对象 来实现组件间状态共享
-    - 在大型复杂的项目中(多级组件嵌套) 需要实现一个组件更改某个数据
-    - 多个组件自动获取更改后的数据进行业务逻辑处理 此时使用Vuex比较合适
-17. Vuex
-    - getters相当于vue中的计算属性 通过getters进一步处理 得到我们想要的数值 且允许传参 第一个参数是state
-    1. 可以通过$store来获取
-    2. 前面的方法名和获取的属性名是一致的
+    - 在大型复杂的项目中(多级组件嵌套) 需要实现一个组件更改某个数据 多个组件自动获取更改后的数据进行业务逻辑处理 此时使用Vuex比较合适
+    
+    > Vuex辅助函数
+    1. computed中对mapState mapGetters解构
+        ```
         import {mapState,mapMutations} from "vuex";
-        computed里面(mapState mapGetters)
-        1.mapState辅助函数(state类似于vue中的data)
+        ```
+        1. mapState辅助函数 state类似vue中的data
         computed:{
             ...mapState(['nickname','age','gender'])
         },
-        2.mapGetters辅助函数(getters相当于vue中computed)
+        2. mapGetters辅助函数 getterr相当于Vue中的computed
         computed:{
         ...mapGetters(['realname','money_us'])
         },
-        methods里面(mapMutations mapActions)
-        3.mapMutations辅助函数(mutations类似于vue中的methods)
-        (mutations需要通过commit调用其里面的方法
-        它也可以传入参数 第一个参数是state 第二个参数是载荷(payLoad)
-        即额外的参数 该参数最好写成对象形式 可以传递更多信息)
-        (mutations只能写同步方法不能写异步方法如axios setTimeout 主要作用就修改state)
-        (为什么调用mutations中的方法对state中的数值进行修改 而不直接进行修改呢
-        作者在mutations中做了类似埋点操作如果
-        从mutations中操作的话， 能被检测到，可以更方便用调试工具调试，调试工具可以检测到实时变化，而直接改变state中的属性，则无法实时监测
-        )
-        (mutations中写异步，也能够调成功，但是由于是异步的，不能被调试工具追踪到，所有不推荐这样写，不利于调试,这是官方的约定。)
+        - getters相当于Vue中的计算属性 通过getters进一步处理得到我们想要的数值 允许穿参 第一个参数是state
+
+    2. methods中对mapMutations mapActions解构
+        1. mutations
+        - mutations类似vue中的methods 需要通过commit调用其中方法 可传入参数 
+        - mutations只能写同步方法不能写异步方法如axios setTimeout 主要作用就修改state
+        - 为什么调用mutations中的方法对state中的数值进行修改 而不直接进行修改呢
+        - 作者在mutations中做了类似埋点操作如果
+        - 从mutations中操作的话， 能被检测到，可以更方便用调试工具调试，调试工具可以检测到实时变化，而直接改变state中的属性，则无法实时监测
+        - mutations中写异步，也能够调成功，但是由于是异步的，不能被调试工具追踪到，所有不推荐这样写，不利于调试,这是官方的约定。)
+        ```
         methods:{
             ...mapMutations(['changePage'])
         }
-        4.mapActions
-        (action类似mutation
-        区别：
-            action可以提交mutation
-            action不要直接操作state 而是去操作mutation
-            action包含异步操作 类似axios请求 都可以放在action中写
-            action默认就是异步 而且返回promise
-        )
+        ```
+        1. state
+        2. 负荷payload -该参数最好写成对象形式 可以传递更多信息
+        
+        2. mapActions
+        - (action类似mutation
+        ```
         methods:{
-        ...mapActions(['getUserInfo'])
+            ...mapActions(['getUserInfo'])
         }
         (this.$store.dispatch(‘getUserInfo’))
-17. Vuex(State Getters Mutations Actions Module)
-    > 定义:
-    - 一个专为 Vue.js 应用程序开发的状态管理插件。每一个 Vuex 应用的核心就是 store（仓库）。
-    - “store” 基本上就是一个容器，它包含着你的应用中大部分的状态 ( state )。
-    - 它采用集中式存储管理应用的所有组件的状态 更改状态的唯一方法是提交mutation，
-    - 例this.$store.commit('SET_VIDEO_PAUSE', video_pause，SET_VIDEO_PAUSE为mutations属性中定义的方法
-    - 1.Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相
-
-    > 包括以下几个模块：
-    1. State：
-        定义了应用状态的数据结构，可以在这里设置默认的初始状态。
-    2. Getter：
-        允许组件从 Store 中获取数据，mapGetters 辅助函数仅仅是将 store 中的 getter 映射到局部计算属性。
-    3. Mutation：
-        是唯一更改 store 中状态的方法，且必须是同步函数。
-    4. Action：
-        用于提交 mutation，而不是直接变更状态，可以包含任意异步操作。
-    5. Module：
-        允许将单一的 Store 拆分为多个 store 且同时保存在单一的状态树中。
-    
-    > 解决问题:
-    1. 多个组件依赖于同一状态时，对于多层嵌套的组件的传参将会非常繁琐，并且对于兄弟组件间的状态传递无能为力。
-    2. 来自不同组件的行为需要变更同一状态。以往采用父子组件直接引用或者通过事件来变更和同步状态的多份拷贝。以上的这些模式非常脆弱，通常会导致无法维护的代码。
-
-    > 应用场景:
-    1. 多个组件依赖于同一状态时。
-    2. 来自不同组件的行为需要变更同一状态。
+        ```
+        > 区别：
+        1. action可以提交mutation
+        2. action不要直接操作state 而是去操作mutation
+        3. action包含异步操作 类似axios请求 都可以放在action中写
+        4. action默认就是异步 而且返回promise
+        > Vuex中action和mutation有什么区别/共同点
+        - 区别：
+            1. action 提交的是 mutation，而不是直接变更状态。mutation可以直接变更状态。
+            2. action 可以包含任意异步操作。mutation只能是同步操作。
+            3. 提交方式不同，action 是用this.$store.dispatch('ACTION_NAME',data)来提交。mutation是用this.$store.commit('SET_NUMBER',10)来提交。
+            4. 接收参数不同，mutation第一个参数是state，而action第一个参数是context，其包含了
+        - 相同：
+            1. 第二参数都可以接收外部提交时传来的参数。
+            ```
+            this.$store.dispatch('ACTION_NAME',data)和
+            this.$store.commit('SET_NUMBER',10)
+            ```
 
     > 手动引入:
     1. 先安装依赖nnpm install vuex --save
     2. 在项目目录src中建立store文件夹
     3. 在store文件夹下新建index.js文件,写入
+        ```
         import Vue from 'vue';
         import Vuex from 'vuex';
         Vue.use(Vuex);
@@ -1618,7 +1620,9 @@
             }
         })
         export default store;
+        ```
     4. main.js文件中引入Vuex
+        ```
         import Vue from 'vue';
         import App from './App.vue';
         import store from './store';
@@ -1626,233 +1630,51 @@
             store:store,
             render: h => h(App)
         }).$mount('#app')
-    5. 5个核心属性
-        1. state、
-            状态存储 
-            改变Vuex中的状态的唯一途径就是显式地提交 (commit) mutation
-            this.$store.commit('SET_NUMBER',10)
-        2. getters、
-        3. mutations、
-        4. actions、
-        5. modules 
-    
+        ```
+
     > Vuex中状态是对象时 使用注意事项
     - 对象是引用类型 复制后改变属性还是会影响原始数据 这样会改变state里面的状态 不允许 先用深度克隆复制对象 再修改。
 
-    > Vuex 使用mapState辅助函数 利用对象展开运算符将state混入computed对象中 实现在组件中批量使用Vuex的state状态
-    ```
-    import {mapState} from 'vuex'
-    export default{
-        computed:{
-            ...mapState(['price','number'])
-        }
-    }
-    ```
-
-    > Vuex中的getter
-    Vuex中要从state派生一些状态 多个组件使用它
-        1.使用getter属性，相当Vue中的计算属性computed，只有原状态改变派生状态才会改变。
-        2.getter接收两个参数，第一个是state，第二个是getters(可以用来访问其他getter)。
-        3.组件中可以用计算属性computed通过this.$store.getters.total这样来访问这些派生转态。
-    Vuex 通过getter实现组件内可以通过特定条件来获取state的状态
-        通过让getter返回一个函数，来实现给getter传参。然后通过参数来进行判断从而获取state中满足要求的状态。
-        然后在组件中可以用计算属性computed通过this.$store.getters.getTodoById(2)这样来访问这些派生转态。
-    Vuex 组件中批量使用Vuex的getter属性
-        使用mapGetters辅助函数, 利用对象展开运算符将getter混入computed 对象中
-            import {mapGetters} from 'vuex'
-            export default{
-                computed:{
-                    ...mapGetters(['total','discountTotal'])
-                }
-            }
-    Vuex 组件中批量给Vuex的getter属性取别名并使用
-        使用mapGetters辅助函数, 利用对象展开运算符将getter混入computed 对象中
-        import {mapGetters} from 'vuex'
-        export default{
-            computed:{
-                ...mapGetters({
-                    myTotal:'total',
-                    myDiscountTotal:'discountTotal',
-                })
-            }
-        }
-    
-    > Vuex中action和mutation有什么区别/共同点
-    - 区别：
-        1. action 提交的是 mutation，而不是直接变更状态。mutation可以直接变更状态。
-        2. action 可以包含任意异步操作。mutation只能是同步操作。
-        3. 提交方式不同，action 是用this.$store.dispatch('ACTION_NAME',data)来提交。mutation是用this.$store.commit('SET_NUMBER',10)来提交。
-        4. 接收参数不同，mutation第一个参数是state，而action第一个参数是context，其包含了
-    相同：
-        1. 第二参数都可以接收外部提交时传来的参数。
-        this.$store.dispatch('ACTION_NAME',data)和
-        this.$store.commit('SET_NUMBER',10)
-    Vuex 组件中多次提交同一个mutation 方便使用法
-        1.使用mapMutations辅助函数,在组件中这么使用
-        import { mapMutations } from 'vuex'
-        methods:{
-            ...mapMutations({
-                setNumber:'SET_NUMBER',
-            })
-        }
-        2.然后调用this.setNumber(10)相当调用this.$store.commit('SET_NUMBER',10)
-    Vuex 组件中多次提交同一个action 方便使用法
-        1.使用mapActions辅助函数,在组件中这么使用
-            methods:{
-                ...mapActions({
-                    setNumber:'SET_NUMBER',
-                })
-            }
-        2.调用this.setNumber(10)相当调用this.$store.dispatch('SET_NUMBER',10)
-    Vuex 如何知道action什么时候结束
-        1.在action函数中返回Promise，然后再提交时候用then处理
-        actions:{
-            SET_NUMBER_A({commit},data){
-                return new Promise((resolve,reject) =>{
-                    setTimeout(() =>{
-                        commit('SET_NUMBER',10);
-                        resolve();
-                    },2000)
-                })
-            }
-        }
-        this.$store.dispatch('SET_NUMBER_A').then(() => {
-        // ...
-        })
-    Vuex中有两个action，分别是actionA和actionB，其内都是异步操作，在actionB要提交actionA，需在actionA处理结束再处理其它操作
-        1.利用ES6的async和await来实现。
-            actions:{
-                async actionA({commit}){
-                    //...
-                },
-                async actionB({dispatch}){
-                    await dispatch ('actionA')//等待actionA完成
-                    // ... 
-                }
-            }
-    > Vuex模块module
-        使用单一状态树 应用的所有状态会集中到一个比较大的对象
-        当应用变得非常复杂时 store 对象就有可能变得相当臃肿
-        将 store 分割成模块（module）
-        每个模块拥有自己的 state mutations actions getters 嵌套子模块，从上至下进行同样方式的分割。
-            1.在module文件新建moduleA.js和moduleB.js文件。在文件中写入
-                const state={
-                    //...
-                }
-                const getters={
-                    //...
-                }
-                const mutations={
-                    //...
-                }
-                const actions={
-                    //...
-                }
-                export default{
-                    state,
-                    getters,
-                    mutations,
-                    actions
-                }
-            2.index.js引入模块
-                import Vue from 'vue';
-                import Vuex from 'vuex';
-                Vue.use(Vuex);
-                import moduleA from './module/moduleA'
-                import moduleB from './module/moduleB'
-                const store = new Vuex.Store({
-                    modules:{
-                        moduleA,
-                        moduleB
-                    }
-                })
-                export default store
-    
-    Vuex 模块中 getter和mutation接收的第一个参数state 是模块的state 局部的state
-    Vuex 模块中 getter mutation action中访问全局的state和getter
-        1.在getter中可以通过第三个参数rootState访问到全局的state,可以通过第四个参数rootGetters访问到全局的getter。
-        2.在mutation中不可以访问全局的satat和getter，只能访问到局部的state。
-        3.在action中第一个参数context中的context.rootState访问到全局的state，context.rootGetters访问到全局的getter。
-    Vuex 组件中访问Vuex模块中的getter和state 提交mutation和action
-        1.直接通过this.$store.getters和this.$store.state来访问模块中的getter和state。
-        2.直接通过this.$store.commit('mutationA',data)提交模块中的mutation。
-        3.直接通过this.$store.dispatch('actionA,data')提交模块中的action。
-    Vuex模块命名空间
-        1.默认情况下，模块内部的action、mutation和getter是注册在全局命名空间，如果多个模块中action、mutation的命名是一样的，那么提交mutation、action时，将会触发所有模块中命名相同的mutation、action。
-        2.这样有太多的耦合，如果要使你的模块具有更高的封装度和复用性，你可以通过添加namespaced: true 的方式使其成为带命名空间的模块。
-            export default{
-                namespaced: true,
-                state,
-                getters,
-                mutations,
-                actions
-            }
-    Vuex在带命名空间的模块内提交全局的mutation和action
-        将 { root: true } 作为第三参数传给 dispatch 或 commit 即可。
-        this.$store.dispatch('actionA', null, { root: true })
-        this.$store.commit('mutationA', null, { root: true })
-    Vuex在带命名空间的模块内注册全局的action？
-        actions: {
-            actionA: {
-                root: true,
-                handler (context, data) { ... }
-            }
-        }
-    Vuex 组件中提交modules中带命名空间的moduleA中的mutationA
-        this.$store.commit('moduleA/mutationA',data)
-    
     > Vuex插件使用
-        Vuex插件就是一个函数 它接受store作为唯一参数
-        在Vuex.store构造器选项plugins引入
-        1.store/plugin.js文件中写入
-            export default function createPlugin(param){
-                return store =>{
-                    //...
-                }
-            }
-        2.store/index.js文件中写入
-            import createPlugin from './plugin.js'
-            const myPlugin = createPlugin()
-            const store = new Vuex.Store({
-            // ...
-            plugins: [myPlugin]
-            })
-    Vuex监听组件提交mutation&action
-        1.Vuex.Store实例方法subscribe监听组件中提交mutation
-        2.用Vuex.Store的实例方法subscribeAction监听组件中提交action 在store/plugin.js文件中引入
-    v-model中使用Vuex中state
-        需通过computed计算属性转换
-        computed: {
-            message: {
-                get () {
-                    return this.$store.state.message
-                },
-                set (value) {
-                    this.$store.commit('updateMessage', value)
-                }
+    - Vuex插件就是一个函数 它接受store作为唯一参数 在Vuex.store构造器选项plugins引入
+    1. store/plugin.js文件中写入
+       ```
+        export default function createPlugin(param){
+            return store =>{
+                //...
             }
         }
-    Vuex严格模式
-        不是由mutations函数引起的状态变更 抛出错误
-        开启
-            Vuex.Store构造器选项
-            const store = new Vuex.Store({
-                strict:true
-            })
+        ```
+    2. store/index.js文件中写入
+        import createPlugin from './plugin.js'
+        const myPlugin = createPlugin()
+        const store = new Vuex.Store({
+        // ...
+        plugins: [myPlugin]
+        })
+
+    > Vuex严格模式
+    - 不是由mutations函数引起的状态变更 抛出错误
+    - 开启
+    - Vuex.Store构造器选项
+    ```
+    const store = new Vuex.Store({
+        strict:true
+    })
+    ```
 18. vue初始化和生命周期钩子函数
     - (初始化:开始创建、初始化数据、编译模板、挂载Dom、数据变化时更新DOM、卸载)
     - (生命周期:Vue实例从创建到销毁的过程)
     - (Vue实例有一个完整的生命周期 指一个实例从开始创建到销毁这个过程)
     - (生命周期钩子自动绑定this到实例上 可以通过this操作访问到数据和方法)
     - (生命周期钩子函数
-    1. beforeCreate(
+    1. beforeCreate
         实例初始化之后 创建之前
         el  undefined
         data undefined
         DOM 未生成
         --el和data未初始化
-    )
-    2. created(
+    2. created
         el undefined
         data [Object Object]
         - el未初始化 data初始化
@@ -1867,8 +1689,7 @@
         el  undefined
         data [Object Object]
         DOM未生成
-    )
-    3. beforeMount(
+    3. beforeMount
         $el挂载前 vm.$el还是未定义
         相关Render函数首次被调用 将模块渲染成HTML
         相关的 render 函数首次被调用
@@ -1881,8 +1702,7 @@
         DOM 相关render函数首次被调用 将模块渲染成HTML
         data初始化
         meaasge Vue生命周期
-    ) 
-    4. mounted(
+    4. mounted
         $el挂载后被调用 编译好的HTML挂载到页面完成后
         初始化页面完成后调用nextTick方法
         el  [Object HTMLDivElement]
@@ -1904,8 +1724,7 @@
         data [Object Object]
         meaasge Vue生命周期
         此阶段中DOM渲染完成
-    ) 
-    5. beforeUpadate(
+    5. beforeUpadate
         更新渲染视图前 
         界面中数据旧 data中数据已更新
         未同步
@@ -1917,8 +1736,7 @@
         vue就会自动帮我们更新渲染视图
         检测到我们要修改数据 
         更新渲染视图之前触发
-    )
-    6. updated(
+    6. updated
         更新渲染视图后
         已同步
 
@@ -1928,15 +1746,13 @@
         1.该钩子在服务器端渲染期间不被调用。
         2.应该避免在此期间更改状态，
         因为这可能会导致更新无限循环。
-    )
-    7. beforeDestory(
+    7. beforeDestory
         实例销毁前触发 实例vm可用
         调用实例的destroy() 
         此时实例仍然完全可用；
         方法可以销毁当前的组件，在销毁前，
         会触发beforeDestroy钩子。
-    )
-    8. destoryed(
+    8. destoryed
         实例销毁后触发 实例vm不可用
         此时该实例与其他实例的关联已经被清除，
         Vue实例指示的所有东西都会解绑定，
@@ -1944,30 +1760,32 @@
         所有的子实例也会被销毁。
     - props methods data 和computed的初始化都是在beforeCreated 和created之前完成的
 18. 在哪个生命周期内调用异步请求(created)/什么阶段才能访问操作DOM(mounted)？
-    1. (created beforeMounted mounted)
+    > (created beforeMounted mounted)
         - 这三个钩子函数中data 已创建 可将服务端端返回的数据进行赋值
-        - 推荐在 created 钩子函数中调用异步请求 可以更快获取服务端数据
-        服务器端没有mounted和beforeMount生命周期钩子函数
-    - created 钩子函数中调用异步请求优点： 
-        (更快获取服务端数据/ssr不支持beforeMount Mounted生命周期钩子)
-        1. 能更快获取到服务端数据，减少页面 loading 时间；
-        2. ssr(服务端渲染) 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
-    - 什么阶段能访问操作DOM
+        - 在 created 钩子函数中调用异步请求 可以更快获取服务端数据
+        - 服务器端没有mounted和beforeMount生命周期钩子函数
+    > 什么阶段能访问操作DOM
         - 钩子函数 mounted 被调用前 Vue 已经将编译好的模板挂载到页面上 在 mounted 中可以访问操作 DOM
-    > 
-    - 请求是异步的 created生命周期中Data才生成 而请求返回的数据需要挂载在data中 所以created里可以初始化请求 但created时候的dom还没有初始化完成
-    - mounted生命周期里dom才初始化渲染完成
-    - 请求是异步的 所以不会阻塞页面渲染的主线程 如果请求不需要借助/依赖/改变DOM 这时请求可以放在created 反之可以放在mounted
-    - created和mounted ？？？
+    
+    - created和mounted 
+    > mounted生命周期钩子中调用优点
     1. created中，页面视图未出现，如果请求信息过多，页面会长时间处于白屏状态，DOM节点没出来，无法操作DOM节点。
-    2. 在mounted不会这样，比较好。
-
+    2. 在mounted不会这样
+    > created 钩子函数中调用异步请求优点： 
+    - (更快获取服务端数据/ssr不支持beforeMount Mounted生命周期钩子)
+    1. 能更快获取到服务端数据，减少页面 loading 时间；
+    2. ssr(服务端渲染) 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
     > 数据获取
     1. 正常获取created
     2. 涉及需页面加载完成后(DOM操作)mounted
 
+    - 请求是异步的 created生命周期中Data才生成 而请求返回的数据需要挂载在data中 所以created里可以初始化请求 但created时候的dom还没有初始化完成
+    - mounted生命周期里dom才初始化渲染完成
+    - 请求是异步的 所以不会阻塞页面渲染的主线程 如果请求不需要借助/依赖/改变DOM 这时请求可以放在created 反之可以放在mounted
+
 18. Vue 的父组件和子组件生命周期钩子函数执行顺序/
-    (加载渲染/子组件更新/父组件更新/销毁)
+    - 洋葱模型
+    - (加载渲染/子组件更新/父组件更新/销毁)
     1. 加载渲染过程 
         父 beforeCreate -> 
         父 created -> 
@@ -1983,14 +1801,14 @@
         子 updated -> 
         父 updated  
     3. 父组件更新过程
-            父 beforeUpdate -> 
-            父 updated  
+        父 beforeUpdate -> 
+        父 updated  
     4. 销毁过程 
         父 beforeDestroy -> 
         子 beforeDestroy -> 
         子 destroyed -> 
         父 destroyed
-20. Vue一些指令(directive)及具体作用
+19. Vue一些指令(directive)及具体作用
     > 指令 (Directives)：
     - 是带有 v- 前缀的特殊 attribute。指令 attribute 的值预期是单个 JavaScript 表达式 (v-for 是例外情况，稍后我们再讨论)。
     - 指令的职责是，当表达式的值改变时，将其产生的连带影响，响应式地作用于 DOM。
@@ -2042,19 +1860,24 @@
     9. v-if和v-for
         - (v-for优先级高于v-if 使用v-for遍历对象时 按Object.keys()的顺序的遍历，转成数组保证顺序)
             1. 处于同一节点，v-for的优先级比v-if更高
-            这意味着v-if将分别重复运行于每个v-for循环中。
-            当你只想为部分项渲染节点时，这种优先级的机制会十分有用。
+            - 这意味着v-if将分别重复运行于每个v-for循环中。当你只想为部分项渲染节点时，这种优先级的机制会十分有用。
+            ```
             <ul>
                 <li v-for="item in items" v-if="item.show">{{item}}</li>
             </ul>
+            ```
             2. 如果你的目的是有条件地跳过循环的执行，那么可以将 v-if 置于外层元素 (或 <template>)上。
+            ```
             <ul v-if="items.length">
                 <li v-for="item in items">{{item}}</li>
             </ul>
-            你也可以用 of 替代 in 作为分隔符，因为它更接近 JavaScript 迭代器的语法：
+            ```
+            - 也可以用 of 替代 in 作为分隔符，因为它更接近 JavaScript 迭代器的语法：
+            ```
             <div v-for="item of items"></div>
-            使用v-for遍历对象时 按Object.keys()的顺序的遍历，转成数组保证顺序。
-21. computed/methods/watch
+            ```
+            - 使用v-for遍历对象时 按Object.keys()的顺序的遍历，转成数组保证顺序。
+20. computed/methods/watch
     > computed & methods
     1. 计算属性computed
     - (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
@@ -2062,13 +1885,15 @@
     2. 事件methods
     - (只要发生重新渲染，method 调用总会执行该函数)
     - methods方法 watch属性 不能用this this会是undefind, 因为箭头函数中的this指向的是定义时的this，而不是执行时的this，所以不会指向Vue实例的上下文。
+    
     > computed & watch
     1. computed(缓存结果每次都会重新创建变量/通过return返回)
-    - (计算属性/依赖多个属性/缓存结果时每次都会重新创建变量/计算开销比较大(计算次数多或者异步处理)/通过return返回)
+    - (计算属性/依赖多个属性/缓存结果时每次都会重新创建变量/计算开销比较大(计算次数多或者异步处理)/通过return返回/不支持异步)
     2. watch(直接计算不会创建变量保存结果/不需要return)
-    - (侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return) 
+    - (侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return/支持异步) 
     - 在选项参数中指定deep: true 可深度监听
     - 在选项参数中指定immediate: true将立即以表达式的当前值触发回调。监听后立即调用
+    
     > computed&watch
     1. computed(支持缓存/不支持异步)
         1. 支持缓存 只有依赖数据发生变化 才会重新进行计算
@@ -2082,12 +1907,11 @@
         3. 监听的函数接收两个参数 第一个参数是最新的值 第二个参数是输入之前的值
         4. 当一个属性发生变化时 需要执行对应的操作 一对多
         5. 监听数据必须是data中声明过或者父组件传递过来的props中的数据 当数据变化时 触发其他操作 函数有两个参数
-            immediate：组件加载立即触发回调函数执行
-            deep:深度监听 为了发现对象内部值的变化 复杂类型的数据时使用
-                PS：监听数组变动不需要这么做 
-                    deep无法监听到数组的变动和对象的新增
-                    参考Vue数组 只有以响应式方式触发才会被监听到
-    >PS
+            - immediate：组件加载立即触发回调函数执行
+            - deep:深度监听 为了发现对象内部值的变化 复杂类型的数据时使用
+                - PS：监听数组变动不需要这么做 
+                    - deep无法监听到数组的变动和对象的新增
+                    - 参考Vue数组 只有以响应式方式触发才会被监听到
     - (computed data props methods 都会被挂载在vm实例上，因此这三个都不能同名。)
 21. 计算属性computed
     > (避免在模板中放入太多的逻辑，导致模板过重且难以维护。)
@@ -2095,17 +1919,16 @@
     - (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
     - 计算属性默认只有 getter，不过在需要时你也可以提供一个 setter：
     > 原理
-        computed 本质是一个惰性求值的观察者。
-        computed 内部实现了一个惰性的 watcher,也就是 computed watcher,
-        computed watcher 不会立刻求值,同时持有一个 dep 实例。
-        其内部通过 this.dirty 属性标记计算属性是否需要重新求值。
-        当 computed 的依赖状态发生改变时,就会通知这个惰性的 watcher
-        computed watcher 通过 this.dep.subs.length 判断有没有订阅者
-        有的话,会重新计算,然后对比新旧值,
-        如果变化了,会重新渲染。 
-        (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)
-        没有的话,仅仅把 this.dirty = true。
-        (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
+    - computed 本质是一个惰性求值的观察者。
+    - computed 内部实现了一个惰性的 watcher,也就是 computed watcher,
+    - computed watcher 不会立刻求值,同时持有一个 dep 实例。
+    - 其内部通过 this.dirty 属性标记计算属性是否需要重新求值。
+    - 当 computed 的依赖状态发生改变时,就会通知这个惰性的 watcher computed watcher 通过 this.dep.subs.length 判断有没有订阅者
+    有的话,会重新计算,然后对比新旧值,如果变化了,会重新渲染。 
+    
+    - (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)
+    没有的话,仅仅把 this.dirty = true。
+    - (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
 22. Vue API 实例属性/实例方法(数据/事件/生命周期)
     > Vue的$(内置的实例方法 属性) 挂载在this上的Vue内部属性 内部API的命名空间
     - 一个特殊标记 增强区分 说明这是内置的实例方法属性
