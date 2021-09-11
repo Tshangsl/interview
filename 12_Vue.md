@@ -10,7 +10,8 @@
     3. HOC&MIXINS Vue通过Mixins组合不同的功能 React通过HOC组合不同的功能
     4. 模版渲染方式不同 表面上模版语法不同 React通过JSX渲染模版 Vue通过一种扩展的HTML语法渲染模版 深层上模版原理不同 React组件JS代码中 通过原生JS实现模版中常见语法 Vue中模版使用的数据必须挂在this上中转一次
     5. Vuex和Redux 表面上store注入和使用方法 。。。实现原理上 Redux使用的是不可变数据 Vuex的数据是可变的 Redux通过diff检测数据变化 Vuex同Vue一样通过getter/setter
-    6. 构建工具 React采用create-react-app vue使用vue-cli
+    6. 组件通信
+    7. 构建工具 React采用create-react-app vue使用vue-cli
 
     1. 监听数据变化实现的原理不同 
         - Vue痛过getter/setter以及一些函数的劫持 能精确知道数据变化 不需要特别的优化就能达到很好的性能 
@@ -43,33 +44,31 @@
         - React采用Create-React-App(webpack&Babel)
         - Vue采用Vue-cli
 
-    - 相同点
+    > 相同点
     1. 都使用了VDOM
     2. 都提供了响应式和组件化的视图组件
     3. 都将注意力集中保持在核心库 其他功能如路由和全局状态管理交给相关库
-    - 不同点
+    4. 都提供合理的钩子函数 可以让开发者定制化处理需求
+    5. 对文件内容都有一些约定 两者都需要编译后使用
+    
+    > 不同点
     1. React中 当某组件的状态发生变化时 它会以该组件为根 重新渲染整个组件子树 Vue中 组件的依赖是在渲染的过程中自动追踪的 所以系统能准确直销那个组件确实需要被重新渲染
     2. Vue的路由库和状态管理库都由官方维护支持且与核心库同步更新
     React选择把这些交给社区维护 因此生态更丰富
     3. Vue-Cli脚手架可配置
 1. Vue事件驱动 响应式原理 双向数据绑定原理
-    - 三者使用同一个底层原理 该底层原理由ES5的Object.definedProperty提供
+    - 三者使用同一个底层原理 该底层原理由ES5的Object.definedProperty((obj,prop,descriptor))提供
     ----------
     > 事件驱动 /数据驱动 (数据改变->视图改变)
     - 当数据发生改变时 视图也会进行更新 数据驱动视图
     -----------
     > 响应式原理 (数据改变->视图改变)
-    - 数据模型仅仅是普通的js对象 修改它们 视图会进行更新
+    - 数据模型仅仅是普通的JS对象 修改它们 视图会进行更新
     - Vue文档中对响应式原理的解释
     - Vue中最独特的特性之一 是其非侵入式的响应式系统 数据模型仅仅是简单的JS对象 当你修改它们时 视图会更新
-    
-    - Vue中实现依赖追踪
-    1. 把一个普通的JS对象传入Vue实例作为data选项 Vue将遍历此对象所有的property 并使用Object.defineProperty 将这些property全部转为getter和setter
-    2. 这些getter setter对用户来说不可见 但在内部它们能让Vue追踪以来 在property被访问和修改时通知变更
-    3. 每个组件都对应一个Watcher实例 它会在组件渲染过程中 把接触过的数据property记录为依赖 之后当依赖项触发时 通知Watcher 使它关联的组件重新渲染
     ----------
-    > 双向数据绑定原理(数据改变->视图改变 视图改变->数据改变)
-    1. 使用v-model指令绑定表单元素时 则可以在视图直接获得数据 当数据发生改变时 数据也会进行更新
+    >  Vue2.x 双向数据绑定原理(数据改变->视图改变 视图改变->数据改变)
+    1. 使用v-model指令绑定表单元素时 可以在视图直接获得数据 当数据发生改变时 数据也会进行更新
     2. 利用数据劫持和事件的发布订阅来实现双向数据绑定
     3. 在Vue data选项中定义数据时 Vue会通过观察者对象Observer的getter和setter设置
     4. 通过v-model指令绑定元素时 自动触发getter getter会返回一个初始值 这样在视图中就能看到数据 
@@ -83,6 +82,9 @@
     >     
     1. 通过getter进行依赖收集 
     2. 每个setter方法就是一个观察者 数据变更时 通知Watcher 从而使它关联的组件重新渲染 通知订阅者更新视图
+    3. Vue会通过观察者对象(Observer)将data选项中的所有key 
+    4. 经过Object.defineProperty的getter和setter设置 通过设置对象属性的setter/getter方法来监听数据 通过getter进行依赖收集
+    5. 每个setter方法就是一个观察者 在数据变更时通知订阅者更新视图
     3. Vue重新生成VDOM 新旧VDOM对比使用DOM-diff算法 DOM-patch算法 把patch对象渲染到视图中
 
     1. 数据=>视图 绑定元素时 触发getter getter返回一个初始值 能在视图中看到数据)
@@ -97,116 +99,7 @@
             setter中触发依赖 数据变更时 通知Watcher 从而使它关联的组件重新渲染
         3. 数据变化时 自动通知需要更新的视图 并进行更新--发布订阅模式subscribe&publish
     )
-        1. data中数据 
-        (通过getter进行依赖收集 
-        每个setter方法就是一个观察者 
-        数据变更时 通知订阅者Watcher更新视图)
-        Vue会通过观察者对象(Observer)
-        将data选项中的所有key
-        经过Object.defineProperty的getter和setter设置
-        通过设置对象属性的setter/getter方法来监听数据
-        通过getter进行依赖收集
-        而每个setter方法就是一个观察者
-        在数据变更时通知订阅者更新视图
-    
-        2.v-model指令
-        (数据=>视图 绑定元素时 触发getter getter返回一个初始值 能在视图中看到数据)
-        (视图=>数据 视图中内容改变时 触发setter(观察者)通知Vue视图已更新
-                    Vue重新生成虚拟DOM/VDOM 通过新旧DO对比生成patch对象
-                    将patch对象渲染到视图中 )
-        (绑定元素时 自动触发getter/视图中内容改变时 自动触发setter)
-        1.绑定元素时 
-            自动触发getter 
-            getter会返回一个初始值 能在视图中看到数据
-        2.视图中内容改变时 
-            触发setter 
-            setter会通知Vue视图已经进行了更新 
-            Vue会重新生成虚拟DOM 
-            通过新旧虚拟DOM对比生成patch对象 
-            将patch对象渲染到视图中
 
-    - 具体实现:(Compiler<->Watcher<->Observer)
-        1. 实现一个Compiler(解析指令/初始化视图/订阅数据变更/绑定更新函数) 订阅者
-            对指令进行解析 初始化视图 订阅数据变更 绑定更新函数
-        2. 实现一个Observer(对数据进行劫持 通知数据变化) 观察者
-            对数据进行劫持 通知数据的变化
-        3. 实现一个Watcher(以上两者的一个中介点 接收数据变更同时 让Dep添加当前watcher 并即时通知视图进行update)
-            将其作为以上两者的一个中介点
-            在接受数据变更的同时 让Dep添加当前Watcher
-            并及时通知视图进行update
-        4. 实现MVVM 整合以上三者 作为一个入口函数
-    模板编译Compiler 
-    数据劫持Observer
-    观察者Watcher
-        创建Watcher观察者
-        新/旧数值进行对比 DOM diff 如发生变化 
-        调用更新方法 DOM patch 进行视图更新
-        一个数据变化 模板中使用这个数据的值都发生了变化
-
-        2.Vue中的双向绑定(数据<=>视图)
-        1.Vue2.x
-            (原理:通过Object对象的defineProperty属性 重写data的set和
-            get函数实现)
-            (原理 数据劫持+发布者-订阅者模式 
-            Object.defineProperty()劫持各个属性setter getter
-            数据变动时发布消息给订阅者 
-            触发相应监听回调
-            )
-            步骤：
-                1.实现一个监听器Observer:
-                    对数据对象进行遍历，包括子属性对象的属性，利用 Object.defineProperty() 对属性都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。
-                2.实现一个解析器Compile
-                    解析 Vue 模板指令，将模板中的变量都替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加监听数据的订阅者，一旦数据有变动，收到通知，调用更新函数进行数据更新。
-                3.实现一个订阅者Watcher
-                    Watcher 订阅者是 Observer 和 Compile 之间通信的桥梁 ，主要的任务是订阅 Observer 中的属性值变化的消息，当收到属性值变化的消息时，触发解析器 Compile 中对应的更新函数。
-                4.实现一个订阅器Dep
-                    订阅器采用 发布-订阅 设计模式，用来收集订阅者 Watcher，对监听器 Observer 和 订阅者 Watcher 进行统一管理。
-            对IE的兼容
-                不支持ie8及以下，部分兼容ie9 ，完全兼容10以上，
-                因为vue的响应式原理是基于es5的Object.defineProperty()
-                而这个方法不支持ie8及以下。
-        2.Vue3.x
-        (Proxy)
-        3.实现对象和数组的监听( JavaScript 的限制，Vue 不能检测数组和对象的变化)
-            JavaScript 的限制：
-                bject.defineProperty() 
-                只能对属性进行数据劫持，不能对整个对象进行劫持，同理无法对数组进行劫持
-                Vue 能检测到对象和数组（部分方法的操作）的变化
-                对象和数组的监听：
-                    通过遍历数组 和递归遍历对象
-                    达到利用 Object.defineProperty() 也能对对象和数组（部分方法的操作）进行监听。
-            对象：
-                1.Vue.set(object, propertyName, value)
-                参数1： 要修改的对象
-                参数2： 属性
-                参数3： 属性的值是啥
-                返回值：已经修改好的值
-                Vue.set(vm.someObject, 'b', 2)
-                2.vm.$set
-                    this.$set(this.someObject,'b',2)
-                    vm.$set实现原理:
-                        1.如果目标是数组，直接使用数组的 splice 方法触发相应式；  
-                        2.如果目标是对象，会先判读属性是否存在、对象是否是响应式.
-                        最终如果要对属性进行响应式处理，则是通过调用   defineReactive 方法进行响应式处理（ defineReactive 方法就是  Vue 在初始化对象时，给对象属性采用 Object.defineProperty 动态添加 getter 和 setter 的功能所调用的方法）
-                3.replace方法
-                4.多个新 property
-                    原对象与要混合进去的对象的 property 一起创建一个新的对象
-                    this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
-                    代替 `Object.assign(this.someObject, { a: 1, b: 2 })`
-            数组：
-                    Vue 不能检测以下数组的变动：
-                    1.当你利用索引直接设置一个数组项时，例如：vm.items[indexOfItem] = newValue
-                    2.当你修改数组的长度时，例如：vm.items.length = newLength
-                第一类问题解决方法：
-                    1.Vue.set
-                    Vue.set(vm.items, indexOfItem, newValue)
-                    vm.$set(vm.items, indexOfItem, newValue)
-
-                    2.Array.prototype.splice
-                    vm.items.splice(indexOfItem, 1, newValue)
-                第二类问题解决方法：
-                    1.splice   
-                    vm.items.splice(newLength)
     --------------
     > Dep 订阅收集者和发布者 框架需要处理变量和更新DOM的Watcher的依赖关系
     - (依赖收集 核心思想 事件发布订阅模式)
@@ -238,7 +131,51 @@
     - 当属性发生变化后 我们要通知用到数据的地方 而使用到这个数据的地方有很多 而且类型还不一样 既有可能是模板 也有可能是用户写好的一个watch 此时需要抽象出一个能集中处理这些情况的类
     - 在依赖收集阶段只收集 这个封装好的类的实例进来 通知也只通知它一个 再由它负责通知其他地方
     -------------------
-2. object.defineProperty(obj,prop,descriptor)&proxy
+    
+    > v-model指令
+    1. (数据=>视图 绑定元素时 触发getter getter返回一个初始值 能在视图中看到数据)
+    2. (视图=>数据 视图中内容改变时 触发setter(观察者)通知Vue视图已更新 Vue重新生成虚拟DOM/VDOM 通过新旧DO对比生成patch对象 将patch对象渲染到视图中 )
+    - 绑定元素时 自动触发getter/视图中内容改变时 自动触发setter
+    1. 绑定元素时 自动触发getter getter会返回一个初始值 能在视图中看到数据
+    2. 视图中内容改变时 触发setter setter会通知Vue视图已经进行了更新 Vue会重新生成虚拟DOM 通过新旧虚拟DOM对比生成patch对象 将patch对象渲染到视图中
+
+    - 具体实现:(Compiler<->Watcher<->Observer)
+        1. 实现一个Compiler(解析指令/初始化视图/订阅数据变更/绑定更新函数) 订阅者
+            对指令进行解析 初始化视图 订阅数据变更 绑定更新函数
+        2. 实现一个Observer(对数据进行劫持 通知数据变化) 观察者
+            对数据进行劫持 通知数据的变化
+        3. 实现一个Watcher(以上两者的一个中介点 接收数据变更同时 让Dep添加当前watcher 并即时通知视图进行update)
+            将其作为以上两者的一个中介点
+            在接受数据变更的同时 
+            并及时通知视图进行update
+        4. 实现MVVM 整合以上三者 作为一个入口函数
+
+    > 暂时用这个
+    - View变化更新Data可以通过事件监听方式实现
+    - Vue双向数据绑定的工作主要是如何根据data变化更新view
+    > Vue2.x
+    - 原理 数据劫持+发布订阅模式 Object.defineProperty()劫持各个属性setter getter/重写data的set和get函数实现 数据变动时发布消息给订阅者 触发相应监听回调
+    
+    > 简述
+    1. 把一个普通的JS对象传入Vue实例作为data选项 Vue将遍历此对象所有的property 并使用Object.defineProperty 将这些property全部转为getter和setter
+    2. 这些getter setter对用户来说不可见 但在内部它们能让Vue追踪以来 在property被访问和修改时通知变更
+    3. 每个组件都对应一个Watcher实例 它会在组件渲染过程中 把接触过的数据property记录为依赖 之后当依赖项触发时 通知Watcher 使它关联的组件重新渲染
+    
+    > 步骤：
+    1. 实现一个监听器Observer:
+        - 对数据对象进行遍历，包括子属性对象的属性，利用 Object.defineProperty() 对属性都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。
+    2. 实现一个解析器Compile
+        - 解析 Vue 模板指令，将模板中的变量都替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加监听数据的订阅者，一旦数据有变动，收到通知，调用更新函数进行数据更新。
+    3. 实现一个订阅者Watcher
+        - Watcher 订阅者是 Observer 和 Compile 之间通信的桥梁 ，主要的任务是订阅 Observer 中的属性值变化的消息，当收到属性值变化的消息时，触发解析器 Compile 中对应的更新函数。
+    4. 实现一个订阅器Dep
+        订阅器采用 发布-订阅 设计模式，用来收集订阅者 Watcher，对监听器 Observer 和 订阅者 Watcher 进行统一管理。
+    > 对IE的兼容
+    - 不支持IE8及以下，部分兼容IE9 ，完全兼容10以上，vue的响应式原理基于es5的Object.defineProperty() 这个方法不支持ie8及以下
+    
+    > Vue 2.x 
+    - 使用Object.defineProperty() 把内部解耦为Observer Dep 使用Watcher相连
+2. object.defineProperty(obj,prop,descriptor) & proxy
     > Object.defineProperty(obj,prop,descriptor)方法
     - 参数:(三个参数都是必填)
         - obj:要定义属性的对象
@@ -257,30 +194,30 @@
         - 具有值的属性 该值可以是可写的 也可以是不可写的
     2. 存取描述符(由getter/setter函数所描述的属性)
         - 由getter函数和setter函数所描述的属性
-    3. 两种描述符都是对象 它们共享以下可选键值
+    - 两种描述符都是对象 它们共享以下可选键值
         - (默认值是指在使用object.defineProperty()定义属性时的默认值)
         1. 共享可选键值：
-            - configurable:
+            1. configurable:
                 - (不设置默认为false 第一次设置false后 第二次不可设置 会报错)
                 - (表示对象的属性是否可以被删除 除了value writable特性之外的其他特性是否可以被修改)
                 - (在非严格模式下，属性配置configurable:false后进行删除操作会发现属性仍然存在严格模式下会抛出错误：)
                 - 当且仅当该属性的 configurable 键值为 true 时，该属性的描述符才能够被改变，同时该属性也能从对应的对象上被删除。
-            - enumerable:(默认为false)
+            2. enumerable:(默认为false)
                 - (定义对象的属性是否可以在for..in和Object.keys()中被枚举)
                 - 当且仅当该属性的 enumerable 键值为 true 时，该属性才会出现在对象的枚举属性中。
         2. 数据描述符 可选键值value/writable
-            - value:(默认undefined)
+            1. value:(默认undefined)
                 该属性对应的值。可以是任何有效的 JavaScript 值（数值，对象，函数等）。
-            - writable:(默认为false时为只读)
+            2. writable:(默认为false时为只读)
                 (在非严格模式下给name属性再次赋值会静默失败，不会抛出错误；而在严格模式下会抛出异常：)
                 当且仅当该属性的 writable 键值为 true 时，属性的值，也就是上面的 value，才能被赋值运算符改变。
         3. 存取描述符 可选键值get/set
             - (get和set函数不是必须成对出现，可以只出现一个；两个函数如果不设置，则默认值为undefined。)
             - (属性b赋值或取值时会分别触发set和get对应函数)
-            - get(属性的getter函数 如果没有getter 默认undefined)
+            1. get(属性的getter函数 如果没有getter 默认undefined)
                 - 一旦目标属性被访问就会返回此方法 并将此方法的运算结果返回用户
                 当访问该属性时，会调用此函数。执行时不传入任何参数，但是会传入 this 对象（由于继承关系，这里的this并不一定是定义该属性的对象）。该函数的返回值会被用作属性的值。
-            - set(属性的setter函数 如果没有setter默认undefined)
+            2. set(属性的setter函数 如果没有setter默认undefined)
                 - 一旦目标属性被赋值 就会调回此方法
                 当属性值被修改时，会调用此函数。该方法接受一个参数（也就是被赋予的新值），会传入赋值时的 this 对象。 
         4. 描述符默认值汇总
@@ -297,70 +234,11 @@
     1. Proxy(代理器 目标对象之前架设一层拦截 外界对该对象的访问 都必须先通过这层拦截)
         - (原意代理 此处表示由它代理某些操作 可译为代理器)
         - 在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。        
-    2. Object.defineProperty
-        - (使用数据劫持 直接在一个对象上定义一个新属性或修改一个对象的现有属性 并返回此对象)
-        - 在访问或修改对象的某个属性时 通过一段代码拦截这个行为 进行额外的操作或修改返回结果 
-        - 数据劫持最典型的应用 双向的数据绑定 
-    3. 比较
-        - Proxy优点:(可以直接监听对象而非属性/可以直接监听数组的变化/
-        - Proxy有多达13种拦截方法/存在兼容性问题 所以在Vue3.x中才重写)
-            1. Proxy 可以直接监听对象而非属性；
-            2. Proxy 可以直接监听数组的变化；
-            3. Proxy 有多达 13 种拦截方法,不限于 apply、ownKeys、deleteProperty、has 等等是 Object.defineProperty 不具备的；
-            4. Proxy 返回的是一个新对象,我们可以只操作新的对象达到目的,而 Object.defineProperty 只能遍历对象属性直接修改；
-            5. Proxy 作为新标准将受到浏览器厂商重点持续的性能优化，也就是传说中的新标准的性能红利；
-        - Object.defineProperty优点：
-            - 兼容性好，支持 IE9，而 Proxy 的存在浏览器兼容性问题,而且无法用 polyfill 磨平
-            - 因此 Vue 的作者才声明需要等到下个大版本( 3.0 )才能用 Proxy 重写。
-        1. 数据劫持 ES5 Object.defineProperties()
-        1. push()、pop()、shift()删除、unshift()添加、splice()、sort()、reverse()这些方法会改变被操作的数组；
-        2. filter()、concat()、slice()这些方法不会改变被操作的数组，返回一个新的数组；
-    - 无法监听
-    (对象属性添加删除 Vue.set解决/混合原有对象创建新对象)
-    (数组 索引设置/修改长度)
-    1. 对象属性的添加删除
-    - 解决方法
-        - 单个property
-        1. Vue.set(object,propertyName,value)
-        2. vm.$set(object,propertyName,value)
-        - 多个property
-        1. 用原对象与要混合进去的对象的property一起创建一个新的对象
-    2. 数组的变化
-        1. 利用索引直接设置一个数组项时 
-            - 如vm.items[indexOfItem]=newValue)
-            - 解决:
-                1. Vue.set(vm.items,indexOfItem,newValue)
-                2. vm.items.splice(indexOfItem,1,newValue)
-        2. 修改数组的长度时
-            如vm.items.length = newLength
-            - 解决:
-                1.vm.items.splice(newLength);     
-    2. 数据代理 ES6 Proxy
-        1. 针对整个对象代理
-        2. 不同于Object.defineProperty必须遍历对象每个属性
-        3. 只需做一层代理 可监听同级结构下所有属性变化
-        4. 深层结构 递归还是要进行的
-        5. 支持代理数组变化/)
-    > Vue2.0&Vue3.0
-    1. Vue 2.x 
-        - 使用Object.defineProperty() 把内部解耦为Observer Dep 使用Watcher相连
-            - 缺点:
-                (能劫持对象的属性但需对对象每一个属性进行遍历劫持 对象上新增属性 需对新增的属性再次劫持 如果属性是对象 还需深度遍历 Vue给对象新增属性 用$set 原理通过Object.defineProperty对新增属性再次劫持)
-            1. 只能监听对象 无法检测到对象属性的添加和删除 不能监听数组的变化 无法触发push pop shift unshift splice sort reverse 需要进行数组方法的重写 无法检测数组的长度修改
-            2. 必须遍历对象的每个属性
-            3. 只能劫持当前对象属性 如果想深度劫持 必须深层遍历嵌套的对象
-    2. Vue 3.x
-        - 使用Proxy进行实现
-            1. 可以直接监听对象而非属性
-            2. 可以直接监听数组的变化
-            - Proxy:
-                - (相较于Object.defineProperty劫持某个属性，Proxy则更彻底，不再局限某个属性，而是直接对整个对象进行代理)
-                - (在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写)
-            - 语法：
-                1. var proxy = new Proxy(target, handler);
-                2. Proxy本身是一个构造函数，通过new Proxy生成拦截的实例对象，让外界进行访问；构造函数中的target就是我们需要代理的目标对象，可以是对象或者数组；handler和Object.defineProperty中的descriptor描述符有些类似，也是一个对象，用来定制代理规则。
-                3. Proxy可以直接代理target整个对象并返回一个新对象 通过监听代理对象上属性的变化来获取目标对象属性的变化
-                4. Proxy不仅能够监听到属性的增加 还能监听属性的删除 比Object.defineProperty的功能更为强大。
+        > 语法
+        1. var proxy = new Proxy(target, handler);
+        2. Proxy本身是一个构造函数，通过new Proxy生成拦截的实例对象，让外界进行访问；构造函数中的target就是我们需要代理的目标对象，可以是对象或者数组；handler和Object.defineProperty中的descriptor描述符有些类似，也是一个对象，用来定制代理规则。
+        3. Proxy可以直接代理target整个对象并返回一个新对象 通过监听代理对象上属性的变化来获取目标对象属性的变化
+        4. Proxy不仅能够监听到属性的增加 还能监听属性的删除 比Object.defineProperty的功能更为强大。
         - Vue3新特性：(目标让 Vue 核心变得更小、更快、更强大)
             1. 监测机制的改变
             2. 模板
@@ -372,6 +250,85 @@
             2. 修改某些Object方法的返回结果，让其变得更合理。
             3. 让Object操作都变成函数行为。某些Object操作是命令式，比如name in obj和delete obj[name]，而Reflect.has(obj, name)和Reflect.deleteProperty(obj, name)让它们变成了函数行为。
             4. Reflect对象的方法与Proxy对象的方法一一对应，只要是Proxy对象的方法，就能在Reflect对象上找到对应的方法。这就让Proxy对象可以方便地调用对应的Reflect方法，完成默认行为，作为修改行为的基础。也就是说，不管Proxy怎么修改默认行为，你总可以在Reflect上获取默认行为。
+        > Proxy只会代理对象的第一层 Vue3.0如何处理该问题
+        1. 判断当前Refect.get的返回值是否为Object 如果是则再通过reactive方法做代理 实现深度观测
+        > 监测数组时可能会触发多次get/set 如何防止触发多次
+        1. 判断key是否为当前被代理对象target自身属性 也可以判断旧值和新值是否相等 只有满足以上两个条件之一时 才有可能执行trigger
+    2. Object.defineProperty
+        - (使用数据劫持 直接在一个对象上定义一个新属性或修改一个对象的现有属性 并返回此对象)
+        - 在访问或修改对象的某个属性时 通过一段代码拦截这个行为 进行额外的操作或修改返回结果 
+        - 数据劫持最典型的应用 双向的数据绑定 
+    3. 比较
+        > Proxy
+        > 优点:(可以直接监听对象而非属性/可以直接监听数组的变化/
+        1. 针对整个对象代理 不同于Object.defineProperty必须遍历对象每个属性 支持代理数组变化
+        2. 只需做一层代理 可监听同级结构下所有属性变化
+        3. 深层结构 递归还是要进行的
+        4. Proxy 有多达 13 种拦截方法,不限于 apply、ownKeys、deleteProperty、has 等等是 Object.defineProperty 不具备的；
+        5. Proxy 返回的是一个新对象,我们可以只操作新的对象达到目的,而 Object.defineProperty 只能遍历对象属性直接修改；
+        6. Proxy 作为新标准将受到浏览器厂商重点持续的性能优化，也就是传说中的新标准的性能红利；
+        > 缺点
+        1. 存在兼容性问题 所以在Vue3.x中才重写
+
+        > Object.defineProperty
+        > 优点：
+        1. 兼容性好，支持 IE9，而 Proxy 的存在浏览器兼容性问题,而且无法用 polyfill 磨平 因此 Vue 的作者才声明需要等到下个大版本( 3.0 )才能用 Proxy 重写。
+        > 缺点
+        1. 能劫持对象的属性但需对对象每一个属性进行遍历劫持 对象上新增属性 需对新增的属性再次劫持 如果属性是对象 还需深度遍历 Vue给对象新增属性 用$set 原理通过Object.defineProperty对新增属性再次劫持)
+        2. 只能监听对象 无法检测到对象属性的添加和删除 不能监听数组的变化 无法触发push pop shift unshift splice sort reverse 需要进行数组方法的重写 无法检测数组的长度修改
+        2. 必须遍历对象的每个属性
+        3. 只能劫持当前对象属性 如果想深度劫持 必须深层遍历嵌套的对象
+
+        1. 数据劫持 ES5 Object.defineProperties()
+        1. push()、pop()、shift()删除、unshift()添加、splice()、sort()、reverse()这些方法会改变被操作的数组；
+        2. filter()、concat()、slice()这些方法不会改变被操作的数组，返回一个新的数组；
+        
+        > 解决
+        > Vue2.x实现对象和数组的监听( JavaScript 的限制，Vue 不能检测数组和对象的变化)
+        - JavaScript 的限制：
+            - object.defineProperty() 只能对属性进行数据劫持，不能对整个对象进行劫持，同理无法对数组进行劫持
+        - Vue 检测对象和数组（部分方法的操作）变化
+            1. 对象和数组的监听：
+                - 通过遍历数组 和递归遍历对象 达到利用 Object.defineProperty() 也能对对象和数组（部分方法的操作）进行监听。
+            2. 对象：
+                > 不能检测
+                1. 对象属性添加删除
+                
+                > 解决方法
+                - 单个property
+                1. Vue.set(object,propertyName,value)
+                    - 参数1： 要修改的对象
+                    - 参数2： 属性
+                    - 参数3： 属性的值是啥
+                    - 返回值：已经修改好的值
+                    - Vue.set(vm.someObject, 'b', 2)
+                2. vm.$set(object,propertyName,value)
+                - 多个property
+                1. 用原对象与要混合进去的对象的property一起创建一个新的对象
+                ```
+                this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
+                代替 `Object.assign(this.someObject, { a: 1, b: 2 })`
+                ```
+
+                > vm.$set实现原理:
+                1. 如果目标是数组，直接使用数组的 splice 方法触发响应式  
+                2. 如果目标是对象，会先判读属性是否存在、对象是否是响应式.
+            3. 数组：
+                > 不能检测
+                1. 利用索引直接设置一个数组项时，例如：vm.items[indexOfItem] = newValue
+                2. 修改数组的长度时，例如：vm.items.length = newLength
+                > 解决方法
+                1. 第一类问题解决方法：
+                    1. Vue.set
+                    - Vue.set(vm.items, indexOfItem, newValue)
+                    - vm.$set(vm.items, indexOfItem, newValue)
+                    2. Array.prototype.splice
+                    - vm.items.splice(indexOfItem, 1, newValue)
+                2. 第二类问题解决方法：
+                    1. splice   
+                    - vm.items.splice(newLength)
+
+                        1. 对象属性的添加删除        
 3. Vue渐进式框架
     - Vue核心功能是一个视图模版引擎
     > 渐进式:Vue.js是一套用于构建用户界面的渐进式框架
@@ -386,6 +343,7 @@
     1. 组件系统
     2. 数据驱动/双向数据绑定
 4. Vue组件通信
+    > 需求(组件实例间作用域相互独立/不同组件之间数据无法相互引用)
     > 组件关系
     1. 父子组件之间通信
     2. 非父子组件之间通信(兄弟组件 隔代关系组件)
@@ -401,7 +359,7 @@
         > PS:节制地使用$parent和$children 它们的目的主要是作为访问组件的应急方法 更推荐用props和events实现父子组件通信
     3. provide/inject
         - provide/inject是Vue2.2.0新增的API
-        - 父组件通过provide提供变量 子组件中通过inject注入便利
+        - 父组件通过provide提供变量 子组件中通过inject注入变量
         > PS: 不论子组件嵌套有多深 只要调用了inject 就可以注入provide中的数据 而不局限于只能从当前父组件的props属性中获取数据
     4. ref/refs
         > ref
@@ -512,57 +470,33 @@
         - Vue2.4中 为了解决组件隔代通信的需求 引入了$attrs和$listeners 新增了inheritAttrs
         - 版本2.4之前 默认情况下 父作用域中不作为prop被识别(且获取)地特性绑定(class和style除外) 将会回退且作为普通的HTML特性应用在子组件的根元素上
 
-    > 需求(组件实例间作用域相互独立/不同组件之间数据无法相互引用)
-    - 组件间几种关系 父子/隔代/兄弟        
-    - 组件通信几种实现方式
-        1. props/$emit  父子组件通信 二个参数 做对象使用
-        2. ref $parent/$children 父子组件通信
-            - ref：如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向组件实例
-            - $parent / $children：访问父 / 子实例
-         3. $attrs/$listeners 隔代组件通信
-            - $attrs
-            - 包含了父作用域中不被 prop 所识别 (且获取) 的特性绑定 ( class 和 style 除外 )
-                - 当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 ( class 和 style 除外 ) 并且可以通过 v-bind="$attrs" 传入内部组件。通常配合 inheritAttrs 选项一起使用
-            - $listeners
-                包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on="$listeners" 传入内部组件
-         4. provide/inject(成对出现) 隔代组件通信 
-            - 作用：
-                父组件向子孙组件传递数据
-            - 使用方法：
-                provide在父组件中返回要传给下级的数据
-                inject在需要使用这个数据的子辈组件或孙辈等下级组件中注入数据
-            - 使用场景：      
-                由于Vue有$parent属性可以让子组件访问父组件
-                但孙组件想要访问祖先组件就比较困难
-                通过provide/inject可以轻松实现跨级访问父组件数据
-            - 另外一种理解：
-                provide/inject 
-                    简单来说就是在父组件中通过provide来提供变量
-                    然后在子组件中通过inject来注入变量
-                PS：这里不论子组件有多深 只要调用inject则可以注入provider中的数据 而不是局限于只能从当前父组件的prop属性来获取数据
-                只要在父组件中调用了 在这个父组件生效的生命周期内 所有子组件都可以调用inject来注入父组件的值
-         5. EventBus($emit/$on) 父子/兄弟/隔代组件通信   
-                通过一个空的 Vue 实例作为中央事件总线（事件中心）
-                用它来触发事件和监听事件，从而实现任何组件间的通信，包括父子、隔代、兄弟组件。      
-         6. Vuex 父子/兄弟/隔代转组件通信
-                一个专为 Vue.js 应用程序开发的状态管理模式。
-                每一个 Vuex 应用的核心就是 store（仓库）
-                “store” 基本上就是一个容器，它包含着你的应用中大部分的状态 ( state 
-                1.Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
-                2.改变 store 中的状态的唯一途径就是显式地提交  (commit) mutation。这样使得我们可以方便地跟踪每一个状态的变化。
-        )
+    > Vue中父子组件双向绑定的方法
+    1. 通过在父组件上自定义一个监听事件
+    ```
+    <myComponent @diy="handleDiy"></myComponent>
+    ```
+    - 在子组件用this.$emit('diy',data)来出发这个diy事件
+    - 其中data为子组件向父组件通信的数据 
+    - 在父组件中监听diy事件时 可以通过$event访问data这个值
+    2. 通过在父组件上用修饰符.sync绑定一个数据
+    ```
+    <myComponent :show.sync="show"></myComponent>
+    ```
+    - 在子组件通过this.$emit('update:show',data)改变父组件中show的值
+    3. 通过v-model
 5. Vue render函数(用来生成VDOM)
     Vue渲染/render函数用来生成VDOM/虚拟DOM
     1. Vue更新渲染render整体流程
-        Compiler整个过程
-        (模板编译生成AST/
-        AST生成Vue的render渲染函数/
-        render渲染函数结合数据生成VDOM树/
-        diff和patch后生成新的UI界面 真实DOM渲染)
+        1. 模板编译生成AST/
+        2. AST生成Vue的render渲染函数/
+        3. render渲染函数结合数据生成VDOM树/
+        4. diff和patch后生成新的UI界面 真实DOM渲染)
+        
         1. 模板通过编译Compiler生成AST(Abstract Synax Tree)抽象语法树
         2. AST生成Vue的render渲染函数
         3. render渲染函数结合数据生成VNODE(Virtual DOM Node)树
         4. diff和patch后生成新的UI界面(真实DOM渲染)
+
         - 概念解释：
 
         > 模板：
@@ -574,18 +508,16 @@
         > render渲染函数
         - (Vue推荐使用模板创建HTML构建应用程序 底层实现中Vue最终还是会将模板编译成render渲染函数 若想得到更好的控制 一些场景中 真正需要JS的完全编程能力 可以直接写渲染函数 它比模板更接近编译器) 用来生成VDOM 
         
-        - Watcher：
-            (每一个Vue组件都有一个对应的watcher 
-            它会在组件render时收集组件所依赖的数据
-            并在依赖更新时触发组件重新渲染 
-            Vue会自动优化并更新需要更新的DOM)
-        - render函数可以作为一条分割线
-            (将Vue模板编译成AST生成render函数/
-            数据结合render函数生成VDOM树 diff和patch映射到真正的DOM树)
-            (render函数左边/编译期/将Vue模板转换成渲染函数)
-            (render函数右边/运行时/将渲染函数生成的VDOM树 进行diff和patch)
-            1.render函数左边可以称为编译期 将Vue模板转换成渲染函数
-            2.render函数右边可以称为运行时 将渲染函数生成的VDOM树 进行diff和patch
+        > Watcher：
+        - (每一个Vue组件都有一个对应的watcher 
+        - 它会在 组件render时 收集组件所依赖的数据 并在 依赖更新时 触发组件重新渲染 
+        - Vue会自动优化并更新需要更新的DOM)
+        
+        > render函数可以作为一条分割线
+        - (将Vue模板编译成AST生成render函数/
+        数据结合render函数生成VDOM树 diff和patch映射到真正的DOM树)
+        1. render函数左边可以称为编译期 将Vue模板转换成渲染函数
+        2. render函数右边可以称为运行时 将渲染函数生成的VDOM树 进行diff和patch
     2. 虚拟DOM
         1. Vue编译器在编译模板后 会将这些模板编译成渲染函数render 当渲染函数render被调用时 会返回一个虚拟DOM树
         2. 在Vue底层实现上 Vue将模板编译成虚拟DOM渲染函数 结合Vue自带的响应系统 在相应状态改变时 Vue能智能计算出重新渲染组件的最小代价并映射到DOM操作上
@@ -603,9 +535,9 @@
             - 不包含模板编译器 渲染过程 render函数=>VNODE=>真实DOM
             3. 运行时构建的包 比独立构建少一个模板编译器(因此运行速度上会更快)在$mount函数上也不同 $mount方法是整个渲染过程中的起始点
         - 渲染过程提供三种模板：(这三种模式最终都要得到render函数)
-            1.自定义render函数
-            2.template
-            3.el
+            1. 自定义render函数
+            2. template
+            3. el
         - Vue渲染
             1. new Vue 执行初始化
             2. 挂载$mount 通过自定义render方法template el等生成render渲染函数
@@ -634,25 +566,25 @@
         所有浏览器渲染引擎工作流程大致分为5步
         (DOM树 CSSOM树 Render树 Layout布局 Painting绘制 实际进行时不是独立的会有交叉)
         1. 创建DOM树
-            用HTML分析器分析HTML元素 构建一颗DOM树
+            - 用HTML分析器分析HTML元素 构建一颗DOM树
         2. 创建Style Rules
-            用CSS分析器分析CSS文件和元素上的inline样式 生成页面样式表
+            - 用CSS分析器分析CSS文件和元素上的inline样式 生成页面样式表
         3. 构建Render树
-            将DOM和样式表关联起来 构建一棵Render树 (Attachment)
-            每个DOM节点都有attach方法 接受样式信息 返回一个render对象(又名renderer)这些render对象最终会被构建成以可Render树
+            - 将DOM和样式表关联起来 构建一棵Render树 (Attachment)
+            - 每个DOM节点都有attach方法 接受样式信息 返回一个render对象(又名renderer)这些render对象最终会被构建成以可Render树
         4. 布局Layout
-            确定节点坐标 根据Render树结构 为每个Render树上的节点确定一个在显示屏上出现的精确坐标
+            - 确定节点坐标 根据Render树结构 为每个Render树上的节点确定一个在显示屏上出现的精确坐标
         5. 绘制Painting
-            根据Render树和节点显示坐标 然后调用每个节点的paint方法 将它们绘制出来
+            - 根据Render树和节点显示坐标 然后调用每个节点的paint方法 将它们绘制出来
         > 注意：
         1. DOM 树的构建不是文档加载完成开始的
-            构建 DOM 树是一个渐进过程，为达到更好的用户体验，渲染引擎会尽快将内容显示在屏幕上，它不必等到整个 HTML 文档解析完成之后才开始构建 render 树和布局。
+            - 构建 DOM 树是一个渐进过程，为达到更好的用户体验，渲染引擎会尽快将内容显示在屏幕上，它不必等到整个 HTML 文档解析完成之后才开始构建 render 树和布局。
         2. Render树/DOM树/CSS样式表 实际进行时不是完全独立的 会有交叉
-            实际进行的时候并不是完全独立的，而是会有交叉，会一边加载，一边解析，以及一边渲染。
+            - 实际进行的时候并不是完全独立的，而是会有交叉，会一边加载，一边解析，以及一边渲染。
         3. CSS的解析注意点
-            CSS的解析式从右向左逆向解析的 嵌套标签越多 解析越慢
+            - CSS的解析式从右向左逆向解析的 嵌套标签越多 解析越慢
         4. JS操作真实DOM代价
-            用我们传统的开发模式，原生 JS 或 JQ 操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程。
+            - 用我们传统的开发模式，原生 JS 或 JQ 操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程。
             在一次操作中，我需要更新 10 个 DOM 节点，浏览器收到第一个 DOM 请求后并不知道还有 9 次更新操作，因此会马上执行流程，最终执行10 次。例如，第一次计算完，紧接着下一个 DOM 更新请求，这个节点的坐标值就变了，前一次计算为无用功。
             计算 DOM 节点坐标值等都是白白浪费的性能。即使计算机硬件一直在迭代更新，操作 DOM 的代价仍旧是昂贵的，频繁操作还是会出现页面卡顿，影响用户体验
     2. 虚拟DOM(Virtual-DOM)--使用JS对象模拟
@@ -662,27 +594,27 @@
             1. JS对象来表示DOM节点 使用对象的属性记录节点的类型/属性/子节点
             2. 渲染用JS表示的DOM对象
             3. 比较两棵虚拟DOM树的差异-diff算法
-                diff算法：
-                    比较两棵VDOM树的差异 
-                    1.如需完全比较 O(n^3)
-                    2.由于前端很少会跨级移动DOM元素 
-                    VDOM只会对同一个层级的元素进行比较
-                    O(n)
+                - diff算法：
+                - 比较两棵VDOM树的差异 
+                1. 如需完全比较 O(n^3)
+                2. 由于前端很少会跨级移动DOM元素 
+                - VDOM只会对同一个层级的元素进行比较
+                O(n)
             4. diff算法具体实现
                 1. 深度优先遍历 记录差异
                     每个节点有一个唯一的标记 每遍历到一个节点 把该节点和新的树进行对比 如果有差异就记录到一个对象中
                 2. 差异类型(元素节点1/属性节点2/文本节点3)
-                    1.节点替换 如将div换成h1
-                    2.顺序互换 移动/删除/新增子节点
-                    3.属性更改
-                    4.文本改变
-                3.列表对比算法
-                4.实例输出
+                    1. 节点替换 如将div换成h1
+                    2. 顺序互换 移动/删除/新增子节点
+                    3. 属性更改
+                    4. 文本改变
+                3. 列表对比算法
+                4. 实例输出
              5. 将两个虚拟DOM对象的差异应用到真正的DOM树(patch.js)
-                1.深度优先遍历DOM树
-                2.对原有DOM树进行DOM操作     
-                    根据不同类型数据 对当前节点进行不同的DOM操作
-                3.DOM结构改变  
+                1. 深度优先遍历DOM树
+                2. 对原有DOM树进行DOM操作     
+                    - 根据不同类型数据 对当前节点进行不同的DOM操作
+                3. DOM结构改变  
     3. 总结VDOM算法主要实现三步骤
         1. 用JS对象模拟DOM树(VNode定义)
         2. 比较两棵虚拟DOM树的差异 diff.js
@@ -695,8 +627,7 @@
     - 虚拟DOM/VDOM：
         1. 用JS去按照DOM结构来实现树状结构对象/可叫DOM对象
         2. 是仅存在内存中的DOM 因还未展示到页面中 所以称作VDOM
-        3. Virtual DOM其实就是一棵以JavaScript对象(VNode节点)为基础的树 
-            用对象属性来描述节点 实际上它只是对一层真实DOM的抽象 最终可以通过一系列操作使这棵树映射到真实环境上。
+        3. Virtual DOM其实就是一棵以JavaScript对象(VNode节点)为基础的树 用对象属性来描述节点 实际上它只是对一层真实DOM的抽象 最终可以通过一系列操作使这棵树映射到真实环境上。
         4. JS中虚拟DOM表现为一个Object对象 并且最少包含标签名(tag)属性(attrs)和子元素对象(children)三个属性 不同框架对这三个属性的命名可能会有差异
         5. Virtual DOM 对象的节点跟 DOM Tree 每个位置的属性一一对应的，因为人们创造出虚拟 DOM 就是为了更好地将虚拟节点渲染到视图上，也就是把虚拟DOM变成真实的 DOM 节点，提高视图的渲染性能。
     > 优点：
@@ -775,33 +706,16 @@
 
     Vue 在内部尝试对异步队列使用原生的 Promise.then 和MessageChannel，
     如果执行环境不支持，会采用 setTimeout(fn, 0)代替。
-    为了在数据变化之后等待 Vue 完成更新 DOM ，
-    可以在数据变化之后立即使用Vue.nextTick(callback) 。
-    这样回调函数在 DOM 更新完成后就会调用。
+
+    - 为了在数据变化之后等待 Vue 完成更新 DOM 可以在数据变化之后立即使用Vue.nextTick(callback) 这样回调函数在 DOM 更新完成后就会调用。
 
     > Vue中nextTick机制
+    - (Vue中nextTick的实现有用到MutationObserver微任务API)
     - (下次DOM更新循环结束后执行延迟回调 修改数据后立即使用这个方法 可在回调中获取更新后的DOM)
     - (Vue中Created钩子函数执行时 DOM其实未进行任何渲染 所以需要放在nextTick中去获取DOM 与其对应的生命周期钩子函数是mounted)
     - (DOM更新完想做点什么 nextTick回调函数中)
     - (Vue生命周期created钩子函数中进行的DOM操作 一定要放在Vue.$nextTick回调函数中)
     - (修改数据之后立即使用这个方法 获取更新后的DOM)
-
-    > Vue中for渲染DOM 
-    就算是中mounted调用nextTick也不能获取到具体的DOM
-    Vue整个nextTick作用
-    主线程更新前-->遇到宏任务/微任务-->放入栈-->主线程执行完成-->更新完成-->执行栈-->获取更新后的DOM
-    (用于延迟执行一段代码
-    接受2个参数（回调函数和执行回调函数的上下文环境）
-    没有提供回调函数 则返回promise对象。
-    )
-    (
-    callbacks 用来存储所有需要执行的回调函数
-    pending 用来标志是否正在执行回调函数
-    timerFunc 用来触发执行回调函数
-    )
-    vm.$nextTick(() =>{this.handleadd()}),
-    将handleadd回调延迟到下次 DOM 更新循环之后执行。
-    (Vue.nextTick：在DOM更新后做点什么 参数回调函数 DOM更新完调用)
     
     > 应用场景:(什么时候需要使用Vue.nextTick()函数)
     1. (Vue.nextTick  在DOM更新后做点什么 参数回调函数 DOM更新完调用)
@@ -820,7 +734,7 @@
         1. 子节点删除 
         2. 属性修改
         3. 文本内容修改等
-        调用过程
+        - 调用过程
             先给它绑定回调 得到MO实例
             这个回调会在MO实例监听到变动时触发
             这里的MO回调放在microtask中执行
@@ -830,7 +744,7 @@
             observer.observe(textNode, {
                 characterData: true // 说明监听文本内容的修改
             })
-        源码
+        - 源码
             nextTick的实现单独有一个JS文件来维护它
             在src/core/util/next-tick.js中
             nextTick源码主要分两块
@@ -844,7 +758,8 @@
                     2.执行timeFunc函数 延迟调用flushCallbacks函数
                     3.遍历执行callbacks数组中所有函数
                     这里的callbacks没有直接在nextTick中执行回调函数原因是 保证在同一个tick内多次执行nextTick 不会开启多个异步任务 而是把这些异步任务都压成一个同步任务在下一个tick执行完毕
-        语法
+        - 语法
+        ```
             Vue.nextTick([callback,context])
             参数:
                 {Function}[callback]:
@@ -854,12 +769,11 @@
                     不传默认自动绑定到调用它的实例上
                 Vue实例方法vm.$nextTick做了进一步封装
                 把context参数设置为当前Vue实例
-        使用目的
-            为了可以获取更新后的DOM
-        触发时机
-            同一事件循环中的数据变化后 
-            DOM完成更新
-            立即执行Vue.nextick()的回调
+        ```
+        > 使用目的
+        - 为了可以获取更新后的DOM
+        > 触发时机
+        - 同一事件循环中的数据变化后 DOM完成更新 立即执行Vue.nextick()的回调
 8. Vue中的component
     1. 可复用的Vue实例且带有一个名字
     2. 每个实例可维护一份被返回对象的独立拷贝
@@ -868,21 +782,21 @@
     - (组件是可复用的 Vue 实例，且带有一个名字：)
     - (el是根实例特有的选项)
     
-    每用一次组件，就会有一个它的新实例被创建。
-    一个组件的 data 选项必须是一个函数
+    - 每用一次组件，就会有一个它的新实例被创建。一个组件的 data 选项必须是一个函数
 
     > 定义组件名的方式(两种):
     1. 使用 kebab-case(短横线分隔命名) 链式命名
     - 须在引用这个自定义元素时使用 kebab-case，例如 <my-component-name>。
     2. 使用 PascalCase(首字母大写命名) 驼峰命名
     <my-component-name> 和 <MyComponentName> 
-    - 都是可接受的
-    - 直接在 DOM (即非字符串的模板) 中使用时只有 kebab-case(短横线分隔命名) 是有效的
 
+    > 使用
     1. 在字符串模板中<my-component></my-component> 和 <MyComponent></MyComponent>都可以使用，
     2. 在非字符串模板中最好使用<my-component></my-component>，因为要遵循W3C规范中的自定义组件名
     (字母全小写且必须包含一个连字符)，避免和当前以及未来的 HTML 元素相冲突。
-    - HTML 中的 attribute 名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符。
+    
+    > 原因
+    1. HTML 中的 attribute 名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符。
     
     > 组件name作用：
     1. 递归组件时，组件调用自身使用；
@@ -894,56 +808,38 @@
     2. v-if='false'；
     3. 执行vm.$destroy()；
     
+    > 组件分类
     1. 全局注册
-    (全局注册的行为必须在根 Vue 实例 (通过 new Vue) 创建之前发生。)
+    - (全局注册的行为必须在根 Vue 实例 (通过 new Vue) 创建之前发生。)
+    ```
         Vue.component('my-component-name', {
         // ... options ...
         })
-        缺点：
-            你使用一个像 webpack 这样的构建系统，全局注册所有的组件意味着即便你已经不再使用一个组件了，它仍然会被包含在你最终的构建结果中。这造成了用户下载的 JavaScript 的无谓的增加。
-    2. 局部注册(局部注册的组件在其子组件中不可用) 
-        1.通过一个普通的 JavaScript 对象来定义组件：
+    ```
+    > 缺点：
+    - 使用一个像 webpack 这样的构建系统，全局注册所有的组件意味着即便你已经不再使用一个组件了，它仍然会被包含在你最终的构建结果中。这造成了用户下载的 JavaScript 的无谓的增加。
+    2. 局部注册
+    - (局部注册的组件在其子组件中不可用) 
+        1. 通过一个普通的 JavaScript 对象来定义组件：
+        ```
         var ComponentA = { /* ... */ }
-        2.在 components 选项中定义你想要使用的组件：
+        ```
+        2. 在 components 选项中定义你想要使用的组件：
+            ```
             new Vue({
-            el: '#app',
-            components: {
-                'component-a': ComponentA,
-                'component-b': ComponentB
-            }
+                el: '#app',
+                components: {
+                    'component-a': ComponentA,
+                    'component-b': ComponentB
+                }
             })
+            ```
     3. 模块系统局部注册(使用了诸如 Babel 和 webpack 的模块系统)
-        1.推荐创建一个 components 目录，并将每个组件放置在其各自的文件中。
-        2.局部注册之前导入每个你想使用的组件。
+        1. 推荐创建一个 components 目录，并将每个组件放置在其各自的文件中。
+        2. 局部注册之前导入每个你想使用的组件。
     4. 基础组件自动化全局注册
-        基础组件，它们会在各个组件中被频繁的用到。
-        恰好使用了 webpack (或在内部使用了 webpack 的 Vue CLI 3+)，那么就可以使用 require.context 只全局注册这些非常通用的基础组件
-prop:
-    1.Prop 的大小写 (camelCase vs kebab-case)
-        HTML 中的 attribute 名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符。这意味着当你使用 DOM 中的模板时，camelCase (驼峰命名法) 的 prop 名需要使用其等价的 kebab-case (短横线分隔命名) 命名：
-        使用字符串模板，那么这个限制就不存在了。
-
-            一个组件默认可以拥有任意数量的 prop，任何值都可以传递给任何 prop。在上述模板中，你会发现我们能够在组件实例中访问这个值，就像访问 data 中的值一样。
-        <input v-model="searchText">等价于
-        <input
-        v-bind:value="searchText"
-        v-on:input="searchText = $event.target.value"
-        >
-        在不同组件之间进行动态切换是非常有用的，
-        上述内容可以通过 Vue 的 <component> 元素加一个特殊的 is attribute 来实现：
-    单文件组件
-        全局注册遇到的问题:
-            全局定义 (Global definitions) 强制要求每个 component 中的命名不得重复
-            字符串模板 (String templates) 缺乏语法高亮，在 HTML 有多行的时候，需要用到丑陋的 \
-            不支持 CSS (No CSS support) 意味着当 HTML 和 JavaScript 组件化时，CSS 明显被遗漏
-            没有构建步骤 (No build step) 限制只能使用 HTML 和 ES5 JavaScript，而不能使用预处理器，如 Pug (formerly Jade) 和 Babel
-        文件扩展名为 .vue 的 single-file components (单文件组件) 为以上所有问题提供了解决方法，并且还可以使用 webpack 或 Browserify 等构建工具。     
-        获得：
-            完整语法高亮
-            CommonJS 模块
-            组件作用域的 CSS
-        Node Package Manager (NPM)：阅读 Getting Started guide 中关于如何从注册地 (registry) 获取包的章节。
-    局部注册
+        - 基础组件，它们会在各个组件中被频繁的用到。
+        - 恰好使用了 webpack (或在内部使用了 webpack 的 Vue CLI 3+)，那么就可以使用 require.context 只全局注册这些非常通用的基础组件
 8. 如何设计一个组件
     > 前端组件库的设计原则
     1. 细粒度考量
@@ -952,23 +848,18 @@ prop:
         2. 缺点 可能会导致过渡抽象 造成组件库的碎片化
     2. 通用性考量
         - 组件的形态(DOM结构)永远是千变万化的 但是其行为(逻辑)是固定的 因此通用组件的秘诀之一就是将DOM结构的控制权交给开发者 组件只负责行为和最基础的DOM结构
-    
     > 技术选型
     1. CSS解决方案
     2. JS解决方案
     
     > 如何快速启动一个组件库项目
     1. 打包工具
-        现代市场上主流的库基本都选择了rollup作为打包工具 包括Angular React和Vue 作为基础类库的打包工具 rollup优势如下
-            1.Tree Shaking 自动移除未使用的代码 输出更小的文件
-            2.Scope Hoisting 所有模块构建在一个函数内 执行效率更高
-            3.。。
-            4.。。
     2. 代码检测
     3. commit规范
     4. 测试工具
     5. 其他
     6. 快速启动脚手架
+
     > 组件化和模块化
     1. 组件化
     - 从UI界面的角度来进行分析的 把一些可复用的UI元素抽离处理
@@ -976,12 +867,12 @@ prop:
     2. 模块化
     - 从代码的角度来进行分析的 把一些可复用的代码 抽离为单个的模块 便于项目的维护和开发
     
-    - 组件可如下定义
+    > 组件可如下定义
         1. 有可复用的模块 完成既定功能
         2. 有明确的接口规定
         3. 有上下文依赖 外部依赖资源的定义
         4. 可以独立发布
-    - 组件设计原则
+    > 组件设计原则
         1. 使用单一职责原则
 9. location.href与Vue-router路由跳转区别
     > (Vue-router pushState
@@ -2768,11 +2659,6 @@ prop:
         complie是createCompiler的返回值 createCompiler是用以创建编译器的 另外compiler还负责合并option
         2. AST经过generate(将AST语法树转化成render function字符串的过程)得到render函数 render的返回值是VNode VNode是Vue的虚拟DOM节点 里面有(标签名/子节点/文本等)        
 
-3. 各种MVVM框架 如Angular Regular Vue React 最大的优点是可以实现数据绑定 不需要手动进行DOM操作 它们实现的原理基本上是脏检查或数据劫持
-- 通过observer观察每个对象的属性 添加到订阅器Dep中 当数据发生变化时发出一个notice 作者使用ES6+flow写 代码在score/core/observer/index.js
-- 上面代码继承Array本身的原型方法 然后又做了劫持修改 可以发出通知
-- Vue会在observer数据阶段判断如果是数组 则修改数组原型
-- Vue还是不能检测到数据项和数组长度的变化 尽量避免这样的调用方式 作者实现了$set操作
 
 48.Vue-router
     1.重定向页面

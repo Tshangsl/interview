@@ -1,4 +1,5 @@
 1. react&vue
+    > 不同点
     1. 监听数据变化实现原理
         - vue通过getter/setter以及一些函数的劫持，能精确知道数据变化，不需要特别的优化就能达到比较好的性能
         - react默认通过比较引用的方式进行，如果不优化(purecomponent/shouldcomponentupdate)可能导致大量不必要的vdom的重新渲染
@@ -25,7 +26,7 @@
     4. 组件通信
         - vue中有三种方式可以实现组件通信
             1. 父组件通过props向子组件传递数据或回调，虽然可以传递回调，但一般只传递数据，而通过时间的机制处理子组件向父组件的通信
-            2. 子组件通过时间向父组件发送消息
+            2. 子组件通过事件向父组件发送消息
             3. 通过v2.2.0新增的provide/inject实现父组件向子组件注入数据，可以跨越多个层级
         - react中有对应的三种方式
             1. 父组件通过props向子组件传递数据或回调
@@ -37,9 +38,12 @@
             1. react通过jsx渲染模版 只是表面现象 react并不必须依赖jsx
             2. vue通过一种拓展的html语法进行渲染
         - 深层上模版原理不同 
+            1. React 组件状态变化时 会以该组件为根重新计算整个组件
+            2. Vue 自动追踪组件依赖变化 不需要渲染整个组件
+
             1. react是在组件js代码中，通过原生js实现模版中的常见语法，如插值，条件，循环等，都是通过js语法实现的
             > react好处 
-            > react中render函数是支持闭包特性的，所以import的组件在render中可以直接调用
+            - react中render函数是支持闭包特性的，所以import的组件在render中可以直接调用
             2. vue是在和组件js代码分离的单独的模版中，通过指令来实现的，比如条件语句就需要v-if实现
             > vue中由于模版中使用的数据都必须挂在this上进行一次中转，所以import一个组件后需要在comoponents中再声明
     6. vuex和redux
@@ -53,23 +57,29 @@
         
         - 实现原理上 最大的区别有两点
             1. redux使用不可变数据，vuex数据是可变的，redux每次都是用新的state替换旧的state，而vuex是直接修改
-            2. redux在检测数据变化时，是通过difff的方式比较差异的，而vuex和vue原理一样，是通过getter/seter来比较的(其内部直接创建一个vue实例用来跟踪数据变化)
+            2. redux在检测数据变化时，是通过diff的方式比较差异的，而vuex和vue原理一样，是通过getter/seter来比较的(其内部直接创建一个vue实例用来跟踪数据变化)
+    > 相同点
+    1. React采用特殊的JSX语法 Vue在组件开发中也推荐编写.vue特殊文件格式 对文件内容都有一些约定 两者都需要编译后使用
+    2. 中心思想相同 一切都是组件 组件实例之间可以嵌套
+    3. 都提供合理的钩子函数 可以让开发者定制化处理需求
+    4. 都不支持Route等功能到核心包 而是以插件形式加载
+
 2. 受控组件和非受控组件
-    > 受控组件
+    > 受控组件(组件维持自身状态 根据用户操作更新)
     - 维持自身状态 根据用户操作更新 由React渲染并控制用户操作后所发生的变化的组件 称为受控组件
     - 每个受控组件都有相对应的处理函数 受控组件用户输入时可根据用户的操作进行判定 能有效控制用户操作的可行性
-    - 优点 组件的状态和内容能准确掌握在自己手中 可以在源头上杜绝一些奇怪的操作 如限制输入框智能输入数字
+    > 优点 组件的状态和内容能准确掌握在自己手中 可以在源头上杜绝一些奇怪的操作 如限制输入框智能输入数字
 
-    > 非受控组件
+    > 非受控组件(组件自己不维护用户操作 所有处理交给DOM 获取值时可以使用ref操作获取或通过原生JS获取)
     - 与受控组件相应 组件自己不维护用户的操作 所有的处理交由DOM自行处理 在获取值时可以使用ref操作获取或通过原生JS方法获取
     - 优点 非受控组件中真实数据保存在DOM中 因此在使用时 可更方便集成React和非React代码 且非受控组件能更好的减少代码量
 
     > react中 所谓受控组件和非受控组件是针对表单而言的
-    - 表单受控组件
+    - 表单受控组件(表单元素修改实时映射到状态值 需要继承react.component 绑定onChange事件)
         - 表单元素依赖于状态，表单元素需要默认值实时映射到状态时，就是受控组件，这个和双向绑定相似
         - 受控组件，表单元素的修改会实时映射到状态值上，此时可以对输入的内容进行校验
-        - 受控组件只有继承react.component才会有状态
-        - 受控组件必须要在表单上使用onchange事件来绑定对应的事件
+        > 受控组件只有继承react.component才会有状态
+        > 受控组件必须要在表单上使用onchange事件来绑定对应的事件
         ```
             class control extends react.component{
                 <!-- 这样的写法也是声明在实例上的对象 -->
@@ -113,7 +123,8 @@
         ```
     > 受控组件中如果没有给输入框绑定onchange事件 将会收到react的警告
     > 且此时输入框除了默认值，无法输入任何其他参数
-    - 非受控组件
+
+    - 非受控组件(不受状态控制 获取数据相当于操作dom)
         - 非受控组件即不受状态的控制，获取数据就是相当于操作dom
         - 优点在于容易和第三方组件结合
         
@@ -167,8 +178,9 @@
             )
         }
         ```
-        - 受状态控制的组件 必须要有onchange方法 否则不能使用 受控组件可以默认赋予默认值(官方推荐使用受控组件)实现双向数据绑定
-        - 非受控 不需要设置它的state属性 通过ref来操作真实的DOM
+        > 小结
+        1. 受控组件(官方推荐使用): 必须要有onChange方法 可以赋予默认值 实现双向数据绑定
+        2. 非受控组件:不需要设置它的state属性 通过ref操作真实DOM
 3. react高阶组件hoc
     > 高阶组件不是组件 是增强函数 可以输入一个元组件 返回一个新的增强组件
     1. 属性代理(Props Proxy) 提取公共的数据和方法到父组件，子组件只负责渲染数据，相当于设计模式中的模版模式，这样组件的重用性更高
@@ -2073,3 +2085,180 @@
         ```
         - 这里 e是一个合成事件 
         - React合成的SyntheticEvent采用了事件池，这样做可以大大节省内存，而不会频繁的创建和销毁事件对象。
+
+98. 
+    - Vue 视图和数据双向绑定
+    - React更注重组件及其状态的管理
+    - 相对于Vue React更加透明 没有过多的隐含逻辑(比如Vue的指令就是一种隐含逻辑) 更便于程序员理解程序的执行过程 当然 也更加复杂强大
+    - React不是一个完整的MVC框架 最多可以认为是MVC中的V(View) 甚至React不非常认可MVC开发模式
+
+    > React生态圈
+    1. JSX 
+    - 扩展了JS自身的语法 是React的基础 让我们可以在JS中写HTML标记语言 是一门独立的语言
+    2. Flux
+    - React的数据流组件 可以实现组件间相互通信和数据共享
+    3. Redux
+    - 比Flux更加简单易用
+    4. React-Router
+    - 为单文件应用提供了路由功能 用url控制页面显示状态
+    5. React-Native(RN)
+    - 用React编写原生移动应用 flutter weex(基于Vue)
+    6. React-server
+    - 服务端渲染React组件
+
+    > 
+    1. browser.js用于编译JSX
+    2. react.js react核心库 用来管理组件和状态
+    3. react-dom.js 用于渲染组件 依赖于react.js 所以必须放在react.js下面
+
+    > 之前class用className代替的原因
+    - 不能辨别是CSS3中的class 还是JS中的类声明关键字class CSS3中的class用className代替 
+
+    > 
+    - React中的HTML代码不是真正的HTML 是一种JSX语法 绝大部分标签同HTML标签一样使用 
+    - JSX不会真正创建DOM元素 JSX只是解析模板语法 创建虚拟DOM节点 需经由ReactDOM渲染才会呈现真正的DOM元素
+    > JSX
+    - 两个特殊属性
+        - class->className
+        - for->htmlFor
+    - 必须要有一个唯一的父元素
+    - 单标签必须闭合
+    - 表达式/变量要用{} 能被识别成一个变量 不仅可以实现变量替代 可以直接把变量对象写到对应位置
+
+    > State&事件处理
+    - State(状态)
+        1.如果组件内的属性需要修改 需要把属性存储在state中 状态一旦变化 组件就会重新渲染
+        2.修改状态时不可以直接修改 需要调用setState()方法
+        3.状态的初始化只能在方法constructor中
+    - Props
+        是只读的不可修改(只能读取 不能写入)
+    - 事件
+        1. 事件的命名需要采用小驼峰式 而不是纯小写eg:onclick=>onClick onblur=>onBlur
+        2. 使用JSX语法时需要传入一个函数作为事件的处理函数而不是一个字符串
+        3. 要注意自定义事件中的this指向问题 通过bind()方法修改this
+        4. 如果需要阻止浏览器的默认行为 需要使用preventDefault()方法 而不能使用return false
+
+    > 组件的引用和组件的通信
+        组件引用
+            ref:需要引用的组件 给组件起一个名字 也可以给一个元素起名 若ref重复后面则会覆盖前面
+            refs：父级中引用所有ref组件
+        组件间通信可分为
+            父组件->子组件 ref
+            子组件->父组件 props
+            非父子组件
+                同页面内:公共对象 共同父级中转
+                跨域面:localStorage 服务器中转redux
+
+    > 组件的重新渲染
+        组件的状态需要使用setState方法 而不能直接修改 是因为我们直接修改以后组件没有重新渲染 
+        如 直接写this.a修改时 组件不会重新渲染
+        状态更新时 组件会重新渲染
+    > 组件的重新渲染 三种情况
+    1. setState({})
+    2. props改变
+    3. forceUpdate
+
+    > 组件的生命周期
+    - 函数组件是没有生命周期的 React中每个class组件都有生命周期(钩子函数)
+        1. render()方法是class组件中唯一必须实现的方法
+        2. constructor(props)通过给this.state赋值对象来初始化内部state 为事件处理函数绑定实例
+        3. componentDidMount 会在组件挂载后(插入DOM树中)立即调用
+        4. componentDidUpdate(prevProps,prevState,snap)在更新后会被立即调用 首次渲染不会执行此方法
+        5. shouldComponentUpdate(nextProps,nextState)
+        6. componentWillUnmount()会在组件卸载及销毁之前直接调用
+        7. static getDerivedStateFromProps()会在调用render方法之前调用 并且在初始挂载及后续更新都会被调用 
+            - 它应返回一个对象来更新state 如返回null则不更新任何内容
+        8. getSnaphotBeforeUpdate()在最近一次渲染输出(提交的DOM节点)之前调用 
+            使得组件能在发生更改之前从DOM中捕获一些信息(如 滚动位置) 此生命周期的任何返回值将作为参数传递给componentDidUpdate()
+    
+    > 生命周期的三个阶段(旧)
+    1. 初始化阶段 由ReactDOM.render()触发--初次渲染
+        1. constructor()
+        2. componentWillMount() 
+        3. render()
+        4. componentDidMount() 常用 页面一上来做点什么
+            一般在这个钩子中做一些初始化的事情 
+            例如 开启定时器 发起网络请求 订阅消息
+    2. 更新阶段 由组件内部this.setState()或父组件更新render函数
+        > state
+        1. shoudComponentUpdate()
+        2. componentWillUpdate()
+        3. render() 必要
+        4. componentDidUpdate()
+        > props
+        1. componentWillReceiveProps
+        2. shouldComponentUpdate
+        3. componentWillUpdate
+        4. render
+        5. componentDidUpdate
+    3. 卸载组件 由ReactDOM.unmountComponentAtNode()触发
+        1. componentWillUnMount() 常用
+            一般在这个钩子中做一些收尾的事
+            关闭定时器 取消订阅消息
+    
+    > 生命周期(新)
+    - 常用的三个生命周期钩子
+        1. render
+        2. componentDidMount
+        3. componentWillUnmount
+    - 即将废弃的三个生命周期钩子
+        1. componentWillMount
+        2. componentWillRecieveProps
+        3. componentWillUpdate
+    新增的两个生命周期钩子
+        getDerivedStateFromProps()
+        getSnapshotBeforeUpdate()
+    1. 初始化阶段 由ReactDOM.render()触发 初次渲染
+        1. constructor()
+        2. getDerivedStateFromProps()
+        3. render()
+        - React更新DOM和refs
+        4. componentDidMount()
+    2. 更新阶段 由组件内部this.setState()或父组件重新render触发
+        1. getDerivedStateFromProps()
+        2. shouldComponentUpdate()
+        3. render()
+        4. getSnapshotBeforeUpdate()
+        - React更新DOM和refs
+        5. componenDidUpdate()
+    3. 卸载组件 由ReactDOM.unmountComponentAtNode()触发
+        1. componentWillUnmount()
+
+    > getDerivedStateFromProps
+    - static getDerivedStateFromProps(nextProps,prevState) 接收父组件传递过来的props和组件之前的状态 返回一个对象来更新state或返回null来表示接收到的props没有变化 不需要更新state
+    > 该生命周期钩子作用
+    - 将父组件传递过来的props映射到子组件的state上面
+    - 这样组件内部就不需要在通过this.props.xxx来获取属性值
+    - 统一通过this.state.xxx获取 
+    - 映射就相当于拷贝了一份父组件传过来的props
+    - 作为子组件自己的状态
+    - 子组件通过setState更新自己状态时 不会改变父组件的props
+    > 配合componentDidUpdate 可以覆盖componentWillRecevieProps的所有用法
+
+    > getSnapshotBeforeUpdate
+    - getSnapshotBeforeUpdate(prevProps,prevState):接收父组件传递过来的props和组件之前的状态 此生命周期狗子必须有返回值
+    - 返回值将作为第三个参数传递给componentDidUpdate
+    - 必须和componentDidUpdate一起使用 否则会报错
+    > 该生命周期钩子作用:在组件更新DOM和refs之前 从DOM捕获一些信息(如滚动位置)
+    > 配合componentDidUpdate可以覆盖componentWillUpdate的所有用法
+    - demo 每次组件更新时 都去获取之前的滚动位置 让组件保持在之前的滚动位置
+
+    > 版本迁移
+    1. componentWillMount componentWillReceiveProps componentWillUpdate这三个生命周期因为经常会被误解和滥用 所以被称为不安全生命周期
+    - 不是指安全性 而是表示使用这些生命周期的代码 有可能会在未来的React版本存在缺陷 可能会影响未来的异步渲染
+    > React17.0版本:推出新的渲染方式-异步渲染
+    - 提出一种可被打断的生命周期 而可以被打断的阶段正是实际dom挂载之前的虚拟dom构建阶段 也就是要被去掉的三个生命周期函数
+    - componentWillUpdate
+    - componentWillReceiveProps
+    - componentWillMount
+
+    > 洋葱模型
+    1. 父组件先触发
+    - componentWillMount
+    2. 子组件触发
+    3. 孙子组件触发
+    - componentWillMount
+    4. 孙子组件触发
+    - componentDidMount
+    5. 子组件触发
+    6. 父组件触发
