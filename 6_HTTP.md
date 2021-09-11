@@ -1438,129 +1438,131 @@
         服务器端设置Access-Control-Allow-Origin以开启CORS。该属性表示哪些域名可以访问资源，如设置通配符则表示所有网站均可访问。
     CORS 是W3C 推荐的一种新的官方方案，能使服务器支持 XMLHttpRequest 的跨域请求。CORS 实现起来非常方便，只需要增加一些 HTTP 头，让服务器能声明允许的访问来源。
     值得注意的是，通常使用CORS时，
-    - 异步请求会被分为
-        1.1简单请求
-        只要同时满足以下两大条件 就属于简单请求
-        1. 请求方法是以下三种方法之一
-            GET 获取数据
-            POST 提交数据
-            HEAD 本质和GET一样 区别在于HEAD不含有呈现数据 仅仅是HTTP头部信息
-        2. HTTP头信息不超过以下几个字段
-            Accept 
+    > 异步请求会被分为 
+    1. 简单请求
+    2. 非简单请求
+    > 简单请求
+    - 同时满足以下两大条件 就属于简单请求
+    1. 请求方法是以下三种方法之一
+        1. GET 获取数据
+        2. POST 提交数据
+        3. HEAD 本质和GET一样 区别在于HEAD不含有呈现数据 仅仅是HTTP头部信息
+    2. HTTP头信息不超过以下几个字段
+        1. Accept 
+        2. application/x-www-form-urlencoded
+        3. multipart/form-data
+        4. text/plain
+        - 表示客户端支持的数据类型 或客户端希望接收到的内容类型
+        
+        - Accept-Language
+        表示客户端支持的语言格式(不是编码格式)
+        如中文/英文 通常浏览器直接发起请求时 浏览器会根据被设置的语言环境(默认语言) 来附加上该字段
+
+        Content-Language
+        说明访问者希望采用的语言或语言组合 用户可根据自己偏好的语言来制定不同的内容
+
+        Last-Event-ID
+
+        Content-Type(只限于三个值)
             application/x-www-form-urlencoded
             multipart/form-data
             text/plain
-            表示客户端支持的数据类型 或客户端希望接收到的内容类型
-            
-            Accept-Language
-            表示客户端支持的语言格式(不是编码格式)
-            如中文/英文 通常浏览器直接发起请求时 浏览器会根据被设置的语言环境(默认语言) 来附加上该字段
+    这是为了兼容表单(form)
+    因为历史上表单一直可以发出跨域请求
+    AJAX的跨域设计就是 
+    只要表单可以发 AJAX就可以直接发
+    凡是不同时满足上面两个条件 属于非简单请求
+    浏览器对这两种请求的处理是不一样的
+    1.2简单请求基本流程
+    对于简单请求 浏览器直接发出CORS请求
+    具体来说就是在头信息中 添加一个Origin字段
+    Origin字段用来说明
+        本次请求来自哪个源
+        (协议+域名+端口)
+    服务器根据这个值 决定是否同意这次请求
 
-            Content-Language
-            说明访问者希望采用的语言或语言组合 用户可根据自己偏好的语言来制定不同的内容
+    如果Origin指定的源 不在许可范围内 服务器会返回一个正常的HTTP回应
+    浏览器发现 这个回应的头信息没有包含Access-Control-Allow-Origin字段
+    知道出错 从而抛出一个错误被XMLHttpRequest的onerror回调函数捕获
+    PS:这种错误无法通过状态码识别 因为HTTP回应的状态码可能是200
 
-            Last-Event-ID
+    如果Origin指定的域名在许可范围内 服务器返回的响应 会多出几个头信息字段
+    上面头信息中 有三个与CORS请求相关的字段 
+    都以Access-Control开头
 
-            Content-Type(只限于三个值)
-                application/x-www-form-urlencoded
-                multipart/form-data
-                text/plain
-        这是为了兼容表单(form)
-        因为历史上表单一直可以发出跨域请求
-        AJAX的跨域设计就是 
-        只要表单可以发 AJAX就可以直接发
-        凡是不同时满足上面两个条件 属于非简单请求
-        浏览器对这两种请求的处理是不一样的
-        1.2简单请求基本流程
-        对于简单请求 浏览器直接发出CORS请求
-        具体来说就是在头信息中 添加一个Origin字段
-        Origin字段用来说明
-            本次请求来自哪个源
-            (协议+域名+端口)
-        服务器根据这个值 决定是否同意这次请求
+        1.Access-Control-Allow-Origin
+        该字段必须 
+        数值要么是请求时Origin字段的值
+        要么是一个*表示接受任意域名的请求
 
-        如果Origin指定的源 不在许可范围内 服务器会返回一个正常的HTTP回应
-        浏览器发现 这个回应的头信息没有包含Access-Control-Allow-Origin字段
-        知道出错 从而抛出一个错误被XMLHttpRequest的onerror回调函数捕获
-        PS:这种错误无法通过状态码识别 因为HTTP回应的状态码可能是200
+        2.Access-Control-Allow-Credentials
+        该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。
 
-        如果Origin指定的域名在许可范围内 服务器返回的响应 会多出几个头信息字段
-        上面头信息中 有三个与CORS请求相关的字段 
-        都以Access-Control开头
+        3.Access-Control-Expose-Headers
+        该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。
+    1.3
+        CORS请求默认不发送Cookie和HTTP认证信息
+        如果要把Cookie发到服务器 
+        一方面要服务器同意 
+            指定Access-Control-Allow-Credentials字段
+        另一方面开发者必须在AJAX请求中打开withCredentials属性
+        否则即使服务器同意发送Cookie 浏览器也不会发送
+        或者 服务器要求设置Cookie 浏览器也不会处理   
+        PS：如果发送Cookie Access-Control-Allow-Origin不能设为星号
+        必须指定明确的 与请求网页一致的域名
+        同时Cookie依然遵循同源策略
+        只有用服务器域名设置的cookie才会上传
+        其他域名的cookie不会上传
+        且原网页代码中的document.cookie也无法读取服务器域名下的cookie
+    2.非简单/复杂请求 
+        2.1预检请求
+        是那种对服务器有特殊要求的请求 比如请求方法是PUT/DELETE 或者Content-Type字段类型是application/json
 
-            1.Access-Control-Allow-Origin
-            该字段必须 
-            数值要么是请求时Origin字段的值
-            要么是一个*表示接受任意域名的请求
+        非简单请求的CORS请求 会在正式通信之前 增加一次HTTP查询请求 称为预检请求
 
-            2.Access-Control-Allow-Credentials
-            该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。
+        浏览器先询问服务器 
+        当前网页所在域名是否在服务器许可名单之中 以及可以使用哪些HTTP动词和头信息字段 
+        只有得到肯定答复 
+        浏览器才会发出正式的XMLHttpRequest请求
+        否则就报错
 
-            3.Access-Control-Expose-Headers
-            该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。
-        1.3
-            CORS请求默认不发送Cookie和HTTP认证信息
-            如果要把Cookie发到服务器 
-            一方面要服务器同意 
-                指定Access-Control-Allow-Credentials字段
-            另一方面开发者必须在AJAX请求中打开withCredentials属性
-            否则即使服务器同意发送Cookie 浏览器也不会发送
-            或者 服务器要求设置Cookie 浏览器也不会处理   
-            PS：如果发送Cookie Access-Control-Allow-Origin不能设为星号
-            必须指定明确的 与请求网页一致的域名
-            同时Cookie依然遵循同源策略
-            只有用服务器域名设置的cookie才会上传
-            其他域名的cookie不会上传
-            且原网页代码中的document.cookie也无法读取服务器域名下的cookie
-        2.非简单/复杂请求 
-            2.1预检请求
-            是那种对服务器有特殊要求的请求 比如请求方法是PUT/DELETE 或者Content-Type字段类型是application/json
+        预检请求用的请求方法是OPTIONS 表示这个请求是用来询问的 
+        头信息中 关键字段是Origin 表示请求来自哪个源
+        除了Origin字段 预检请求的头信息包含两个特殊字段
+        1.Access-Control-Request-Method
+            必须的 用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。
+        2.Access-Control-Request-Headers
+            该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。
+    2. 预检请求回应
+        服务器受到预检请求以后
+        检查Origin Access-Control-Request-Method         
+        Access-Control-Request-Header
+        字段后
+        确认允许跨域请求 就可以做出回应
+        
+        上面的HTTP回应中 关键的是Access-Control-Allow-Origin字段
+        表示http://api.bob.com可以请求数据
+        该字段也可以设为* 表示同意任何跨院请求
 
-            非简单请求的CORS请求 会在正式通信之前 增加一次HTTP查询请求 称为预检请求
+        如果服务器否定了预检请求 会返回一个正常的HTTP回应 但是没有任何CORS相关的头信息字段 这时 浏览器就会认定 服务器不同意预检请求 因此触发一个错误 被XMLHttpRequest对象的onerror回调函数捕获
+        。。。
+    3. 浏览器的正常请求和回应
+        一旦服务器通过了预检请求
+        以后每次浏览器正常的CORS请求
+        都与简单请求一样
+        会有一个Origin头信息字段
+        服务器回应 也都会有一个Access-Control-Allow-Origin信息字段
 
-            浏览器先询问服务器 
-            当前网页所在域名是否在服务器许可名单之中 以及可以使用哪些HTTP动词和头信息字段 
-            只有得到肯定答复 
-            浏览器才会发出正式的XMLHttpRequest请求
-            否则就报错
-
-            预检请求用的请求方法是OPTIONS 表示这个请求是用来询问的 
-            头信息中 关键字段是Origin 表示请求来自哪个源
-            除了Origin字段 预检请求的头信息包含两个特殊字段
-            1.Access-Control-Request-Method
-                必须的 用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。
-            2.Access-Control-Request-Headers
-                该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。
-        2. 预检请求回应
-            服务器受到预检请求以后
-            检查Origin Access-Control-Request-Method         
-            Access-Control-Request-Header
-            字段后
-            确认允许跨域请求 就可以做出回应
-            
-            上面的HTTP回应中 关键的是Access-Control-Allow-Origin字段
-            表示http://api.bob.com可以请求数据
-            该字段也可以设为* 表示同意任何跨院请求
-
-            如果服务器否定了预检请求 会返回一个正常的HTTP回应 但是没有任何CORS相关的头信息字段 这时 浏览器就会认定 服务器不同意预检请求 因此触发一个错误 被XMLHttpRequest对象的onerror回调函数捕获
-            。。。
-        3. 浏览器的正常请求和回应
-            一旦服务器通过了预检请求
-            以后每次浏览器正常的CORS请求
-            都与简单请求一样
-            会有一个Origin头信息字段
-            服务器回应 也都会有一个Access-Control-Allow-Origin信息字段
-
-        优缺点
-            1.使用简单方便，更为安全
-            2.支持 POST 请求方式，
-            3.CORS是一种新型的跨域问题的解决方案，存在兼容问题，仅支持IE 10以上
-        JSONP和CORS比较
-            1.CORS与JSONP使用目的相同 但是比JSONP强大
-            2.JSONP只支持GET请求
-                CORS支持所有类型的HTTP请求
-            3.JSONP优势在于支持老式浏览器
-                以及可以向不支持CORS的网站请求数据
+    优缺点
+        1.使用简单方便，更为安全
+        2.支持 POST 请求方式，
+        3.CORS是一种新型的跨域问题的解决方案，存在兼容问题，仅支持IE 10以上
+    JSONP和CORS比较
+        1.CORS与JSONP使用目的相同 但是比JSONP强大
+        2.JSONP只支持GET请求
+            CORS支持所有类型的HTTP请求
+        3.JSONP优势在于支持老式浏览器
+            以及可以向不支持CORS的网站请求数据
     3. Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
         > 原理：同源策略仅是浏览器需要遵循的策略，故搭建中间件服务器转发请求与响应，达到跨域目的。
         - 类似于将跨域请求交给第三方，第三方去访问指定的网络，获取数据然后返回
@@ -1636,155 +1638,101 @@
     - 请求响应的处理在then和catch回调中 请求正常会进入then 请求一场则会进catch
 18. AJAX
     > AJAX
+    - AJAX是'Asyncchronous JavaScript And XML'缩写(即异步的JS和XML)
     - 一种实现无页面刷新获取服务器资源的混合技术 一种能够实现局部网页刷新的技术 使网页异步刷新
+    
     > 实现
     1. 创建XMLhttpRequest核心对象|
     2. open方法打开与服务器连接|
     3. send方法发送请求 POST请求时 需设置额外请求头|
     4. 监听服务器响应 接收返回值)
-    
     - (open打开连接 send发送请求 监听服务器响应 接收返回值)
 
-    > AJAX概述 AJAX是什么
-    - AJAX是'Asyncchronous JavaScript And XML'缩写(即异步的JS和XML)
-    - 一种实现无页面刷新获取服务器数据的混合技术
+    > AJAX意义：
+    1. 使浏览器在不刷新页面的情况下获取服务器响应
+    2. 大大提升互联网用户使用体验
+    3. AJAX请求获取的是数据而不是HTML文档 节省网络带宽
     
+    > AJAX获取数据
+    - 通常使用API与各式各样的数据库交互 服务器 AJAX技术核心--XMLHttpRequest对象
+    - XMLHttpRequest对象是浏览器提供的一个API 用来顺畅地向服务器发送请求并解析服务器响应 整个过程中 浏览器页面不会被刷新
+    1. XMLHttpRequest只是一个JS对象 
+        - 确切地说是一个构造函数 特殊之处只在于它是由客户端(即浏览器)提供的(而不是JavaScript原生的) 除此之外它有属性 方法 需要通过new关键字进行实例化
+    2. XMLHttpRequest对象不断被扩展
+        const xhr = new XMLHttpRequest()
+        属性
+            .responseText:包含响应主体返回文本
+            .responseXML:如果响应的内容类型是text/xml或application/xml 该属性将保存包含相应数据的XML DOM文档
+            .status:响应的HTTP状态
+            .statusText:HTTP状态的说明
+            .readyState:请求/响应过程的当前活动阶段
+        方法
+            .open():准备启动一个AJAX请求
+            .setRequestHeader():设置请求头部信息
+            .send()发送AJAX请求
+            .getResponseHeader():获得响应头部信息
+            .getAllResponseHeader():获得一个包含所有头部信息的长字符串
+            .abort():取消异步请求
+        浏览器为该对象提供一个onreadystatechange监听事件 
+        每当XML实例的readyState属性变化时 会触发该事件的发生
+
+    > AJAX请求时 如何解释json数据
+    - 字符串形式的JSON：eval("("+ajax.response+")")
+    - 本地的JSON文件：JSON.parse(data)
+
     > 概念：
-        XML 
-            (一种特征类似HTML用来描述 
-            数据是什么并承载数据的标记语言)
-            (JSON发明之前 
-            人们大量使用XML作为数据传输的载体)
-            Extensible Markup Language缩写
-            (即:可扩展标记语言)
-            一种特征类似HTML 用来描述 数据是什么 
-            并承载数据的标记语言
-            JSON只是一种数据格式 JSON发明之前
-            人们大量用XML作为数据传输的载体 而如今情况发生了些变化
-            JSON这种类似字符串对象的轻量级的数据格式越来越受开发者的青睐 几乎变成了AJAX技术的标准数据格式 
-            PS:JSON不是XML的替代品两者各自有其适应的场景
-        无页面刷新
-            互联网最重要功能在于资源交换
-            有没有办法在页面数据变动时 只向服务器请求新的数据 并且在阻止页面刷新的情况下动态替换页面中展示的数据呢 --AJAX
-            AJAX技术 
-                通过阻止浏览器接受响应时刷新页面提升互联网用户使用体验
-                使开发者能以更微观视角重新思考互联网应用的构建
-                开发者将在“数据”层面而不是“资源”层面以更高的自由度构建网站和Web应用。
-        混合技术
-            AJAX技术不只是操作XMLHttpRequest对象发起异步请求 
-            是为了实现无页面刷新的资源获取的一些列技术的统称
-            这些技术包括
-                1.JS：用来获取数据后 通过操作DOM或其他方式达到目的
-                2.客户端(即浏览器)提供的实现异步服务器通信的XMLHttpRequest对象
-                3.服务器端允许浏览器向其发起AJAX请求的相关设置
-            PS:明白AJAX并不只是操作XMLHttpRequest对象 对初学者而言十分必要
-        DRY
-            Don't Repeat Yourself
-    - AJAX意义：
-        1. 使浏览器在不刷新页面的情况下获取服务器响应
-        2. 大大提升互联网用户使用体验
-        3. AJAX请求获取的是数据而不是HTML文档 节省网络带宽
-    AJAX获取数据
-        通常使用API与各式各样的数据库交互 服务器
-        AJAX技术核心--XMLHttpRequest对象
-            XMLHttpRequest对象是浏览器提供的一个API 
-            用来顺畅地向服务器发送请求并解析服务器响应 
-            整个过程中 
-            浏览器页面不会被刷新
-            1.XMLHttpRequest只是一个JS对象 
-                确切地说是一个构造函数 
-                特殊之处只在于它是由客户端(即浏览器)提供的(而不是JavaScript原生的)
-                除此之外它有属性 方法 需要通过new关键字进行实例化
-            2.XMLHttpRequest对象不断被扩展
-                随XML对象被广泛接收 
-                W3C开始着手指定相应地标准来规范其行为 
-                XMLHttpRequest有两个级别1级提供XML对象实现细节 
-                2级进一步发展了XML对象 
-                额外添加了一些方法 
-                属性和数据结构 
-                不是所有浏览器都实现了XML对象2级地内容
-            XMLHttpRequest实例属性和方法开始 
-            const xhr = new XMLHttpRequest()
-            属性
-                .responseText:包含响应主体返回文本
-                .responseXML:如果响应的内容类型是text/xml或application/xml 该属性将保存包含相应数据的XML DOM文档
-                .status:响应的HTTP状态
-                .statusText:HTTP状态的说明
-                .readyState:请求/响应过程的当前活动阶段
-            方法
-                .open():准备启动一个AJAX请求
-                .setRequestHeader():设置请求头部信息
-                .send()发送AJAX请求
-                .getResponseHeader():获得响应头部信息
-                .getAllResponseHeader():获得一个包含所有头部信息的长字符串
-                .abort():取消异步请求
-            浏览器为该对象提供一个onreadystatechange监听事件 
-            每当XML实例的readyState属性变化时 会触发该事件的发生
-
-    AJAX请求
-        概念解释：
-        XMLHttpRequest实例的.open()方法接受三个参数
-        请求方式 请求URL 异步请求的布尔值
-        XMLHttpRequest实力的.send()方法 参数不可为空
-        对于不需要发送任何数据的GET请求 也需要在调用.send()方法时 向其传入null值
-        两种向服务器发送数据的方式
-            1.表单提交
-            2.发送POST请求
-
-        服务器对着两种方式并不一视同仁
-        服务器需要有相应的代码专门处理POST请求发送来的原始数据
-        可以通过POST请求模拟表单提交 
-        两步
-        1.设置请求头参数 
-        Content-Type:application/x-www-form-urlencoded
-        表单提交时的内容类型
-        2.将表单数据序列化为查询字符串形式 传入.send()方法
-    1.使用.open()方法确定请求方式 等待响应的方式和请求地址
-    2.setRequestHeader()自定义响应头
-    4.用send()方法发送AJAX请求
-
-    1.创建核心对象XMLhttpRequest；
-        2.利用open方法打开与服务器的连接；
-        3.利用send方法发送请求；
-        （"POST"请求时，还需额外设置请求头）
-        4.监听服务器响应，接收返回值。
-
-    AJAX请求时 如何解释json数据
-        字符串形式的JSON：eval("("+ajax.response+")")
-        本地的JSON文件：JSON.parse(data)
+    > XML 
+    - 一种特征类似HTML用来描述 数据是什么并承载数据的标记语言
+    - JSON发明之前 人们大量使用XML作为数据传输的载体
+    - Extensible Markup Language缩写 (即:可扩展标记语言)
+    - 一种特征类似HTML 用来描述 数据是什么 并承载数据的标记语言
+    - JSON只是一种数据格式 JSON发明之前 人们大量用XML作为数据传输的载体 而如今情况发生了些变化
+    - JSON这种类似字符串对象的轻量级的数据格式越来越受开发者的青睐 几乎变成了AJAX技术的标准数据格式 
+    - PS:JSON不是XML的替代品两者各自有其适应的场景
+    
+    > 无页面刷新
+    - 互联网最重要功能在于资源交换
+    - 有没有办法在页面数据变动时 只向服务器请求新的数据 并且在阻止页面刷新的情况下动态替换页面中展示的数据呢 --AJAX
+    
+    > AJAX技术 
+    - 通过阻止浏览器接受响应时刷新页面提升互联网用户使用体验
+    - 使开发者能以更微观视角重新思考互联网应用的构建
+    - 开发者将在“数据”层面而不是“资源”层面以更高的自由度构建网站和Web应用。
+    
+    > 混合技术
+    - AJAX技术不只是操作XMLHttpRequest对象发起异步请求 
+    - 是为了实现无页面刷新的资源获取的一些列技术的统称
+    - 这些技术包括
+        1. JS：用来获取数据后 通过操作DOM或其他方式达到目的
+        2. 客户端(即浏览器)提供的实现异步服务器通信的XMLHttpRequest对象
+        3. 服务器端允许浏览器向其发起AJAX请求的相关设置
+    
+    > PS:明白AJAX并不只是操作XMLHttpRequest对象 对初学者而言十分必要
+    > DRY
+    - Don't Repeat Yourself
 19. Form表单提交和AJAX提交区别
-    (安全性一样 安全性与提交文件的业务处理有关 与提交方式无关)
-    (AJAX网页局部刷新 异步请求/Form放弃本页面 新建一个页面
-    AJAX必须使用JS实现 由JS引擎解释/Form浏览器自带 使用JS与否都可以提交表单)
+    - (安全性一样 安全性与提交文件的业务处理有关 与提交方式无关)
+    - (AJAX网页局部刷新 异步请求/Form放弃本页面 新建一个页面
+    - AJAX必须使用JS实现 由JS引擎解释/Form浏览器自带 使用JS与否都可以提交表单)
     1. 使用场景
-        安全性一样 都是发送HTTP协议 
-        安全性与提交文件的业务处理(格式检测 防注入)有关
-        与提交方式无关
-        Form表单提交
-        一般登录 点击提交触发submit事件 
-        会使页面发生跳转 页面的跳转等行为的控制往往在后端
-        后端控制页面的跳转及数据的传递
-        AJAX提交
-        通过JS来提交请求 请求与响应均由JS引擎处理
-        页面不会刷新
-        不希望页面跳转/将控制权放在前端 
-        通过JS操作页面跳转或数据变化
-        AJAX有个隐藏问题 浏览器不保存密码 不符合用户习惯
-        理想方式
+        - 安全性一样 都是发送HTTP协议 安全性与提交文件的业务处理(格式检测 防注入)有关 与提交方式无关
+        - Form表单提交 一般登录 点击提交触发submit事件 会使页面发生跳转 页面的跳转等行为的控制往往在后端 后端控制页面的跳转及数据的传递
+        - AJAX提交 通过JS来提交请求 请求与响应均由JS引擎处理 页面不会刷新 不希望页面跳转/将控制权放在前端 通过JS操作页面跳转或数据变化 AJAX有个隐藏问题 浏览器不保存密码 不符合用户习惯
+        - 理想方式
             建立隐藏的iframe
             把form标签的target指向iframe 
             然后检测iframe状态
-    比较
-        1.AJAX在提交请求接收时 都是异步进行 网页不需要刷新 只刷新页面局部 不关心也不影响其他部分的内容
-         Form提交则是新建一个页面 哪怕是提交给自己本身的页面也需要刷新 为了维持页面用户对表单的状态改变 要在控制器和模板之间传递更多参数以保持页面状态
-        2.AJAX提交时 是在后台新建一个请求
-          Form是放弃本页面 然后再请求
-        3.AJAX必须要用JS实现 存在调试麻烦 浏览器兼容问题
-        不启动JS的浏览器 无法完成操作
-          Form表单是浏览器自带的 无论是否开启JS都可以提交表单
-        4.AJAX在提交 请求接收时 整个过程都需要使用程序对其进行数据处理 
-          Form表单提交 根据表单结构自动完成 不需要代码干预 用submit提交
-    其他方面
+    > 比较
+    1. AJAX在提交请求接收时 都是异步进行 网页不需要刷新 只刷新页面局部 不关心也不影响其他部分的内容
+        Form提交则是新建一个页面 哪怕是提交给自己本身的页面也需要刷新 为了维持页面用户对表单的状态改变 要在控制器和模板之间传递更多参数以保持页面状态
+    2. AJAX提交时 是在后台新建一个请求
+        Form是放弃本页面 然后再请求
+    3. AJAX必须要用JS实现 存在调试麻烦 浏览器兼容问题
+    不启动JS的浏览器 无法完成操作
+        Form表单是浏览器自带的 无论是否开启JS都可以提交表单
+    4. AJAX在提交 请求接收时 整个过程都需要使用程序对其进行数据处理 
+        Form表单提交 根据表单结构自动完成 不需要代码干预 用submit提交
+    > 其他方面
         关于输入内容的校验 
         AJAX可以在获取到元素内部用程序判断 
         Form表单的属性中有校验的字段
@@ -1851,9 +1799,9 @@
             XSS漏洞原理和相关函数 eval() assert() preg_replace() 回调函数 动态执行函数
             XSS漏洞的防范
 21. CSRF(Cross Site Request Forgery(伪造))
-(XSS 利用合法用户获取其信息)
-(CSRF 伪装成合法用户发起请求 原理和XSS正好相反)
-(防范：post修改信息/不让第三方网站访问cookie/请求时附带验证信息 token 验证码)
+    (XSS 利用合法用户获取其信息)
+    (CSRF 伪装成合法用户发起请求 原理和XSS正好相反)
+    (防范：post修改信息/不让第三方网站访问cookie/请求时附带验证信息 token 验证码)
     原理和XSS正好相反
         XSS(Cross Site Script 跨站脚本攻击)利用合法用户获取其信息
         CRSF(Cross Site Request Forgery跨站请求伪造)伪装成合法用户发起请求
@@ -1874,39 +1822,40 @@
         2. 代码层 不准出现SQL语句
         3. web输入参数处 对所有参数做sql转义
         4. 上线测试 需要使用sql自动注入工具进行所有页面sql注入脚本
-23. MITM(Man-in-the-MiddleAttck-中间人攻击)攻击
-(HTTPS/不使用公共网络发送敏感信息/不点击恶意链接和电子邮件)
-        流程：
-            1.服务器向客户端发送公钥 攻击者截获公钥 保留在自己手上
-            2.攻击者自己生成一个伪造公钥 发给客户端
-            3.客户端收到伪造的公钥 生成加密hash值发给服务器
-            4.攻击者获得加密hash值 用自己的私钥解密获得真秘钥。
-            5.生成假的加密hash值 发给服务器
-            6.服务器用私钥解密获得假秘钥。
-            7.服务器用假秘钥加密传输信息
-        工作方式：
-            1.嗅探
-                嗅探和数据包嗅探是一种用于捕获流进和流出系统/网络的数据包的技术 网络中的数据包嗅探就好像电话中的监听 如果使用正确 数据包嗅探是合法的 许多公司处于安全目的都会使用它
-            2.数据包注入
-                这种技术中 攻击者会将恶意数据包注入常规数据中
-                这样用户便不会注意到文件/恶意软件 因为它们是合法通讯流的一部分
-                在中间人攻击和拒绝式攻击中 这些文件是很常见的
-            3.会话劫持
-                在你登录进你的银行账户和退出登录这一段期间称为一个会话 这些会话通常都是黑客攻击目标 因为它们包含潜在的重要信息 大多数案例中 黑客会潜伏在会话中 并最终控制它 这些攻击的执行反射光hi有多种
-            4.SSL剥离
-                SSL剥离/SSL降级攻击是MITM攻击的一种十分罕见的方式 也是最危险的一种 SSL/TSL证书通过加密保护通讯安全 在SSL剥离攻击中 攻击者使SSL/TLS连接剥落 随之协议从安全HTTPS变成不安全HTTP
-        防范：(HTTPS/不使用公共网络发送敏感信息/不点击恶意链接和电子邮件)
-            1.确保在URL前你所访问的网站有HTTPS
-            2.点击电子邮件前 检查电子邮件发送人
-            3.如果你是一个网站检查员 你应当执行HSTS协议
-            4.不要在公共WIFI网络上购买/发送敏感数据
-            5.确保你的网站没有任何混合内容
-            6.如果你的网站使用了SSL
-            确保你禁用了不安全的SSL/TLS协议 
-            应当只启动TLS1.1和TLS1.2
-            7.不要点击恶意链接或电子邮件
-            8.时不要下载盗版内容
-            9.将安全工具正确安装在系统上
+23. MITM
+    (Man-in-the-MiddleAttck-中间人攻击)攻击
+    (HTTPS/不使用公共网络发送敏感信息/不点击恶意链接和电子邮件)
+    流程：
+        1.服务器向客户端发送公钥 攻击者截获公钥 保留在自己手上
+        2.攻击者自己生成一个伪造公钥 发给客户端
+        3.客户端收到伪造的公钥 生成加密hash值发给服务器
+        4.攻击者获得加密hash值 用自己的私钥解密获得真秘钥。
+        5.生成假的加密hash值 发给服务器
+        6.服务器用私钥解密获得假秘钥。
+        7.服务器用假秘钥加密传输信息
+    工作方式：
+        1.嗅探
+            嗅探和数据包嗅探是一种用于捕获流进和流出系统/网络的数据包的技术 网络中的数据包嗅探就好像电话中的监听 如果使用正确 数据包嗅探是合法的 许多公司处于安全目的都会使用它
+        2.数据包注入
+            这种技术中 攻击者会将恶意数据包注入常规数据中
+            这样用户便不会注意到文件/恶意软件 因为它们是合法通讯流的一部分
+            在中间人攻击和拒绝式攻击中 这些文件是很常见的
+        3.会话劫持
+            在你登录进你的银行账户和退出登录这一段期间称为一个会话 这些会话通常都是黑客攻击目标 因为它们包含潜在的重要信息 大多数案例中 黑客会潜伏在会话中 并最终控制它 这些攻击的执行反射光hi有多种
+        4.SSL剥离
+            SSL剥离/SSL降级攻击是MITM攻击的一种十分罕见的方式 也是最危险的一种 SSL/TSL证书通过加密保护通讯安全 在SSL剥离攻击中 攻击者使SSL/TLS连接剥落 随之协议从安全HTTPS变成不安全HTTP
+    防范：(HTTPS/不使用公共网络发送敏感信息/不点击恶意链接和电子邮件)
+        1.确保在URL前你所访问的网站有HTTPS
+        2.点击电子邮件前 检查电子邮件发送人
+        3.如果你是一个网站检查员 你应当执行HSTS协议
+        4.不要在公共WIFI网络上购买/发送敏感数据
+        5.确保你的网站没有任何混合内容
+        6.如果你的网站使用了SSL
+        确保你禁用了不安全的SSL/TLS协议 
+        应当只启动TLS1.1和TLS1.2
+        7.不要点击恶意链接或电子邮件
+        8.时不要下载盗版内容
+        9.将安全工具正确安装在系统上
 25. Fetch API与传统Request的区别
     1. fetch 符合关注点分离，使用 Promise，API 更加丰富，支持 Async/Await 
     2. 语意简单，更加语意化
