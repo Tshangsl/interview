@@ -110,7 +110,7 @@
     - 这样看AOP只是OOP的补充 OOP从横面上区分出一个个的类 AOP 从纵面上向对象中加入特定的代码 
     - 有了AOP OOP立体 加上时间维度 AOP使OOP由原来的二维变成三维 由平面变立体 技术上说 AOP是通过代理机制实现的
 6. 前端工程化
-    > 前端工程化可以分为四个方面来说 分别为
+    > 可以分为四个方面来说 分别为
     1. 模块化 
         - 将一个文件拆分成多个相互依赖的文件 最后进行统一的打包和加载 这样能很好的保证高效的多人协作 其中包含
         1. JS模块化 CommonJS AMD CMD ES6 Module
@@ -352,7 +352,7 @@
         XML使用DTD文档类型定义来组织数据 格式统一 跨平台和语言 称为业界公认的标准
         XML是标准通用标记语言SGML的子集 非常适合Web传输 
         XML提供统一的方法来描述和交换独立于应用程序或供应商的结构化数据
-    JSON JavaSript Object Notation
+    > JSON JavaSript Object Notation
         一种轻量级数据交换格式
         具有良好的可读和便于快速编写的特性
         可在不同平台之间进行数据交换
@@ -470,7 +470,7 @@
         ctx.body={
             state:'success'/'fail'
         }
-1. Nodejs解决跨域问题9种方案
+20. Nodejs解决跨域问题9种方案
     > 什么是跨域
     - 一个域下的文档或脚本尝试去请求另一个域下的资源 这里跨域是广义的
     > 广义的跨域
@@ -529,3 +529,332 @@
         同一个账号可以在不同终端同时登录 同时收发信息
         禁止用户多点在线
         一个端同一个账号只能登录一个实例  
+
+25. > mobx
+    > 优点
+    1. redux不允许直接修改state，而mobx可随意修改
+    2. redux修改状态必须走一套指定的流程比较麻烦，mobx可在任何地方直接修改(非严格模式下)
+    3. redux模版代码文件多，而mobx非常简洁，就一个文件
+    4. redux只有一个store，state or store 难以取舍，mobx多store 可以把所有的state都放入store中 完全交给mobx管理 减少顾虑
+    5. redux需要对监听的组件做scu优化，减少重复render，而mobx都是smartcomponent 不需要手动做scu
+
+    > 原理
+    1. 利用了es6的proxy追踪属性(旧版本使用object.defineproperty实现)通过隐式订阅 自动追踪被监听的对象变化 然后触发组件的ui更新
+
+    > 区别
+    - redux把要做的事情都交给用户 保证自己的纯净 mobx把最简易的操作给了用户 其他交给mobx内部实现 用户不必关心该过程 mode和view完全分离 完全可以讲业务逻辑写在action里 用户只需操作observeabledata
+    - observalbeview会自动做出响应 此即为mobx主打的响应式设计 但编程风格仍然是传统的面向对象的oo范式(vue即利用数据劫持实现双向绑定 react+mobx就是一个复杂点的vue vue3版本的一个重大改变就是将代理交给了proxy)
+
+    > 优点
+    1. 代码量少
+    2. 基于数据劫持实现精准定位(真正意义上的局部更新)
+    3. 多store抽离业务逻辑(model view分离)
+    4. 响应式性能良好(频繁的交互依然可以胜任)
+    5. 完全可以替代react自身的状态管理
+    6. 支持ts
+
+    > 缺点
+    1. 没有状态回溯能力：mobx直接修改对象引用 很难去做状态回溯
+    2. 没有中间件：和redux一样 mobx也没有很好的方法处理异步数据流 没办法更精细地控制数据流动(redux虽然自己不做 但它提供了applymiddleware)
+    3. store太多： 随store数量增多 维护成本也会增加 且多store之间的数据共享以及相互饮用也会出错
+    4. 副作用：mobx直接修改数据 和函数式编程模式强调的纯函数相反 这导致了数据的很多未知性
+
+    > 主流数据流管理分为两大派
+    1. 以redux为首的函数式库
+    2. 以mobx为首的响应式库
+    3. redux和mobx有一个共同的短板 即在处理异步数据流时 没有一个较好的解决方案
+
+    > 处理异步数据流 rxjs
+
+    > 前端框架历史
+    1. 传统命令式编程的代表jquery 过去绘制一个页面 会用jquery提供的一套api 然后手动操作dom进行绘制 精准 完全手动操作 且改动时性能损耗较大 开发者注意力集中在如何绘制
+    2. 响应式编程的react 开发者不关心界面如何绘制 只要告诉react 希望页面 剩下的交给react react会自动帮助绘制界面 ui = render(data) 只要操作data即可 页面ui会自动做出响应 且一切操作都是基于内存之中 不会有较大的性能损耗 这就是react响应式编程的精髓 也是为何它叫react
+
+    > rxjs实现响应式
+    > 两种强大的设计模式 观察者模式和迭代器模式
+
+    1. 观察者模式
+    - 观察者模式中 有两个重要角色 observable和observer 就是可观察对象和观察者 
+
+    1. 可观察对象(observable)是事件发布者 负责产生事件
+    2. 观察者(observer)是事件响应者 负责对发布的时间做出响应
+    3. 通过订阅的形式，也就是subscribe方法连接一个发布者和响应者(类似 redux的store.subscribe) 在订阅之前 两者毫无关系 无论observer发出多少时间 observer也不会做出任何响应 订阅关系中断时也不会
+
+    2. 迭代器模式
+    > 拉取pull 推送push
+    - 拉取和推送是两种不同的协议 用来描述生产者producer如何和消费者consumer进行通信
+    > 拉取
+    - 拉取体系中由消费者来决定何时从生产者中接收数据 生产者本身不知道数据何时交付到消费者手中
+    - 每个js函数都是拉取体系，函数是数据的生产者，调用该函数的代码通过从函数调用中取出一个单个返回值对该函数进行消费
+    - es2015引入了generator函数和iterators(function*) 这是另外一种类型的拉取体系 调用iterator.next的代码是消费者 它会从iterator中取出多个值
+                生产者                  消费者
+    拉取    被动的：当被请求时产生数据      主动的：决定何时请求数据
+    推送    主动的：按自己的节奏产生数据    被动的：对收到的数据做出反应
+    > 推送
+    - 在推送体系中 由生产者决定何时把数据发送给消费者 消费者本身不知道何时会接收到数据
+    - 在当今的js世界中 promises是最常见的推送体系类型 promise(生产者)讲一个解析过的值传递给已注册的回调函数(消费者) 不同于回调函数的是 由promise来决定何时把值推送给回调函数 rxjs引入observables 一个新的推送体系 observable是多个值的生产者 并将值推送给观察者(消费者)
+
+    > 拉取和推送实际上对于观察者来说就是一个主动和被动的区别 是主动去获取 还是被动接收 rxjs中 作为事件响应者(消费者)的observer对象也有一个next属性(回调函数)用来接受从发布者那推过来的数据
+
+    > 开发者角度 消息是被动接收 因为倡导的就是通过操作data数据层 让view层进行一个响应 则这里data数据层一定是事件发布者 view层是事件响应者 每当data数据层发生变化时 都会主动推送一个值给view层 这符合真正意义上的响应式编程
+
+    > rxjs只是响应式编程在js中的应用
+    > 如何配合react 帮助react实现状态管理
+    - 只需要将组件作为事件响应者 然后在next回调里定义好更新组件状态的动作setstate 当接收到数据推送时 就会自动触发setstate 完成界面更新 这其实类似mobx (很多人在react项目中没有完全只使用rxjs 而是用了redux-observable中间件 利用rxjs的操作符来处理异步action)
+
+    > rxjs优点
+    1. 纯函数：rxjs中数据流动的过程中 不会改变已经存在的observable实例 会返回一个新的observable 没有任何副作用
+    2. 强大的操作符：rxjs又被称为lodash forasync 和lodash一样 拥有众多强大的操作符来操作数据流 不只是同步数据 针对各种复杂的异步数据流 可以多种事件流组合搭配 汇总到一起处理
+    3. 更独立：rxjs不依赖任何一个框架 它可以任意搭配 因为它的关注点完全就是在数据流的处理上 并且它更偏低层
+
+    > 缺点
+    1. 学习曲线陡峭
+    2. 事件流高度抽象
+
+    > 总结各类适用场景
+    1. 项目中复杂程度较低，建议只用react即可
+    2. 项目中跨组件通信 数据流同步等情况较多时 建议搭配react的新context api
+    3. 项目复杂度一般时 小规模团队或开发周期较短 mobx
+    4. 项目复杂度较高，团队规模较大或要求对事件分发处理可监控可回溯时，建议使用redux
+    5. 项目复杂度较高 且数据流(尤其是异步数据)混杂 建议使用rxjs
+13. Flux和MVC
+    - 在Web应用程序开发中 MVC是客户端和服务器端应用程序的设计模式
+    - Flux是Facebook提出的一种新的应用程序体系结构 它与MVC相同 但侧重于单向数据流
+    1. MVC
+        - MVC设计中 最好将每一层分开 如视图 模型 控制器 
+        - 模型: 管理应用程序域的行为和数据
+        - 视图: 表示模型在UI中的显示
+        - 控制器: 接受用户输入 操纵模型并导致视图更新
+        > 优点
+        1. 将表示形式与模型分开提高可测试性
+        2. 将视图和控制器分离
+        > 缺点
+        1. 服务器端 MVC是好的 但是在客户端 大多数JS框架都提供了数据绑定支持 该视图直接与模型进行通信
+        2. 问题 view1操作model1 model1更新view2 就像系统具有循环依赖关系一样
+        1. 不可预测 
+        2. 级联修改
+        3. 响应顺序
+        4. 有条件响应
+    2. Flux
+        - Facebook用于构建客户端Web应用程序的应用程序体系结构 它通过利用单向数据流来补充React的可组合视图组件 它更像是一种模式 而不是正式的框架
+        - Flux是在MVC模式中进行了一些修改的方法
+    - MVC设计模式
+    - M 就是 model，即数据模型，负责数据相关的任务，包括对数据的增删改查。
+    - V 就是 view，即视图层，即用户能看得到的界面。
+    - C 就是 Controller,即控制器，负责监听用户事件，然后调用 M 和 V 更新数据和视图。
+    - MVC 其实就是将代码变的结构化的一种抽象概念。
+
+    一些建议：
+    1. 所有业务代码放在controller中
+    2. 所有的数据库操作的代码放在model中
+    3. 所有用户可见的页面放在view中
+    4. routes路由只是做简单的路由转发
+    5. controller和model以及route都可以根据业务复杂度选择是否分拆多个，分拆的原则是数据库中有几张表，对应有几个controller和model
+    6. controller中的方法命名规范要和业务相关，比如登录业务，就可以叫signin，注册业务，就可叫signup
+    7. model中的方法命名规范就是CRUD，增删改查：查get*, 删除delete*, 改update*, 增save*
+    8. mysql数据库操作完的结果results,一般会有以下几种情况
+        1. 如果查询不到，results=[], 可以通过results.length是不是>0，来判断查没查到
+        2. 如果查询多条，results=[{},{}...]，可以通过results.length是不是>0，来判断查没查到
+        3. 如果查询到一条，results=[{}]，只有一个查询结果对象，仍然可以通过results.length是不是>0，来判断查没查到
+        4. 如果是添加记录，results返回一个对象，其中有一个insertId属性，用来获取刚刚插入的这条记录的主键值，可以通过这个值是不是>0，来判断插入是否成功
+        5. 如果是删除和修改记录，results返回一个对象，其中有一个affectedRows属性，可以通过这个值是不是>0，来判断删除或修改是否成功
+13. Flux和Redux
+    - React框架本身只应用于View 如果基于MVC模型开发 还需要Model和Controller层 这样催生了Flux的产生 而Redux是基于Flux理念的一种解决方式
+    - Flux
+        - Flux框架也是一种MVC框架 不同于传统的MVC 它采用单向数据流 不允许Model和Control互相引用
+        - Flux框架大致
+        1. Actions: 驱动Dispatcher发起改变
+        2. Dispatcher: 负责分发动作(事件)
+        3. Store: 存储数据 处理数据
+        4. View: 视图部分
+        - Dispacther只会暴露一个函数dispatch 接受action为参数 发起动作 如果需要增加新功能 不需要改变或增加接口 只需增加Action类型 - - Dispatch初始化和更新如下
+        ```
+        // Dispatcher.js
+        import {Dispatcher } from 'flux'
+        export default 
+
+        //actions
+        import AppDispatcher from './Dispatcher.js'
+        
+        export const increment = (number)=>{
+           AppDispatcher.dispatch({
+               type:'ADD',
+               value:number
+           }) 
+        }
+        ```
+        - Store一般会继承EventEmitter 实现事件监听 发布 卸载 需要将store注册到Dispatcher实例上才能发挥作用
+        - Store可以直接修改对象 这点和Redux不同
+        - view组件中的state应该与Flux store保持一致
+        > Flux缺点
+        1. 一个应用可以拥有多个store 多个store之间可能有依赖关系(相互引用)
+        2. Store封装了数据和处理数据的逻辑
+        
+        - 针对Flux的不足 Redux框架出现
+    > Redux
+    - 相比Flux Redux有以下两个特点
+    1. 在整个应用中只提供一个store 它是一个扁平的树形结构 一个节点状态应该只属于一个组件
+    2. 不允许修改数据 即不能修改老状态 只能返回新状态
+    - 不同于Flux Redux没有dispatcher的概念(Store已经集成了dispatch方法 所有不需要Dispatcher) 它依赖纯函数Reducer来替代事件处理器 
+    > 纯函数
+    - 计算机编程中 加入满足下面两个句子的约束 一个函数可能被描述为一个纯函数
+    1. 给出相同的参数值 该函数总是求出同样的结果 该函数结果值不依赖任何隐藏信息或程序执行处理可能改变的状态在程序的两个不同的执行
+- 组件Context
+    - Flux Redux都需要显性地在View里引入store import store from './Store' 一个应用中 只引入一次store 然后所有组件都可以访问到 React提供Context
+    - Context就是上下文环境 让一个树状组件上所有组件都能访问一个共有的对象
+13. 几种常见状态管理模式 Flux Redux Vuex Mobx
+    > 状态管理
+    - 把组件之间需要共享的状态抽取出来 遵循特定的约定 统一来管理 让状态的变化可以预测
+    
+    > 需要
+    1. 状态共享
+        - 需要将共享的状态提升至公共的父组件 若无公共的父组件 往往需要自行构造
+        - 状态由父组件自上而下逐层传递 若组件层级过多 数据传递会变得很冗杂
+    2. 变化追踪
+
+    > Store模式
+    - Store模式是一种相对简单的状态管理模式 一般有以下约定
+        1. 状态存储在外部变量store里(也可以是全局变量)
+        2. store中的state用于存储数据 由store实例维护
+        3. store中的actions封装了改变state的逻辑
+        - 如果对state的变更均通过actions 则实现记录变更 保存快照 历史回滚就会很简单 但store模式没有对此进行强制约束
+
+    > Flux模式
+    - Flux是一种架构思想 类似于MVC MVVM
+    - Flux组成 Flux把一个应用分为四部分
+        1. View 视图层
+        2. Action 动作 即数据改变的消息对象(可通过事件触发 测试用例触发等)
+            - Store的改变只能通过Action
+            - 具体Action的处理逻辑一般放在Store里
+            - Action对象包含type(类型)与payload(传递参数)
+        3. Dispatcher 派发器 接收Actions 发送给所有的store
+        4. Store 数据层 存放应用状态和更新状态的方法 一旦发生变动 就提醒Views更新页面
+        - PS: Action本质是一个纯声明式的数据结构 仅提供对事件的描述 不提供事件的具体逻辑 通常会给Action的type属性赋值一个大写的字符串表明是常量 增强可维护性
+    - Flux特点
+        1. 单向数据流 视图时间或外部测试用例发出Action 经由Dispatcher派发给Store Store会触发相应的方法更新数据 更新视图
+        2. Store可以有多个
+        3. Store不仅存放数据 还封装了处理数据的方法
+
+    > Redux模式
+    - Redux特点
+        1. 单向数据流
+        2. 单一数据源 只有一个store
+        3. state是只读的 每次状态更新后只能返回一个新的state
+        4. 没有Dispatcher 而是在store中集成了dispatch方法 store.dispatch()是View发出Action唯一途径
+        5. 支持使用中间件 管理异步数据流
+
+    > Vuex
+    - Vuex是Vue的状态管理模式
+    - Vuex的核心概念
+        1. Store Vuex采用单一状态树 每个应用仅有一个Store实例 该实例包含state actions mutations getters modules
+        2. State Vuex为单一数据源
+            - 可以通过mapState辅助函数将state作为计算属性访问 或将通过Store将State注入全局后使用this.$store.state访问
+            - State更新视图是通过Vue的双向绑定机制实现的
+        3. Getter
+            - Getter作用和filters有一些相似 可以将State进行过滤后输出
+        4. Mutation
+            - Mutation是Vuex中改变State的唯一途径(严格模式下)并且只能是同步操作 Vuex中通过store.commit()调用mutation
+        5. Action
+            - 一些对State的异步操作可以放在Action中 并通过在Action提交Mutation变更状态
+                1. Action通过store.dispatch()方法触发
+                2. 可以通过mapActions辅助函数将Vue组件的methods映射成store.dispatch调用(需要先在根节点注入store)
+        6. Module
+            - 当store对象过于庞大 可根据具体业务需求分为多个Module 每个Module具有自己的state mutation action getter
+    - Vuex特点
+        1. 单向数据流 View通过store.dispatch()调用Action 在Action执行完异步操作之后通过store.commit()调用Mutation更新State 通过Vue的响应式机制进行视图更新
+        2. 单一数据源 和Redux一样全局只有一个Store实例
+        3. 只能应用于VUex
+
+    > Mobx
+    - Mobx背后的哲学是 任何源自应用状态的东西都应该自动地获得 当状态改变时 所有应用到状态的地方都会自动更新
+    - Mobx核心概念
+        1. State:驱动应用的数据
+        2. Computed values:计算值 如果想创建一个基于当前状态的值 使用computed
+        3. Reactions:反应 当状态改变时自动发生
+        4. Actions:动作 用于改变State
+        5. 依赖收集(autoRun):Mobx中的数据以来基于观察者模式 通过autoRun方法添加观察者
+    - Mobx特点
+        1. 数据流流动不自然 只有用到的数据才会引发绑定 局部精确更新(细粒度控制)
+        2. 没有时间回溯能力 因为数据只有一份引用
+        3. 基于面向对象
+        4. 往往是多个Store
+        5. 代码侵入性小
+        6. 简单可扩展
+        7. 大型项目使用Mobx会使得代码难以维护
+    
+    > 小结
+    1. Flux Redux Vuex均为单向数据流
+    2. Redux和Vuex是基于Flux的 Redux较为范用 Vuex只能用于Vue
+    3. Flux和Mobx可以有多个Store Redux Vuex全局只有一个Store(单状态树)
+    4. Redux Vuex适用于大型项目的状态管理 Mobx在大型项目中应用会使代码可维护性变差
+    5. Redux中引入了中间件 主要用来解决异步带来的副作用 可通过约定完成许多复杂工作
+    6. Mobx是状态管理库中代码侵入性最小之一 具有细粒度控制 简单可扩展等优势 但是没有时间回溯能力 一般适合应用于中小型项目中
+14. 函数式编程的compose和pipe
+    - 函数式编程中有一种模式是通过组合多个函数的功能来实现一个组合函数
+    - 一般支持函数式编程的工具库都实现了这种模式
+    - 这种模式一般被称为compose和pipe
+    - 以函数式著称的Ramda工具库为例
+    
+    > compose函数
+    - compose函数可以将需要嵌套执行的函数平铺 嵌套执行就是一个函数的返回值作为另一个函数的参数
+    - 嵌套执行时 里面的方法 从右边的方法最开始执行 然后往左边返回
+    - compose方法也是从右边的参数开始执行
+    - compose方法的实现借助了Array.prototype.reduceRight(从右往左平铺)
+    - Redux的中间件就是用compose实现的 webpack的loader的加载顺序也是从右往左 这是因为它也是compose实现的
+
+    > pipe函数
+    - pipe函数跟compose函数作用一样 也是将参数平铺 不过顺序是从左往右 
+    - 借助Array.prototype.reduce实现
+15. AST抽象语法树
+    > 为什么要学习AST
+    1. AST在开发过程中扮演着一个非常重要的角色 但是我们却很少直接接触他
+    2. 无论是代码编译babel 打包wepack 代码压缩 css预处理 代码校验(eslint) 代码美化pretiier Vue对template的编译 这些的实现都离不开AST
+    > AST
+    - 对源代码的抽象语法结构的树状表现形式 在不同的场景下 会有不同的解析器将源码解析成抽象语法树
+    > 生成
+    1. 解析器 JS Parser 是把JS源码转化成抽象语法树(AST)的解析器 这个步骤分为两个阶段
+        1. 词法分析 代码解析成tokens流
+        2. 语法分析 token转换成AST
+    > 应用
+    1. babel
+    - babel是一个编译器 把ES6语法编译成ES5
+    > 三个阶段
+    1. 解析 Parse
+    - 通过解析器babylon将代码解析成抽象语法树
+    2. 转换 TransForm
+    - 通过babel-traverse plugin对抽象语法树进行深度优先遍历 遇到要转换的就直接在AST对象上 对节点进行添加 更新 以及移除操作 比如遇到箭头函数就转换成普通函数 最后得到新的AST树
+    3. 生成 Generate
+    - 通过babel-generator将AST树生成ES5代码
+
+    2. Vue模版编译过程
+    - Vue提供了两个版本 
+    1. 一个是Runtime+Compiler 前置是包含编译代码的 会把编译的过程放在运行时做
+    2. 另一个是Runtime only 后者是不包含编译代码的 需要借助webpack的vue-loader把模版编译成render函数
+    - 使用哪个版本都有一个环节 就是将模版编译成render函数
+    > Vue模版编译过程 分为三个阶段
+    1. 解析 Parse
+    - 将模版字符串解析生成AST 这里的解析器是Vue自己实现的 解析过程中会使用正则表达式对模板顺序解析，当解析到开始标签、闭合标签、文本的时候都会有相对应的回调函数执行，来达到构造 AST 树的目的。
+    2. 优化语法树 Optimize
+    - 此阶段会深度遍历生成的AST树 监测它每一颗子树是不是静态节点 如果是静态节点 它们生成的DOM永远不需要改变
+    - 遍历过程中 会对整个AST树中的每一个AST元素节点标记static staticRoot(递归该节点的所有children 一旦子节点又不是static的情况 则为false 否则为true)
+    3. 生成代码 
+    - 通过generate方法 将AST生成render函数
+
+    3. Prettier
+    1. 将代码解析成AST树 对AST遍历 
+    2. 调整长句 整理空格 括号等 最后输出代码
+15. 消息摘要算法
+    - 主要特征是加密过程中不需要密钥 并且经过加密的数据无法被解密 目前可以被解密逆向的只有CRC32算法 只有输入相同的明文数据经过相同的消息摘要算法才能得到相同的密文
+16. 
+    > CSR 浏览器渲染
+    1. 所有的页面渲染 逻辑处理 页面路由 接口请求均是在浏览器中发生
+    2. 其实 现代主流的前端框架均是这种渲染方式 这种渲染方式的好处在于实现了前后端架构分离 利于前后端职责分离 减少首屏渲染事件
+    3. CSR可以通过在打包编译阶段进行预渲染或骨架屏生成 可以进一步提升首次渲染的用户体验
+
+    > NSR
+    - UC浏览器在新闻feed流页面加载中采用了NSR(Native Side Renderfing)首先在列表页中加载离线页面模版 通过Ajax预加载页面数据 通过native渲染生成HTML数据并缓存在客户端
+    - NSR本质是分布式SSR 将服务器的渲染工作放在一个个独立的移动设备中 实现了页面的预加载 同时不会增加额外的服务器压力
+
+    > ESR Edge Side Rendering
+    - 方案核心思想是 借助边缘计算的能力 将静态内容与动态内容以流式的方式 先后返回给用户 
+    - CDN节点相比于Server 距离用户更近 有更短的网络延时 在CDN节点上 可将缓存的页面静态部分 先快速返回给用户 同时在CDN节点上发起动态部分内容请求 并将动态内容在静态部分的响应流后 继续返回给用户

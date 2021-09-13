@@ -2295,7 +2295,29 @@
         reject 函数将 Promise 对象的状态从“未完成”变为“失败”（即从 pending 变为 rejected），在异步操作失败时调用，并将异步操作报出的错误，作为参数传递出去。    
         而一旦状态改变，就不会再变。 所以 代码中的reject('error'); 不会有作用。
         Promise 只能 resolve 一次，剩下的调用都会被忽略。 所以 第二次的 resolve('success2'); 也不会有作用。  
-
+1. 如何串行执行多个Promise
+    1. Array.prototype.reduce
+    ```
+    arr.reduce((s,v)=>{
+        return s.then(()=>delay(v))
+    },Promise.resolve())
+    ```
+    2. async+循环+await
+    ```
+    (
+        async function(){
+            for (const v of arr){
+                await delay(v);
+            }
+        }
+    )()
+    ```
+    3. 普通循环
+    4. 递归
+    
+    5. for await of
+    - for await of和for of规则类似 只需要实现一个内部[Symbol.asyncIterator]方法
+    6. generator
 
 
 

@@ -127,8 +127,8 @@
     - loader和plugin作为webpack两个重要组成部分 承担两部分不同的指责
 
     - webpack基于发布订阅模式 在运行的生命周期会广播出许多事件 插件通过监听这些事件 可以在特定的阶段执行自己的插件任务 从而实现自己想要的功能
-    
-    > Webpack提供的事件钩子
+
+    > Webpack提供的事件钩子(compiler compilation汇编)
     1. compiler 暴露了和Webpack整个生命周期相关的钩子 compiler-hooks
     2. compilation 暴露了与模块和依赖有关的粒度更小的事件钩子 Compilation Hooks
     - Webpack的事件机制基于webpack自己实现的一套Tapable事件流方案
@@ -140,8 +140,9 @@
 4. Loader和Plugin区别
     > Loader：(本质函数 让webpack拥有加载和解析非JavaScript文件的能力)
     1. 本质是一个函数 在该函数中对接收到的内容进行转换 返回转换后的结果 因为Webpack只认识JavaScript 所以Loader就成了翻译官 对其他类型的资源进行转译的预处理工作
-    直译为"加载器"。Webpack将一切文件视为模块，但是webpack原生是只能解析js文件，如果想将其他文件也打包的话，就会用到loader。 所以Loader的作用是让webpack拥有了加载和解析非JavaScript文件的能力。
+    - 直译为"加载器"。Webpack将一切文件视为模块，但是webpack原生是只能解析js文件，如果想将其他文件也打包的话，就会用到loader。 所以Loader的作用是让webpack拥有了加载和解析非JavaScript文件的能力。
     2. 在modules.rules中配置 作为模块的解析规则 类型为数组 每一项都是一个Object 里面描述了对于什么类型的文件（test），使用什么加载(loader)和使用的参数（options）
+    
     > Plugin:(扩展Webpack功能)
     1. 插件 基于事件流框架Tapable Plugin可以扩展Webpack功能 在Webpack运行的生命周期中会广播出许多事件 Plugin可以监听这些事件 在合适的时机通过Webpack提供的API改变输出结果
     2. 在plugins中单独配置 类型为数组 每一项是一个plugin的实例 参数都通过构造函数传入
@@ -383,12 +384,12 @@
     1. VSCode 中有一个插件 Import Cost 可以帮助我们对引入模块的大小进行实时监测，还可以使用 webpack-bundle-analyzer 生成 bundle 的模块组成图，显示所占体积。
     2. bundlesize 工具包可以进行自动化资源体积监控。
 10. gulp和Webpack基本区别
-    > gulp
+    > gulp - 基于流 任务的自动化构建工具
     - 可以进行JS HTML CSS IMG 的压缩打包 是自动化构建工具
     - 可以将多个JS文件/CSS文件压缩成一个文件 并压缩成一行 以此来减少文件体积 加快请求速度和减少请求次数
     - gulp有task定义处理事务 从而构建整体流程 它是基于流的自动化构建工具
 
-    > Webpack
+    > Webpack - 基于入口 模块的自动化构建工具
     - 前端构建工具 实现了模块化开发和文件处理
     - 思想就是万物皆为模块 它能够将各个模块进行按需加载 不会导致加载了无用或冗余的代码
     - 所以它还有个名字叫前端模块化打包工具
@@ -414,15 +415,18 @@
     
     > 小总：
     1. 构建思路
-    - gulp和grunt需要开发者将整个前端构建过程拆分成多个`Task`，并合理控制所有`Task`的调用关系
-    - webpack需要开发者找到入口，并需要清楚对于不同的资源应该使用什么Loader做何种解析和加工
+        - gulp和grunt需要开发者将整个前端构建过程拆分成多个`Task`，并合理控制所有`Task`的调用关系
+        - webpack需要开发者找到入口，并需要清楚对于不同的资源应该使用什么Loader做何种解析和加工
     2. 知识背景
-    - gulp更像后端开发者的思路，需要对于整个流程了如指掌 webpack更倾向于前端开发者的思路
+        - gulp更像后端开发者的思路，需要对于整个流程了如指掌 webpack更倾向于前端开发者的思路
 10. 与webpack类似的工具
     > 同样是基于入口的打包工具
     1. webpack
+        - 大型复杂的前端站点构建
     2. rollup
+        - 基础库的打包 如Vue React
     3. parcel
+        - 简单的实验性项目
     > 应用场景：
     1. webpack适用于大型复杂的前端站点构建
     2. rollup适用于基础库的打包，如vue、react
@@ -447,11 +451,13 @@
         optimization.minimizer可以配置你自己的压缩程序
 12. Webpack看法
     1. Webpack是一个模块打包工具，可以使用Webpack管理模块依赖，并编译输出模块们所需的静态文件，它能很好的管理，打包Web开发中所用到的HTML  JS CSS以及各种静态文件(图片 字体等) 让开发过程更加高效 对于不同类型的资源 Webpack有对应的模块加载器 Webpack模块打包器会分析模块间的依赖关系 最后生成优化且合并后的静态资源
-    - Webpack两大特色
+
+    > Webpack两大特色
     1. code splitting(可以自动完成)
     2. loader可以处理各种类型的静态文件，并且支持串联操作
-    - Webpack是以conmmonJS的形式来书写脚本的 但对AMD/CMD的支持也很全面 方便旧项目进行代码迁移
-    - Webpack具有requirejs和browserify的功能 但仍有很多自己的新特性
+    
+    > Webpack是以conmmonJS的形式来书写脚本的 但对AMD/CMD的支持也很全面 方便旧项目进行代码迁移
+    > Webpack具有requirejs和browserify的功能 但仍有很多自己的新特性
     1. 对CommonJS AMD ES6的语法做了兼容
     2. 对JS CSS图片等资源文件都支持打包
     3. 串联式模块加载器以及插件机制，让其具有更高的灵活性和扩展性 如提供对CoffeeScript ES6的支持

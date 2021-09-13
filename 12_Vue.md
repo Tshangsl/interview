@@ -1,61 +1,3 @@
-0. Vue和React区别
-    1. Vue的标签如v-model 比react方便 一层封装好的语法糖 绑定input不再写change事件 
-    2. React的JSX功能强大，扩展性强
-    3. Vue的dom操作很方便 各种方便的for指令 if指令
-    4. React思想 各种抽象和模式使得代码更美观
-    5. Vue的底层使用Object.defineProperty实现 因此方法不支持数组绑定 Vue源码中重新封装数组的方法 重写了push pop shift unshift splice sort reverse 这七个数组方法
-
-    1. 监听事件变化实现原理不同 Vue getter&setter 函数劫持 React 比较引用    
-    2. 数据流不同 Vue默认支持双向绑定 组件和DOM之间可通过v-model双向绑定 React 单向数据流 onchange/setState模式
-    3. HOC&MIXINS Vue通过Mixins组合不同的功能 React通过HOC组合不同的功能
-    4. 模版渲染方式不同 表面上模版语法不同 React通过JSX渲染模版 Vue通过一种扩展的HTML语法渲染模版 深层上模版原理不同 React组件JS代码中 通过原生JS实现模版中常见语法 Vue中模版使用的数据必须挂在this上中转一次
-    5. Vuex和Redux 表面上store注入和使用方法 。。。实现原理上 Redux使用的是不可变数据 Vuex的数据是可变的 Redux通过diff检测数据变化 Vuex同Vue一样通过getter/setter
-    6. 组件通信
-    7. 构建工具 React采用create-react-app vue使用vue-cli
-
-    1. 监听数据变化实现的原理不同 
-        - Vue痛过getter/setter以及一些函数的劫持 能精确知道数据变化 不需要特别的优化就能达到很好的性能 
-        - React默认通过比较引用的方式进行 如果不优化(PureComponent/shouldComponent) 可能会导致大量不必要的VDOM重新渲染
-    2. 数据流不同
-        - Vue中默认支持双向绑定 Vue1.0中可实现两种双向绑定
-            - 父子组件之间 props可以双向绑定(Vue2.x去掉了第一种)
-            - 组件和DOM之间可以通过v-model双向绑定
-        - React从诞生之初就不支持双向绑定 React一直倡导的是单向数据流 称之为onChange/setState()模式 使用Vuex及Redux等单向数据流状态管理框架
-    3. Hoc和minxins
-        - Vue中组合不同功能的方式是通过mixin
-        - React中通过Hoc高阶组件 高阶组件本质上就是高阶函数 React的组件就是一个单纯的函数 所以高阶函数对React来说非常简单
-    4. 模版渲染方式不同
-        - 表面上模版语法不同
-            - React通过JSX渲染模版(只是表面现象 React不必依赖JSX)
-            - Vue通过一种扩展的HTML语法进行渲染
-        - 深层上 模版的原理不同
-            - React在组件JS代码中 通过原生JS实现模版中的常见语法 比如插值 条件 循环等 都是通过JS语法实现
-            - Vue中 模版中使用的数据必须挂在this上进行一次中转 import一个组件后还需要在components中再声明
-    5. Vuex和Redux区别
-        - 表面上 store注入和使用方法
-            - Vuex中 $store被直接注入到组件实例 因此比较灵活的使用
-                1. 使用dispatch和commit提交更新
-                2. 通过mapState或直接通过this.$store读取数据
-            - Redux中 每一个组件都需显式用connect把需要的props和dispatch连接起来
-        - 实现原理
-            1. Redux使用的是不可变数据 Vuex的数据是可变的 Redux每一次都是用新的state替换旧的state Vuex是直接修改
-            2. Redux检测数据变化时 是通过diff方式比较差异的 Vuex和Vue原理一样 通过getter和setter比较
-    6. 构建工具
-        - React采用Create-React-App(webpack&Babel)
-        - Vue采用Vue-cli
-
-    > 相同点
-    1. 都使用了VDOM
-    2. 都提供了响应式和组件化的视图组件
-    3. 都将注意力集中保持在核心库 其他功能如路由和全局状态管理交给相关库
-    4. 都提供合理的钩子函数 可以让开发者定制化处理需求
-    5. 对文件内容都有一些约定 两者都需要编译后使用
-    
-    > 不同点
-    1. React中 当某组件的状态发生变化时 它会以该组件为根 重新渲染整个组件子树 Vue中 组件的依赖是在渲染的过程中自动追踪的 所以系统能准确直销那个组件确实需要被重新渲染
-    2. Vue的路由库和状态管理库都由官方维护支持且与核心库同步更新
-    React选择把这些交给社区维护 因此生态更丰富
-    3. Vue-Cli脚手架可配置
 1. Vue事件驱动 响应式原理 双向数据绑定原理
     - 三者使用同一个底层原理 该底层原理由ES5的Object.definedProperty((obj,prop,descriptor))提供
     ----------
@@ -150,6 +92,7 @@
             并及时通知视图进行update
         4. 实现MVVM 整合以上三者 作为一个入口函数
 
+    -----------
     > 暂时用这个
     - View变化更新Data可以通过事件监听方式实现
     - Vue双向数据绑定的工作主要是如何根据data变化更新view
@@ -161,8 +104,8 @@
     2. 这些getter setter对用户来说不可见 但在内部它们能让Vue追踪以来 在property被访问和修改时通知变更
     3. 每个组件都对应一个Watcher实例 它会在组件渲染过程中 把接触过的数据property记录为依赖 之后当依赖项触发时 通知Watcher 使它关联的组件重新渲染
     
-    > 步骤：
-    1. 实现一个监听器Observer:
+    > 步骤：Observer<->Watcher<->Compiler
+    1. 实现一个监听器Observer:(发布者)
         - 对数据对象进行遍历，包括子属性对象的属性，利用 Object.defineProperty() 对属性都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。
     2. 实现一个解析器Compile
         - 解析 Vue 模板指令，将模板中的变量都替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加监听数据的订阅者，一旦数据有变动，收到通知，调用更新函数进行数据更新。
@@ -275,7 +218,7 @@
         1. 兼容性好，支持 IE9，而 Proxy 的存在浏览器兼容性问题,而且无法用 polyfill 磨平 因此 Vue 的作者才声明需要等到下个大版本( 3.0 )才能用 Proxy 重写。
         > 缺点
         1. 能劫持对象的属性但需对对象每一个属性进行遍历劫持 对象上新增属性 需对新增的属性再次劫持 如果属性是对象 还需深度遍历 Vue给对象新增属性 用$set 原理通过Object.defineProperty对新增属性再次劫持)
-        2. 只能监听对象 无法检测到对象属性的添加和删除 不能监听数组的变化 无法触发push pop shift unshift splice sort reverse 需要进行数组方法的重写 无法检测数组的长度修改
+        2. 只能监听对象 无法检测到对象属性的添加和删除 不能监听数组的变化 无法触发push pop shift unshift splice sort reverse 需要进行数组方法的重写 无法检测数组的长度修改 
         2. 必须遍历对象的每个属性
         3. 只能劫持当前对象属性 如果想深度劫持 必须深层遍历嵌套的对象
 
@@ -1893,6 +1836,7 @@
     - (侦听器/依赖一个属性/直接计算，不会创建变量保存结果/计算开销比较大(计算次数多或者异步处理)/不需要return/支持异步) 
     - 在选项参数中指定deep: true 可深度监听
     - 在选项参数中指定immediate: true将立即以表达式的当前值触发回调。监听后立即调用
+    3. computed是计算一个新的属性 并将该属性挂载到vm(Vue实例)上 而watch是监听已经存在且已挂载到vm上的数据 所以用watch同样可以监听computed计算属性的变化
     
     > computed&watch
     1. computed(支持缓存/不支持异步)
@@ -1918,6 +1862,8 @@
     > 特性：
     - (计算属性是基于它们的响应式依赖进行缓存的,只在相关响应式依赖发生改变时它们才会重新求值)
     - 计算属性默认只有 getter，不过在需要时你也可以提供一个 setter：
+    > computed怎么实现的缓存
+
     > 原理
     - computed 本质是一个惰性求值的观察者。
     - computed 内部实现了一个惰性的 watcher,也就是 computed watcher,

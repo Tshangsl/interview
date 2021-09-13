@@ -17,3 +17,9 @@
 5. `微搭-分享` 了解性能优化可以怎么做，storybook快速生成组件文档，云开发网关架构设计，各种node框架优势选型。
 
 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
+
+1. 遇到哪些难点
+2. 怎么解决
+3. 做过哪些优化 
+4. 优化有量化吗
+5. 用过哪些loader plugin

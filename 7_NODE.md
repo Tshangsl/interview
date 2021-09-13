@@ -1,13 +1,10 @@
 1. Node
     > 是什么
-    - Nodejs使用了一个事件驱动 非阻塞式I/O的模型 使其轻量而高效 避免由于等待输入或输出响应而造成的CPU时间损失 Nodejs适合运用在高并发 i/o密集 少量业务逻辑的场景
-
+    - Nodejs使用了一个事件驱动 非阻塞式I/O的模型 使其轻量而高效 避免由于等待输入或输出响应而造成的CPU时间损失 Nodejs适合运用在高并发 I/O密集 少量业务逻辑的场景
     - Nodejs是一个基于Chrome V8引擎的JS运行环境runtime Node不是一门语言 是让JS运行在后端的运行时 并且不包括JS全集 因为在服务端中不包含DOM和BOM
     - Node也提供了一些新的模块例如http fs模块等
     - Nodejs使用了事件驱动 非阻塞式I/O的模型 使其轻量又高效
     - 且Nodejs的包管理器npm 是全球最大的开源库生态系统
-
-    - 一个基于Chrome V8引擎的JS运行环境 Nodejs使用了一个事件驱动 非阻塞式I/O模型 使其轻量且高效
 
     > 核心结构
     1. 体系架构
@@ -34,28 +31,38 @@
     - Web主要场景就是接受客户端的请求读取静态资源和渲染界面 所以Node非常适合Web应用的开发
 2. Nodejs优缺点
     > 优点
+    1. 处理高并发场景性能更高
+    2. 适合IO密集型应用
+
     1. 事件驱动 通过闭包很容易实现客户端的生命活期
     2. 不用担心多线程 锁 并行计算的问题
     3. V8引擎速度非常快
     4. 对于游戏来说 写一遍游戏逻辑代码 前端后端通用
-    > 缺点
-    1. nodejs更新很快 可能会出现版本兼容
-    2. nodejs不像其他服务器 对于不同的链接 不支持进程和线程操作
 
-    - 优点
     1. 执行快速。
-    2. 永远不会阻滞。
-    3. JavaScript是通用的编程语言。
-    4. 异步处理机制。
-    5. 避免并行所带来的问题。
+    2. JavaScript是通用的编程语言。
+    3. 异步处理机制。
+    4. 避免并行所带来的问题。
     - 特点
     1. 单线程，有很高的可扩展性，使用JavaScript作为主流编程语言。使用的是异步处理机制和事件驱动。处理高效。
+    > 缺点
+    1. 不适合用CPU密集型
+    - CPU使用率较重 IO使用率较轻 
+    2. 无法充分利用多核CPU性能
+    3. 可靠性低 一旦代码某个环节崩溃 整个系统都崩溃
+
+    1. nodejs更新很快 可能会出现版本兼容
+    2. nodejs不像其他服务器 对于不同的链接 不支持进程和线程操作
+    > 解决方案
+    1. Nginx反向代理 负载均衡 开多个进程绑定多个端口
+    2. 单线程变多线程 开多个进程监听同一端口 使用cluster模块
 3. Node中的事件循环
     > Node中的事件循环和浏览器中是完全不相同的东西 Node.js采用V8作为JS解析引擎 I/O处理方面使用自己设计的libuv 
+    - Nodejs中 事件循环的模型和浏览器相比大致相同 最大的不同点在于Nodejs事件循环分不同的阶段
+    - 两者最主要的区别在于浏览器的微任务是在每个相应的宏任务中执行的 nodejs的微任务是在不同阶段之间执行的
 
     > libuv是一个基于事件驱动的跨平台抽象层
-    - 封装了不同操作系统一些底层特性
-    - 对外提供统一的API 事件循环机制也是它里面的实现
+    - 封装了不同操作系统一些底层特性 对外提供统一的API 事件循环机制也是它里面的实现
     
     > libuv 
     - 为Nodejs提供了跨平台 线程池 事件池 异步I/O等能力 是Nodejs如此强大的关键
@@ -67,15 +74,16 @@
     4. V8引擎再将结果返回给用户
 
     > 六个阶段 
-    - libuv引擎中事件循环分为六个阶段 它们会按照顺序反复运行每当进入某一个阶段时 都会从对应的回调队列中取出函数执行 当队列为空 或者执行的回调函数数量达到系统设置的阈值 就会进入下一阶段
+    - libuv引擎中事件循环分为六个阶段 它们会按照顺序反复运行 每当进入某一个阶段时 都会从对应的回调队列中取出函数执行 当队列为空 或者执行的回调函数数量达到系统设置的阈值 就会进入下一阶段
     1. timers
         - 这个阶段执行timer(setTimeOut setInterval)中到期的回调 
     2. I/O callbacks
         - 上一轮循环中在poll阶段有少数的I/O callbacks 会被延迟到这一轮的这一阶段执行
         - 处理一些上一轮循环中少量为执行的I/O回调
-    3. idle,prepare
+    3. idle/闲置的,prepare/准备
         - 仅node内部使用
-    4. poll
+        - 尽管名字是空闲的 但是每个tick都运行 Prepare也在轮询阶段开始之前运行 不管怎样 这两个阶段是node主要做一些内部操作的阶段
+    4. poll/投票
         - 最为重要的阶段 执行I/O callback 适当的条件下会阻塞在这个阶段
         - 获取新的I/O事件 适当条件下node将阻塞在这里
     5. check
@@ -83,6 +91,8 @@
     6. close callbacks
         - 执行close时间的callback
         - 执行socket的close事件回调   
+    - 每个阶段执行特定的任务 每个阶段都有一个队列
+    - JS可以在任何一个阶段执行 除了(idle prepare)
 
     - PS：上述六个阶段都不包含process.nextTick
     1. timer poll check 日常开发中绝大部分异步任务都是在这个三个阶段处理的
@@ -103,7 +113,15 @@
         3. check阶段
             - setImmediate()的回调会被加入check队列中，从event loop的阶段图可以知道，check阶段的执行顺序在poll阶段之后
             1. 一开始执行栈的同步任务（这属于宏任务）执行完毕后（依次打印出start end，并将2个timer依次放入timer队列）,会先去执行微任务（这点跟浏览器端的一样），所以打印出promise3
-            2. 然后进入timers阶段，执行timer1的回调函数，打印timer1，并将promise.then回调放入microtask队列，同样的步骤执行timer2，打印timer2；这点跟浏览器端相差比较大，timers阶段有几个setTimeout/setInterval都会依次执行，并不像浏览器端，每执行一个宏任务后就去执行一个微任务（关于Node与浏览器的 Event Loop 差异，下文还会详细介绍）。
+            2. 然后进入timers阶段，执行timer1的回调函数，打印timer1，并将promise.then回调放入microtask队列，同样的步骤执行timer2，打印timer2；这点跟浏览器端相差比较大，timers阶段有几个setTimeout/setInterval都会依次执行，并不像浏览器端，每执行一个宏任务后就去执行一个微任务（关于Node与浏览器的 Event Loop 差异，下文还会详细介绍）
+    > 一些常见的误解
+    1. 在JS引擎内部的事件循环
+    - 最常见的误解之一 事件循环是JS引擎的一部分 事实上事件循环主要利用JS引擎来执行代码
+    2. 有一个栈或队列
+    - 首先没有栈 其次这个过程是复杂的 有多个队列(像数据结构中的队列)参与 
+    3. 事件循环运行在一个单独的线程中
+    - 由于错误的nodejs事件循环图 有一部分认为有两个线程 一个执行JS 一个执行时间循环 事实上都在一个线程里面执行
+
     > Node中事件循环大致顺序
     1. 外部输入数据-->
     2. 轮询阶段(poll)-->
@@ -117,23 +135,22 @@
     > Micro-Task和Macro-Task
     - Node端事件循环中的异步队列也是这两种
     1. 常见的宏任务
-        1. setTimeout setInterval I/O
-        2. setImmediate script整体代码
-        3. requestAnimationFrame
+        1. setTimeout setInterval I/O 浏览器和Node
+        2. setImmediate script整体代码 Node
+        3. requestAnimationFrame 浏览器
         4. postMessage
     2. 常见的微任务
-        1. process.nextTick 
-        2. new Promise().then() async await回调
-        3. MutationObserver
+        1. process.nextTick Node
+        2. new Promise().then() async await回调 浏览器 Node
+        3. MutationObserver 浏览器
 
     > 注意
     1. setTimeout和setImmediate
-        两者非常像 区别主要在于调用时机不同
-        setImmediate 设计在poll阶段完成时执行，即check阶段；
-        setTimeout 设计在poll阶段为空闲时，且设定时间到达后执行，但它在timer阶段执行
-        。。。
+        - 两者非常像 区别主要在于调用时机不同
+        - setImmediate 设计在poll阶段完成时执行，即check阶段；
+        - setTimeout 设计在poll阶段为空闲时，且设定时间到达后执行，但它在timer阶段执行
     2. process.nextTick
-        该函数其实是独立于Event Loop之外 它有一个自己的队列 当每个阶段完成后 如果存在nextTick队列 就会清空队列中的所有回调函数 并且由于其他microtask执行
+        - 该函数其实是独立于Event Loop之外 它有一个自己的队列 当每个阶段完成后 如果存在nextTick队列 就会清空队列中的所有回调函数 并且由于其他microtask执行
     
     > Node与浏览器的事件轮询差异
     - 浏览器环境下 microtask任务队列是每个macrotask执行完之后执行
@@ -152,7 +169,7 @@
     - Node采用的是单线程的处理机制(所有的I/O请求都采用非阻塞的工作方式) 至少从nodejs开发者的角度是这样的 
     - 而在底层 Nodejs借助libuv作为抽象封装层 从而屏蔽不同操作系统差异 Node可以借助libuv实现多线程 
     - libuv库负责Node API的执行 它将不同的任务分配给不同的线程 形成一个事件循环 以异步的方式将任务的执行结果返回给V8引擎 
-    - 每一个i/o都需要一个回调函数 一旦执行完就堆到事件循环上用于执行
+    - 每一个I/O都需要一个回调函数 一旦执行完就堆到事件循环上用于执行
 
     > Nodejs中的事件循环
     - Node采用V8作为JS的执行引擎 同时使用libuv实现事件驱动式异步I/O 
@@ -242,6 +259,59 @@
     5. net(网络)
         - net模块用于创建基于流的TCB或IPC的服务器
 4. 模块系统
+    > Nodejs中的模块系统
+    1. 模块化是一种将项目分解成独立功能部分的方法 在Node中 没有全局作用域 只有模块作用域
+    2. 模块化的文件 具有模块作用域 外部访问不到内部变量 内部也访问不到外部变量 默认都是封闭的 每个文件的命名空间都是独立且封闭的 不同模块之间不会相互影响 不会有污染情况
+    3. 只有通过export暴露出去 其他文件才能通过require拿到 
+
+    > 模块化的优缺点
+    > 优点
+    1. 可维护性
+    > 缺点
+    1. 性能损耗
+
+    > commonJS
+    - JS天生不支持模块化(ES6才支持) Nodejs环境中对JS做了特殊的模块化支持 即为commonjs
+
+    > exports和module.exports区别
+    1. 在node中 每个模块内部都有一个自己的module对象
+    2. module.exports也是一个对象(默认是空对象)
+    3. 对外导出成员 只需要把导出的成员挂载到module.exports中
+
+    > 模块加载规则
+    1. 优先从缓存中夹在
+        1. 如果已经require过 不会重复执行加载 直接可以拿到里面的接口对象
+        2. 目的是避免重复加载 提高模块加载效率
+    2. 判断模块标识符 require('模块标识符')
+        1. 核心模块
+        2. 自定义模块(路径形式的模块标识)
+        - ./ ../ /xxx
+        - 
+        3. 第三方模块
+    
+    > 核心模块
+    - 核心模块是由Node提供的一个个具名的模块 它们都有自己特殊的名称标识
+    1. fs 文件操作系统模块
+    2. http http服务构建模块
+    3. path 路径操作模块
+    4. os 操作系统模块
+    - 核心模块必须引入才能使用
+
+    > 自定义模块
+    1. 加载文件时相对路径一定要加./ 不然默认是加载核心模块
+    
+    > 第三方模块
+    1. 凡是第三方模块都必须通过npm来下载
+    2. 使用时可以通过require('包名')方式来进行加载才可以使用
+    3. 不可能有任何第三方包名和核心模块重名 提交第三方包不会允许 不然加载会有冲突
+    4. 
+    5. 
+    6. 
+
+    > 扩展
+    1. require()中的路径 是从当前这个JS文件出发 找到目标文件
+    2. fs是从命令提示符找到目标文件 fs等其他模块用到路径时 都是相对于cmd命令光标所在位置
+
     - 为了让Nodejs中的文件可以相互调用 Nodejs提供了一个简单的模块系统
     - 模块是Nodejs应用程序的基本组成部分 文件和模块是一一对应的 换言之 一个Nodejs文件就是一个模块 这个文件可能是JS代码 JSON 或者编译过的C/C++扩展
     > 模块CommonJS
@@ -347,7 +417,7 @@
     - Node提供了net dgram http https四个模块 分别用于处理 TCP UDP HTTP HTTPS适用于服务端和客户端
 5. libuv
     > libuv和linux
-    1. 单以linux平台来看 liuc主要工作可以简单划分为两部分
+    1. 单以linux平台来看 linux主要工作可以简单划分为两部分
         1. 围绕epoll 处理哪些被epoll支持的IO操作
         2. 线程池(Thread pool) 处理那些不被epoll支持的IO操作
     > epoll简介
@@ -378,14 +448,11 @@
         1. 对于Network I/O相关的请求 根据OS平台不同 分别使用Linux上的epoll OSX和BSD类OS上的kqueue SunOS上的event ports以及Windows上的IOCP机制
         2. 对于File I/O为代表的请求 则使用thread pool 利用thread pool 的方式实现异步请求处理 在各类OS上都能获得很好的支持
 
-    - libuv
-    - libuv是一个跨平台的异步IO库 它结合Unix下的libev和windows下的IOCP的特性 最早由Node的作者开发 专门为Node提供多平台下的异步IO支持
-    - Libuv本身是由C++语言实现的
-    - Node中的非阻塞IO以及事件循环的底层机制都是由libuv实现的
-    - Winodws环境下 libuv直接使用Windows的IOCP来实现异步IO 在非windows环境下 libuv使用多线程来模拟异步IO
-    - Node的异步调用是由libuv支持的 
-    - 以读取文件的例子 读文件实质的系统调用是由libuv实现的 
-    - Node只是负责调用libuv的接口 等数据返回后再执行对应的回调方法
+    > libuv
+    1. libuv是一个跨平台的异步IO库 它结合Unix下的libev和windows下的IOCP的特性 最早由Node的作者开发 专门为Node提供多平台下的异步IO支持
+    2. Libuv本身是由C++语言实现的 Node中的非阻塞IO以及事件循环的底层机制都是由libuv实现的
+    3. Winodws环境下 libuv直接使用Windows的IOCP来实现异步IO 在非windows环境下 libuv使用多线程来模拟异步IO Node的异步调用是由libuv支持的 
+    4. 以读取文件的例子 读文件实质的系统调用是由libuv实现的 Node只是负责调用libuv的接口 等数据返回后再执行对应的回调方法
 6. Node的异步I/O
     1. 介绍Node事件循环的流程
         - 进程启动时 Node会创建一个类似while(true)的循环 每执行一次循环体的过程 我们称之为tick
@@ -412,6 +479,7 @@
     > 异步异常捕获
     - 由于node的回调异步特性 无法通过try catch来捕获所有的异常
     - 如果
+
     > domain
     - node v0.8+版本时 发布了一个模块domain 这个模块做的就是try catch无法做到的 捕获异步回调中出现的异常
     - domain虽然捕获到了一场 但是还是由于一场儿导致的堆栈丢失会导致内存泄漏 所以出现这种情况还是要重启这个线程
@@ -427,17 +495,16 @@
         4. fork
         5. spawn
         6. 
-    2.
     3. 实现一个node子进程被杀死 然后自动重启代码的思路
         - 创建子进程时 就让子进程监听exit事件 如果被杀死就重新fork一下
-2. Nodejs单线程
+7. Nodejs单线程
     - 事件驱动/事件循环: 高效 处理数万级的并发而不会造成阻塞
     - 我们所看到的nodejs单线程只是一个js主线程 本质上的异步操作还是由线程池完成的 
     - node将所有的阻塞操作都交给了内部的线程池去实现
     - 本身只负责不断的往返调度 并没有进行真正的IO操作 
     - 从而实现异步非阻塞IO
     - 这是node单线程和事件驱动的精髓
-2. Node.js多线程支持
+7. Node.js多线程支持
     - nodejs在v10.5.0新增了多线程的支持 并且在v11中不需要再加实验特性后缀即可直接使用
     > 核心API
     ```
@@ -454,11 +521,11 @@
     2. 启动多线程 需要提供的Worker构造函数去启动 且主线程也可以通过WorkerData去传递数据给工作线程
     Worker构造函数第一个参数默认是执行的js文件路径，或者当第二个可选参数eval为true时，可以行内执行。
     3. 线程通信 和进程通信类似
-        worker_threads模块还有MessageChannel和MessagePort类(继承于EventEmitter)
-        MessageChannel类(创建自定义通信频道)
-            包含两个已经互相能够跨线程通信的Message类型对象 可用于创建自定义的通信频道 实例化后包含两个属性port1和port2 MessagePort类型对象 可将其一个发到工作线程后通过该对象实现自定义跨线程通信
-        MessagePort(跨线程通信的句柄)
-            用于跨线程通信的句柄 继承了EventEmitter 包括close message事件用于接受对象关闭和发送的消息 以及close postMessage等操作
+    - worker_threads模块还有MessageChannel和MessagePort类(继承于EventEmitter)
+    - MessageChannel类(创建自定义通信频道)
+        包含两个已经互相能够跨线程通信的Message类型对象 可用于创建自定义的通信频道 实例化后包含两个属性port1和port2 MessagePort类型对象 可将其一个发到工作线程后通过该对象实现自定义跨线程通信
+    - MessagePort(跨线程通信的句柄)
+        用于跨线程通信的句柄 继承了EventEmitter 包括close message事件用于接受对象关闭和发送的消息 以及close postMessage等操作
 8. Global对象
     - 所有属性都可以在程序的任何地方被访问 即全局变量
     - JS中 通常Window是全局变量 而Node.js的全局变量是global 所有全局变量都是global对象的属性 如console processs等
@@ -468,10 +535,10 @@
     2. 全局对象的属性
     3. 隐式定义的变量(未定义直接赋值的变量)
     - Node.js中不可能在最外层定义变量 因为所有的用户代码都是属于当前模块的 而模块本身不是最外层上下文 Node.js中也不提倡自定义全局变量
+    
     > Node.js提供以下几个全局变量 它们是所有模块都可以调用的
     1. global: 表示Node所在的全局变量 类似浏览器的window对象 
-        - 如果在浏览器中声明了一个全局变量 实际上是声明了一个全局对象的属性
-        - Node中不是这样 至少在模块中不是这样 REPL环境的行为和浏览器一致 
+        - 如果在浏览器中声明了一个全局变量 实际上是声明了一个全局对象的属性 Node中不是这样 至少在模块中不是这样 REPL环境的行为和浏览器一致 
         - 在模块文件中 声明var x = 1 该变量不是global对象的属性 global.x等于undefined 这时因为模块的全局变量都是该模块私有的 其他模块无法取到
     2. process: 该对象表示Node所处的当前进程 允许开发者与该进程互动
     3. console: 指向Node内置的console模块 提供命令行环境中的标准输入 标准输出功能
@@ -488,8 +555,9 @@
 9. Buffer缓冲区
     - JS语言自身只有字符串数据类型 没有二进制数据类型
     - 但在处理TCP流或文件流时 必须使用到二进制数据 因此在Node.js中 定义了一个Buffer类 该类用来创建一个专门存放二进制数据的缓冲区
-    - 在Nodejs中 Buffer类是随Node内核一起发布的核心库 Buffer库为Nodejs带来了一种存储原始数据的方法 可以让Node.js处理二进制数据 每当需要在Nodejs中处理I/O操作中移动的数据时 就有可能使用Buffer库 
-    - 原始数据存储在Buffer类的实例中 一个Buffer类似于一个整数数组 但它对应于V8堆内存之外的一块原始内存
+    > 在Nodejs中 Buffer类是随Node内核一起发布的核心库 Buffer库为Nodejs带来了一种存储原始数据的方法 可以让Node.js处理二进制数据 
+    - 每当需要在Nodejs中处理I/O操作中移动的数据时 就有可能使用Buffer库 
+    > 原始数据存储在Buffer类的实例中 一个Buffer类似于一个整数数组 但它对应于V8堆内存之外的一块原始内存
     ```
     // buffer: 八位字节组成数组 可以有效的在js中存储二进制数据
     //创建
@@ -517,9 +585,9 @@
     - 在Nodejs中 Buffer类是随Node内核一起发布的核心库
     - Buffer库为Nodejs带来一种存储原始数据的方法 可以让Nodejs处理二进制数据
     > 小结
-    - Buffer是一个典型的JS和C++结合的模块 性能相关部分用C++实现 非性能相关部分用JS实现
-    - Node在进程启动时 Buffer就已经加装进了内存 并将其放入全局变量 因此无需require
-    - Buffer内存分配 Buffer对象的内存分配不是在V8的堆内存中 在Node的C++层面实现内存的申请
+    1. Buffer是一个典型的JS和C++结合的模块 性能相关部分用C++实现 非性能相关部分用JS实现
+    2. Node在进程启动时 Buffer就已经加装进了内存 并将其放入全局变量 因此无需require
+    4. Buffer内存分配 Buffer对象的内存分配不是在V8的堆内存中 在Node的C++层面实现内存的申请
 
     > Buffer模块
     1. 新建Buffer会占用v8分配的内存吗
@@ -533,6 +601,21 @@
     4. Buffer乱码问题
         - rs.setEncoding('utf8')
 10. Stream流
+    - node中读取文件方式有两种
+    1. 利用fs模块
+        - 读取小文件 fs读取文件时 将文件一次性读取到本地内存
+    2. 利用流来读取
+        - 读取一个大文件 一次性读取会占用大量内存 效率很低 这个时候需要流来读取 流是将数据分割段 一段一段读取 可以控制速率 效率很高 不会占用太大内存
+        - gulp的task任务 文件压缩 http中的请求和响应等功能的实现都是基于流来实现的
+    > 可读流用法
+    1. node中读是将内容读取到内存中 而内存就是Buffer对象
+    2. 流都是基于原生的fs操作文件的方法来实现的 通过fs创建流 所有的Stream对象都是EventEmitter实例
+    > 常用事件
+    1. open 打开文件
+    2. data 当有数据可读时触发
+    3. error 读收和吸入过程中发生错误时触发
+    4. close 关闭文件
+    5. end 没有更多数据可读时触发
     > 管道流
     - 管道提供了一个输出流到输入流的机制 通常用于从一个流中获取数据并将数据传递到另外一个流中
     - 以下实例通过读取一个文件内容并将内容写入另外一个文件中
@@ -566,7 +649,7 @@
     1. 包和模块
     > 包是描述一个文件或一个目录 一个包的配置通常由以下构成
 
-18. node中cluster是怎么开启多线程的 并且一个端口可以被多个进程监听吗
+12. node中cluster是怎么开启多线程的 并且一个端口可以被多个进程监听吗
     - nodejs是单线程的模式 不能充分利用服务器的多核资源
     - 使用node的cluster模块可以监听应用进程
     - 退出后重新启动node应用进程 并可以启动多个node应用进程
@@ -577,6 +660,32 @@
     2:请求已接收(send方法已被调用 且头部和状态已可获得)
     3:请求处理中(下载中 responseText属性已包含部分数据)
     4:请求已完成 且响应已就绪(下载操作已完成)
+13. Nodejs10的workder_threads
+    - Nodejs从v10.5.0开始引入实验性的Worker_Threads概念 
+    - 并将其体现在workder_threads模块 该模块从NodejsV12 LTS开始作为一个稳定功能模块提供出来
+    > Nodejs的CPU密集型应用的历史
+    - 在worker threads出现前 就已经有很多方案来完成基于Nodejs的CPU密集型应用 常见的有如下几种
+    1. 使用child_process模块 在子进程中运行耗费CPU的代码操作
+    2. 使用cluster模块 在多个进程中运行耗费CPU资源的代码操作
+    3. 使用第三方模块 如Microsoft的Napa.js
+    - 但是由于性能限制 额外的引入学习成本 接收度不足 不稳定性以及文档缺失等原因 这其中没有一个方案是能被广泛接受的
+    
+    > 使用worker threads 来执行CPU密集的代码操作
+    - 尽管worker_threads对于JS的并发问题来说是一个优雅的解决方案 但是其实JS本身并没有引入多线程的语言特性
+    - 实际上workder threads是通过允许应用可以运行多个独立的JS workers workers和其父worker可以通过Nodejs来通信
+    - 在Nodejs中 每个worker有它自己的V8实例和事件循环机制(Event Loop) 但是和子进程不同 workers是可以共享内存的
+
+    > workder threads如何工作的
+    1. JS没有多线程的性质 所有Nodejs的Worker Threads和其他支持多线程的高级语言在处理上是不一样的
+    2. 在Nodejs中 一个worker的职责就是执行parent worker提供给他的代码片段(worker script)
+    3. 每一个worker都通过一个message channel来和其parent worker通信 child worker可以通过parentPort,postMessage将信息写入信道 而parent worker需要通过worker.postMessage()将信息写入信道
+
+    > Nodejs workers如何并行运行
+    - V8 Isolates
+    - 一个独立的chrome V8运行实例 其有独立的JS堆和微任务队列
+    - 这位每一个Nodejs worker独立运行提供了保障
+    - 其缺陷就是 workers之间没法直接访问对方的堆 
+    - 由于这个原因 每个worker都有其自己的libuv eventloop
 
 1. eventloop 
     1. 概念
@@ -949,3 +1058,172 @@
 5. 如何保证Node高可用性
     把数据放到redis/数据库中
     再加一个可以优雅重启应用服务的HTTP前端
+
+
+1. 中间件listen
+    - listen中间件就是一个语法糖 其实它里面还是http的listen 只是包装的一层
+    ```
+    listen(...args){
+        let server = http.createServer(this.handleRequest.bind(this));
+        server.listen(...args)
+    }
+    ```
+2. 中间件use    
+    - 使用use时 会发现里面的函数会立即执行 说明use的源码中有一个回调函数 可以让他立即执行
+    ```
+    use(fn){
+        //use里传入回调函数
+        this.fn = fn;//执行回调函数 保证其在listen后面执行
+    }
+    ```
+3. 中间件ctx
+    - 在使用koa时 不论是请求操作还是响应操作都是使用ctx调用 这也是koa框架的优势 让代码更加简单
+
+1. Node和apache等服务器软件的区别
+    1. 没有自己的语法，使用V8引擎，所以就是JS。Node就是将V8中的一些功能自己没有重写，移植到了服务器上。V8引擎解析JS的，效率非常高，并且V8中很多东西都是异步的。
+    2. Node.js没有根目录的概念，因为它根本没有任何的web容器，就是安装配置完成之后，没有一个根目录。让node.js提供一个静态服务，需要自己封装
+
+1. koa2 koa1和express区别
+    > koa1&koa2
+    1. koa1:依赖co库并采用genertor函数 在函数内使用yield语句
+    2. koa2:增加了箭头函数 移除了co依赖 使用Promise 因此可以结合async await使用 ES6书法 执行时间比Koa1更快
+    > koa&express
+    1. express大而全 koa小而精
+    2. API 
+        1. Koa模版引擎和路由方面没有express提供的API丰富 koa将req res都挂载在ctx上 通过ctx既可以访问req 也可以访问res
+    3. 中间件加载和执行机制
+        1. 中间件模式区别的核心是next的实现
+        2. koa请求和响应是洋葱进出模型 使用最新的async代码 没有回调函数 代码运行非常清晰 
+        - 当koa处理中间件遇到await next()时会暂停当前中间件进而处理下一个中间件 最后再回过头来继续处理剩下的任务(逻辑就是回调函数)
+        - 递归存在栈溢出的问题 可能会把js引擎卡死 koa采用了尾调用的方式进行了性能优化
+        3. express是直线型 只进不出 express本身是不支持洋葱模型的数据流入流出能力的 需要引入其他插件
+    4. 编程体验
+        1. express是回调函数
+        2. koa2是基于新的语法特性 async function 实现了Promise链式传递 错误处理更友好
+
+1. koa
+    > Koa是一种简单好用的Web框架 它的特点是优雅 简洁 表达力强 自由度高 本身代码只有1000多行 所有功能都通过插件实现 很符合Unix哲学
+    1. 架设HTTP服务
+    ```
+    const Koa = require('koa');
+    const app = new Koa();
+    app.listen(3000)
+    ```
+    2. Context对象
+    - Koa提供一个Context对象 表示一次对话的上下文(包括HTTP请求和HTTP回复)通过加工这个对象 可以控制返回给用户的内容
+    ```
+    const Koa = require('koa');
+    const app = new Koa();
+
+    const main = ctx=>{
+        ctx.response.body = 'Hello World'
+    }
+    app.use(main);
+    app.listen(3000)
+    ```
+    3. HTTP Response类型
+    - Koa默认的返回类型是text/plain 如果想返回其他类型的内容 可以先使用ctx.request.accepts判断一下 客户端希望接受什么数据(根据HTTP Request的Accept字段) 然后使用ctx.response.type指定返回类型
+    4. 路由
+        1. 原生路由
+        - 网站一般都有多个页面 通过ctx.request.path可以获取用户请求的路径 由此实现简单的路由
+        2. koa-route模块
+        ```
+        const route = require('koa-route');
+
+        const about = ctx=>{
+            ctx.response.type = 'html';
+            ctx.response.body = '<a href="/">Index Page</a>'
+        }
+
+        const main = ctx=>{
+            ctx.response.body = 'Hello World'
+        }
+        app.use(route.get('/',main));
+        app.use(route.get('/about',about))
+        ```
+        3. 静态资源
+        - 如果网站提供静态资源 为它们一个个写路由 没有必要
+        - koa-static封装了这部分请求
+        4. 重定向
+        - ctx.response.redirect()
+    5. 中间件
+        1. Logger功能
+        - 它处在HTTP Request 和HTTP Response中间 用来实现某种中间功能 app.use()用来加载中间件
+        - 基本上Koa所有功能都通过中间件实现 每个中间件默认接受两个参数
+        1. 第一个参数是Context对象
+        2. 第二个参数是next函数 只要调用next函数 就可以把执行权转交给下一个中间件
+
+        2. 中间件栈
+        - 多个中间件会形成一个栈结构 以先进后厨顺序执行
+
+        3. 异步中间件
+        - 如果有异步操作(如读取数据库)中间件必须写成async函数
+        ```
+        const fs = require('fs.promised')
+        const Koa = require('koa')
+        const app = new Koa()
+
+        const main = async function(ctx,next){
+
+        }
+        ```
+        - 上面代码中 fs.readFile是一个异步操作 必须写成await fs.readFile() 中间件必须写成async
+        4. 中间件的合成
+        - koa-compose模块可以将多个中间件合成一个
+    6. 错误处理
+        1. ctx.throw()
+        2. 处理错误的中间件
+        - 为了方便处理错误 最好使用try catch将其捕获
+        3. error事件的监听
+2. koa常见中间件 
+    1. koa-router
+    2. koa-ctx
+    3. koa-logger
+    4. koa-compose
+
+1. koa是一个精简的Node框架
+    1. 它基于node原生的req和res 封装自定义的request和response对象 并基于他们封装成一个统一的context对象
+    2. 它基于async/await(generator)的洋葱模型实现了中间件机制
+    > Koa框架核心目录
+    - lib
+        - application.js
+            - koa实例的初始化 组合中间件 启动服务器
+            - application.js是koa的主入口 也是核心部分
+            1. 完成koa实例初始化工作 启动服务器
+            2. 实现洋葱模型的中间件机制
+            3. 封装了高内聚的context对象
+            4. 实现了异步函数的统一错误处理机制
+        - request.js
+            - 代理原生req请求对象 提供更加简便的方法和属性
+            - request.header = >req.header
+            - 当访问ctx.request.xxx时 实际上是在访问request对象上的setter和getter
+        - response.js
+            - 代理原生res响应对象 提供更加简便的方法和属性
+            - response.status = >res.statusCode
+            - 当访问ctx.response.xxx时 实际上是在访问response对象上的setter和getter
+        - context.js
+            - 上下文 同时代理request和response
+            - ctx.header = >ctx.request.header=>req.header
+            - ctx.status = >ctx.response.status=>res.statusCode
+            1. 完成了错误事件处理
+            2. 代理了response对象和request对象的部分属性和方法
+
+    > koa工作流
+    1. 初始化阶段
+        1. new初始化一个实例 包括创建中间件数组 创建context/request/response对象 
+        2. 再使用use(fn)添加中间件到middleware数组 最后使用listen合成中间件fnMiddleware 
+        3. 按照洋葱模型依次执行中间件 返回一个callback函数给http.createServer 开启服务器 等待http请求
+    2. 请求阶段
+        - 每次请求 createContext生成一个新的ctx 传给fnMiddleware触发中间件的整个流程
+    3. 响应阶段
+        - 整个中间件完成之后 调用response方法 对请求做最后的处理 返回响应给客户端 
+
+    > koa中间件机制
+    - 采用koa-compose实现 
+    - compose函数接收middleware数组作为参数 middleware中每个对象都是async函数 返回一个以context和next作为入参的函数
+    - 我们和源码一样 称其为fnMiddleware在外部调用this.handleRequest的最后一行
+
+    > 异步函数的统一错误处理机制
+    - koa框架中有两种错误处理机制 分别为
+    1. 中间件捕获(Promise catch)
+    2. 框架捕获(Emitter error)
