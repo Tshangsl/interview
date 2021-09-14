@@ -983,3 +983,56 @@
         AMD 推崇依赖前置 提前执行
         CMD 推崇依赖就近 延迟执行
     此规范其实是在sea.js推广过程中产生的 
+7. 概念
+    concurrency并发
+    non-blocking 非阻塞
+    event-loop 事件轮询
+    callback 回调函数
+    asynchronous 异步的
+    single-threaded 单线程
+    FPS(frames-per-second)
+    JS有
+        call stack
+        event loop
+        callback quene
+        API
+    V8有
+        heap
+        callstack(调用栈)
+    web API
+        DOM
+        AJAX
+        timeout(setTimeout setInterval)
+    single threaded === single call stack === do one thing at a time
+    
+    HTML(结构层)：定义结构
+    CSS(表示层):定义样式
+    JavaScript(行为层)：定义行为
+8. 可枚举属性 不可枚举属性
+    - 可枚举属性
+    1. 是指那些内部 “可枚举” 标志设置为 true 的属性。
+        对于通过直接的赋值和属性初始化的属性，该标识值默认为即为 true。但是对于通过 Object.defineProperty 等定义的属性，该标识值默认为 false。
+    2. 其中js中基本包装类型的原型属性是不可枚举的
+        如Object, Array, Number等。
+    3. 可枚举的属性可以通过for...in循环进行遍历（除非该属性名是一个Symbol），或者通过Object.keys()方法返回一个可枚举属性的数组。
+9. MongoDB与MySql区别
+    > MySQL 关系型数据库
+    - Oracle公司开发 将数据存储在表中 并使用结构化查询语言SQL进行数据库访问
+    - 相关信息存储在单独的表中 通过关联查询来关联 使数据重复量被最小化
+    
+    > MongoDB 非关系型数据库
+    - MongoDB inc开发的开源数据库 MongoDB将数据存储在类似JSON的文档中
+    - 且文档中每个JSON串结构可能有所不同 相关信息存储在一起 通过MongoDB查询语言进行快速查询访问 
+
+    > 术语和概念
+    > MySql     MongoDB
+    - 表            集合
+    - 行            文档
+    - 列            字段
+    - joins         潜入文档或链接
+
+    > 特色对比
+    1. 像MySQL一样 MongoDB提供丰富的远超出简单的键值存储中提供的功能 MongoDB具有查询语言 功能强大的辅助索引(包括文本搜索和地理空间) 数据分析能力强大的聚合框架 相比使用关系数据库 使用MongoDB
+
+    > 为什么使用MongoDB而不是MySQL
+    - 各种规模的组织企业都采用MongoDB 因为它能够更快的构建应用程序 处理高度多样化的数据类型 并更有效的管理应用程序

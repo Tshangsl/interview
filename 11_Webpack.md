@@ -24,10 +24,11 @@
     1. 读取Webpack配置参数
     2. 启动Webpack 创建Compiler对象并开始解析项目
     3. 从入口文件(entry)开始解析 并找到其导入的依赖模块 递归遍历分析 形成依赖关系树
+        - 文件的解析与构建 compiler compilation汇编
         - 文件的解析与构建是一个比较复杂的过程 在webpack源码中主要依赖compiler和complication(并发)两个核心对象实现
         1. compiler对象是一个全局单例 它负责把控整个webpack打包的构建流程
         2. compilation对象是每一次构建的上下文对象 它包含当次构建所需的所有信息 每次热更新和重新构建 compiler都会重新生成一个新的compilation对象 负责此次更新的构建过程
-        3. 每个模块间的依赖关系 依赖于AST语法树 每个模块文件在通过loader解析完成之后 会通过acron库生成模块代码的AST语法书 通过语法书就可以分析这个模块是否还有依赖的模块 进而继续循环执行下一个模块的编译解析
+        3. 每个模块间的依赖关系 依赖于AST语法树 每个模块文件在通过loader解析完成之后 会通过acron库生成模块代码的AST语法树 通过语法树就可以分析这个模块是否还有依赖的模块 进而继续循环执行下一个模块的编译解析
         4. 最终webpack打包出来的bundle文件是一个IIFE的执行函数
     4. 对不同文件类型的依赖模块文件使用对应的Loader进行编译 最终转为JS文件
     5. 整个过程中webpack会通过发布订阅模式 向外抛出一些hooks webpack的插件plugin即可通过监听这些关键的事件节点 执行插件任务进而达到干预输出结果的目的
@@ -124,7 +125,7 @@
     - 如果webpack选择pipe方式 写loader顺序就是从左往右
 4. plugin思路
     - loader负责文件转换 plugin负责功能扩展
-    - loader和plugin作为webpack两个重要组成部分 承担两部分不同的指责
+    - loader和plugin作为webpack两个重要组成部分 承担两部分不同的职责
 
     - webpack基于发布订阅模式 在运行的生命周期会广播出许多事件 插件通过监听这些事件 可以在特定的阶段执行自己的插件任务 从而实现自己想要的功能
 
@@ -209,6 +210,12 @@
         - PS:loader需要配置在module.rules中 rules是一个数组
     4. plugin
         - 插件(plugins): 可以用于执行范围更广的任务 从打包优化和压缩一直到重新定义环境中的变量等
+        CleanWebpackPlugin 打包时自动清除dist文件
+        HtmlWebpackPlugin 帮助创建html文件 支持html压缩
+        (丑陋)uglifyjs-webpack-plugin 压缩js文件
+        MiniCssExtractPlugin 将css提取到单独的文件 需要配合loader一起使用
+        VueLoaderPlugin 将定义过的css js等规则应用到vue文件中
+        CommonsChunkPlugin 分包策略Webpack4.x版本之前
         ```
         // cleanWebpackPlugin帮助在打包时自动清除dist文件 
         const {cleanWebpackPlugin} = require("clean-webpack-plugin");
@@ -305,11 +312,11 @@
     2. 减小文件体积
         - 当把这些共同引用的模块都堆在一个模块中 这个文件可能异常巨大1不利于网络请求和页面加载 所以需要把这个公共模块再按照一定规则进一步拆分成几个模块文件--减小文件体积
 7. sourcemap
-    > source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。
+    - source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。
 7. Webpack热更新(HMR Hot Module Replacement)原理
     - Webpack 的热更新又称热替换（Hot Module Replacement），缩写为 HMR。 这个机制可以做到不用刷新浏览器而将新变更的模块替换掉旧的模块。
 
-    - HMR的核心就是客户端从服务端拉去更新后的文件，准确的说是 chunk diff (chunk 需要更新的部分)，实际上 WDS 与浏览器之间维护了一个 Websocket，当本地资源发生变化时，WDS 会向浏览器推送更新，并带上构建时的 hash，让客户端与上一次资源进行对比。
+    - HMR的核心就是客户端从服务端拉取更新后的文件，准确的说是 chunk diff (chunk 需要更新的部分)，实际上 WDS 与浏览器之间维护了一个 Websocket，当本地资源发生变化时，WDS 会向浏览器推送更新，并带上构建时的 hash，让客户端与上一次资源进行对比。
     - 客户端对比出差异后会向 WDS 发起 Ajax 请求来获取更改内容(文件列表、hash)，这样客户端就可以再借助这些信息继续向 WDS 发起 jsonp 请求获取该chunk的增量更新。
 
     - 后续的部分(拿到增量更新之后如何处理？哪些状态该保留？哪些又需要更新？)由 HotModulePlugin 来完成，提供了相关 API 以供开发者针对自身场景进行处理，像react-hot-loader 和 vue-loader 都是借助这些 API 实现 HMR。
@@ -376,7 +383,7 @@
         - 可以把以下文件单独处理出来打包
         1. node_modules 文件夹下的 模块
         2. 被3个入口chunk共享的模块
-    2. optimization.splitChunks
+    2. optimization(优化).splitChunks
         - Webpack4最大的改动就是废除了CommonChunkPlugin引入了optimization.splitChunks
         - 如果mode是production webpack4就会自动开启Code Splitting
         - 内部代码分割策略
@@ -384,25 +391,21 @@
     1. VSCode 中有一个插件 Import Cost 可以帮助我们对引入模块的大小进行实时监测，还可以使用 webpack-bundle-analyzer 生成 bundle 的模块组成图，显示所占体积。
     2. bundlesize 工具包可以进行自动化资源体积监控。
 10. gulp和Webpack基本区别
-    > gulp - 基于流 任务的自动化构建工具
+    > gulp - 基于流 任务的自动化构建工具 不包含模块化功能 如果要用到 要引入外部文件
     - 可以进行JS HTML CSS IMG 的压缩打包 是自动化构建工具
     - 可以将多个JS文件/CSS文件压缩成一个文件 并压缩成一行 以此来减少文件体积 加快请求速度和减少请求次数
     - gulp有task定义处理事务 从而构建整体流程 它是基于流的自动化构建工具
 
-    > Webpack - 基于入口 模块的自动化构建工具
+    > Webpack - 基于入口 模块的自动化构建工具 具有模块化 具有压缩合并的功能
     - 前端构建工具 实现了模块化开发和文件处理
     - 思想就是万物皆为模块 它能够将各个模块进行按需加载 不会导致加载了无用或冗余的代码
     - 所以它还有个名字叫前端模块化打包工具
     
     > 使用
-        gulp.config.js中gulp的代码更加简单易懂
-        需要压缩合并谁就用哪个方法
-        webpack样式合并需要在node环境下下载插件才能使用
-        gulp是基于流的打包工具
-        需要谁引用谁 并且他的压缩简单明了 后期维护起来方便
-        webpack可以将具体的模块进行划分
-        需要哪个模块就加载哪个模块
-        实现按需加载 并且排除掉冗余代码 减少代码体积
+    1. gulp.config.js中gulp的代码更加简单易懂 需要压缩合并谁就用哪个方法
+    2. gulp是基于流的打包工具 需要谁引用谁 并且他的压缩简单明了 后期维护起来方便
+    1. webpack样式合并需要在node环境下下载插件才能使用
+    2. webpack可以将具体的模块进行划分 需要哪个模块就加载哪个模块 实现按需加载 并且排除掉冗余代码 减少代码体积
     > 总结
     1. gulp是基于流的自动化构建工具 但不包括模块化的功能 如果要用到的话 就要引入外部文件 如require.js等
     2. webpack是自动化模块打包工具 本身就具有模块化 并且也具有压缩合并的功能
@@ -419,6 +422,36 @@
         - webpack需要开发者找到入口，并需要清楚对于不同的资源应该使用什么Loader做何种解析和加工
     2. 知识背景
         - gulp更像后端开发者的思路，需要对于整个流程了如指掌 webpack更倾向于前端开发者的思路
+10. 构建工具
+    - 把工具按类型分可以分为三类
+    1. 基于任务运行的工具 Grunt Gulp 
+    - 它们会自动执行指定的任务 就像流水线 把资源放上去然后通过不同的插件进行加工 它们包含活跃的社区 丰富的插件 能方便打造各种工作流
+    2. 基于模块化打包的工具 Browserify Webpack rollup.js
+    - 类似Nodejs 需要引用组件直接一个require就ok 这个工具就是这个模式 还可以实现按需加载 异步加载模块
+    3. 整合型工具 Yeoman FIS jdf Athena cooking weflow
+    - 使用了多种技术栈实现的脚手架工具 好处是即开即用 缺点是它们约束了技术选型 且学习成本相对较高
+
+    > Grunt &Gulp
+    > 工作流
+    - 这两款工具都是基于任务类型 所以它们的工作流是一致的
+    - 它们打包的策略通常是All in one 最后页面还是引用css img js开发流程和徒手开发相比并无差异
+    > 特点与不足
+    > Grunt
+    1. Grunt 老牌的构建工具 特点是配置驱动 要做的就是了解各种插件的功能 然后把配置整合到Gruntfile.js中 
+    2. Grunt的缺点也是配置驱动 当任务非常多的情况下 试图用配置完成所有的事 I/O操作 每一次任务都需要从磁盘中读取文件 处理完后再写入磁盘 
+    - 这样一来 当资源文件较多 任务较复杂时性能就是个问题
+    > Gulp
+    1. 特点是代码驱动 写任务就和写普通的Nodejs代码一样 对文件是流式操作(Stream) 一次I/O可以处理多个任务 
+    2. Gulp作为任务类型的工具没有明显的缺点 唯一的问题就是完成相同的任务 它需要写的代码更多一些 所以除非是项目有历史包袱 Grunt和Gulp中推荐Gulp
+
+    > Webpack
+    > 特点
+    1. 把一切都视为模块 不管是CSS JS Image还是HTML都可以互相引用 通过定义entry.js对所有依赖的文件进行跟踪 将各个模块通过loader和plugins处理 然后打包在一起
+    2. 按需加载 打包过程中Webpack通过Code Splitting功能将文件分为多个chunks 还可以将重复的部分单独提取出来作为commonChunk从而实现按需加载
+    - Webpack 也是通过配置来实现管理 与Grunt不同 它包含许多自动化的黑盒操作 所以配置起来会简单很多(但遇到问题调试起来很麻烦)
+    > 不足
+    1. 对Server端渲染的多页应用有些力不从心 Webpack的最初设计就是针对SPA 所以在处理Server端渲染的多页应用时 不管如何chunk 总不能真正达到按需加载的地步 往往要去考虑如何提取公共文件才能达到最优状态
+    - Webpack特别适合配合React.js Vue.js构建单页面应用 以及需要多人合作的大型项目 在规范流程都已约定好的情况下往往能极大提升开发效率和开发体验
 10. 与webpack类似的工具
     > 同样是基于入口的打包工具
     1. webpack

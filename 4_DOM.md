@@ -400,6 +400,11 @@
 21. document.write和document.innerHTML
 - innerHTML&innerText
 
+21. 事件绑定(不会被覆盖)和普通事件(会被覆盖)有什么区别。
+    - 标签.事件：如果给同一个元素添加同一个事件，后面的会覆盖前面
+    - 事件绑定：可以给同一个元素添加同一个事件，不会被覆盖
+21. 拖拽效果中有几种事件？
+    按下onmousedown，拖拽onmousemove，弹起onmouseup
 
 
 
