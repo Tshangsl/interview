@@ -858,3 +858,128 @@
     > ESR Edge Side Rendering
     - 方案核心思想是 借助边缘计算的能力 将静态内容与动态内容以流式的方式 先后返回给用户 
     - CDN节点相比于Server 距离用户更近 有更短的网络延时 在CDN节点上 可将缓存的页面静态部分 先快速返回给用户 同时在CDN节点上发起动态部分内容请求 并将动态内容在静态部分的响应流后 继续返回给用户
+17. Serverless
+    > 前端开发模式的演进 四个阶段
+    1. 基于模版渲染的动态页面
+        - JSP PHP等技术写一些动态模版 然后通过Web Server将模版解析成一个个HTML文件 浏览器只负责渲染这些HTML文件 这个阶段还没有前后端的分工 通常是后端工程师 顺便写了前端页面
+    2. 基于AJAX的前后端分离
+        - 基于AJAX可以把Web分为前端和后端 
+        - 前端负责界面和交互 后端负责业务逻辑的处理
+        - 前后端通过接口进行数据交互
+        - 网页复杂度由后端的Web Server转向了浏览器端的JS
+    3. 基于Nodejs的前端工程化
+        - 2009Nodejs出现
+        - 由基于一个个页面进行开发 变为基于一个个组件进行开发
+        - 开发完成后使用webpack等工具进行打包构建 通过基于Nodejs实现的命令行工具将构建结果发布线上 前端开发 规范化 标准化 工程化
+    4. 基于Nodejs的全栈开发
+        - 差不多在Nodejs诞生的那个时代
+        - 后端普遍开始由巨石应用模式向微服务架构转变 
+        - 这也导致以往的前后端分工出现分歧
+        - 随着微服务架构的兴起 后端接口渐渐变得原子性 
+        - 微服务接口也不再面向页面 前端调用变得复杂
+        - BFF(Backend For Fronted)架构应运而生 在微服务和前端中间 加了一个BFF层 由BFF对接口进行聚合裁剪 再输出给前端
+        - BFF这层不是后端本质工具 且距离前端最近和前端关系最大 所以前端工程师自然而然选择Nodejs来实现 这也是当前Nodejs在服务端较为广泛的应用
+    
+    > 下一代前端开发模式
+    - 每一次前端开发模式的变化 都因某个变革性的技术而起 AJAX Nodejs 下一个Serverless
+
+    > Serverless服务中前端解决方案
+    - Serverless是指构建和运行不需要服务器管理的应用程序概念
+
+    - 技术角度 Serverles就是Faas(Function as a Service)和Baas(Backend as a Service)的结合
+    > Faas 一些运行函数的平台 如阿里云的函数计算 AWS的Lambda等
+    > Baas 一些后端云服务 如云数据库 对象存储 消息队列等 
+    > Serverless可以理解为运行在Faas中 使用了Baas的函数
+
+    > Serviceless主要特点
+    1. 事件驱动
+        - 函数在 FaaS 平台中，需要通过一系列的事件来驱动函数执行。
+    2. 无状态
+        - 因为每次函数执行，可能使用的都是不同的容器，无法进行内存或数据共享。如果要共享数据，则只能通过第三方服务，比如 Redis 等。
+    3. 无运维
+        - 使用 Serverless 我们不需要关心服务器，不需要关心运维。这也是 Serverless 思想的核心。
+    4. 低成本
+        - 使用 Serverless 成本很低，因为我们只需要为每次函数的运行付费。函数不运行，则不花钱，也不会浪费服务器资源
+6. AMD CMD
+    > AMD
+    - Asynchronous Module Definition 中文名异步模块定义 采用异步方式加载模块 模块的加载不影响它后面语句的运行 所有依赖这个模块的语句 都定义在一个回调函数中 等到加载完成 这个回调函数才会执行
+    - 这里介绍用require.js实现AMD规范的模块化
+        用require.config()指定引用路径
+        用define()定义模块
+        用require()加载模块
+
+    - 由于Node.js主要用于服务器编程 模块文件一般都已经存在于本地硬盘 所以加载起来比较快 不用考虑非同步夹杂的方式 所以CommonJS规范比较适用
+    如果是浏览器环境 要从服务端加载模块 此时需采用非同步模式 因此浏览器端一般采用AMD规范
+
+    - AMD规范比CommonJS规范在浏览器端实现得早
+    AMD规范语法
+        定义暴露模块
+        定义没有依赖的模块
+        define(function(){
+            return 模块
+        })
+        定义有依赖的模块
+        define(['module1','module2',function(m1,m2){
+            return 模块
+        }])
+        引入适用模块
+        require(['modlue1','module2',function(m1,m2){
+            使用m1/m2
+        }])
+    未使用AMD规范与使用require.js
+    通过比较两者实现方法 说明使用AMD规范的好处
+
+    - 未使用AMD规范 
+    这种方式缺点很明显
+        首先会发送多个请求 其次引入的js文件顺序不能搞错 否则会报错
+        使用require.js
+        RequireJS是一个工具库 主要用于客户端的模块管理 它的模块管理遵循AMD规范 RequireJS的基本思想是 通过define方法 将代码定义为模块 通过require方法 实现代码的模块加载
+    ADM规范在浏览器实现的步骤
+        1.下载require.js并引入
+            官网: http://www.requirejs.cn/
+            github : https://github.com/requirejs/requirejs
+            然后将require.js导入项目: js/libs/require.js
+        2.创建项目结构
+        3.定义require.js的模块代码
+        4.页面引入require.js模块
+            在index.html引入 <script data-main="js/main" src="js/libs/require.js"></script>
+    小结
+        AMD模块定义的方法比较清晰 不会污染全局变量 能够清楚地显示依赖关系 AMD模式可用于浏览器环境 并允许非同步加载模块 也可以根据需要动态加载模块
+    > CMD
+    - (整合了CommonJS和AMD规范的特点 Sea.js中所有JS模块都遵循CMD模块定义规范)
+    CMD规范专用于浏览器端 模块的加载是异步的
+    模块使用时才会加载执行
+    CMD规范整合了CommonJS和AMD规范的特点
+    在Sea.js中 所以JS模块都遵循CMD模块定义规范
+    SeaJS是一个遵循CMD规范的JS模块加载框架 可以实现JS模块化开发及加载机制
+    主要目的是令JS开发模块化便于加载 将前端工程师从繁重的JS文件以及对象依赖处理中解放出来
+    CMD规范基本语法
+        定义暴露模块
+        定义没有依赖的模块
+        define(function(require,exports,module){
+            exports.xxx = value;
+            module.exports = value;
+        })
+        定义有依赖的模块
+        define(function(require,exports,module){
+            引入依赖模块(同步)
+            var module2 = require('./module2');
+            引入依赖模块(异步)
+            require.async('./module3',function(m3){
+
+            })
+            暴露模块
+            exports.xxx = value;
+        })
+        引入使用模块
+        define(function (require) {
+        var m1 = require('./module1')
+        var m4 = require('./module4')
+        m1.show()
+        m4.show()
+    require.js在申明依赖的模块时会在第一之间加载并执行模块内的代码
+    CMD是另一种JS模块化方案 它与AMD很类似
+    不同点在于 
+        AMD 推崇依赖前置 提前执行
+        CMD 推崇依赖就近 延迟执行
+    此规范其实是在sea.js推广过程中产生的 

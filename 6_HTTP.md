@@ -1417,7 +1417,7 @@
             2. XMLHttpRequest相对于JSONP有着更好的错误处理机制       
             3. 容易受到XSS(跨站脚本)攻击 
     2. CORS Cross-origin resource sharing 跨域资源共享
-    - (主要依靠后端配置|前端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)  
+    - (主要依靠后端配置|服务器端设置Access-Control-Allow-Origin即可开启CORS|前端分简单请求和非简单请求|存在兼容问题 支持post请求)  
     > 简单请求 同时满足以下两个条件
     1. 请求方法是 HEAD/GET/POST
     2. HTTP头信息字段为 
@@ -1434,9 +1434,10 @@
     3. 该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。
     4. 虽然设置 CORS 和前端没什么关系，但是通过这种方式解决跨域问题的话，会在发送请求时出现两种情况，分别为简单请求和复杂请求。
     
-    原理：
-        服务器端设置Access-Control-Allow-Origin以开启CORS。该属性表示哪些域名可以访问资源，如设置通配符则表示所有网站均可访问。
-    CORS 是W3C 推荐的一种新的官方方案，能使服务器支持 XMLHttpRequest 的跨域请求。CORS 实现起来非常方便，只需要增加一些 HTTP 头，让服务器能声明允许的访问来源。
+    > 原理：
+    - 服务器端设置Access-Control-Allow-Origin以开启CORS。该属性表示哪些域名可以访问资源，如设置通配符则表示所有网站均可访问。
+    
+    - CORS 是W3C 推荐的一种新的官方方案，能使服务器支持 XMLHttpRequest 的跨域请求。CORS 实现起来非常方便，只需要增加一些 HTTP 头，让服务器能声明允许的访问来源。
     值得注意的是，通常使用CORS时，
     > 异步请求会被分为 
     1. 简单请求
@@ -1454,115 +1455,51 @@
         4. text/plain
         - 表示客户端支持的数据类型 或客户端希望接收到的内容类型
         
-        - Accept-Language
-        表示客户端支持的语言格式(不是编码格式)
-        如中文/英文 通常浏览器直接发起请求时 浏览器会根据被设置的语言环境(默认语言) 来附加上该字段
+        > Accept-Language
+        - 表示客户端支持的语言格式(不是编码格式) 如中文/英文 通常浏览器直接发起请求时 浏览器会根据被设置的语言环境(默认语言) 来附加上该字段
 
-        Content-Language
-        说明访问者希望采用的语言或语言组合 用户可根据自己偏好的语言来制定不同的内容
+        > Content-Language
+        - 说明访问者希望采用的语言或语言组合 用户可根据自己偏好的语言来制定不同的内容
 
         Last-Event-ID
 
-        Content-Type(只限于三个值)
-            application/x-www-form-urlencoded
-            multipart/form-data
-            text/plain
-    这是为了兼容表单(form)
-    因为历史上表单一直可以发出跨域请求
-    AJAX的跨域设计就是 
-    只要表单可以发 AJAX就可以直接发
-    凡是不同时满足上面两个条件 属于非简单请求
-    浏览器对这两种请求的处理是不一样的
-    1.2简单请求基本流程
-    对于简单请求 浏览器直接发出CORS请求
-    具体来说就是在头信息中 添加一个Origin字段
-    Origin字段用来说明
-        本次请求来自哪个源
-        (协议+域名+端口)
-    服务器根据这个值 决定是否同意这次请求
+        > Content-Type(只限于三个值)
+        1. application/x-www-form-urlencoded
+        2. multipart/form-data
+        3. text/plain
 
-    如果Origin指定的源 不在许可范围内 服务器会返回一个正常的HTTP回应
-    浏览器发现 这个回应的头信息没有包含Access-Control-Allow-Origin字段
-    知道出错 从而抛出一个错误被XMLHttpRequest的onerror回调函数捕获
-    PS:这种错误无法通过状态码识别 因为HTTP回应的状态码可能是200
+        - 这是为了兼容表单(form) 因为历史上表单一直可以发出跨域请求 AJAX的跨域设计就是 只要表单可以发 AJAX就可以直接发 凡是不同时满足上面两个条件 属于非简单请求 浏览器对这两种请求的处理是不一样的
 
-    如果Origin指定的域名在许可范围内 服务器返回的响应 会多出几个头信息字段
-    上面头信息中 有三个与CORS请求相关的字段 
-    都以Access-Control开头
+        > 简单请求基本流程
+        - 对于简单请求 浏览器直接发出CORS请求 具体来说就是在头信息中 添加一个Origin字段 Origin字段用来说明 本次请求来自哪个源 (协议+域名+端口) 服务器根据这个值 决定是否同意这次请求
+        - 如果Origin指定的源 不在许可范围内 服务器会返回一个正常的HTTP回应浏览器发现 这个回应的头信息没有包含Access-Control-Allow-Origin字段知道出错 从而抛出一个错误被XMLHttpRequest的onerror回调函数捕获
+        - PS:这种错误无法通过状态码识别 因为HTTP回应的状态码可能是200
+        - 如果Origin指定的域名在许可范围内 服务器返回的响应 会多出几个头信息字段上面头信息中 有三个与CORS请求相关的字段 都以Access-Control开头
 
-        1.Access-Control-Allow-Origin
-        该字段必须 
-        数值要么是请求时Origin字段的值
-        要么是一个*表示接受任意域名的请求
+        > 非简单/复杂请求 
+        > 预检请求
+        - 是那种对服务器有特殊要求的请求 比如请求方法是PUT/DELETE 或者Content-Type字段类型是application/json
+        - 非简单请求的CORS请求 会在正式通信之前 增加一次HTTP查询请求 称为预检请求
+        - 浏览器先询问服务器 
+        - 当前网页所在域名是否在服务器许可名单之中 以及可以使用哪些HTTP动词和头信息字段 只有得到肯定答复 浏览器才会发出正式的XMLHttpRequest请求 否则就报错
 
-        2.Access-Control-Allow-Credentials
-        该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。
-
-        3.Access-Control-Expose-Headers
-        该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。
-    1.3
-        CORS请求默认不发送Cookie和HTTP认证信息
-        如果要把Cookie发到服务器 
-        一方面要服务器同意 
-            指定Access-Control-Allow-Credentials字段
-        另一方面开发者必须在AJAX请求中打开withCredentials属性
-        否则即使服务器同意发送Cookie 浏览器也不会发送
-        或者 服务器要求设置Cookie 浏览器也不会处理   
-        PS：如果发送Cookie Access-Control-Allow-Origin不能设为星号
-        必须指定明确的 与请求网页一致的域名
-        同时Cookie依然遵循同源策略
-        只有用服务器域名设置的cookie才会上传
-        其他域名的cookie不会上传
-        且原网页代码中的document.cookie也无法读取服务器域名下的cookie
-    2.非简单/复杂请求 
-        2.1预检请求
-        是那种对服务器有特殊要求的请求 比如请求方法是PUT/DELETE 或者Content-Type字段类型是application/json
-
-        非简单请求的CORS请求 会在正式通信之前 增加一次HTTP查询请求 称为预检请求
-
-        浏览器先询问服务器 
-        当前网页所在域名是否在服务器许可名单之中 以及可以使用哪些HTTP动词和头信息字段 
-        只有得到肯定答复 
-        浏览器才会发出正式的XMLHttpRequest请求
-        否则就报错
-
-        预检请求用的请求方法是OPTIONS 表示这个请求是用来询问的 
-        头信息中 关键字段是Origin 表示请求来自哪个源
-        除了Origin字段 预检请求的头信息包含两个特殊字段
-        1.Access-Control-Request-Method
-            必须的 用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。
-        2.Access-Control-Request-Headers
-            该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。
-    2. 预检请求回应
-        服务器受到预检请求以后
-        检查Origin Access-Control-Request-Method         
-        Access-Control-Request-Header
-        字段后
-        确认允许跨域请求 就可以做出回应
+        - 预检请求用的请求方法是OPTIONS 表示这个请求是用来询问的 头信息中 关键字段是Origin 表示请求来自哪个源 除了Origin字段 预检请求的头信息包含两个特殊字段
+        > 预检请求回应
+        - 服务器受到预检请求以后 检查Origin Access-Control-Request-Method         Access-Control-Request-Header字段后 确认允许跨域请求 就可以做出回应
         
-        上面的HTTP回应中 关键的是Access-Control-Allow-Origin字段
-        表示http://api.bob.com可以请求数据
-        该字段也可以设为* 表示同意任何跨院请求
+        - 上面的HTTP回应中 关键的是Access-Control-Allow-Origin字段 表示http://api.bob.com可以请求数据 该字段也可以设为* 表示同意任何跨源请求
 
-        如果服务器否定了预检请求 会返回一个正常的HTTP回应 但是没有任何CORS相关的头信息字段 这时 浏览器就会认定 服务器不同意预检请求 因此触发一个错误 被XMLHttpRequest对象的onerror回调函数捕获
-        。。。
-    3. 浏览器的正常请求和回应
-        一旦服务器通过了预检请求
-        以后每次浏览器正常的CORS请求
-        都与简单请求一样
-        会有一个Origin头信息字段
-        服务器回应 也都会有一个Access-Control-Allow-Origin信息字段
-
-    优缺点
-        1.使用简单方便，更为安全
-        2.支持 POST 请求方式，
-        3.CORS是一种新型的跨域问题的解决方案，存在兼容问题，仅支持IE 10以上
-    JSONP和CORS比较
-        1.CORS与JSONP使用目的相同 但是比JSONP强大
-        2.JSONP只支持GET请求
-            CORS支持所有类型的HTTP请求
-        3.JSONP优势在于支持老式浏览器
-            以及可以向不支持CORS的网站请求数据
+        - 如果服务器否定了预检请求 会返回一个正常的HTTP回应 但是没有任何CORS相关的头信息字段 这时 浏览器就会认定 服务器不同意预检请求 因此触发一个错误 被XMLHttpRequest对象的onerror回调函数捕获
+        > 浏览器的正常请求和回应
+        - 一旦服务器通过了预检请求 以后每次浏览器正常的CORS请求 都与简单请求一样 会有一个Origin头信息字段 服务器回应 也都会有一个Access-Control-Allow-Origin信息字段
+        > 优缺点
+        1. 使用简单方便，更为安全
+        2. 支持 POST 请求方式，
+        3. CORS是一种新型的跨域问题的解决方案，存在兼容问题，仅支持IE 10以上
+        > JSONP和CORS比较
+        1. CORS与JSONP使用目的相同 但是比JSONP强大
+        2. JSONP只支持GET请求 CORS支持所有类型的HTTP请求
+        3. JSONP优势在于支持老式浏览器 以及可以向不支持CORS的网站请求数据
     3. Node中间件代理(跨域问题限制的是浏览器 搭建中间件服务器转发请求和响应)
         > 原理：同源策略仅是浏览器需要遵循的策略，故搭建中间件服务器转发请求与响应，达到跨域目的。
         - 类似于将跨域请求交给第三方，第三方去访问指定的网络，获取数据然后返回
@@ -1574,12 +1511,7 @@
     5. postMessage(H5新增) 使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源
         1. window.postMessage(message,targetOrigin) 方法是html5新引进的特性
         2. 可以使用它来向其它的window对象发送消息，无论这个window对象是属于同源或不同源
-        3. 目前IE8+、FireFox、Chrome、Opera等浏览器都已经支持window.postMessage方法。
-
-        调用postMessage方法的window对象是指要接收消息的那一个window对象
-        该方法的第一个参数message为要发送的消息，类型只能为字符串
-        第二个参数targetOrigin用来限定接收消息的那个window对象所在的域，如果不想限定域，可以使用通配符* 
-        需要接收消息的window对象，可是通过监听自身的message事件来获取传过来的消息，消息内容储存在该事件对象的data属性中。
+        3. 目前IE8+、FireFox、Chrome、Opera等浏览器都已经支持window.postMessage方法
     6. WebSocket
         - webSocket本身不存在跨域问题 可以利用webSocket进行非同源之间的通信
         - 原理：利用webSocket的API 可以直接new一个socket实例 然后通过open方法内send要传输到后台的值 也可以利用message方法接收后台传来的数据 后台是通过new WebSocket Server({port:3000})实例 利用message接收数据 利用send向客户端发送数据
@@ -1605,9 +1537,9 @@
 
     > 基本使用
     - axios提供了两种不同的形式来发送HTTP请求
-    1. 通过axios()方法
+    1. 通过axios(config)方法
     2. 分别通过axios对象提供的与HTTP对应的方法发起请求
-        1. axios.get(url)
+        1. axios.method(url,data,config)
 
     > 使用方法:
     1. 执行get数据请求
@@ -1624,9 +1556,9 @@
     安装：
         使用npm
             npm install axios
-    实现原理：
-        1.axios原理还是属于XMLHttpRequest 因此需要实现一个AJAX
-        2.需要一个Promise对象对结果进行处理
+    > 实现原理：
+    1. axios原理还是属于XMLHttpRequest 因此需要实现一个AJAX
+    2. 需要一个Promise对象对结果进行处理
 
     > axios api的使用
     - axios方法接收一个对象 这个对象包含了一些对请求的配置 axios会根据这些配置来发送对应的HTTP请求
@@ -1636,6 +1568,26 @@
     3. data请求发送的数据(post的部分请求需要)
     - PS：默认的请求方法是get所以如果是get请求可以不设置method
     - 请求响应的处理在then和catch回调中 请求正常会进入then 请求一场则会进catch
+    > axios有什么特性
+    1. 从浏览器中创建XMLHttpRuquests
+    2. 是从node.js中创建http请求
+    3. 支持Promise API
+    4. 拦截请求和响应
+    5. 转换请求数据和响应数据
+    6. 取消请求
+    7. 自动转换JSON数据
+    8. 客户端支持防御XSRF
+    > axios可以用在浏览器和nodejs中是因为
+    1. 它会自动判断当前环境是什么 
+    2. 如果是浏览器 就会基于XMLHttpRequests实现axios 
+    3. 如果是nodejs环境 就会基于node内置核心模块http实现axios
+    > axios基本原理
+    1. axios还是属于XMLHttpRequest 因此需要实现一个AJAX 或者基于HTTP
+    2. 还需要一个promise对象来对结果进行处理
+    > 请求和响应拦截器
+    1. 请求拦截器 在发送请求之前做点什么 对请求错误做点什么
+    2. 响应拦截器 对响应数据做点什么 对相应错误做点什么
+    3. axios.interceptors.response.use & axios.interceptors.request.use来触发拦截器执行use方法
 18. AJAX
     > AJAX
     - AJAX是'Asyncchronous JavaScript And XML'缩写(即异步的JS和XML)
@@ -1798,7 +1750,7 @@
         总结：
             XSS漏洞原理和相关函数 eval() assert() preg_replace() 回调函数 动态执行函数
             XSS漏洞的防范
-21. CSRF(Cross Site Request Forgery(伪造))
+21. CSRF(Cross Site Request Forgery(伪造))/XSRF
     (XSS 利用合法用户获取其信息)
     (CSRF 伪装成合法用户发起请求 原理和XSS正好相反)
     (防范：post修改信息/不让第三方网站访问cookie/请求时附带验证信息 token 验证码)
