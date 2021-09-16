@@ -968,7 +968,7 @@
     1. Cookie 存储在客户端 只能存储字符串数据 cookie.setMaxAge()可以设置任意时间有效 不超过4k cookie不可跨域 会受到CSRF攻击 受到跨域限制
     2. Session(基于Cookie实现) 存储在服务器端 占用资源 SessionId存储在Cookie中 任意类型数据 失效时间短 存储容量大 服务器集群情况下 无法轻易做到共享 需要借助缓存 由于是借助cookie实现的 可能会受到CSRF攻击 基于cookie实现 不可跨域
     
-    >Session/Token对比
+    > Session/Token对比
     1. Session 一种记录服务器和客户端会话状态的机制 占用服务端资源 使服务器端有状态化 可以存储会话信息 服务器集群需要用到缓存做资源共享 会受到CSRF攻击 基于cookie实现有跨域问题 多点登录
     2. Token 令牌 访问API所需资源凭证 不占用服务端资源 使服务器端无状态化 不会存储会话信息 不会受到CSRF攻击 不受同源策略限制 单点登录)
 

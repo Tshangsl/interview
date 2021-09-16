@@ -64,7 +64,7 @@
     1. 父元素相对定位，子元素绝对定位，top:-50%,left:-50%,margin-left:-width/2,margin-top:-height/2;
     - 该方法需要子元素有宽高
     2. 父元素相对定位，子元素绝对定位，top:0,right:0,bottom:0,left:0,margin:auto;
-    - 该方法不需要子元素有宽高，但是不兼容
+    - 该方法不需要子元素有宽高，但是不兼容.
     3. 父元素相对定位，子元素绝对定位，使用CSS中transform:translate(-50%,-50%)
     4. Flex 父元素display:flex; justify-content:center; align-columns:center;
     5. JavaScript 
@@ -80,12 +80,12 @@
             设置height margin border
 3. CSS3清除浮动方式
     > 目的：为了解决，父元素因为子元素浮动引起的内部高度为0的问题
-    > (额外标签法/
-    > 父元素添加overflow:hidden/
-    > after伪元素/
-    > before&after双伪元素/
-    > 父级同时浮动/
-    > 父元素设置高度)
+    1. (额外标签法/
+    2. 父元素添加overflow:hidden/
+    3. after伪元素/
+    4. before&after双伪元素/
+    5. 父级同时浮动/
+    6. 父元素设置高度)
     > 解决方法：
     1. 额外标签法(最后一个标签后/新加一个标签/给其设置clear:both) 不推荐使用
         - 在最后一个浮动标签后，新加一个标签，给其设置clear:both     
@@ -151,9 +151,11 @@
             width:calc(100%-200px);
             font-size:20px;
         }
-        第二类宽度未知：
-            1.BFC方法 左侧浮动 右侧overflow:hidden
-            3.grid布局
+    
+    > 第二类宽度未知：
+    1. BFC方法 左侧浮动 右侧overflow:hidden
+    2. grid布局
+    
     > 三列布局(左右两侧宽度固定 中间自适应)
     1. 浮动 左右浮动 中间100% 设置margin-left margin-right
         左右两边浮动
@@ -230,11 +232,15 @@
         animation-direction 
         animation：以下六个元素的简写
         animation-name、animation-duration、animation-timing-function、animation-delay、animation-iteration-count、animation-direction
-    transition和animation:
+    - transition和animation:
         它们很像 flash 中的补间动画和逐帧动画；
         transition是从一个状态变化到另外一种状态，当变化有了平滑的效果后就产生了动画
             它是一个公式化的变化，在比较规则的动画效果中我们可以使用例如：旋转的风车、行驶的汽车、颜色的渐变等等；
         animation的动画效果更加灵活，可以实现像影片一样的复杂无规则的动画。
+    > Android动画分类主要分三类
+    1. Tweened Animation 补间动画
+    2. Frame Animation 帧动画
+    3. Property Animation 属性动画
 7. CSS动画特性可以用JS实现，为什么还要用CSS实现(页面动画在移动设备上运行更快)
     > 让你的页面动画在移动设备上运行的更快一些
     > JavaScript效率低的两大原因：
@@ -272,7 +278,7 @@
         > vh 和 vw与百分比的区别
         > 百分比是基于父元素的设置而言的，如果父元素为100px，那么子元素100%也就是100px。而 vh 和 vw 始终是针对窗口的宽高。
 10. rem移动端适配
-    > PC 端浏览器下（以谷歌浏览器为主），字体的默认大小是16px，字体最小为12px 。 
+    > PC 端浏览器下（以谷歌浏览器为主），字体的默认大小是16px，字体最小为12px 。
     > 移动端浏览器字体没有默认大小。
     > iphone5下 1rem=16px
     1. 获取html的宽
@@ -296,9 +302,11 @@
     > 子级容器属性(Flex项目)
     
     > 布局的传统解决方案
-        > 基于盒装模型依赖display属性+position属性+float属性
+    - 基于盒装模型依赖display属性+position属性+float属性
+    
     > Flex:
-        > 弹性盒布局，CSS3的新属性，用于方便布局，比如垂直居中
+    - 弹性盒布局，CSS3的新属性，用于方便布局，比如垂直居中
+    
     > 基础概念：
     > (1.Flex容器/项目|主轴 交叉轴|项目默认沿主轴排列)
     1. 采用Flex布局的元素，称为Flex容器(flex container)简称容器，它的所有子元素自动成为容器成员，称为Flex项目(flex item)简称项目
@@ -993,6 +1001,9 @@
 40. 五种前端基本布局
     table布局 float布局 absolute布局 flexbox布局 grid布局
 41. 什么是FOUC(无样式内容闪烁)如何避免FOUC
+    > FOUC 无样式内容闪烁(Flash Of Unstyled Content) 是在IE下通过@import引入css文件引起的
+    - IE首先会加载整个HTML文档的DOM 然后再导入外部的CSS文件
+    - 因此在页面DOM加载完成到CSS导入完成之间 有一段时间页面上的内容是没有样式的 这段时间的长短和网速和电脑速度都有关
 
 
 

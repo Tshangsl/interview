@@ -20,7 +20,6 @@
         父节点.replaceChild（newChild，refChild）
 2. 操作DOM为什么是昂贵的
     > 操作DOM对象时 会触发浏览器的布局和绘制行为 会导致DOM卡慢 占用内存较高
-    
     > 优化:
     1. 使用虚拟DOM(VDOM)映射成实际DOM来进行DOM操作 
     2. 使用CSS动画来替代DOM动画 减少页面重绘，使得性能更加完善

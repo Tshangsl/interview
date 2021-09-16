@@ -9,7 +9,6 @@
     - 优点 非受控组件中真实数据保存在DOM中 因此在使用时 可更方便集成React和非React代码 且非受控组件能更好的减少代码量
 
     > react中 所谓受控组件和非受控组件是针对表单而言的
-    (react中 所谓受控组件和非受控组件是针对表单而言的)
     - 表单受控组件(表单元素修改实时映射到状态值 需要继承react.component 绑定onChange事件)
         - 表单元素依赖于状态，表单元素需要默认值实时映射到状态时，就是受控组件，这个和双向绑定相似
         - 受控组件，表单元素的修改会实时映射到状态值上，此时可以对输入的内容进行校验
@@ -60,7 +59,6 @@
     > 且此时输入框除了默认值，无法输入任何其他参数
 
     - 非受控组件(不受状态控制 获取数据相当于操作dom)
-        - 非受控组件即不受状态的控制，获取数据就是相当于操作dom
         - 优点在于容易和第三方组件结合
         
         - 获取输入框中值的两种方法
@@ -181,7 +179,7 @@
     ```
     const enhancedComponent = higherOrderComponent(WrappedComponent);
     ```
-    > 组件是将props转换成ui 而高阶组件是将组建转换为另一个组件
+    > 组件是将props转换成ui 而高阶组件是将组件转换为另一个组件
     > 高阶组件是react中用于复用组件逻辑的一种高级技巧
     - 高阶组件能解决的问题
         - 抽取重复代码 实现组件复用 常见场景：页面复用
@@ -289,11 +287,12 @@
             - 本质是接收一个组件作为参数 返回一个组件的函数
             - 高阶组件采用装饰器模式 在增强原有组件的功能 并不破坏它原有的特性
             > 优点
-            1. 逻辑复用
-            2. 不影响被包裹的组件的内部逻辑
+            1. 逻辑复用 不影响被包裹的组件的内部逻辑
             > 缺点
-            1. 高阶组件传递给被包裹组件的props如果重名的话 会发生覆盖
+            1. 高阶组件传递给被包裹组件的props如果重名的话 会发生覆盖/hoc传递给被包裹组件的props容易和被包裹后的组件重名 进而被覆盖
         2. Render props
+            - 一种在React组件之间使用一个值为函数的prop共享代码的简单技术 render prop是一个用于告知组件需要渲染什么内容的函数prop
+            - 具有render prop的组件接受一个返回React元素的函数 将render的渲染逻辑注入到组件内部
             - Render Props通过父组件将可复用逻辑封装起来 并把数据提供给子组件 
             - 子组件拿到数据后如何渲染 完全由子组件决定 灵活性非常高
             - 高阶组件中渲染结果是父组件决定的 Render Props不会产生新的组件 更加直观地体现了父子关系
@@ -321,14 +320,14 @@
             ```
             - 相较于hooks和hoc render props使用场景较少
             > 优点
-            1. 数据共享
-            2. 逻辑复用
+            1. 数据共享 逻辑复用 将组件内的state作为props传递给被调用者 将渲染逻辑交给调用者
             > 缺点
-            1. 无法在return语句外访问数据
-            2. 嵌套
+            1. 无法在return语句外访问数据 嵌套写法不够优雅
         3. Hooks
             - Hooks是React16.8中新增的特性 可以让你在不编写class的情况下使用state lifecycle 等React特性
             - 通过自定义hook 可以很轻松的实现逻辑复用
+
+            - 解决了hoc的prop覆盖问题 解决了render props的嵌套地狱问题
             > 优点
             1. 使用直观
             2. 不存在HOC的重命名问题
@@ -401,6 +400,18 @@
         return <Greeting {...props}>
     }
     ```
+    > React中的props为什么是只读的
+    - React具有浓重的函数式编程思想
+    - 函数式编程中有一个概念 纯函数
+    1. 给定相同的输入 总是返回相同的输出
+    2. 过程没有副作用
+    3. 不依赖外部状态
+    - this.props就是汲取了纯函数的思想 props的不可变性就保证了同样的输入 页面显示的内容是一样的 且不会产生副作用
+
+    > React组件的props改变时更新组件的方法
+    1. componentWillReceiveProps 将新的props更新到组件的state中 这种state被称为派生状态 Derived State 从而实现重新渲染
+    2. getDerivedStateFromProps
+
     > state
     - React的核心思想是组件化 组件中最重要的概念是State(状态) State是一个组件的UI数据模型 是组件渲染时的数据依据
     - 状态(state)和属性(props)类似 都是一个组件所需要的一些数据集合 但是state是私有的 可以认为state是组件的私有属性
@@ -481,6 +492,47 @@
     2. 如果在constructor生命周期不使用this.props或props时 可不传入props
     3. super中的props是否接收 只能影响constructor生命周期能否使用this.props 其他生命周期已默认存在this.props
 6. react的setstate方法
+    > React setState调用原理
+    1. 首先调用setState入口函数 入口函数在这里就是充当一个分发器的角色 根据入参不同 将其分发到不同的功能函数中
+    2. enqueueSetState方法将新的state放进组件的状态队列里 并调用enqueuUpdate来处理将要更新的实例对象
+    3. enqueueUpdate
+        - 在enqueueUpdate方法中引出了一个关键的对象
+        - bacthingStrategy 该对象所具备的isBatchingUpdates属性直接决定了当下是要走更新流程 还是应该排队等待 如果轮到执行 就调用batcheUpdates方法来直接发起更新流程 由此可以推测 batchingStrategy或许正是React内部专门用于管控疲劳更新的对象
+    4. IsBatchingUpdates
+        - true 组件入队 dirtyComponents
+        - false 循环更新 dirtyComponents中的所有组件
+    
+    > React的setState后发生了什么
+    - React会将传入的参数对象和组件当前的状态合并 然后触发调和过程Reconciliation经过调和过程 React会以相对搞笑的方式根据新的状态构建React元素树并着手重新渲染整个UI界面
+    - 如果在短时间内频繁setState()React会将state的改变压入栈中 在合适的时机 批量更新state和试图 达到提高性能的效果
+    
+    > setState同步异步
+    - setState不是单纯的同步/异步 它的表现会因调用场景的不同而不同 
+    - 在源码中 通过isBatchingUpdate来判断setState是现存入state还是直接更新 如果是true则执行异步操作 为false则直接更新
+    1. 异步 在React可以控制的地方 就为true 比如在React生命周期事件和合成事件中 都会走合并操作 延迟更新的策略
+    2. 同步 在React无法控制的地方 如原生事件 setTimeout中 就只能同步更新
+    - 一般认为 做异步更新是为了性能优化 减少渲染次数
+
+    > React中setState的第二个参数作用
+    1. 是一个可选的回调函数 这个回调函数将在组件重新渲染后执行
+    2. 等价于在componentDidUpdate生命周期中执行
+    3. 通常建议使用componentDidUpdate代替此方法 在这个回调函数中可以拿到更新后state的值
+
+    > React setState和replaceState区别
+    1. setState()用于设置状态对象
+    ```
+    setState(object nextState[, function callback])
+    ```
+    - nextState将要设置的新状态 该状态会和当前的state合并
+    - callback 可选参数 回调函数 该函数会在setState设置成功 且组件重新渲染后调用
+    2. replaceState()与setState()类似 但是方法只会保留nextState中状态 原state不在nextState中的状态都会被删除
+    - setState只是修改其中的部分状态 相当于Object.assign 只是覆盖 不会减少原来的状态 
+    - replaceState是完全替换原来的状态 相当于赋值 将原来的state替换成另一个对象 如果新状态属性减少 state中就没有这个状态
+
+    > this.state this.setState
+    - 初始化 
+    - 更新state
+
     > 不同事件中的setState
     1. 合成事件中的setState()
     2. 生命周期函数中的setState()
@@ -504,6 +556,9 @@
         - 其中调用会造成死循环 导致程序崩溃
     6. 推荐的使用方法
         - 在调用setState时使用函数传递state值 在回调函数中获取最新更新后的state
+    
+    > state怎样注入到组件的 从reducer到组件经历了什么样的过程
+    - 通过connect和mapStateToProps将state注入到组件中
 7. React 组件通信的几种方式
     > 需要组件之间进行通信的几种情况
     1. 父->子
@@ -592,7 +647,7 @@
     > 配合componentDidUpdate 可以覆盖componentWillRecevieProps的所有用法
 
     > getSnapshotBeforeUpdate
-    - getSnapshotBeforeUpdate(prevProps,prevState):接收父组件传递过来的props和组件之前的状态 此生命周期狗子必须有返回值
+    - getSnapshotBeforeUpdate(prevProps,prevState):接收父组件传递过来的props和组件之前的状态 此生命周期勾子必须有返回值
     - 返回值将作为第三个参数传递给componentDidUpdate
     - 必须和componentDidUpdate一起使用 否则会报错
     > 该生命周期钩子作用:在组件更新DOM和refs之前 从DOM捕获一些信息(如滚动位置)
@@ -735,6 +790,9 @@
     3. js对象
 10. react 函数式/无状态组件和类组件/有状态组件区别
     > React的函数式组件和类组件之间根本区别在 心智模型上
+    > 心智模型
+    - 类组件是基于面向对象编程的 它主打的是继承 生命周期等核心概念 
+    - 函数组件内核是函数式变成 主打的是Immutable 没有副作用 引用透明等特点
     1. 语法上区别
         - 函数式组件是一个纯函数 它需要接受props参数并返回一个React元素 类组件需要继承React.Component class组件需要创建render并且返回React元素 语法上讲更复杂
     2. 调用方式
@@ -787,8 +845,9 @@
     > 除了使用jsx(是react.createElement语法糖)语法 还可以使用react.createElement() react.cloneElement()来构建react元素
     
     > react组件
-    > react中有三种构建组件的方式 React.createClass() ES6 class 和无状态函数
-    1. react.createClass()
+    > react中有三种构建组件的方式 ES5 React.createClass() ES6 extends React.Component 和无状态函数
+    1. ES5 react.createClass() RFC
+    - 会自动绑定函数方法 导致不必要的性能开销 增加代码过时的可能性
     ```
     var Greeting = React.createClass({
         render:function(){
@@ -796,7 +855,8 @@
         }
     })
     ```
-    2. ES6 class
+    2. ES6 extends React.Component RCC
+    - 目前极为推荐的创建有状态组建的方式 最终会取代React.createClass形式 相对于React.createClass可以更好实现代码复用
     ```
     class Greeting extends React.Component{
         render:function(){
@@ -805,9 +865,17 @@
     }
     ```
     3. 无状态函数
+    - 为了创建纯展示组件 这种组件只负责根据传入的props来展示 不涉及到state状态的操作 组件不会被实例化 整体渲染性能得到提升 不能访问this对象 不能访问声明周期方法
     > 无状态函数是使用函数构建的无状态组件 无状态组件传入props和context两个参数 它没有state 除了render没有其他生命周期方法
+    > 与无状态组件相比 React.createClass和React.Component都是创建有状态的组件 这些组件是要被实例化的 并可以访问组件的生命周期方法
+    
     4. PureComponent
     > 除了提供一个具有浅比较的shouldComponentUpdate方法 PureCompoent和Component基本完全相同
+
+    > React.createClass与React.Component区别
+    1. 函数this自绑定
+    2. 组件属性类型propTypes及其默认的props属性dedaultProps配置不同
+    3. 组建初始状态state的配置不同
 
     > 元素和组件的区别
     - 组件是由元素构成的 元素数据结构是普通对象 而组件数据结构是类或纯函数
@@ -944,6 +1012,10 @@
     - 这个问题可以通过React.forwardRef解决 在React.forwardRef之前 这个问题 可以通过给容器组件添加forwardedRef解决
     > 小结
     - 函数组件内部不支持使用字符串refs 支持createRef useRef 回调Ref
+    > React.forwardRef
+    - 会创建一个React组件 这个组件能够将其接受的ref属性转发到其组件树下的另一个组件中 这种技术并不常见 但在以下两种场景中 特别有用
+    1. 转发refs到DOM组件
+    2. 在高阶组件中转发refs
 12. react数据流
     > react核心思想是UI=render(data) data数据 render是react提供的纯函数 用户界面的展示取决于数据层
 
@@ -986,7 +1058,7 @@
         - globalstore可以保证组件即使销毁也以来保留之前状态
     2. 状态可回溯
         - 每个action都会被序列化 reducer不会修改原有状态 总是返回新状态 方便做状态回溯
-    3. functional programming/函数式编程
+    3. functional programming/函数式编程ƒ
         - 使用纯函数 输出完全依赖输入 没有任何副作用
     4. 中间件 
         - 针对异步数据流 提供了类express中间件的模式 社区中一批优秀的第三方插件 能够更精细地控制数据流动 对复杂的业务场景起到缓冲作用
@@ -1197,9 +1269,41 @@
     - SyntheticEvent是React跨浏览器的浏览器原生事件包装器 它拥有和浏览器原生事件相同的接口 包括stopPropagation()和preventDefault()
     - React实际上并不将事件附加到子节点本身 React使用单个事件侦听器侦听定策的所有事件 这对性能有好处 意味React在更新DOM时不需要跟踪事件监听器
     
+    > React事件机制
     1. 用户在为onclick添加函数时 react并没有将click事件绑定在dom上面
     2. 是在document处监听所有支持的事件，当事件发生并冒泡至document处时 react将事件内容封装交给synthetic event/合成事件(负责所有事件合成)
     3. 当事件触发时，对使用统一的分发函数dispatchEvent将指定函数执行
+    - 这样的方式不仅仅减少了内存的消耗 还能在组件挂载销毁时统一订阅和移除事件
+    - 冒泡到document上的事件也不是原生的浏览器事件 而是由React自己实现的合成事件(SyntheticEvent)
+    - 因此如果不想要时事件冒泡 应该调用event.preventDefault()方法 而不是调用event.stopPropagation()方法
+    - JSX上写的事件并没有绑定在对应的真实DOM上 而是通过事件代理的方式 将所有的事件都统一绑定在document上 
+    - 减少内存消耗 在组件挂在销毁时统一订阅和移除事件
+    > 实现合成事件的目的
+    1. 抹平了浏览器之间的兼容性问题 这是一个跨浏览器原生事件包装器 赋予了跨浏览器开发的能力
+    2. 对于原生浏览器事件 浏览器会给监听器创建一个事件对象 但是你有很多的事件监听 那么就需要分配很多的事件对象 造成高额的内存分配问题
+    - 但是对于合成事件来说 有一个事件池专门管理它们的创建和销毁 
+    - 当事件需要被使用时 就会从池子中服用对象 事件回调结束后 就会销毁事件对象上的属性 便于下次复用时间对象
+    
+    > React事件和普通的HTML事件
+    > 区别
+    1. 对于事件名称命名方式 原生事件为全小写 react事件采用小驼峰
+    2. 对于事件函数处理语法 原生事件为字符串 react事件为函数
+    3. react事件不能采用return false方式来阻止浏览器的默认行为 而必须要明确的调用preventDefault()来阻止默认行为
+    > 优点
+    - 合成事件是react模拟原生DOM事件所有能力的一个事件对象 
+    1. 兼容所有浏览器 更好的跨平台
+    2. 将事件统一存放在一个数组 避免频繁的新增与删除(垃圾回收)
+    3. 方便react统一管理和事务机制
+    > 执行顺序
+    1. 原生事件先执行 合成事件后执行
+    - 合成时事件会冒泡绑定到document上 所以要尽量避免原生事件和合成事件混用 如果原生事件阻止冒泡 可能会导致合成事件不执行 因为需要冒泡到document上合成事件才会执行
+
+    > React组件中怎么做事件代理 原理
+    - React基于VDOM实现了一个SyntheticEvent层(合成事件层) 定义的事件处理器会接收到一个合成事件对象的实例 它符合W3C标准 且与原生的浏览器事件拥有同样的接口 支持冒泡机制 所有事件都自动绑定在最外层
+    - React底层 主要对合成事件做了两件事
+    1. 事件委派 React会把所有事件绑定到结构的最外层 使用统一的事件监听器 这个事件监听器上维持了一个映射来保存所有组件内部事件监听和处理函数
+    2. 自动绑定 React组件中 每个方法的上下文都会指向该组件的实例 即自动绑定this为当前组件
+ 
 
     1. 为什么要手动绑定this
     - 通过事件触发过程的分析 dispatchEvent调用了invokeGuardedCallback方法
@@ -1391,7 +1495,7 @@
     - 通过循环递归对节点进行依次比较 算法复杂度达到O(n^3) n是树的节点数 
 
     > React的diff算法
-    1. 调和reconcilation 将VDOM树转换为actual DOM树的最少操作的过程称为调和
+    1. 调和reconcilation(调和) 将VDOM树转换为actual DOM树的最少操作的过程称为调和
     2. 什么是React diff算法
     - diff算法是调和的具体实现
 
@@ -1752,7 +1856,8 @@
     - 用React编写原生移动应用 flutter weex(基于Vue)
     6. React-server
     - 服务端渲染React组件
-95. > class与className
+95. 
+    1. class与className
     > 之前为什么要使用classname
     - class是JS的保留关键字 JSX是JS的扩展 
     > 现在React中可以使用classname
@@ -1897,3 +2002,226 @@
             - useLocation会返回当前url的location对象
     > 小结
     - React Router可以在一个页面模拟出多页面的情况 并具有很高的可用性(归根结底 它仍然是单页面应用)
+18. React -Router
+    > 实现思想
+    - 客户端路由实现思想
+    1. 基于hash的路由 通过监听hashchange事件 感知hash的辩护
+        - 改变hash可以直接通过location.hash = xxx
+    2. 基于H5 history路由
+        - 改变url可以通过history,pushState和replaceState等 将URL压入堆栈 同时能够应用history.go()等API
+        - 监听url的变化可以通过自定义事件触发实现
+    - react-router实现思想
+    1. 基于history库来实现上述不同的客户端路由实现思想 并能保存历史记录 磨平浏览器差异 上层无感知
+    2. 通过维护的列表 在每次URL发生变化的回收 通过配置的路由路径 匹配到对应的Componennt并且render
+    > 配置React-Router实现路由切换
+    1. 使用<Route>组件
+    - 路由匹配是通过比较<Route>的path属性和当前地址的pathname来实现的 当一个<Route>匹配成功时 它将渲染其内容 当它不匹配时就会渲染null 没有路由的<Route>将始终被匹配
+    2. 结合使用<Switch>组件和<Route>组件
+    - <Switch>用于将<Route>分组
+    - <Switch>不是分组<Route>所必须的 但他通常很有用 一个<Switch>会遍历i去所有的子<Route>元素 并仅渲染与当前地址匹配的第一个元素
+    3. 使用<Link><NavLink><Redirect>组件
+    - <Link>组件用来在应用程序中创建连接 无论在何处渲染一个<Link>都会在应用程序的HTML中渲染锚<a>
+    - 是一种特殊类型 当它的to属性和当前地址匹配时 可将其定义为活跃的
+    - 当我们想强制导航时 可以渲染一个<Redirect> 当一个<Redirect>渲染时 它将使用它的to属性进行定向
+    
+    > React-Router设置重定向
+    - 使用<Redirect>组件实现路由重定向
+    
+    > React-router中Link标签和a标签区别
+    - 从最终渲染的DOM来看 这两者都是链接 都是标签 
+    - 区别是<Link>是React-router中实现路由跳转的链接 一般配合<Route>使用 react-router接管了其默认的链接跳转行为 
+    - 区别于传统的页面跳转 <Link>的跳转行为只会触发相应匹配的<Route>对应的页面内容更新 而不会刷新整个页面
+    - <Link>做了三件事
+    1. 有onclick就执行onclick
+    2. click时组织a标签默认事件
+    3. 根据挑战href 用hisory挑战 此时只是链接变了 并没有刷新页面
+    - a标签就是普通的超链接了 用于从当前页面跳转到href指向的另一个页面(非锚点情况)
+
+    > React-Router如何获取URL的参数和历史对象
+    1. 获取URL的参数
+    - get传值
+        - this.props.location.search
+        - 浏览器提供的API URLSearchParams对象或自己封装的方法解析出id的值
+    - 动态路由传值
+        - this.props.match.params.id
+        - useParams(Hooks)
+    - 通过query或state传值
+        - this.props.location.state
+        - this.props.locationquery
+    2. 获取历史对象
+        - this.props.history获取历史对象
+
+    > React-Route如何在路由变化时重新渲染同一个组件
+    - 当路由变化 即组件的props发生了变化 调用componentWillReceiveProps等生命周期钩子 当路由改变时 根据路由 也去请求数据
+    - 利用生命周期componentWillReceiveProps 进行重新render的预处理操作
+    
+19. React16渲染流程
+    > Stack Reconciler
+    - Reacrt16之前的组件渲染方式是递归渲染
+    - 渲染父节点 -> 渲染子节点
+    - 递归渲染看起来简单 但如果想在子节点的渲染过程中执行优先级更高的操作 只能保留调用栈中子节点的渲染及子节点之前节点的渲染 这样是很复杂的 这种调和/渲染也叫做Stack Reconciler(和解者)
+
+    > Fiber Reconciler(和解着)
+    - Fiber使用链表的结构去渲染节点 每一个节点都称之为Fiber Node 每个节点会有三个属性
+        1. child指向第一个字节点
+        2. sibling指向兄弟节点
+        3. return指向父节点
+    - Fiber的渲染方式 从父节点开始 向下依次遍历子节点 深度优先渲染完子节点后 再回到其父节点去检查是否有兄弟节点 如果有兄弟节点 则从该兄弟节点开始继续深度优先的渲染 知道回退到根结点结束
+    - 重复遍历的节点并不会重复渲染 而是为了取到下一个可能需要渲染的节点
+    - 此时每一个节点都是一个渲染任务 从而将整个界面渲染任务拆分成更小的模块 模块可拆分就意味着每次任务执行前都可以去检查是否去执行优先级更高的操作
+
+    > Fiber Node Tree
+    - 真实的DOM渲染过程是diff两棵Fiber节点树得到effect list 在commit阶段执行 在React16中 两颗树分别是
+    1. current tree
+    2. workInProgress tree
+    - React并没有实现两棵Fiber Node Tree 实际情况是两颗树上对应的Fiber Node通过alternate属性相互引用
+
+    > React渲染流程
+    - 可分为Scheduler Reconcilation Commit三个阶段
+    - Scheduler->Reconciliation/Render->Commit->Browser Screen
+    1. Scheduler阶段
+    - Scheduler阶段主要是创建更新 创建更新的方式
+        - ReactDOM.render
+        - setState
+    - 可以发现React将首次渲染和更新渲染统一了起来
+    > ReactDOM.render
+    - 调用legacyRenderSubtreeIntoContainer
+    > legacyRenderSubtreeIntoContainer
+    - 调用root.render root来自调用legacyCreateRootFromDOMContainer
+    > legacyCreateRootFromDOMContainer
+    1. 清除根节点下的所有子元素
+    2. 创建ReactRoot
+    > ReactSyncRoot
+    > setState
+    > enqueueUpdate
+    > scheduleWork
+    2. Reconciliation阶段
+    > workLoop
+    - 循环更新 对整颗Fiber树都遍历一遍
+    - 循环每渲染完成一个Fiber Node就利用shouldYield来判断是否有优先级更高的任务存在 是则跳出循环 先执行优先级更高的任务 否则继续渲染下一个Fiber Node
+    - 判断当前帧是否还有时间更新 如果没有时间更新就将剩余时间去进行其他操作
+    > performUnitOfWork
+    > beginWork
+    > completeWork
+    3. commit阶段
+    - commit阶段是将调和阶段的更新进行提交 即把更新操作反映到真实的DOM上
+    - 同时commit阶段是同步执行的不可被打断
+
+    > Effect
+    - 函数式编程经常会看到Effect这个概念 表示副作用 在Fiber架构中 Effect定义了Fiber Node在commit阶段要做的事情 在源码中 也就是EffectTag这个属性
+        - 对于组件：更新refs 调用componentDidUpdate
+        - 对于DOM：增加 更新 删除DOM
+    - Effect组成的链表成为effects list
+        - firstEffect:指向第一个更新的节点
+        - nextEffect:指向下一个更新的节点
+
+    > commitRoot
+    - 使effecs list生效
+    1. 第一次遍历effects list(commitBeforeMutationEffects):在更改前读取DOM上的state 这里是getSnapshotBeforeUpdate生命周期调用的地方
+    2. 第二次遍历effects list(commitMutationEffects):此阶段是真正改变DOM的阶段
+    3. 第三次遍历effects list(commitLayoutEffects):执行生命周期函数componentDidMount componentDidUpdate
+20. React16
+    - React16后各功能点是多个版本陆陆续续迭代增加的
+    > 更新概览
+    - React v16.0~React v16.6
+    1. Reactv16.0
+        1. render支持返回数组和字符串
+        2. 支持自定义DOM属性
+        3. 减少文件体积
+    2. Reactv16.3
+        1. createContext
+        2. createRef
+        3. 生命周期函数的更新
+    3. Reactv16.4
+        - 更新getDerivedStateFromProps
+    4. Reactv16.6
+        1. memo
+        2. lazy
+        3. Suspense
+        4. static contextType
+        5. static getDerivedStateFromError
+    5. Reactv16.7 
+        - hooks
+
+    > 新的生命周期函数
+    1. 挂载
+        1. constructor
+            1. 初始化state 
+            - 应避免使用props给state赋值 这样state的初始化可以提到constructor外面处理
+            2. 给方法绑定this
+        2. getDerivedStateFromprops
+            - 挂载组件时 该静态方法会在render前执行
+            - 更新组件时 该静态方法会在shouldComponentUpdate前执行
+            - getDerivedStateFromProps的返回值将作为setState的参数 如果返回null 则不更新state 不能返回object或null以外的值 否则会警告
+            - getDerivedStateFromProps是一个静态方法 是拿不到实例this的 所以开发者应该将函数设计成纯函数
+        3. render
+        4. componentDidMoun
+    2. 更新
+        1. getDerivedStateFromProps
+        2. shouldComponentUpdate
+        3. render
+        4. getSnapShotBeforeUpdate
+            - 在React更新DOM之前调用 此时state已更新 返回值作为componentDidUpdate的第三个参数 一般用于获取render之前的DOM数据
+            - getSnapSlotBeforeUpdate的使用场景一般是获取组件更新之前的滚动条位置
+        5. componentDidUpdate
+    3. 卸载
+        - componentWillUnmount
+    4. 异常
+        - componentDidCatch
+        - 这个函数是React16新增的 用于捕获组件树的异常 如果render()函数抛出错误 则会触发该函数 可以按照try catch来理解和使用 在可能出现错误的地方 使用封装好的包含componentDidCatch生命周期的组件包裹可能出错的组件
+21. Component Element Instance区别和联系
+    1. 元素: 一个元素element是一个普通对象(plain object)描述对于一个DOM节点或其他组件component 想让它在屏幕上呈现什么样子 
+    - 元素element可以在它的属性props中包含其他元素(用于形成元素树)创建一个React元素element的成本很低 元素element创建之后是不可变的
+    2. 组件：一个组件component可以通过多种方式声明 可以是带有一个render()方法的类 简单点也可以定义为一个函数 这两种情况下 它都把属性props作为输入 把返回的一颗元素树作为输出
+    3. 实例：一个实例instance是你在所写的组件类component class中使用关键字this所指向的东西(组件实例) 它用来存储本地状态和响应生命周期事件很有用
+    - 函数组件没有实例instance 
+    - 类组件有实例instance 但是永远也不需要直接创建一个组件的实例 因为react帮我们做了这些
+22. React.createClass和extends Component的区别
+    1. 语法
+    2. propType和getDefaultProps
+    3. 状态
+    4. this
+    5. mixins
+23. 哪些方法会触发React重新渲染 重新渲染render会做什么
+    > 哪些方法
+    1. setState()
+    - 执行setState时不一定会重新渲染 当setState传入null时并不会触发render
+    2. 父组件重新渲染
+    > 重新渲染会做什么
+    1. Diff
+    2. 深度优先遍历
+    3. 遍历差异对象 根据差异类型 根据对应规则更新VNODE
+24. React中Fragment理解 使用场景
+    - React中 组件返回的元素只能有一个根元素 为了不添加多余的DOM节点 可以使用Fragment标签来包裹所有的元素 Fragement标签不会渲染出任何元素 React对Fragement解释
+    - React中的一个常见模式是一个组件返回多个元素 Fragments允许你将子列表分组 而无需向DOM添加额外节点
+25. React中可以在render访问refs吗
+    - 不可以
+    - render阶段 DOM还没生成 无法获取DOM DOM的获取需要在pre-commit阶段和commit阶段
+26. React的插槽Portals的理解 如何使用 有哪些使用场景
+    - Portal提供一种将子节点渲染到存在于父组件以外的DOM节点的优秀方案
+    - Portal是React16提供的官方解决方案 使得组件可以脱离父组件层级挂载在DOM树的任何位置
+    - render一个组件 但这个组件的DOM结构不在本组件内
+    > Portals语法
+    ```
+    ReactDOM.createPortal(child,container);
+    ```
+    1. 第一个参数child是可渲染的React子项 比如元素 字符串或片段等
+    2. 第二个参数container是一个DOM元素
+    - 一般情况下 组件的render函数返回的元素会被挂载在它的父级组件上
+    - 然而 有些元素需要被挂载在更高层级的位置 
+    - 父组件具有overflow:hidden或z-index的样式设置时 组件有可能被其他元素震荡 这时就可以考虑要不要使用Portal使组件的挂载脱离父组件
+    - 如对话框 模拟窗
+27. 对React.Intl理解 工作原理
+28. React Context理解
+    - 不想在组件树木中通过逐层传递props或者state的方式来传递数据时 可以使用Context来实现跨层级的组件数据传递
+    > React不推荐使用Context
+    1. 目前还处于实验阶段
+    2. 
+    3. 
+    4. context的更新需要通过setState()的触发 但这并不是很可靠的 Context支持跨组件访问 但如果中间的子组件通过一些方法不影响 更新 如should返回false 不能保证context的更新一定可以使用Context的子组件 因此Context可靠性需要关注
+29. getDefaultProps
+    - 通过实现组件的getDefaultProps对属性设置默认值 ES5写法
+30. propType
+    - 当我们向props传入数据无效(与验证的数据类型不符)就会在控制台发出警告信息
+    - 它可以避免随着应用越来越复杂而出现的问题 它可以让程序变得更易读
+    - 当然 如果项目中使用了TS 就可以不用proptypes来校验 而使用TS定义接口来校验props

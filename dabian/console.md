@@ -121,7 +121,7 @@ store.dispatch({
 store.dispatch(addTodo('Learn Redux'));
 #####Reducer
 Store 收到 Action 以后，必须给出一个新的 State，这样 View 才会发生变化。这种 State 的计算过程就叫做 Reducer。
-Reducer 是一个函数，它接受 Action 和当前 State 作为参数，返回一个新的 State。
+Reducer 是一个纯函数，它接受 Action 和当前 State 作为参数，返回一个新的 State。
 ```
 const reducer = function (state, action) {
         // ...
@@ -165,7 +165,6 @@ store.subscribe() Store允许使用该方法设置监听函数 一旦State发生
 #####关于异步
 reducer必须是纯函数不支持异步，但是它支持中间件
 ###  2.React-Redux
-    
 ####Redux 和 React 之间没有关系。
 为了方便使用，Redux 的作者封装了一个 React 专用的库 React-Redux。
 这个库是可以选用的。实际项目中，你应该权衡一下，是直接使用 Redux，还是使用 React-Redux。后者虽然提供了便利，但是需要掌握额外的 API，并且要遵守它的组件拆分规范。
@@ -410,6 +409,7 @@ redux-saga 是一个用于管理应用程序 Side Effect（副作用，例如异
 redux-saga 使用了 ES6 的 Generator 功能，让异步的流程更易于读取，写入和测试。（如果你还不熟悉的话，这里有一些介绍性的链接） 通过这样的方式，这些异步的流程看起来就像是标准同步的 Javascript 代码。（有点像 async/await，但 Generator 还有一些更棒而且我们也需要的功能）。
 
 你可能已经用了 redux-thunk 来处理数据的读取。不同于 redux thunk，你不会再遇到回调地狱了，你可以很容易地测试异步流程并保持你的 action 是干净的。
+
 ####Saga辅助函数
 #####takeEvery
 takeEvery 允许多个 fetchData 实例同时启动。在某个特定时刻，尽管之前还有一个或多个 fetchData 尚未结束，我们还是可以启动一个新的 fetchData 任务，
@@ -492,16 +492,21 @@ selector Function 一个(state,...args)=&gt;args的函数 它接受当前state�
             
 #####6.delay(ms,[val])
 返回一个效果描述符以阻止执行ms几毫秒并返回val值
+
 ####redux-saga&redux-thunk
+
 #####redux-thunk
 是redux作者给出的中间件 实现极为简单 10多行代码
 判别action类型,如果action是函数,就调用这个函数,调用步骤action(dispatch,getState,extraArgument)定义action为thunk函数时 一般形参为dispatch和getState
+
 #####redux-saga
 redux-saga是控制执行的generator 在redux-saga中action是原始js对象 把所有的异步副作用操作放在了sage函数里面 统一了action的形式 使得异步操作集中可以被集中处理
 redux-saga是通过generator实现的，如果不支持generator需要通过插件babel-polyfill转义
 和调用redux的其他中间件一样 如果想使用redux-saga中间件 那么只要在applyMiddleware中调用一个createSagaMiddleware的实例 唯一不同的是需要调用run方法使得generator可以开始执行
+
 #####区别
 对于redux-thunk的整个流程来说，它是等异步任务执行完成之后，我们再去调用dispatch，然后去store去调用reduces。
+
 对于redux-saga的整个流程来说，它是等执行完action和reducer之后，判断reducer中有没有这个action
 redux-thunk和redux-saga处理异步任务的时机不一样。对于redux-saga，相对于在redux的action基础上，重新开辟了一个 async action的分支，单独处理异步任务
 #### 官方文档
@@ -525,8 +530,8 @@ https://cyrilluce.gitbook.io/saga-duck/
 该文档可能会有权限限制，如不能正常访问，可询问相关同学。由于该文档内已包含了saga-duck的一系列基本使用方法，所以在此不赘述。
 http://tapd.oa.com/personal_documents/show/1100000000000460312#target:toc43
 
-###   5.React Hooks
-####Hooks官网介绍
+### 5.React Hooks
+#### Hooks官网介绍
 React 16.8 中的新增功能。让您无需编写类即可使用状态和其他 React 功能。
 #### 规则
 Hooks是JS函数，但它们强加了两个额外的规则。
@@ -573,7 +578,6 @@ React保证setState函数标识是稳定的并且不会在重新渲染时改变�
 
 ### 6. Generator  
 ####1. JS异步编程之旅
-	
 ``` 
 	回调函数-可能会造成回调地狱
 	事件监听
@@ -583,7 +587,6 @@ React保证setState函数标识是稳定的并且不会在重新渲染时改变�
 	async/await函数-Generator函数的语法糖
 	(协程-多个线程互相协作，完成异步任务)
 ``` 
-
 ####2. generator函数和普通函数的区别
 	generator函数可以使用yield表达式暂停执行，形式上在函数名前加星号与普通函数做区分。generator函数是协程在ES6的实现，最大的特点是可以交出函数的执行权(即暂停执行)。整个generator函数就是一个封装的异步任务，异步操作需要暂停的地方，都用yield语句注明
 	generator函数的执行方法
