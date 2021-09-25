@@ -20,7 +20,7 @@ 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
 
 > 云开发一些概念
 - 云开发/云数据库/云存储/静态网站托管/云函数/云计算/云托管
-> 云开发(Tencent CloudBase TCB)
+> 云开发(Tencent CloudBase)
 1. 云开发Cloudbase是腾讯云出品的Serverless云原生一体化产品方案 为小程序 web应用 移动应用提供一站式后端服务 弱化了运维和服务器概念 有更多精力关注业务代码
 - ClouBase在后台创建环境后 会默认提供云数据库 云存储 云函数 静态资源部署等功能
 

@@ -1,6 +1,6 @@
-var msg = 'hello'
-for(var i=0;i<10;i++){
-    var msg = 'hello'+i*2+i;
+function captureThreeNumbers(str) {
+    let reg = /[0-9]{3}/;
+    let num = str.match(reg);
+    
 }
-console.log(msg);
-console.log('0');
+console.log(captureThreeNumbers('9876543'));

@@ -6,6 +6,8 @@
         3. 通过splitChunks拆分出来的代码也是
     3. bundle: webpack打包出来的文件 
         - 也可以理解为就是对chunk编译压缩打包等处理后的产出
+    - 不像大多数的模块打包机 webpack是吧项目当作一个整体 通过一个给定的主文件 webpack将从这个文件开始找到你的项目的所有依赖文件 使用loaders处理它们 最后打包成一个或多个浏览器可识别的js文件
+    - webpack-dev-server用来创建本地服务器 监听你的代码改动 并自动刷新修改后的结果
 1. Webpack作用
     > 定义
     - Webpack是一个现代JS应用程序的静态模块打包器 当webpack处理应用程序时 会递归构建一个依赖关系图 其中包含应用程序需要的每个模块 然后将这些模块打包成一个或多个bundle
@@ -33,13 +35,6 @@
     4. 对不同文件类型的依赖模块文件使用对应的Loader进行编译 最终转为JS文件
     5. 整个过程中webpack会通过发布订阅模式 向外抛出一些hooks webpack的插件plugin即可通过监听这些关键的事件节点 执行插件任务进而达到干预输出结果的目的
 
-    1. Webpack启动后会在entry里配置的module开始递归解析entry所依赖的所有module
-    2. 每找到一个module就会根据配置的loader去找相应的转换规则
-    3. 对module进行转换后再解析当前module所依赖的module 这些模块会以entry为分组
-    4. 一个entry和所有相依赖的module也就是一个chunk
-    5. 最后webpack会把所有chunk转换成文件输出
-    6. 在整个流程中webpack会在恰当时机执行plugin的逻辑
-
     (初始化Compiler-开始编译(调用compiler的run方法)-确定入口-编译模板-完成编译模板-输出资源-输出完成)
     1. 初始化compiler:new Compiler(config) config就是webpack.config.js文件
     2. 开始编译 调用compiler的run方法开始编译
@@ -48,37 +43,13 @@
     5. 完成模块编译：在经过第4步使用Loader编译完所有模块后，得到每个模块编译的内容和它们的依赖关系
     6. 输出资源：根据入口和模块之间的依赖关系，组装成一个个包含多个模块的Chunk，再把每个chunk转换成单独的文件加入到输出列表。（这步是可以修改输出内容的最后机会）。
     7. 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统。
-
-    Webpack 的运行流程是一个串行的过程，从启动到结束会依次执行以下流程：
-    1. 初始化参数：从配置文件和 Shell 语句中读取与合并参数，得出最终的参数
-    2. 开始编译：用上一步得到的参数初始化 Compiler 对象，加载所有配置的插件，执行对象的 run 方法开始执行编译
-    3. 确定入口：根据配置中的 entry 找出所有的入口文件
-    4. 编译模块：从入口文件出发，调用所有配置的 Loader 对模块进行翻译，再找出该模块依赖的模块，再递归本步骤直到所有入口依赖的文件都经过了本步骤的处理
-    5. 完成模块编译：在经过第4步使用 Loader 翻译完所有模块后，得到了每个模块被翻译后的最终内容以及它们之间的依赖关系
-    6. 输出资源：根据入口和模块之间的依赖关系，组装成一个个包含多个模块的 Chunk，再把每个 Chunk 转换成一个单独的文件加入到输出列表，这步是可以修改输出内容的最后机会
-    7. 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
-
-    在以上过程中，Webpack 会在特定的时间点广播出特定的事件，插件在监听到感兴趣的事件后会执行特定的逻辑，并且插件可以调用 Webpack 提供的 API 改变 Webpack 的运行结果。
-
-    简单来说
+    - 以上过程中 Webpack会在特定的时间点广播出特定的事件 插件在监听到感兴趣的事件后会执行特定的逻辑 并且插件可以调用Webpack提供的API改变Webpack的运行结果
+    - 简单来说
     1. 初始化：启动构建，读取与合并配置参数，加载 Plugin，实例化 Compiler
     2. 编译：从 Entry 出发，针对每个 Module 串行调用对应的 Loader 去翻译文件的内容，再找到该 Module 依赖的 Module，递归地进行编译处理
     3. 输出：将编译后的 Module 组合成 Chunk，将 Chunk 转换成文件，输出到文件系统中
-
-    1. 读取webpack的配置参数；
-    2. 启动webpack，创建Compiler对象并开始解析项目；
-    3. 从入口文件（entry）开始解析，并且找到其导入的依赖模块，递归遍历分析，形成依赖关系树；
-        一个比较复杂的过程，在webpack源码中主要依赖于compiler和compilation两个核心对象实现。
-        compiler:
-            对象是一个全局单例，他负责把控整个webpack打包的构建流程。
-        compilation:
-            对象是每一次构建的上下文对象，它包含了当次构建所需要的所有信息，每次热更新和重新构建，compiler都会重新生成一个新的compilation对象，负责此次更新的构建过程。
-        而每个模块间的依赖关系，则依赖于AST语法树。
-        每个模块文件在通过Loader解析完成之后，会通过acorn库生成模块代码的AST语法树，通过语法树就可以分析这个模块是否还有依赖的模块，进而继续循环执行下一个模块的编译解析。
-        最终Webpack打包出来的bundle文件是一个IIFE的执行函数。
-    4. 对不同文件类型的依赖模块文件使用对应的Loader进行编译，最终转为Javascript文件；
-    5. 整个过程中webpack会通过发布订阅模式，向外抛出一些hooks，而webpack的插件即可通过监听这些关键的事件节点，执行插件任务进而达到干预输出结果的目的。
 3. loader的编写思路
+    > loader支持链式调用 所以开发上需要严格遵循单一职责 每个loader只负责自己要负责的事情
     - Webpack最后打包出来的成果是一份JS代码
     - Webpack内部默认只能处理JS模块代码 
     - 打包过程中 会默认把遇到的所有文件都当作JS代码进行解析
@@ -115,6 +86,15 @@
     - loader函数中的this上下文由webpack提供 可以通过this对象提供的相关属性 获取当前loader需要的各种信息数据 
     - 事实上这个this 指向一个叫loaderContext的loader runner特有对象
     
+    1. loader运行在Node.js中 我们可以调用任意Nodejs自带的API或安装第三方模块进行调用
+    2. Webpack传给Loader的原内容都是UTF-8格式编码的字符串 当某些场景下Loader处理二进制文件时 需要通过exports.raw = true 告诉Webpack该Loader是否需要二进制数据
+    3. 尽可能异步化Loader 如果计算量很小 同步也可以
+    4. Loader是无状态的 不应该在Loader中保留状态
+    5. 使用loader-utils和schema-utils为我们提供的实用工具
+    6. 加载本地loader方法
+        - npm link
+        - ResolveLoader
+
     > loader的执行顺序为什么是后写的先执行 即从右往左
     - webpack选择了compose方式 而不是pipe的方式
     > 函数组合 函数式编程中非常重要的思想
@@ -131,13 +111,21 @@
 
     > Webpack提供的事件钩子(compiler compilation汇编)
     1. compiler 暴露了和Webpack整个生命周期相关的钩子 compiler-hooks
-    2. compilation 暴露了与模块和依赖有关的粒度更小的事件钩子 Compilation Hooks
+    2. compilation汇编 暴露了与模块和依赖有关的粒度更小的事件钩子 Compilation Hooks
     - Webpack的事件机制基于webpack自己实现的一套Tapable事件流方案
 
     > Plugin开发和Loader开发一样 需要遵循一些开发上的规范和原则
     1. 插件必须是一个函数或包含一个apply方法的对象 这样才能访问compiler实例
     2. 传给每个插件的compiler和complation对象都是同一个引用 若在一个插件中修改了他们身上的属性 会影响后面的插件
     3. 异步的事件需要在插件处理完任务时调用回调函数通知Webpack进入下一个流程 不然会卡住
+
+    > 提高效率的插件
+    1. webpack-dashboard 更友好的展示相关打包信息
+    2. webpack-merge 提取公共配置 减少重复配置代码
+    3. speed-measure-webpack-plugin 简称SMP 分析出Webpack打包过程中Loader和Plugin的耗时 有助于找到构建过程中的性能瓶颈
+    4. size- plugin 监控资源体积变化 尽早发现问题
+    5. HotModuleReplacePlugin 模块热替换
+    
 4. Loader和Plugin区别
     > Loader：(本质函数 让webpack拥有加载和解析非JavaScript文件的能力)
     1. 本质是一个函数 在该函数中对接收到的内容进行转换 返回转换后的结果 因为Webpack只认识JavaScript 所以Loader就成了翻译官 对其他类型的资源进行转译的预处理工作
@@ -172,10 +160,13 @@
             test:/\.css$/
             // 使用哪些loader进行处理 执行顺序 从右至左 从下至上
             use:[
+                // 加载文件原始内容(utf-8)
+                raw-loader
                 // 创建style标签 将js中的样式资源(也就是css-loader转化成的字符串)拿过来 添加到页面header标签
                 "style-loader"
                 // 将css文件变成commonjs一个模块加载到js中 里面的内容是样式字符串
                 "css-loader"
+                // 处理样式中的url 如url('@/static/img.png')
                 // 兼容性问题
                 "postcss-loader"
                 // sass/less
@@ -225,6 +216,9 @@
         const MiniCssExtractPlugin = require('mini-css-exact-plugin')
         // VueLoaderPlugin 插件 作用是将定义过的css js等规则应用到vue文件中
         const {VueLoaderPlugin} = require('vue-loader');
+        // ExtractTextWebpackPlugin 将入口中引入的css文件都打包到独立的css文件 而不是内嵌在js打包文件中
+        const {ExtractTextPlugin} = require('extract-text-webpack-plugin');
+        // HotModuleReplacementPlugin 允许你在修改组件代码时 自动刷新实时预览修改后的结果 永远不要在生产环境使用HMR 
         ```
     5. mode
         - 指示Webpack使用相应模式的配置 默认为production
@@ -282,6 +276,8 @@
         - Webpack4种做不到 Webpack4只会去除从未使用过的模块
         - 因为Wepack4默认所有文件的代码都是有副作用的
     7. Code Split代码分割
+        - 代码分割本质是在源代码直接上线和打包成唯一的脚本main.bundle.js这两种极端方案之间的一种更适合时机场景的中间状态
+        - 用可接受的服务器性能压力增加换取更好的用户体验
         - Webpack默认会将所有依赖的文件打包输出到一个bundle.js中(单入口时)
         - 当应用程序逐渐复杂 这个bundle.js文件也会越来越大 浏览器加载速度也会越来越慢 所以需要使用代码分割将不同代码单独打包成不同thrunk输出
         1. 通过optimization将公共代码单独打包成trunk
@@ -312,14 +308,24 @@
     2. 减小文件体积
         - 当把这些共同引用的模块都堆在一个模块中 这个文件可能异常巨大1不利于网络请求和页面加载 所以需要把这个公共模块再按照一定规则进一步拆分成几个模块文件--减小文件体积
 7. sourcemap
-    - source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。
+    > source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。
+    - map文件只要不打开开发者工具 浏览器是不会加载的
+    - 线上环境一般有三种处理方案
+    1. hidden-source-map 借助第三方错误监控平台Sentry使用
+    2. nosources-source-map 只会显示具体行数以及查看源代码的错误栈 安全性比sourcemap高
+    3. sourcemap 通过nginx设置将.map文件只对白名单开发
+    - PS:避免在生产环境中使用inline- 和eval- 它们会增加bundle体积大小 并降低增提性能
 7. Webpack热更新(HMR Hot Module Replacement)原理
     - Webpack 的热更新又称热替换（Hot Module Replacement），缩写为 HMR。 这个机制可以做到不用刷新浏览器而将新变更的模块替换掉旧的模块。
 
     - HMR的核心就是客户端从服务端拉取更新后的文件，准确的说是 chunk diff (chunk 需要更新的部分)，实际上 WDS 与浏览器之间维护了一个 Websocket，当本地资源发生变化时，WDS 会向浏览器推送更新，并带上构建时的 hash，让客户端与上一次资源进行对比。
+    
     - 客户端对比出差异后会向 WDS 发起 Ajax 请求来获取更改内容(文件列表、hash)，这样客户端就可以再借助这些信息继续向 WDS 发起 jsonp 请求获取该chunk的增量更新。
 
     - 后续的部分(拿到增量更新之后如何处理？哪些状态该保留？哪些又需要更新？)由 HotModulePlugin 来完成，提供了相关 API 以供开发者针对自身场景进行处理，像react-hot-loader 和 vue-loader 都是借助这些 API 实现 HMR。
+    > 原理
+    - 自己开启了express应用 添加了对webpack编译的监听 添加了和浏览器的websocket长连接 当文件变化出发webpack进行编译后完成 会通过socket消息告诉浏览器准备刷新
+    - 为了减少刷新的代价 就是不同刷新网页 而是刷新某个模块 webpack-server可以支持热更新 通过省层文件的hash值来对比需要更新的模块 浏览器再热替换
 8. 文件指纹是什么？怎么用？(打包后输出文件的后缀)
     > 文件指纹是打包后输出的文件名的后缀
     1. Hash：和整个项目的构建相关，只要项目文件有修改，整个项目构建的 hash 值就会更改
@@ -339,6 +345,16 @@
         contenthash   文件的内容hash，默认是md5生成
         hash         文件内容的hash，默认是md5生成
         emoji        一个随机的指代文件内容的emoj
+    > Webpack打包时hash码是如何生成的
+    1. webpack生态中存在多种计算hash的方式
+        1. hash
+        2. chunkhash
+        3. contenthash
+    - hash代表每次webpack编译中生成的hash值 所有使用这种方式的文件hash都相同 每次构建都会使webpack计算新的hash
+    - chunkhash基于入口文件及其关联的chunk形成 某个文件的改动只会影响与它有关联的chunk的hash值 不会影响其他文件contenthash根据文件内容创建 
+    - 当文件内容发生变化时 contenthash发生变化
+    2. 避免相同随机数
+    - webpack在计算hash后分割chunk 产生相同随机数可能是因为这些文件属于一个chunk 可以将某个文件提到独立的chunk(如放入entry)
 9. webpack异步加载原理以及分包策略
     > Webpack异步加载原理
     - webpack ensure有人称它为异步加载/代码切割
@@ -479,6 +495,7 @@
         - 使用动态import 而不是用system.import/require.ensure
     5. vue-loader
         - 使用vue-loader插件为.vue文件中的各部分使用相对应的loader如css-loader
+        - 它是基于webpack的一个loader插件 解析和转换.vue文件 提取出其中的逻辑代码script 样式代码style 以及HTML模版template 再分别把它们交给对应的loader去处理如style-loader less-loader等等 核心作用就是提取
     6. UglifyJsPlugin
         现在也不需要使用这个plugin了，只需要使用optimization.minimize为true就行，production mode下面自动为true
         optimization.minimizer可以配置你自己的压缩程序
@@ -505,14 +522,24 @@
     - 对Webpack开发者来说 它是一个扩展性高的系统
     - Webpack之所以能成功 是因为它把复杂的实现隐藏起来 给用户暴露出的指示一个简单的工具 让用户能快速达成目的
     - 同时整体架构设计合理 扩展性高 开发扩展难度不高 通过社区补足了大量缺失的功能 让Webpack几乎能胜任任何场景
-
-1. 文件监听原理
+13. Webpack离线缓存静态资源如何实现
+    1. 配置webpack时 可以使用html-webpack-plugin来注入到和html一段脚本来实现将第三方或公用资源进行静态化存储 如<%HtmlWebpackPlugin.options.loading.html%>在html-webpack-plugin中即可通过配置html属性 将script注入
+    2. 利用webpack-manifest-plugin并通过配置webpack-manifest-plugin生成manifestjson文件 用来对比js资源的差别 做到是否替换
+    3. 做CI或CD时 通过编辑文件流来实现净态化脚本注入 降低服务器的压力 提高性能 
+    4. 可以通过自定义plugin或html-webpack-plugin等周期函数 动态注入前端静态化存储script
+14. webpack如何实现持久化缓存
+    1. 服务端设置http缓存头(cache-control)
+    2. 打包依赖和运行时到不同的chunk 即作为splitChunk 因为他们几乎是不变的
+    3. 延迟加载 使用import方式 可以动态加载的文件分到独立的chunk 以得到自己的chunkhash
+    4. 保持hash值的稳定 编译过程和文件内的更改尽量不影响其他文件hash的计算 对于低版本webpack生成的增量数字id不稳定问题 可以通过hashedModulePlugin基于文件路径生成解决
+15. 文件监听原理
     - 在发现源码发生变化时，自动重新构建出新的输出文件。
     - Webpack开启监听模式，有两种方式：
     1. 启动 webpack 命令时，带上 --watch 
     2. 参数在配置 webpack.config.js 中设置 watch:true
     > 缺点：每次需要手动刷新浏览器
     > 原理：轮询判断文件的最后编辑时间是否变化，如果某个文件发生了变化，并不会立刻告诉监听者，而是先缓存起来，等 aggregateTimeout 后再执行。
+1. webpack-cli是执行webpack的工具 webpack4.x版本以后 剥离出了webpack-cli
 2. 怎么配置单页应用？怎么配置多页应用？
     - 单页应用可以理解为webpack的标准模式，直接在entry中指定单页应用的入口即可，这里不再赘述
     - 多页应用的话，可以使用webpack的 AutoWebPlugin来完成简单自动化的构建，但是前提是项目的目录结构必须遵守他预设的规范。 

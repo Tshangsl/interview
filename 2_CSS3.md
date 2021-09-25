@@ -1004,7 +1004,7 @@
     > FOUC 无样式内容闪烁(Flash Of Unstyled Content) 是在IE下通过@import引入css文件引起的
     - IE首先会加载整个HTML文档的DOM 然后再导入外部的CSS文件
     - 因此在页面DOM加载完成到CSS导入完成之间 有一段时间页面上的内容是没有样式的 这段时间的长短和网速和电脑速度都有关
-
+42. border:none和border:0区别
 
 
 

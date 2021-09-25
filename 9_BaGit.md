@@ -36,7 +36,14 @@
     1. Babylon
     2. babel-traverse
     3. babel-types
+2. Babel使用方式
+    1. 使用单体文件
+    2. 命令行(babel-cli)
+    3. 构建工具如webpack中的babel-loader插件 -前端最常用
 
+    1. @babel/core babel核心库
+    2. @babel/present-env 取代了es2015 es2016 es2017 通过配置浏览器版本的形式 将编译的主动权交给插件
+    3. babel-loader webpack的loader插件 用于编译代码 转化成浏览器读得懂的代码
 
 1. Git Github
     - Git 目前世界上最先进的分布式版本控制系统（没有之一）。
