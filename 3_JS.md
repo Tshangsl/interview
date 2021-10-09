@@ -12,6 +12,13 @@
         4. JS语言是弱语言类型 在项目开发中 当我们随意更改某个变量的数据类型后 有可能会导致其他引用这个变量的方法中报错等
 1. JS有哪些数据类型，数据类型之间有哪些不同，判断数据类型的方法
     > 基本数据类型:String Number Boolean Undefined Null Symbol(ES6新增 表示独一无二的值) BigInt(ES2020即ES11新增)
+    > BigInt
+    1. BigInt使用数字字面量加n表示支持二进制八进制十六进制形式 对于八进制 只支持新写法0o064n 不支持旧写法0640 BigInt不支持科学记数法
+    2. 转换为字符串
+    3. 零值处理 因为BigInt表示的是整数 所以只存在一个0(无正0负0区分)
+    4. 与Number比较 BigInt只是函数没有构造器 因此不能使用new来创建BigInt的实例
+    5. 类型转换 BigInt不能隐式转换为Number 所以在接受Number为参数的运算中 将抛出TypeError异常
+    > Symbol
     - Symbol函数的参数只是表示当前Symbol值的描述 
     - 相同参数的Symbol函数依然是不同的
     - 反复使用一个Symbol值 可以通过Symbol.for()方法来创建
@@ -253,9 +260,29 @@
 
     > 箭头函数中this(定义时确定)指向问题：
     1. 箭头函数本身没有原型(prototype) 不存在this 箭头函数的this由它外层作用域的普通函数的this指向决定 否则就是window
-    2. 所以箭头函数的this指向在定义时就已经确定了 并且之后永远都不会改变
+    2. 所以箭头函数的this指向在定义时就已经确定了 并且之后永远都不会改变 但可以修改它要继承的对象的this
     3. 使用apply call bind都不能改变箭头函数中的this指向
-    
+    4. 通过rest参数获取函数的多余参数 这是ES6的API 用于获取函数不定数量的参数数组 这个API是用来代替arguments的
+        - 除获取函数第一个确定的参数 以及用一个变量接收其他剩余参数的示例 也可直接接收函数的所有参数
+        - 优点
+        1. 箭头函数和普通函数都可以使用
+        2. 更加灵活 接收参数的数量完全自定义
+        3. 可读性更好 参数都是在函数括号中定义的 不会突然出现一个arguments
+        4. rest是一个真正的数组 可以直接使用数组的API
+    5. 使用new调用箭头函数会报错 无论箭头函数的this指向哪里 使用new调用箭头函数都会报错 因为箭头函数没有constructor
+    6. 箭头函数不支持new.target
+        - new.target是ES6新引入的属性 普通函数如果通过new调用 new.target会返回该函数的引用 此属性主要用于确定构造函数是否为new调用
+    7. 箭头函数不支持重命名函数参数 普通函数的函数参数支持重命名
+    8. 箭头函数相对于普通函数语法更加优雅
+
+    > 箭头函数注意事项
+    1. 一条语句返回对象字面量 需要加括号 或写成多条语句的return形式 
+    2. 箭头函数在参数和箭头之间不能换行
+    3. 箭头函数的解析顺序相对靠前
+
+    > 箭头函数不适用场景
+    1. 定义字面量方法 this的意外指向
+
     >改变this指向的几种方法：
     1. 使用箭头函数
     2. 在函数内部使用_this = this
@@ -478,21 +505,207 @@
         1. 执行上下文总是关键字this的值 是调用当前可执行代码的对象的引用
         2. 作用域是函数定义的时候就确定好的 函数当中的变量适合函数所处的作用域有关，函数运行的作用域也是与该函数定义时的作用域有关
         3. 上下文，主要是关键字this的值，这个是由函数运行时决定的，简单来说就是谁调用此函数，this就指向谁。
-15. 数组操作  
-    1. map【常用】: 遍历数组，返回回调返回值组成的新数组
-    2. forEach【常用】: 无法break，可以用try/catch中throw new Error来停止
-    3. filter【常用】: 过滤
-    4. some: 有一项返回true，则整体为true
-      every: 有一项返回false，则整体为false
-    5. join【常用】: 通过指定连接符生成字符串
-    6. push / pop: 末尾推入和弹出，改变原数组， push 返回数组长度, pop 返回原数组最后一项；
-    7. unshift / shift: 头部推入添加一个或更多元素和弹出头部第一个元素，改变原数组，unshift 返回数组长度，shift 返回原数组第一项 ；
-    8. sort(fn) / reverse【常用】: 排序与反转，改变原数组
-    9. concat【常用】: 连接数组，不影响原数组， 浅拷贝
-    10. slice(start, end): 返回截断后的新数组，不改变原数组
-    11. splice(start, number, value...)【常用】: 返回删除元素组成的数组，value 为插入项，改变原数组
+15. 数组操作 字符串操作 Math操作
+    > Set中的方法
+    - 创建
+    ```
+    let i = new Set();
+    let i = new Set([1,2])
+    ```
+    - 属性
+    1. size 返回Set实例的成员总数
+    - 方法 分为两大类 
+    - 操作方法(用于数据操作) 
+    1. set.add(5) 添加数据5
+    2. set.delete(4) 删除数据4
+    3. set.has(4) 查看是否存在数据4
+    4. set.clear() 清除所有数据
+    - 遍历方法(用于遍历数据)
+    1. keys()
+    2. values()
+    3. entries()
+    4. forEach()
+
+    > Map中的方法
+    1. get 获取某一个属性值
+    2. has 判断是否有某一个属性值
+    3. delete 删除某一个属性值
+    4. clear 清除所有属性值
+    5. size 获取属性个数
+    > Date中的方法
+    - 所有的get和set都必须初始化一个实例并以实例的属性方式调用
+    - 创建日期的四种方法
+    1. new Date()
+    2. new Date(value);
+    3. new Date(dateString);
+    4. new Date(year, monthIndex [, day [, hours [, minutes [, seconds [, milliseconds]]]]])
+    - 设置日期的两种方法
+    1. 
+    ```
+    var myDate = new Date();
+    myDate.setFullYear(2010,0,14)
+    ```
+    2. 
+    ```
+    var myDate = new Date();
+    myDate.setDate(myDate.getDate())
+    ```
+    - get方法
+    1. getDate() 返回一个月中的某天
+    2. getDay() 返回一周中的某天
+    3. getMonth() 返回月份
+    4. getFullYear() 返回年份
+    5. getHours() 返回小时数
+    6. getMinutes() 返回对象的分钟数
+    7. getSeconds() 返回秒数
+    8. getMilliseconds() 返回毫秒数
+    9. getTime() 返回1970年1月1日到至今的毫秒数
+    - set方法 每个get方法都有对应的set方法
+    - 其他方法
+    1. valueOf()得到真实值 每个对象都有
+    2. toString()得到字符串形式表示值 每个对象都有
+    3. toTimeString() 将Date对象时间部分转化为字符串并返回 因此必须有时间参数 必须有实例
+    4. toDateString() 将Date对象的日期部分转化为字符串并返回 必须有实例
+    > Boolean中的方法
+    1. booleanObject.toString() 把一个逻辑值转换为字符串并返回结果
+
+    > Number中的方法
+    1. parseFloat 将给定值解析为浮点数
+    2. parseInt 将给定值解析成整数
+    3. Number() 将给定对象转换为数字 JS隐式转换
+    4. number.toFixed() 将number数换成一个十进制数形式的字符串 可选参数控制其小数点后的数字位数 它的值必须在0-20之间 默认为0
+    5. number.toString(radix) 将numer转换成一个字符串 返回该数字的指定进制形式的字符串
+
+    > Math中的方法
+    1. Math.abs(10)
+        - 取绝对值
+    2. Math.ceil()/floor()/round()
+        - 向上/下取整/附近
+    3. Math.round()
+        - 四舍五入
+    4. Math.max()/min()
+        - 取最大值/最小值
+        - max方法严格认为负0小于正0
+    5. Math.sqrt
+        - 开平方
+    6. Math.pow(底数,几次方)
+        - 取幂(N的M次方)
+    7. Math.PI
+        - 获取圆周率
+    8. Math.random()
+        - 获取0-1之间的随机小数
+        - Math.round(Math.random()*(m-n)+n)
+        - 获取n-m之间的随机整数
+    > 字符串操作
+    1. length
+    - 返回字符串的长度
+    2. indexOf
+    - 返回字符串中指定文本首次出现的索引 如果未找到返回-1
+    3. lastIndexOf
+    - 返回字符串中指定文本最后一次出现的索引 如果未找到返回-1
+    4. search
+    - 返回字符串中指定字符串首次出现的索引
+        > search&indexOf
+        1. search方法无法设置第二个开始位置的参数
+        2. indexOf方法无法设置更强大的搜索值(正则表达式)
+    5. slice
+        - 如果是负数 该参数规定的是从字符串的尾部开始算起的位置 -1指字符串最后一个字符 -2指倒数第二个字符 以此类推
+    6. substring
+    - 类似 slice 区别是不能设置负数索引
+    7. substr
+    - 类似 slice 区别是第二个参数不同
+    - substr(start,length);
+    8. replace()
+    - 字符串中即将被替换的文本 替换成的文本
+    - 该方法对大小写敏感 因此不会匹配到大写的WORLD 大小写不敏感要使用正则表达式/i 全替换加/ig
+    9. toUpperCace()/toLowerCase()
+    - 把字符串转换成大写/小写
+    10. concat()
+    11. trim()
+    - 去除字符串两端的空白字符
+    - IE8及更低版本不支持trim方法 
+    12. charAt(position)
+    - 返回字符串中指定下标(位置)的字符串
+    13. split(seperator,howmany)
+        - seprator 必选 字符串或正则表达式 从该参数指定的地方分割stringObject
+        - howmany 可选 该参数指定返回的数组的最大长度
+        - 如果把空字符串用作separator 则每个字符之间都会被分割
+    - 字符串转换为数组
+    14. includes
+    - 判断字符串是否包含指定的子字符串 如果找到匹配的字符串则返回true 否则返回false 区分大小写
+    > 字符串扩展方法
+    1. .startWith
+    - 这个字符串是否以 开始
+    2. .endsWith
+    - 这个字符串是否以 结尾
+    3. String.prototype.padStart
+    4. String.prototype.padEnd
+
+    > 数组遍历的一些方法
+    1. 不会改变原数组
+        1. map【常用】: 遍历数组，返回回调返回值组成的新数组
+            - 不会改变原数组
+        2. filter【常用】: 过滤 
+            - 不会改变原数组
+        3. some: 有一项返回true，则整体为true every: 有一项返回false，则整体为false
+            - 不会改变原数组
+        4. reduce / reduceRight(fn(prev, cur)， defaultPrev): 两两执行，prev 为上次化简函数的return值，cur 为当前值 当传入 defaultPrev 时，从第一项开始；当未传入时，则为第二项
+    2. 会改变原数组
+        1. forEach【常用】: 无法break，可以用try/catch中throw new Error来停止 没有返回值 本质上等同于for循环 对每一项执行function函数 即map是返回一个新数组 原数组不变 forEach会改变原数组
+        - 会改变原数组
+    > 对数组内容进行操作
+    1. 不会改变原数组
+        1. concat【常用】: 连接数组，浅拷贝
+            - 不改变原数组 
+        2. slice(start, end): 返回截断后的新数组，
+            - 不改变原数组
+            - 可以不传参 返回原数组
+    2. 会改变原数组
+        1. push / pop: 末尾推入和弹出，， push 返回数组长度, pop 返回原数组最后一项；
+            - 改变原数组
+        2. unshift / shift: 头部推入添加一个或更多元素和弹出头部第一个元素，unshift 返回数组长度，shift 返回原数组第一项 ；
+            - 改变原数组
+        3. splice(start, number, value...)【常用】: 返回删除元素组成的数组，value 为插入项，
+        - 改变原数组
+        4. sort(fn) / reverse【常用】: 排序与反转， 正数按降序排列 负数按升序排列 
+        - sort方法可以传入一个函数作为参数 这个参数必须是函数 这个函数的返回值可以决定排列顺序 
+        - 改变原数组
+        - reverse方法用于颠倒数组中元素的顺序 该方法会改变原来的数组而不会创建新的数组
+
+    1. join【常用】: 通过指定连接符生成字符串 把数组中所有元素放入一个字符串 返回一个字符串 把数组转换成字符串 然后给它规定个链接符号 默认是逗号
+
+    1. indexOf / lastIndexOf(value, fromIndex): 查找数组项首次/最后出现位置，返回对应的下标
+
+    1. fill(value,fromIndex,toIndex) 用从fromIndex到toIndex的值填充数组(不包括toIndex本身) fromIndex可选参数默认为0 toIndex可选参数默认为array.length
+        - 会改变原数组
+
+    1. array.flat(depth) 通过递归扁平属于数组的项知道一定的深度来创建新数组 depth可选参数默认为1
+
+    1. array.includes(itemToSearchfromIndex) 返回一个布尔值 array是否包含itemToSearch 可选参数fromIndex 默认为0 表示开始搜索的索引
+
+    1. Array.isArray() 确定传递的值是否是一个Array 如果是返回true否则返回false
+
+    1. Array.of() 创建一个具有可变数量参数的新数组实例 不考虑参数的数量或类型
+
+    1. Array.toString() 返回一个字符串 表示指定的数组及其元素 Array对象覆盖了Object的toString方法 对于数组对象 toString方法连接数组并返回一个字符串 其中包含用逗号分隔的每个数组对象
     
-     Slice&Splice
+    > substring和substr和slice区别
+    > 数组没有substr和substring方法
+    > 作用
+    - 都是基于原字符串创建新字符串的方法 截取字符串
+    > 相同点
+    - 接收1-2个参数
+    - 接收一个参数时 都表示截取从当前下标 截取字符串 直到字符串的最后一个字符串
+    ```
+    let str = 'hello'
+    console.log(str.slice(3),str.substring(3),str.slice(3))
+    ```
+    > 不同点
+    - 接收第二个参数时
+    1. 第一个参数都表示当前的下标 slice和substring第二个参数表示截取的结束下标 substr表示需要截取的字符串的位数
+    2. 传入是负数时 slice()会把当前的负值加上字符串的长度 slice(-3) slice(8) substring会把所有的负值转化为0 substr的第一个负值会把当前负值加上字符串的长度 第二个附属会转化为0
+
+    > Slice&Splice
     1. Slice方法
         1. 可以用来从数组提取特定元素 该方法不会改变原数组 而是将截取到的元素封装到一个新的数组中返回
         2. 语法 arr.slice(start,end);
@@ -516,8 +729,8 @@
         4. splice()方法是一个多功能的方法
         可以删除/替换元素
         在数组指定位置插入元素
-    8. sort方法
-        - sort方法在原数组上进行排序 不生成副本(会改变原数组)
+    > sort方法
+    - sort方法在原数组上进行排序 不生成副本(会改变原数组)
         - 通过给sort()的参数返回一个负值可以实现数组reverse()效果
         - sort方法用于对数组的元素进行排序 并返回数组 默认排序顺序是根据字符串Unicode码点
         - 如果调用该方法时没有使用参数 将按字母数序对数组中的元素进行排序 更精确些是按照字符编码顺序进行排序
@@ -525,11 +738,14 @@
         1. a < b a在b之前 返回一个小于0的数
         2. a === b 返回0
         3. a > b a在b之后 返回一个大于0的数
-    12. indexOf / lastIndexOf(value, fromIndex): 查找数组项首次/最后出现位置，返回对应的下标
-    13. reduce / reduceRight(fn(prev, cur)， defaultPrev): 两两执行，prev 为上次化简函数的return值，cur 为当前值
-    当传入 defaultPrev 时，从第一项开始；
-    当未传入时，则为第二项
-    。。。。
+    > 函数柯里化
+    - 减少代码冗余 增加代码可读性
+    - 将使用多个参数的函数转换成一系列使用一个参数的函数 使函数从一次调用传入的多个参数改为多次调用每次传入一个函数
+    - 只传递给函数一部分参数去调用它 让它返回一个函数去处理剩下的参数
+    - 优点
+    1. 参数复用
+    2. 提前确认
+    3. 延迟执行 JS中常用的bind 实现机制就是curry 
 16. JS中数组的几种创建方法
     (创建数组再赋值 new Array(); a[0]='a'
     /直接实例化 new Array('as')
@@ -630,7 +846,6 @@
         1. new Set() Set结构不会添加重复的值
         2. Array.from()转成数组
     6. reduce方法
-        .....
 17. JS中数组和对象的关系
     >JS中所有的东西(除了undefined和null)都是对象(Object)。
     1. 包括字符串(String), 数值(Number), 数组(Array), 函数(function)等等.
@@ -665,6 +880,7 @@
     能遍历到enurable为false
     getOwnPropertyNames/
     Reflet.ownKeys(object))
+    > 不可获取对象enurable为false的属性
     1. for-in遍历+hasOwnProperty方法确认是否存在
         某个key这种方法不能够被遍历到enurable为false属性
     2. keys方法
@@ -673,6 +889,7 @@
     3. JSON方法
       使用JSON.stringfy()方法将对象转为字符串
       与字符串'{}'对比 该方法同样无法获取不可枚举属性enurable为false属性
+    > 可以获取对象enurable为false的属性
     4. getOwnPropertyNames方法
        使用Object的getOwnPropertyNames方法 获取所有属性名
        不可枚举属性仍然能够获取到
@@ -766,28 +983,18 @@
             person1.say() //hanmeimei
 19. 普通函数和构造函数区别
     > 构造函数也是一个普通函数 创建方式和普通函数一样 但构造函数习惯上首字母大写
-    2. 构造函数和普通函数的区别在于
-        调用方式不一样 作用也不一样
-        构造函数用来新建实例对象
-    3. 调用方式不一样
-        普通函数的调用方式
-            直接调用 person()
-        构造函数的调用方式
-            需要使用new关键字调用 new Person()
-    4. 构造函数的函数名与类名相同 
-        Person()这个构造函数 
-        Person既是函数名
-        也是这个对象的类名
-    5. 内部用this来构造属性和方法
-    6. 构造函数执行流程
-        立刻在堆内存中创建一个新的对象
-        将新建的对象设置为函数中的this
-        逐个执行函数中的代码
-        将新建的对象作为返回值
-    7. 普通函数例子：因为没有返回值，所以为undefined
-    8. 构造函数例子：构造函数会马上创建一个新对象，并将该新对象作为返回值返回
-    9. 用instanceof 可以检查一个对象是否是一个类的实例，是则返回true；
-    所有对象都是Object对象的后代，所以任何对象和Object做instanceof都会返回true
+    > 构造函数和普通函数的区别在于
+    1. 调用方式不一样
+        - 普通函数的调用方式 直接调用 person()
+        - 构造函数的调用方式 需要使用new关键字调用 new Person()
+    2. 作用不同
+        - 构造函数用来新建实例对象
+    3. 首字母大小
+        - 一般构造函数名称会用大写
+        - 普通函数用小写
+    4. 函数中this指向不同
+        - 普通函数中的this严格模式下指向undefined 非严格模式下指向window
+        - 构造函数中的this 指向它创建的对象实力
 20. ES5/ES6继承有什么区别
     - ES5 通过prototype/构造函数机制实现 先创建子类的实例对象 再将父类的方法添加到this上
     - ES6 先创建父类的实例对象this 所以必须先调用父类的super方法 再用 子类的构造函数 修改this)
@@ -1229,7 +1436,7 @@
         2. 解决浮点数计算精度
             1. 可以把需要计算的数字升级（乘以10的n次幂）成计算机能够精确识别的整数，等计算完成后再进行降级（除以10的n次幂），这是大部分变成语言处理精度问题常用的方法。
             2. 将浮点数toString后indexOf('.')
-64. script标签的defer和async属性
+53. script标签的defer和async属性
     > script标签
     - 用于加载脚本和执行脚本 直接使用script脚本 HTML会按照顺序加载并执行脚本 脚本加载&执行过程中 会阻塞后续的DOM渲染
     - script标签提供两个属性async&defer解决阻塞DOM渲染问题
@@ -1292,36 +1499,13 @@
             1.百度统计
     总结
     1. defer和async在网络加载过程是一致的，都是异步执行的；  
-    2. 两者的区别在于脚本加载完成之后何时执行，可以看出defer更符合大多数场景对应用脚本加载和执行的要求；
+    2. 两者的区别在于脚本加载完成之后何时执行，可以看出defer更符合大多数场景对应用脚本加载和执行的要求；defer会在文档渲染后执行
     3. 如果存在多个有defer属性的脚本，那么它们是按照加载顺序执行脚本的；而对于async，它的加载和执行是紧紧挨着的，无论声明顺序如何，只要加载完成就立刻执行，它对于应用脚本用处不大，因为它完全不考虑依赖。
-
-        
-        文档解析
-        脚本加载
-        脚本执行
-        DOMContentLoaded
-            当初始的HTML文档被完全加载和解析完成后 DOMContentLoaded事件被触发 而无需等待样式表 图像 和子框架的完全加载
     > js为什么需要放在body末尾(避免影响前面HTML解析 DOM渲染)
     - 浏览器的渲染引擎和js解析引擎的冲突
     - 浏览器生成Dom树的时候是一行一行读HTML代码的
     - script标签放在最后面就不会影响前面的页面的渲染。
-67. substring和substr和slice区别
-    > 数组没有substr和substring方法
-    > 作用
-    - 都是基于原字符串创建新字符串的方法 截取字符串
-    > 相同点
-    - 接收1-2个参数
-    - 接收一个参数时 都表示截取从当前下标 截取字符串 直到字符串的最后一个字符串
-    ```
-    let str = 'hello'
-    console.log(str.slice(3),str.substring(3),str.slice(3))
-    ```
-    > 不同点
-    - 接收第二个参数时
-    1. 第一个参数都表示当前的下标 slice和substring第二个参数表示截取的结束下标 substr表示需要截取的字符串的位数
-    2. 传入是负数时 slice()会把当前的负值加上字符串的长度 slice(-3) slice(8) substring会把所有的负值转化为0 substr的第一个负值会把当前负值加上字符串的长度 第二个附属会转化为0
-
-1. 同步/异步JS工作流程
+54. 同步/异步JS工作流程
     > 同步JS工作流程
     1. 函数代码在函数执行上下文中执行 
     2. 全局代码在全局执行上下文中执行 
@@ -1417,8 +1601,7 @@
         2. 使用reject抛出，错误会被不停地返回到下一个，必须在每一个then里面使用throw将错误派出去，不然不能被catch捕捉到，其实也可以不用再次throw错误，在promise正常catch就好，在异步中reject一下在最后就能catch到
         3. Promise中的错误不会影响到外层的运行，window.onerror也是无法检测道德
     resolve函数和reject函数作用：
-
-1. eval函数
+55. eval函数
     > 全局对象上的一个函数 会把传入的字符串当作JS代码执行 如果传入的参数不是字符串 它会原封不动的将其返回
     - eval分为直接调用和间接调用两种 通常间接调用的性能会好于直接调用
     1. 直接调用时 eval运行于其调用函数的作用域下
@@ -1427,8 +1610,7 @@
     1. 降低性能
     2. 安全问题 动态执行特性 给被求值的字符串赋予了太大的权利 担心会因此导致XSS攻击
     3. 调试困难 eval就像是一个黑盒 其执行的代码很难进行断点调试
-
-1. 为什么JavaScript是单线程的 什么是异/同步 JS为什么需要异步 JS中使用异步的场景 异步操作的方法 JS是如何实现异步的
+56. 为什么JavaScript是单线程的 什么是异/同步 JS为什么需要异步 JS中使用异步的场景 异步操作的方法 JS是如何实现异步的
     > JS引擎是单线程的，但又能实现异步的原因在于事件循环(EventLoop)和任务队列体系(Task Queue)。
     > JavaScript单线程
     - JavaScript语言的一大特点就是单线程，也就是说，同一个时间只能做一件事 JavaScript的单线程，与它的用途有关
@@ -1515,18 +1697,57 @@
     2. 所有同步代码执行完成后，先去微任务队列里把所有的微任务都执行完，再去宏任务队列里按顺序执行宏任务. 
     3. 每执行完一个宏任务，就去微任务队列看看有没有产生新的微任务 
     4. 如果有就执行微任务，没有就执行下一个宏任务，直到所有任务都执行完。
+57. Lodash
+    > 是一个一致性 模块化 高性能的JS实用工具库
+    - 内部封装了诸多对字符串 数组 对象等常见数据类型的处理函数 
+    - lodash通过降低array number objects string等等的使用难度从而让js变得更简单 
+    - 可以直接调用 比如数组去重 防抖函数等 可以简化很多代码
+    > Lodash的模块化方法非常适用于
+    1. 遍历array object string
+    2. 对值进行操作和监测
+    3. 创建符合功能的函数
+    > Lodash比较常用的一些方法
+    1. Array 适用于数组类型 比如填充数据 查找元素 数组分片等操作
+    2. Collection 适用于数组和对象类型 部分适用于字符串 比如分组 查找 过滤等操作
+    3. Function 适用于函数类型 比如节流 延迟 缓存 设置钩子等操作
+    4. Lang 普遍适用于各种类型 常用于执行类型判断和类型转换
+    5. Math 适用于数值类型 常用于执行数学运算
+    6. Number 适用于生成随机数 比较数值和数值区间的关系
+    7. Object 适用于对象类型 常用于对象的创建 扩展 类型转换 检索 集合等操作
+    8. Seq 常用于创建链式调用 提高执行性能(惰性计算)
+    9. String 适用于字符串类型
 
-
-
-- Math.floor()向下取整
-
-
-
-
-
-
-
-
+    1. _.get(object, path, [defaultValue])
+    ```
+    @description get方法，用于解决a.b.c.d出现undefined导致代码保存不继续向下执行
+    @param {Object} [object] 目标对象
+    @param {String} [path] 需要取值路径
+    @param {*} [defaultVal] 值不存在时候的默认值
+    ```
+    2. _getObjArray
+    @description 返回指定对象的 key 的值的数组，支持多层属性嵌套获取，如：obj.x.y.z，快速获取数组内需要的key值数组
+    @param {Array} [objects] 目标对象
+58. setInterval
+    > 存在问题
+    1. 推入任务队列后的时间不准确
+    ```
+    setInterval(fn(),N);
+    ```
+    - fn()在N秒之后被推入任务队列
+    - 在setInterval被推入任务队列时 如果在它之前有很多任务或某个任务等待时间较长比如网络请求等 那这个定时器的执行时间和我们预定它执行的事件肯能不一致
+    2. 函数操作耗时过长导致不准确
+    - 考虑极端情况 如定时器中代码需要进行大量计算耗费时间较长 或是DOM操作 花的时间较长 有可能前一次代码没有执行完 后一次代码就被添加到队列中 会使得定时器不准确 甚至出现同一时间执行两次的情况
+    - 最常出现的情况就是 当我们需要使用AJAX轮询服务器是否有新数据时 必定会有一些人使用setInterval 然而无论网络状态如何 它都会一遍遍发送请求 最后间隔时间可能和原定时间有很大的出入
+    > setInterval 缺点与setTimeout不同
+    - 定时器指定的时间间隔 表示的是何时将定时器的代码添加到消息队列 而不是何时执行代码 所以真正何时执行代码的时间是不能保证的 取决于何时被主线程的事件循环取到并执行
+    > 缺点小结
+    1. 使用setInterval时 某些间隔会被跳过
+    2. 可能多个定时器会连续执行
+    - 每个setTimeout产生的任务会直接push到任务队列中 而setInterval在每次把任务push到任务队列之前 都会进行一下判断(看上次的任务是否仍在队列中 如果有则不添加 没有则添加)
+    - 一般用setTimeout模拟setInterval规避上面的缺点
+    > setTimeout()代替setInterval()
+    1. 在前一个定时器执行完前 不会向队列插入新的定时器(解决缺点1)
+    2. 保证定时器间隔(解决缺点2)
 
 
 

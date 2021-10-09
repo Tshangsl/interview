@@ -30,9 +30,10 @@ let dog1 = new Dog();
 dog1.colors.push('yellow');
 let dog2 = new Dog();
 console.log(dog2.colors);
+
 // 3.借用构造函数实现继承
 // 解决了原型链继承两个问题 引用类型共享和传参
-// 由于方法必须定义在构造函数中 导致每次创建子类实例都会擦黄健一遍方法
+// 由于方法必须定义在构造函数中 导致每次创建子类实例都会创建一遍方法
 function Animal(name) {
     this.name = name;
     this.getName = () => {
@@ -43,6 +44,7 @@ function Dog(name) {
     Animal.call(this, name);
 }
 Dog.prototype = new Animal();
+
 // 4.组合继承
 /*
 结合原型链和盗用构造函数
@@ -69,6 +71,7 @@ Dog.prototype.constructor = Dog
 // let dog2 = new Dog('哈赤', 1)
 // console.log(dog2) 
 // { name: "哈赤", colors: ["black", "white"], age: 1 }
+
 // 5.寄生式组合继承
 function object(o) {
     function F() { }
@@ -81,6 +84,7 @@ function inheritPrototype(child, parent) {
     child.prototype = prototype
 }
 inheritPrototype(Dog, Animal)
+
 // 6.class实现继承
 // class Animal {
 //     constructor(name) {
@@ -96,6 +100,7 @@ inheritPrototype(Dog, Animal)
 //         this.age = age
 //     }
 // }
+
 // 7.数组去重 ES5实现
 function unique(arr) {
     var res = arr.filter((item, index, array) => {
@@ -109,7 +114,31 @@ function unique1(arr) {
     return [...new Set(arr)];
 }
 console.log(unique1([1, 22, 22, 1, 34, 54, 56, 67, 78, 66, 88]));
+
+// 这两种写法的结果是一样的 但位操作效率更高
+// 按位右移
+Math.floor(Math.random()*100)
+// Math.floor
+(Math.random()*100)>>0 
+
+// 数组排序
+function sortNumber(a,b){//升序
+    return a - b
+}
+var arr = [5, 100, 6, 3, -12];
+arr.sort(sortNumber);
+console.log(arr);
+
+// sort函数没有使用参数时 将按字母顺序对数组中的元素进行排序 如果想按照其他标准进行排序
+// 就要提供比较函数 该函数要比较两个值 然后返回一个用于说明这两个值的相对顺序的数字 
+// 比较函数应该具有两个参数 a和b 其返回值如下
+// 1. a<b 则返回一个小于0的值
+// 2. a==b 返回0
+// 3. a>b 返回一个大约0的值
+
+
 // 7.数组乱序 sort实现
+// 不是真正的乱序 计算机的random函数因为循环周期存在 无法生成真正的随机数
 /*
     Math.random()-0.5随机得到一个正数 负数 0
     正数按降序排列
@@ -124,6 +153,7 @@ values.sort(
     function () {
         return Math.random() - 0.5;
     })
+
 console.log(values);
 // 7.数组乱序 Fisher-Yates洗牌算法实现
 /*
@@ -187,6 +217,22 @@ function flatten1(arr) {
     }
     return arr;
 }
+// 8.数组扁平化 reduce
+function flatten(arr){
+    return arr.reduce((prev,item)=>{
+        return prev.concat(Array.isArray(item)?flatten(item):item);
+    },[])
+}
+// 8. 数组扁平化 正则表达式
+function flatten(arr){
+    let str = JSON.stringify(arr).replace(/\[|\]/g,"");
+    return JSON.parse(Array.of('['+str+']')[0]);
+}
+// 8. 数组扁平化 直接调用flat方法
+function flatten(arr){
+    return arr.flat(Infinity);
+}
+
 console.log(flatten1([1, [1, 2, [1, 2, 3]]]));
 // 9.函数防抖 
 // 短时间大量触发同一事件 只会执行最后一次
@@ -412,16 +458,28 @@ function partial(fn, ...args) {
 */
 // Object.create()方法提供一个新对象 
 // 使用现有对象来提供新创建的对象的_proto_
-// function _new(){
-//     // 拿到第一个参数 构造函数名Func
-//     var Func = [].shift.call(arguments);
-//     // 创建一个空对象 并让其继承Func.prototype
-//     var obj = Object.create(Func.prototype);
-//     // 执行构造函数 并将this指向创建的空对象obj
-//     Func.apply(obj,arguments);
-//     // 返回对象
-//     return obj;
-// }
+function objectFactory(){
+    //1. new产生一个新对象
+    var obj = new Object();
+    //2. 拿到传入的参数中的第一个参数 即构造函数Constructor
+    Constructor = [].shift.call(arguments);
+    obj.__proto__  = Constructor.prototype;
+    // 3. 执行构造函数并将this指向创建的控对象obj
+    var ret = Constructor.apply(obj,arguments);
+    // ret || obj 这样写考虑了构造函数显示返回null的情况
+    return typeof ret === 'object'?ret||obj:obj;
+}
+
+function _new(){
+    // 拿到第一个参数 构造函数名Func
+    var Func = [].shift.call(arguments);
+    // 创建一个空对象 并让其继承Func.prototype
+    var obj = Object.create(Func.prototype);
+    // 执行构造函数 并将this指向创建的空对象obj
+    Func.apply(obj,arguments);
+    // 返回对象
+    return obj;
+}
 
 function _new() {
     // 拿到fn
@@ -1179,9 +1237,417 @@ Author.prototype.getBooks = function () {
 }
 
 
+//1. 实现一个compose函数
+// 选择数组的reduce方法实现
+function compose(...fns){
+    return function(x){
+        return fns.reverse().reduce((arg,fn,index)=>{
+            return fn(arg);
+        },x)
+    }
+}
+// 数组的reduceRight方法实现
+function compose(...fns){
+    return function(x){
+        return fns.reduceRight((arg,fn)=>{
+            return fn(arg)
+        },x)
+    }
+}
+function fn1(x) {
+    return x + 1;
+}
+function fn2(x) {
+return x + 2;
+}
+function fn3(x) {
+return x + 3;
+}
+function fn4(x) {
+return x + 4;
+}
+console.log(compose(fn1,fn2,fn3,fn4)(1));
+
+//2. setTimeout模拟实现setInterval(带清除定时器的版本)
+// setInterval的简单实现
+const mySetInterval = (cb,time)=>{
+    const fn = ()=>{
+        cb();// 执行传入的回调函数
+        setTimeout(()=>{
+            fn();
+        },time)
+    }
+    setTimeout(fn,time);
+}
+mySetInterval(()=>{
+    console.log(new Date());
+},1000)
+// clearInterval的实现
+// clearInterval的用法是clearInterval(id) 这个id是setTimeout的返回值 通过这个id能够清除指定的定时器
+// 需要每次执行setTimeout时把新的id存下来
+
+// setInterval实现
+let timeMap = {};
+let id = 0;// 简单实现id唯一
+const mySetInterval = (cb,time)=>{
+    let timeId = id;// 将timeId赋予id
+    id++;//id自增实现唯一id
+    let fn = ()=>{
+        cb();
+        timeMap[timeId] = setTimeout(()=>{
+            fn()
+        },timer)
+    }
+    timeMap[timeId] = setTimeout(fn,time);
+    return timeId//返回timeId
+}
+// clearInterval实现
+const myClearInterval = (id)=>{
+    clearTimeout(timeMap[id])// 通过timeMap[id]获取真正的id
+    delete timeMap[id];
+}
+// 3. 发布订阅者模式
+// 实现一个发布订阅模式拥有on emit once off方法
+class EventEmitter{
+    constructor(){
+        this.events = {};
+    }
+    // 实现订阅
+    on(type,callBack){
+        if(!this.events[type]){
+            this.events[type] = [callBack];
+        }else{
+            this.events[type].push(callBack);
+        }
+    }
+    // 删除订阅
+    off(type,callBack){
+        if(!this.events[type]) return;
+        this.events[type] = this.events[type].filter((item)=>{
+            return item!==callBack;
+        })
+    }
+    // 只执行一次订阅事件
+    once(type,callBack){
+        function fn(){
+            callBack();
+            this.off(type,fn);
+        }
+        this.on(type,fn);
+    }
+    // 触发事件
+    emit(type,...rest){
+        this.events[type]&&
+            this.events[type].forEach((fn)=>fn.apply(this,rest))
+    }
+}
 
 
 
+/**
+ * @param {string[]} timePoints
+ * @return {number}
+ */
+ var findMinDifference = function(timePoints) {
+    let nums = [];
+    let mid = [];
+    for(let i =0;i<timePoints.length;i++){
+        nums.push(getMinTime(timePoints[i]));
+    }
+    nums.sort((a,b)=>{
+        return a-b;
+    })
+    console.log(nums);
+    if(nums[0]==0){
+        // 考虑两种情况 nums为0 或1440
+        nums[0] = nums[1]>1440-nums[nums.length-1]?1440:0;
+    }
+    nums.sort((a,b)=>{
+        return a-b;
+    })
+    nums.map((item,index)=>{
+        if(item<60){
+            nums[index] = nums[index]<nums[index]
+        }
+    })
+    console.log(nums);
+    for(let i = 0;i<nums.length-1;i++){
+        mid.push(nums[i+1]-nums[i]);
+    }
+    mid.sort((a,b)=>{
+        return a-b;
+    })
+    console.log(mid);
+    return mid[0];
+};
 
+var getMinTime = function(t){
+    let hour = Number(t.substr(0,2));
+    let min = Number(t.substr(3,2));
+    if(!hour){
+        return min;   
+    }
+    return hour*60+min;
+}
 
+console.log(findMinDifference(["05:31","22:08","00:35"]));
 
+// map使用
+var groupAnagrams = function(strs) {
+    const map = new Map();
+    for (let str of strs) {
+        let array = Array.from(str);
+        array.sort();
+        let key = array.toString();
+        let list = map.get(key) ? map.get(key) : new Array();
+        list.push(str);
+        map.set(key, list);
+    }
+    return Array.from(map.values());
+};
+console.log(groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"]));
+// 1. 获取url参数
+function getUrlParam(sUrl, sKey) {
+    // 取出每个参数的键值对放入数组
+    let paramArr = sUrl.split('?')[1].split('#')[0].split('&');   
+    const obj = {};
+    paramArr.forEach(element=>{
+        // 取出数组中每一项的键和值
+        const [key,value] = element.split('=');
+        if(key in obj){
+            obj[key] = [].concat(obj[key],value);
+        }else{
+            obj[key] = value;
+        }
+    })
+    return sKey?obj[sKey]||"":obj
+}
+// 2. 二进制转换
+function valueAtBit(num, bit) {
+    let Num2Str = num.toString(2)
+    return Num2Str[Num2Str.length-bit]
+}
+function valueAtBit(num, bit) {
+    return (num>>(bit-1))&1;
+}
+// 3. 修改this指向
+function bindThis(f, oTarget) {
+    return function(){
+        return f.apply(oTarget,arguments);
+    }
+}
+function bindThis(f,oTarget){
+    return function(){
+        return f.call(oTarget,...arguments);
+    }
+}
+function bindThis(f,oTarget){
+    return f.bind(oTarget);
+}
+// 4. dom节点查找
+// 查找两个节点的最近的一个共同父节点 可以包含节点自身
+function commonParentNode(oNode1, oNode2) {
+    let p1 = oNode1.parentNode;
+    let p2 = oNode2.parentNode;
+    if(p1 === p2){
+        return p1;
+    }else{
+        commonParentNode(p1,p2);
+    }
+}
+// 5. 根据包名在指定空间中创建对象
+// 6. 数组去重
+Array.prototype.uniq = function () {
+    return Array.from(new Set(this));   
+}
+// 7. 斐波那契数列
+function fibonacci(n){
+    if(n<=2){
+        return 1
+    }else{
+        return fibonacci(n-1)+fibonacci(n-2);
+    }
+}
+// 8. 时间格式化输出
+function formatDate(date,format){
+    let addZero = function(data){
+        if(data <10){
+            return '0'+data
+        }
+        return data;
+    }
+    let obj = {
+        'yyyy':date.getFullYear(),
+        'yy':date.getFullYear()%100,
+        'MM':addZero(date.getMonth()+1),
+        'M': date.getMonth() + 1,
+        'dd': addZero(date.getDate()),
+        'd': date.getDate(),
+        'HH': addZero(date.getHours()),
+        'H': date.getHours(),
+        'hh': addZero(date.getHours() % 12),
+        'h': date.getHours() % 12,
+        'mm': addZero(date.getMinutes()),
+        'm': date.getMinutes(),
+        'ss': addZero(date.getSeconds()),
+        's': date.getSeconds(),
+        'w': function () {
+            arr = ['日', '一', '二', '三', '四', '五', '六']
+            return arr[date.getDay()]
+        }()
+    }
+    for (let i in obj) {
+        format = format.replace(i, obj[i])
+    }
+    return format
+}
+// 9. 获取字符串长度
+function strLength(s, bUnicode255For1) {
+    let length = s.length;
+    if(!bUnicode255For1){
+        for(let i in s){
+            if(s.charCodeAt(i)>255){
+                length++;
+            }
+        }
+    }
+    return length;
+}
+//10. 邮箱字符串判断
+function isAvailableEmail(sEmail) {
+    var reg = /^[0-9a-zA-Z_.]{1,}@[a-zA-Z0-9_.]{1,}[a-zA-Z0-9]{2,4}$/;     // 正解
+    return reg.test(sEmail);
+}
+// 11. 颜色字符串转换
+// 定义一个新的rgb函数 然后用eval执行字符串
+function rgb2hex(sRGB) {
+    if (!/^rgb\((\d{1,3},\s*){2}\d{1,3}\)$/.test(sRGB)) return sRGB;
+    let  color = '#';
+    sRGB.replace(/\d+/g, n => color += ('0' + (+n).toString(16)).slice(-2));
+    return color;
+}
+// 12. 将字符串转换为驼峰格式
+function cssStyle2DomStyle(sName) {
+    let res = [];
+    let arr = sName.split('-');
+    arr.map((item,index)=>{
+        console.log(index,item);
+        item = item.substring(0,1).toUpperCase()+item.substring(1);
+        res.push(item);
+    })    
+    return res.join('').substring(0,1).toLowerCase()+res.join('').substring(1);
+}
+// 13. 字符串字符统计
+function count(str) {
+    str = str.replace(/\s*/g,"");
+    let arr = str.split("");
+    let obj = {};
+    arr.map((item,index)=>{
+      if(item in obj){
+          obj[item]++;
+      }else{
+          obj[item] = 1;
+      }
+    })
+    return obj
+}
+// 14. 加粗文字
+(function(w,d){
+    let p = document.querySelector('p')
+    p.innerHTML = `<strong>牛客网</strong>${p.innerText.replace(/牛客网/, '')}`
+})(window,document)
+// 15. reduce详解
+// arr.reduce(callback,[initialValue]) callback- prev cur index arr
+// 如果没有提供initialValue reduce会从索引1的地方开始执行callback方法 跳过第一个索引 如果提供initialValue从索引0开始
+// 1. 数组求和求乘积
+let arr = [1,2,3,4];
+let sum = arr.reduce((prev,item,index,arr)=>{
+    return prev+item;
+},0)
+console.log(sum);
+// 2. 计算数组中每个元素出现的次数
+let nums = [1,2,3,4,5,6,5];
+let numsNum = nums.reduce((ini,item)=>{
+    if(item in ini){
+        ini[item]++;
+    }else{
+        ini[item] = 1;
+    }
+    return ini;
+},{})
+console.log(numsNum);
+// 3. 数组去重
+let nums = [1,2,2,3,1,2,3];
+let newArr = nums.reduce((prev,item)=>{
+    if(!prev.includes(item)){
+        return prev.concat(item);
+    }else{
+        return prev;
+    }
+},[])
+console.log(newArr);
+// 4. 二维数组转化成一维数组
+let arr = [[0,1],[2,3],[4,5]];
+let newArr = arr.reduce((prev,cur)=>{
+    return prev.concat(cur);
+},[])
+console.log(newArr);
+// 5. 对象中属性求和
+let res = [
+    {
+        name:'lisi',
+        age:23
+    },
+    {
+        name:'lisi',
+        age:33
+    },
+]
+let sum = res.reduce((prev,item)=>{
+    return prev+item.age;
+},0)
+console.log(sum);
+// 6. 查找重复的元素
+function duplicates(arr) {
+    let res = [];
+    arr.forEach((elem)=>{
+        if(arr.indexOf(elem)!==arr.lastIndexOf(elem)&&res.indexOf(elem===-1)){
+            res.push(elem);
+        }
+    })
+    return res;
+}
+// 7. 使用闭包
+// 实现函数makeClosures 调用之后满足如下条件
+// 1. 返回一个函数数组result 长度与arr相同
+// 2. 运行result中第i个函数 即result[i]()结果与fn(arr[i])相同
+function makeClosures(arr,fn){
+    let res = [];
+    for(let i = 0;i<arr.length;i++){
+        res[i] = fn.bind(this,arr[i]);
+    }
+    return res;
+}
+// 8. 找出对象obj不在原型链上的属性
+// 1. 返回数组 格式为key:value
+// 2. 结果数组不要求顺序
+function iterate(obj) {
+    let arr = [];
+    Object.keys(obj).forEach(key=>{
+        arr.push(key+": "+obj[key])
+    })
+    return arr;
+}
+// 9. 检查重复字符串
+function contains(str){
+    const reg = /([a-z])\1/gi
+    return reg.test(str);
+}
+//10. 
+function isUSD(str) {
+    let reg = /^\$\d{1,3}(,\d{3})*(\.\d{2})*$/;
+    if(reg.test(str)){
+        return true;
+    }
+    return false;
+}

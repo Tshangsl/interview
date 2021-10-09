@@ -33,7 +33,6 @@ MyQueue.prototype.push = function (x) {
 }
 
 MyQueue.prototype.pop = function () {
-    // 假如stack2不为空呢
     if (this.stack2.length <= 0) {
         while (this.stack1.length !== 0) {
             this.stack2.push(this.stack1.pop());

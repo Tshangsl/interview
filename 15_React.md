@@ -2380,3 +2380,20 @@
     - 函数如果不依赖外部变量或状态 只依赖输入的参数 就是引用透明的
     - 我们如果能用唯一的值来替换调用的函数表达式并且不改变程序运行状态 就证明这个函数是引用透明的
     - 引用透明的函数必须是纯函数
+38. redux immutablejs mobx性能优化
+    1. 页面加载 redux>immutablejs>mobx
+    2. 实际渲染速度 mobx>immutablejs>redux
+    > mobx用户操作渲染速度快的原因
+    1. 本质上是谁能让react做最少的事情 谁就快
+38. immutablejs
+    - JS中 引用类型的数据 优点在于频繁的操作数据都是在原对象的基础上修改的 不会创建新对象 从而可以有效利用内存 不会浪费内存 这种特性叫做mutable可变 但是太过灵活在复杂数据场景下造成了它的不可控性 
+    - 为了解决这种问题 出现immutable对象 每次修改immutable对象都会创建一个新的不可变对象 而老的对象不会改变
+    > immutablejs
+    - 现今实现immutable数据结构的JS类库有好多 immutablejs是其中比较主流的库之一
+    - 出自Facebook 是最流行的不可变数据结构的实现之一 从头开始实现了完全的持久化数据结构 通过tries这样的先进技术来实现结构共享 所有的更新操作都会返回新的值 但是在内部结构是共享的 来见减少内存占用(和垃圾回收的失效)
+    > 三大特性
+    1. Persistent data structure 持久化数据结构
+        - imuttablejs提供十余种不可变的类型 List Map Set Seq Collection Range
+        - immutable使用先进的tries(字典树)技术实现结构共享来解决问题 当对一个immutable对象进行操作时 immutableJS只会clone该节点及其祖先节点 其他保持不变 这样可以共享相同的部分 大大提高性能
+    2. structural sharing 结构共享
+    3. support lazy operation 惰性操作

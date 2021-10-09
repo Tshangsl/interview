@@ -11,6 +11,22 @@
 // const dummy = new ListNode();
 // dummy.next = head;
 
+// 删除倒数第n个节点
+const removeNthFromEnd = function(head,n){
+    let slow = fast = head;
+    while(n--){
+        fast = fast.next;
+    }
+    if(!fast){
+        return slow.next;
+    }
+    while(fast.next){
+        fast = fast.next;
+        slow = slow.next;
+    }
+    slow.next = slow.next.next;
+    return head;
+}
 // 快慢指针 删除链表地倒是第N个结点
 // 思路
 // 倒数第N个 正数第len-n+1
@@ -127,3 +143,23 @@ const reverseBetween = function(head,m,n){
 
 
 
+// 反转链表 迭代
+var reverseList = function(head) {
+    let prev = null, curr = head
+    while (curr) {
+        const next = curr.next
+        curr.next = prev
+        prev = curr
+        curr = next
+    }
+    return prev
+};
+
+// 反转链表 递归
+var reverseList = function(head) {
+    if (head == null || head.next == null) return head
+    const p = reverseList(head.next)
+    head.next.next = head
+    head.next = null
+    return p
+};

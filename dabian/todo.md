@@ -11,3 +11,7 @@
 3.`微搭-控制台` 学习React,React-redux,redux-saga,saga-duck,hook,whistle的使用,实际项目中进一步熟悉ts使用与git的使用，了解schema。
 4.`微搭-应用市场` 学习nextjs,项目中进一步认识ssr。
 5.`微搭-分享` 了解性能优化可以怎么做，storybook快速生成组件文档，云开发网关架构设计，各种node框架优势选型。
+
+1.项目背景 项目架构 具体实现功能
+选用的技术栈
+具体遇到的问题以及如何解决

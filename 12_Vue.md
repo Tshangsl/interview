@@ -10,7 +10,7 @@
     - Vue中最独特的特性之一 是其非侵入式的响应式系统 数据模型仅仅是简单的JS对象 当你修改它们时 视图会更新
     ----------
     >  Vue2.x 双向数据绑定原理(数据改变->视图改变 视图改变->数据改变)
-    1. 使用v-model指令绑定表单元素时 可以在视图直接获得数据 当数据发生改变时 数据也会进行更新
+    1. 使用v-model指令绑定表单元素时 可以在视图直接获得数据 当数据发生改变时 视图也会进行更新
     2. 利用数据劫持和事件的发布订阅来实现双向数据绑定
     3. 在Vue data选项中定义数据时 Vue会通过观察者对象Observer的getter和setter设置
     4. 通过v-model指令绑定元素时 自动触发getter getter会返回一个初始值 这样在视图中就能看到数据 
@@ -43,6 +43,7 @@
     )
 
     --------------
+    > Dep&Watcher
     > Dep 订阅收集者和发布者 框架需要处理变量和更新DOM的Watcher的依赖关系
     - (依赖收集 核心思想 事件发布订阅模式)
     - (目的是将观察者Watcher对象存放到当前闭包的订阅者Dep的subs中)
@@ -54,24 +55,10 @@
     > Watcher
     - Watcher意为观察者 它负责做的事情就是订阅Dep 当Dep发出消息传递(notify)时 所有订阅Dep的Wathers会进行自己的update操作
 
-    ----------------
     > 小结
     1. Dep负责收集所有的订阅者Watcher 通过target指向的计算去收集订阅其消息的Wather即可 然后只需做好消息发布notify即可
     2. Watcher负责订阅Dep 并在订阅时 让Dep进行收集 接收到Dep发布的消息时 做好其update操作即可
     - 两者看似相互依赖 实则却保证了其独立性 保证了模块的单一性
-
-    -------------
-    > 依赖收集中两个重要角色(所谓的依赖其实就是Watcher)
-    > 订阅者Dep(存储依赖的地方 存放Watcher观察对象)
-    - 收集依赖需要为依赖找一个存储依赖的地方为此我们创建了Dep 它用来收集依赖删除依赖/和向依赖发送消息等
-    - 实现一个订阅者Dep类 用于解耦属性的依赖收集和派发更新操作 主要作用是用来存放Watcher观察者对象 (可以把Watcher理解成一个中介的角色数据发生变化时通知它 然后它再通知其他地方)
-
-    > 观察者Watcher
-    - (抽象出一个能集中处理这些情况的类)
-    - (通知只通知它一个/再由它负责通知到其他地方)
-    - Vue中定义一个Watcher类来表示观察订阅依赖
-    - 当属性发生变化后 我们要通知用到数据的地方 而使用到这个数据的地方有很多 而且类型还不一样 既有可能是模板 也有可能是用户写好的一个watch 此时需要抽象出一个能集中处理这些情况的类
-    - 在依赖收集阶段只收集 这个封装好的类的实例进来 通知也只通知它一个 再由它负责通知其他地方
     -------------------
     
     > v-model指令
@@ -105,12 +92,12 @@
     3. 每个组件都对应一个Watcher实例 它会在组件渲染过程中 把接触过的数据property记录为依赖 之后当依赖项触发时 通知Watcher 使它关联的组件重新渲染
     
     > 步骤：Observer<->Watcher<->Compiler
-    1. 实现一个监听器Observer:(发布者)
+    1. 实现一个监听器Observer:(发布者/观察者)
         - 对数据对象进行遍历，包括子属性对象的属性，利用 Object.defineProperty() 对属性都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。
-    2. 实现一个解析器Compile
+    2. 实现一个解析器Compiler
         - 解析 Vue 模板指令，将模板中的变量都替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加监听数据的订阅者，一旦数据有变动，收到通知，调用更新函数进行数据更新。
     3. 实现一个订阅者Watcher
-        - Watcher 订阅者是 Observer 和 Compile 之间通信的桥梁 ，主要的任务是订阅 Observer 中的属性值变化的消息，当收到属性值变化的消息时，触发解析器 Compile 中对应的更新函数。
+        - Watcher 订阅者是 Observer 和 Compile 之间通信的桥梁 ，主要的任务是订阅 Observer 中的属性值变化的消息，当收到属性值变化的消息时，触发解析器 Compiler 中对应的更新函数。
     4. 实现一个订阅器Dep
         订阅器采用 发布-订阅 设计模式，用来收集订阅者 Watcher，对监听器 Observer 和 订阅者 Watcher 进行统一管理。
     > 对IE的兼容
@@ -194,7 +181,7 @@
             3. 让Object操作都变成函数行为。某些Object操作是命令式，比如name in obj和delete obj[name]，而Reflect.has(obj, name)和Reflect.deleteProperty(obj, name)让它们变成了函数行为。
             4. Reflect对象的方法与Proxy对象的方法一一对应，只要是Proxy对象的方法，就能在Reflect对象上找到对应的方法。这就让Proxy对象可以方便地调用对应的Reflect方法，完成默认行为，作为修改行为的基础。也就是说，不管Proxy怎么修改默认行为，你总可以在Reflect上获取默认行为。
         > Proxy只会代理对象的第一层 Vue3.0如何处理该问题
-        1. 判断当前Refect.get的返回值是否为Object 如果是则再通过reactive方法做代理 实现深度观测
+        1. 判断当前Reflect.get的返回值是否为Object 如果是则再通过reactive方法做代理 实现深度观测
         > 监测数组时可能会触发多次get/set 如何防止触发多次
         1. 判断key是否为当前被代理对象target自身属性 也可以判断旧值和新值是否相等 只有满足以上两个条件之一时 才有可能执行trigger
     2. Object.defineProperty
@@ -429,12 +416,7 @@
     3. 通过v-model
 5. Vue render函数(用来生成VDOM)
     Vue渲染/render函数用来生成VDOM/虚拟DOM
-    1. Vue更新渲染render整体流程
-        1. 模板编译生成AST/
-        2. AST生成Vue的render渲染函数/
-        3. render渲染函数结合数据生成VDOM树/
-        4. diff和patch后生成新的UI界面 真实DOM渲染)
-        
+    1. Vue更新渲染render整体流程        
         1. 模板通过编译Compiler生成AST(Abstract Synax Tree)抽象语法树
         2. AST生成Vue的render渲染函数
         3. render渲染函数结合数据生成VNODE(Virtual DOM Node)树
@@ -593,34 +575,24 @@
     > DOM-diff：(比较两颗虚拟DOM树用到的算法)
     - DIFF算法：
     - (Diff仅在两棵树同级虚拟节点间递归比较 最终实现整颗DOM树更新)
-    - (比较分三个层级
-    1. 层级比较 Tree Diff/
-        1. 对一个父节点下所有子节点比较 判断子节点类型 
-        2. 组件则做Component组件比较
-        3. 标签/元素 Element比较 
-    2. 组件比较 Component Diff/
-    3. 元素比较 Element Diff)
-        1. Diff仅在两棵树同级虚拟节点间递归比较 最终实现整颗DOM树更新
-        2. 是React框架采用的方法 也就是判断DOM是否发生了变化 然后找到这个变化 这样我们才能实现差量更新
+    > 比较时分为三个层级:
+    层级比较 Tree Diff
+    组件比较 Component Diff
+    元素比较 Element Diff
+    1. Tree Diff（层级比较）
+        1. 先进行树结构的层级比较，对同一个父节点下的所有子节点进行比较；
+        2. 接着看节点是什么类型的，是组件就做 Component Diff;
+        3. 如果节点是标签或者元素，就做 Element Diff;
+    2. Component Diff （组件比较）
+        1. 若组件类型相同，则继续按照层级比较其虚拟 DOM的结构;
+        2. 如果组件类型不同，则替换整个组件的所有内容
+    3. Element Diff (元素比较)
+        1. 如果节点是原生标签，则看标签名做比较是否相同来决定替换还是更新属性
+        2. 然后进入标签后代递归 Tree Diff
     > 三个步骤：
     1. 用 JS 对象的方式来表示 DOM 树的结构，然后根据这个对象构建出真实的 DOM 树，插到文档中。
     2. 当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树进行比较，记录两棵树的差异
     3. 最后把所记录的差异应用到所构建的真正的DOM树上，视图更新
-    
-    - 比较时分为三个层级:
-        层级比较 Tree Diff
-        组件比较 Component Diff
-        元素比较 Element Diff
-        1. Tree Diff（层级比较）
-            1.先进行树结构的层级比较，对同一个父节点下的所有子节点进行比较；
-            2.接着看节点是什么类型的，是组件就做 Component Diff;
-            3.如果节点是标签或者元素，就做 Element Diff;
-        2. Component Diff （组件比较）
-            1.若组件类型相同，则继续按照层级比较其虚拟 DOM的结构;
-            2.如果组件类型不同，则替换整个组件的所有内容
-        3. Element Diff (元素比较)
-            1.如果节点是原生标签，则看标签名做比较是否相同来决定替换还是更新属性
-            2.然后进入标签后代递归 Tree Diff
     > DOM变化主要有三种：
     1. applendChild
     2. replaceChild
@@ -646,11 +618,8 @@
     - 下一个事件循环tick中 Vue刷新队列并执行实际(已去重)
     > DOM异步
     - Vue异步执行DOM更新 数据变化 一个队列 缓冲同一事件循环发生所有数据改变 避免不必要的计算和DOM操作
-
-    Vue 在内部尝试对异步队列使用原生的 Promise.then 和MessageChannel，
-    如果执行环境不支持，会采用 setTimeout(fn, 0)代替。
-
-    - 为了在数据变化之后等待 Vue 完成更新 DOM 可以在数据变化之后立即使用Vue.nextTick(callback) 这样回调函数在 DOM 更新完成后就会调用。
+    - Vue 在内部尝试对异步队列使用原生的 Promise.then 和MessageChannel，如果执行环境不支持，会采用 setTimeout(fn, 0)代替。
+    - 为了在数据变化之后等待 Vue 完成更新 DOM 可以在数据变化之后立即使用Vue.nextTick(callback) 这样回调函数在 DOM 更新完成后就会调用
 
     > Vue中nextTick机制
     - (Vue中nextTick的实现有用到MutationObserver微任务API)
@@ -811,12 +780,12 @@
     - 从代码的角度来进行分析的 把一些可复用的代码 抽离为单个的模块 便于项目的维护和开发
     
     > 组件可如下定义
-        1. 有可复用的模块 完成既定功能
-        2. 有明确的接口规定
-        3. 有上下文依赖 外部依赖资源的定义
-        4. 可以独立发布
+    1. 有可复用的模块 完成既定功能
+    2. 有明确的接口规定
+    3. 有上下文依赖 外部依赖资源的定义
+    4. 可以独立发布
     > 组件设计原则
-        1. 使用单一职责原则
+    1. 使用单一职责原则
 9. location.href与Vue-router路由跳转区别
     > (Vue-router pushState
     1. 进行路由更新 静态跳转 页面不会重新加载/
@@ -828,13 +797,6 @@
     1. 触发浏览器 页面重新加载一次/
     2. 不同页面间跳转
     3. 同步加载)
-
-    1. vue-router使用pushState进行路由更新 静态跳转 页面不会重新加载 location.href会触发浏览器 页面重新加载一次
-    (使用router跳转和使用history.pushState()没有差别
-    vue-router用了history.pushState()尤其是在history模式下)
-    2. vue-router使用diff算法 实现按需加载 减少DOM操作
-    3. vue-router是路由跳转或同一个页面跳转 location.href是不同页面间跳转
-    4. vue-router是异步加载this.$nextTick(()=>{获取URL}) location.href是同步加载
 
     > Location href属性
     - href属性是一个可读可写的字符串 可设置或返回当前显示的文档的完整URL
@@ -1208,7 +1170,7 @@
     > 小结
     1. hash 和 history 的使用方式差不多，hash 中路由带 # ，但是使用简单，不需要服务端配合，站在技术角度讲，这个是配置最简单的模式，
     2. history 模式需要服务端配合处理404的情况
-    (在路由跳转的时候，就会出现访问不到静态资源而出现 404 的情况，这时候就需要服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面) 路由中不带 # ，比 hash 美观一点。
+    - (在路由跳转的时候，就会出现访问不到静态资源而出现 404 的情况，这时候就需要服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面) 路由中不带 # ，比 hash 美观一点。
     3. abstract 模式没有使用浏览器api 可以放到node环境或者桌面应用中   
 14. Vue-Router导航守卫 
     1. 全局的(beforeEach路由跳转前触发/beforeResolve路由跳转前触发/afterEach路由跳转完成后触发)
@@ -1424,10 +1386,6 @@
         - 为实现单页 Web 应用功能及显示效果，需要在加载页面的时候将 JavaScript、CSS 统一加载，部分页面按需加载；
     
     > 优化：
-    1. (将公用的JS库通过script标签引入 (减少app.bundle大小/
-    2. 配置路由时页面和组件使用懒加载方式引入)
-    3. /加一个首屏loading图提升用户体验)
-    
     1. 将公用的JS库通过script标签外部引入，减小app.bundel的大小，让浏览器并行下载资源文件，提高下载速度；
     2. 在配置路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用某个组件时再加载对应的js文件；
     3. 加一个首屏 loading 图，提升用户体验；
@@ -1439,10 +1397,12 @@
     - Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相
 
     > 包括以下几个模块：
+    - computed中解构Vuex辅助函数
     1. State：
         - 定义了应用状态的数据结构，可以在这里设置默认的初始状态。
     2. Getter：
         - 允许组件从 Store 中获取数据，mapGetters 辅助函数仅仅是将 store 中的 getter 映射到局部计算属性。
+    - methods中解构Vuex辅助函数
     3. Mutation：
         - 是唯一更改 store 中状态的方法，且必须是同步函数。
     4. Action：
@@ -1620,24 +1580,15 @@
     2. created
         el undefined
         data [Object Object]
-        - el未初始化 data初始化
+        - el未初始化 data初始化 DOM未生成
 
         实例创建之后 vm.$el未定义 挂载属性el不存在
         能读取到data的值(属性和方法的运算watch/event事件回调)
         模板渲染成HTML DOM未生成
-
-        数据初始化最好在此阶段完成
-        完成数据观测，    
-
-        el  undefined
-        data [Object Object]
-        DOM未生成
     3. beforeMount
         $el挂载前 vm.$el还是未定义
-        相关Render函数首次被调用 将模块渲染成HTML
-        相关的 render 函数首次被调用
-        期间将模块渲染成html
-        将编译完成的html挂载到对应的虚拟DOM
+        - 相关Render函数首次被调用 将模块渲染成HTML
+        - 将编译完成的html挂载到对应的虚拟DOM
 
         el  [Object HTMLDivElement]
         data [Object Object]
@@ -1646,11 +1597,10 @@
         data初始化
         meaasge Vue生命周期
     4. mounted
-        $el挂载后被调用 编译好的HTML挂载到页面完成后
-        初始化页面完成后调用nextTick方法
+        - $el挂载后被调用 编译好的HTML挂载到页面完成后 初始化页面完成后调用nextTick方法
         el  [Object HTMLDivElement]
         data [Object Object]
-        --挂载渲染完成后调用->初始化页面->对DOM进行操作
+        - -挂载渲染完成后调用->初始化页面->对DOM进行操作
         
         此时vm.$el可以调用
 
@@ -1686,8 +1636,8 @@
         此阶段为更新渲染视图之后触发
         此时再读取视图上的内容，已经是最新的内容。
         PS:
-        1.该钩子在服务器端渲染期间不被调用。
-        2.应该避免在此期间更改状态，
+        1. 该钩子在服务器端渲染期间不被调用。
+        2. 应该避免在此期间更改状态，
         因为这可能会导致更新无限循环。
     7. beforeDestory
         实例销毁前触发 实例vm可用
@@ -1704,11 +1654,12 @@
     - props methods data 和computed的初始化都是在beforeCreated 和created之前完成的
 18. 在哪个生命周期内调用异步请求(created)/什么阶段才能访问操作DOM(mounted)？
     > (created beforeMounted mounted)
-        - 这三个钩子函数中data 已创建 可将服务端端返回的数据进行赋值
-        - 在 created 钩子函数中调用异步请求 可以更快获取服务端数据
-        - 服务器端没有mounted和beforeMount生命周期钩子函数
-    > 什么阶段能访问操作DOM
-        - 钩子函数 mounted 被调用前 Vue 已经将编译好的模板挂载到页面上 在 mounted 中可以访问操作 DOM
+    - 这三个钩子函数中data 已创建 可将服务端端返回的数据进行赋值
+    - 在 created 钩子函数中调用异步请求 可以更快获取服务端数据
+    - 服务器端没有mounted和beforeMount生命周期钩子函数
+    
+    > 什么阶段能访问操作DOM mounted
+    - 钩子函数 mounted 被调用前 Vue 已经将编译好的模板挂载到页面上 在 mounted 中可以访问操作 DOM
     
     - created和mounted 
     > mounted生命周期钩子中调用优点
@@ -1718,7 +1669,7 @@
     - (更快获取服务端数据/ssr不支持beforeMount Mounted生命周期钩子)
     1. 能更快获取到服务端数据，减少页面 loading 时间；
     2. ssr(服务端渲染) 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
-    > 数据获取
+    > 在哪个生命周期内进行数据获取
     1. 正常获取created
     2. 涉及需页面加载完成后(DOM操作)mounted
 

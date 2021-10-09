@@ -25,3 +25,22 @@
     回溯法以这种工作方式递归地在解空间中搜索 
         直到找到所要求的解或解空间已没有活结点位置
 */
+// 动态规划求最大子序和
+/*
+动态规划首先是对数组进行遍历 当前最大连续子序列和为sum 结果为ans
+1. 如果sum>0 则说明sum对结果有增益效果 则sum保留并加上当前遍历数字
+2. 如果sum<=0 则说明sum对结果无增益效果 则sum直接更新为当前遍历数字
+3. 每次比较sum和ans的大小 将最大值设置为ans 遍历结束返回结果
+*/
+var maxSubArray = function(nums){
+    let ans = nums[0];
+    let sum = 0;
+    for(let a of nums){
+        if(sum>0){
+            sum+=a;
+        }else{
+            sum = a;
+        }
+    }
+    return Math.max(ans,sum);
+}

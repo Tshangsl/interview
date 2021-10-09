@@ -61,7 +61,6 @@ const isValid = function (s) {
     for (let i = 0; i < len; i++) {
         let ch = s[i];
         if (ch === '(' || ch === '[' || ch === '{') {
-            // 不太明白此处的leftToRight[ch]
             stack.push(leftToRight[ch]);
         } else {
             if (stack.length && ch !== stack.pop()) {
@@ -250,3 +249,37 @@ m2.push(-25);
 console.log('方法二');
 console.log(m2.top()); 
 console.log(m2.getMin());
+
+// 单调栈思路
+/*
+1. 用一个栈保存每天的温度在数组中的下标
+2. 每次从数组中读取一个温度 然后将其与栈中保存的温度(根据下标可以得到温度)进行比较
+3. 如果当前温度比位于栈顶的温度高 那么就能知道位于栈顶那一天需要等待几天才会出现更高的温度
+4. 然后出栈一次 将当前温度和下一个位于栈顶的温度进行比较
+5. 如果栈中已经没有比当前温度低的温度 则将当前温度在数组中的下标入栈
+保存在栈中的温度(通过数组下标可以得到温度)是递减排序的 这是因为如果当前温度比位于栈顶的温度高
+位于栈顶的温度将出栈 所以每次入栈时当前温度一定比位于栈顶的温度低或相同
+*/
+var dailyTemperature = function(temperatures){
+    let result = new Array(temperatures.length).fill(0);
+    let stack = [];
+    for(let i =0;i<temperatures.length;i++){
+        while(
+            stack.length&&
+            temperatures[i]>temperatures[stack[stack.length-1]]
+        ){
+            let prev = stack.pop();
+            result[prev] = i-prev;
+        }
+        stack.push(i);
+    }
+    return result;
+}
+
+// 1.“有效括号”问题
+// 2.栈问题进阶-每日温度问题
+// 3.栈的设计——“最小栈”问题
+// 4.栈向队列的转化
+// 5.双端队列
+// 6.优先队列
+

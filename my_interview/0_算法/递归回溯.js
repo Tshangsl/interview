@@ -1,4 +1,4 @@
-// 全排列问题
+//1. 全排列问题
 
 // 思维
 // 穷举 DFS 深度优先遍历(用递归实现)
@@ -42,7 +42,7 @@ console.log(permute([2,5,6,7]));
 // 空间复杂度 O(n)
 
 
-//括号栈问题
+//2. 括号栈问题
 const leftToRight = {
     "(": ")",
     "[": "]",
@@ -110,3 +110,21 @@ let arr1 = [[1,2,3],[4,5,6],[7,8,9]];
 let arr2 = [[9,8,7],[6,5,4],[3,2,1]]
 console.log(find(arr1,12));
 console.log(find(arr2,9));
+
+// 3. 递归组合
+const combine = (n,k)=>{
+    const res = [];
+    const search = (start,path)=>{
+        if(path.length == k){
+            res.push(path.slice());
+            return;
+        }
+        for(let i = start;i<=n;i++){
+            path.push(i);
+            search(i+1,path);
+            path.pop();
+        }
+    }
+    search(1,[]);
+    return res;
+}
