@@ -234,6 +234,17 @@ const threeSum = function(nums){
 console.log(threeSum([-1, 0, 1, 2, -1, -4]));
 console.log('///');
 
+// 创建一个长度确定 同时每一个元素的值也都确定的数组 
+// 调用fill方法
+const arr= (new Array(7)).fill(1);
+
+// 当你给fill传递一个入参时
+// 如果这个入参的类型是引用类型
+// fill在填充坑位的其实就是入参的引用
+
+// 二维数组初始化 一个for循环实现
+
+// N层数组N层循环完成遍历
 
 
 
