@@ -1602,9 +1602,40 @@ function isSym(left, right) {
     }
     return arguments.callee(left.left,right.right)&&arguments.callee(left.right,right.left);
 }
-
-
-
+// 渲染几万条数据不卡住页面
+/*
+渲染大数据时 合理使用createDocumentFragment和requestAnimationFrame 
+将操作切分为一小段一小段执行
+*/
+setTimeout(()=>{
+    const total = 100000;
+    const once = 20;
+    const loopCount = Math.ceil(total/once);
+    let countOfRender = 0;
+    const ul = document.querySelector('ul');
+    // 添加数据的方法
+    function add(){
+        const fragment = document.createDocumentFragment();
+        for(let i = 0;i<once;i++){
+            const li = document.createElement('li');
+            li.innerText = Math.floor(Math.random()*total);
+            fragment.appendChild(li);
+        }
+        ul.appendChild(fragment);
+        countOfRender+=1;
+        loop();
+    }
+    function loop(){
+        if(countOfRender < loopCount){
+            window.requestAnimationFrame(add);
+        }
+    }
+    loop();
+},0)
+// 打印出当前网页使用了多少种HTML元素
+const fn = ()=>{
+    return [...new Set([...document.querySelector('*')].map(el=>el.tagName))].length;
+}
 
 
 
