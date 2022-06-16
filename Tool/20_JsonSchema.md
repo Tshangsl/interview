@@ -1,4 +1,4 @@
-53. JSON(JavaScript Object Notation JS对象标记)
+1. JSON(JavaScript Object Notation JS对象标记)
     > JSON
     - JSON(JavaScript Object Notation JS对象标记) JS是一种数据格式 具有简介 可读性高 是一种轻量级的数据交换格式 是基于ECMAScript(W3C制定JS规范)的一个子集 在域后端的数据交互中有较为广泛的应用
     - JSON出现之前 用XML传递数据 因为XML是一种纯文本格式 它适合在网络上交换数据 XML本身不算复杂 但是加上DTD XSD XPath XSLT等一大推复杂的规范后
@@ -88,7 +88,7 @@
         原因：eval_r获取的json对象的值中，如果有执行代码，也将照样执行！所以若不能保证数据的安全性，不要使用eval_r方法进行转义。
     XML概念
         XML与Access,Oracle和SQL Server等数据库不同，数据库提供了更强有力的数据存储和分析能力，例如：数据索引、排序、查找、相关一致性等，XML的宗旨传输数据的，而与其同属标准通用标记语言的HTML主要用于显示数据。事实上XML与其他数据表现形式最大的不同是：他极其简单。这是一个看上去有点琐细的优点，但正是这点使XML与众不同。
-54. schema
+2. schema
     > 一个词汇表 允许注释和验证JSON文档
     > 好处
     - 描述现有的数据格式
