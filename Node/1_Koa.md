@@ -1,3 +1,112 @@
+### Koa-generator Koa2的脚手架
+1. 全局安装
+```
+npm install -g koa-generator
+```
+2. 创建项目
+```
+koa2 -e koa2-demo
+```
+3. 安装依赖
+```
+cd koa2-demo
+npm install
+```
+4. 启动项目
+```
+npm start
+```
+- 项目端口号在目录bin/www里面 
+```
+var port = normalizePort(process.env.PORT||"3000")
+```
+- 脚手架已经带了一些依赖 模版 路由 post的请求解析等
+### Koa中间件 koa-cors
+>CORS响应头部
+- 当响应报文包含正确CORS的响应头 Web应用程序才能从跨域的服务器加载资源
+1. Access-Control-Allow-Origin 指定了允许访问该资源的外域URI
+2. Access-Control-Expose-Headers 服务器设置允许浏览器访问特定的头
+3. Access-Control-Max-Age 指定预请求的结果能够被缓存多久
+4. Access-Control-Allow-Credentials 当浏览器的credentails设置为true时是否允许浏览区读取response的内容
+5. Access-Control-Allow-Methods 预检请求的响应 指明实际请求所允许使用的HTTP方法
+6. Access-Control-Allow-Headers 预检请求的响应 指明实际请求中允许携带的首部字段
+> 定义
+- koa-cors是基于node-cors开发的Koa CORS中间件
+> 安装
+```
+npm install koa-cors --save
+```
+### koa上下文对象ctx
+> koa的上下文对象
+- Koa Context将Node的request和response对象封装在一个单独的对象里 其为编写web应用和API提供了很多有用的方法
+- Koa的参数中有一个ctx对象，全称是context(上下文对象)，该对象中有很多请求对象和响应对象的属性。express是request和response对象
+- ctx上下文对象 当前的作用环境
+- ctx.req Node的request对象
+- ctx.res Node的response对象
+- ctx.response Koa的response对象
+- ctx.request Koa的request对象
+- ctx.body response.body 向前端发送数据即接口返回的数据
+- ctx.app 应用实例饮用
+- ctx.url 整个url
+- ctx.path 只有地址
+- ctx.method 请求方式
+- 其他的属性很多是请求对象和相应对象中比较常用的属性
+### koa路由
+> 创建并使用路由
+1. 导入koa-router
+```
+const Router = require('koa-router')
+```
+2. 创建实例化对象
+```
+const router = new Router;
+```
+3. 生成路由
+```
+router.get('/',(ctx,next)=>{
+    ctx.body=''
+})
+```
+4. 将路由挂载到应用程序
+```
+挂载
+app.use(router.routes())
+当请求数据的方法和设置的方法不一致 会报错
+app.use(router.allowedMethods())
+```
+> 路由传值
+- Koa2中get传值用request接收，接收的方法有两种 query和querystring
+1. query 返回的是格式化好的参数对象
+2. querystring 返回的是请求字符串
+
+### kao获取请求参数的三种方法
+1. ctx.request.body
+- 需要安装koa-bodyparser npm插件 获取post请求参数
+2. ctx.params
+- 获取动态路径参数
+```
+router.get('/package/:aid/:cid',async(ctx)=>{
+    console.log(ctx.params);
+    {aid:'123',cid:'456'}
+})
+```
+3. ctx.request.query
+- 获取解析的查询字符串 当没有查询字符串时 返回一个空对象
+
+### koa-bodyparser()
+- 用来解析请求体的中间件 
+- 比如获取post提交的表单数据 通过koa-bodyparse解析后就能获取到数据
+
+### koa-views
+- 对需要进行视图模块渲染的应用是个不可缺少的中间件 支持ejs nunkucks等众多模版引擎
+
+### koa-static
+- 搭建静态服务器
+
+### app.use()
+- 把函数存放到this.middleware数组中 然后返回实例对象this
+- koa2中 则是判断是generator函数 用koa-convert转换一次 然后再存放到this.middleware数组中 真正执行的是app.listen
+
 > Koa是一种简单好用的Web框架 它的特点是优雅 简洁 表达力强 自由度高 本身代码只有1000多行 所有功能都通过插件实现 很符合Unix哲学
 1. 架设HTTP服务
     ```

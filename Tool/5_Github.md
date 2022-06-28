@@ -220,3 +220,17 @@ git tag -d 标签名
 ```
 git push origin:refs/tags/标签名
 ```
+### 本地项目搭建完毕 想和远程仓库做关联
+```
+echo "# NO.1" >> README.md //该命令是创建readme文件
+git init
+git add .
+git commit -m 'first commit'
+git remote add origin http://www.git_xxx.git
+git push -u origin master
+```
+### 一些步骤的昨晚 推push到指定仓库时
+```
+git remote add origin git@github.com:
+git push -u origin master
+```

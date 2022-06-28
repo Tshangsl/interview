@@ -1,3 +1,33 @@
+### Node的mysql模块
+> 定义
+- 是Node.js下专门用于操作mysql数据库的模块
+1. 下载
+```
+npm install mysql
+```
+2. 连接数据库
+```
+引入Mysql模块
+const mysql = require('mysql');
+创建连接对象
+const c = mysql.createConnection({
+    host:'127.0.0.1',
+    port:'3306',
+    user:'root',
+    password:'',
+    database:'tete'
+})
+测试连接
+c.connect();
+```
+### jsonwebtoken
+> 定义
+- jsonwebtoken是node版本的JWT(JSON WEB TOKEN)实现
+> 下载
+```
+npm install jsonwebtoken
+```
+
 1. Node
     > 是什么
     - Nodejs使用了一个事件驱动 非阻塞式I/O的模型 使其轻量而高效 避免由于等待输入或输出响应而造成的CPU时间损失 Nodejs适合运用在高并发 I/O密集 少量业务逻辑的场景
