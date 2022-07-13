@@ -1,3 +1,6 @@
+[http]
+    proxy = http://127.0.0.1:7890
+
 ### 条件渲染
 > &&运算符
 - JS中 true&&expression总是会返回expression false&&expression总是会返回false
