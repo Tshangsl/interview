@@ -1,5 +1,12 @@
+最新token
+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
+
+
 [http]
     proxy = http://127.0.0.1:7890
+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
+
+git remote set-url origin https://<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>@github.com/<xiaoli6>/<interview>.git
 
 ### 条件渲染
 > &&运算符
