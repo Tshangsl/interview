@@ -45,42 +45,4 @@
     2. @babel/present-env 取代了es2015 es2016 es2017 通过配置浏览器版本的形式 将编译的主动权交给插件
     3. babel-loader webpack的loader插件 用于编译代码 转化成浏览器读得懂的代码
 
-1. Git Github
-    - Git 目前世界上最先进的分布式版本控制系统（没有之一）。
-    - GitHub 一个面向开源及私有软件项目的托管平台，因为只支持Git作为唯一的版本库格式进行托管，故名GitHub。
-    - 四个关键点：
-    1. 工作区：
-        本地电脑存放项目文件的地方
-    2. 暂存区(Index/Stage):
-        使用git管理项目文件时 其本地项目文件会多出一个.git文件夹 将这个.git文件夹称之为版本库 
-        其中.git文件夹包含了两部分 
-        一个是暂存区(Index/Stage) 暂时存放文件的地方
-        通常使用add命令将工作区的文件添加到暂存区里
-    3. 本地仓库：
-        .git文件夹中还包含git自动创建的master分支 并将head指针指向master分支 使用commit命令可以将暂存区中文件添加到本地仓库
-    4. 远程仓库
-        不是在本地仓库中 项目代码在远程git服务器上
-        比如项目放在github上 就是一个远程仓库
-        通常使用clone命令将远程仓库拷贝到本地仓库中
-        开发后推送到远程仓库
-2. 
-    1. 之前的git工作流
-    2. rebase做什么 一般解决什么问题
-        - 可以对某一段先行提交历史 进行编辑 删除 复制 粘贴 因此 合理使用rebase命令可以使我们的提交历史干净简洁
-        - 不要通过rebase对任何已提交到公共仓库的commit进行修改
-        - 使用git log 可以按s向下翻log
-        - git log -oneline 可以一行展现
-    3. 如何合并多个commit
-    4. 具体操作 
-        - 本地仓库提交多次 在把本地提交push进公共仓库之前 为了让提交记录更简洁明了 把如下分支B C D三个提交记录合并成一个完整的提交 然后push到公共仓库
-        ```
-        git rebase -i [startpoint] [endpoint]
-        ```
-        - -i的意思是--interactive 即弹出交互式的界面让用户编辑完成合并操作 [startpoint][endpoint]指定一个编辑区间 如果不指定[endpoint]则该区间的终点默认是当前分支HEAD所指向的commmit(该区间指定的是一个前开后闭的区间) 在查看到了log日志后 运行以下命令
-        ```
-        git rebase -i 36224db
-        ```
-        ```
-        git rebase -i HEAD-3
-        ```
 

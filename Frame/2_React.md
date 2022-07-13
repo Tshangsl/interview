@@ -1,3 +1,48 @@
+### 条件渲染
+> &&运算符
+- JS中 true&&expression总是会返回expression false&&expression总是会返回false
+- 如果条件是true &&右侧的元素就会被渲染 如果是false React会忽略并跳过它
+> 阻止组件渲染
+- render方法直接返回null 可隐藏组件 即使它已经被其他组件渲染
+- 在组件的render方法中返回null并不会影响组件的生命周期
+### key的使用
+- 元素的key只有放在就近的数组上下文中才有意义
+- key只是在兄弟节点之间必须唯一 不需要时全局唯一的 当生成两个不同的数组时 我们可以使用相同的key值
+### JSX允许在大括号中嵌入任何表达式
+### 受控组件
+- 在HTML中 表单元素(如<input><textarea><select>)之类的表单组件通常自己维护state 并根据用户输入进行更新
+- 在React中 可变状态(mutable state)通常保存在组件的state属性中 并且只能通过使用setState()更新
+- 把两者结合起来 使React的state成为唯一数据源 渲染表单的React组件还控制着用户输入过程中表单发生的操作 被React以这种方式控制取值的表单输入元素就叫做受控组件
+- 由于在表单元素上设置了value属性 因此显示的值将始终为this.state.value 这使得React的state成为唯一数据源 由于handlechange在每次按键时都会执行并更新React的state 因此显示的值将随着用户输入而更新
+> select标签
+- React并不会使用selected属性 而是在根select标签上使用value属性 这在受控组件中更便捷 只需要在根标签中更新它
+> 文件input标签
+```
+<input type = 'file'>
+```
+- 因为它的value只读 所以它是React中的一个非受控标签
+> 受控输入空值
+- 在受控组件上指定value的prop会阻止用户更改输入
+- 如果指定了value 但输入仍可编辑 可能是意外将value设置为undefined或null
+### Web Components
+> 定义
+- 一套不同的技术 允许创建可重用的定制元素 功能封装在代码之外 并且在Web应用中使用它们
+> 组成
+1. Custom elements自定义元素
+2. shadow DOM(影子DOM)
+3. HTML templates(HTML模版)
+### style
+- React会自动添加px后缀到内联样式为数字的属性后
+- 如需使用px以外的单位 要将此值设为数字与所需单位组成的字符串
+```
+<div style={{height:10}}>
+Hello World!
+</div>
+<div style={{height:10%}}>
+Hello World!
+</div>
+```
+
 1. 受控组件和非受控组件
     > React中 受控组件和非受控组件是针对表单而言的
     - 受控组件 组件维持自身状态 根据用户操作更新
