@@ -1,3 +1,80 @@
+### Vite
+- 是一个web开发构建工具 由于其原生ES模块导入方式 可以实现闪电般的冷服务器启动
+### unpkg
+- 是一个快速的全球内容交付网络 适用于npm上的所有内容 使用它可以使用以下URL快速轻松从任何包中加载任何文件
+```
+unpkg.com/:package@:version/:file
+```
+- 一个内容源自npm的全球快速CDN
+- 它部署在cloudflare上 在大陆地区访问到的是香港节点 它支持h/2和很多新特性 
+### jsDelivr - 高速且免费的CDN服务
+- jsDelivr是免费高速且稳定的CDN服务 提供了NPM Github WordPress Plugin和其他自定义网站的资源镜像
+### mustache语法
+- 是胡子的意思 因为嵌入标记像胡子{{}}
+- 被Vue使用 mustach语法库是最早的模版引擎库 比Vue诞生的要早得多 她的底层实现机制在当时是非常有创造性 轰动性的 为后续模版引擎的发展提供了崭新的思路
+### Web Components规范
+- Web Components是W3C制定的一种规范可用于构建独立的Web应用组件 主要包含一下四个模块：模版元素，HTML import,Shadow DOM,自定义元素
+1. 模版元素
+- <template>元素中可以包含HTML标签 样式和脚本 这些都是可复用的
+- 为了提高Web应用的性能 模版中的内容默认是不加载的 它不在DOM结构中 需要手动加载
+2. HTML import
+- 通过HTML Import可以将外部HTML文档嵌入当前的文档中
+3. Shadow DOM
+- 引入是为了解决由封装机制的作用域造成的问题 它将Web Components的HTML CSS JS打包 不受外部作用域影响
+- Shadow DOM使得我们可以将一棵DOM子树插入正在渲染的文档中 每一个DOM树上的子节点 都能再拥有它自己的Shadow DOM树
+- 拥有至少一个Shadow DOM子树的DOM元素 称为宿主元素 也叫做shadow host
+4. 自定义元素
+- Web Components规范中规定了 如果在DOM中创建出一个全新的元素 那么自定义元素可以有自己的属性和方法
+> 开发一个自定义元素需要5个步骤
+1. 创建对象
+- 使用Object.create来创建对象 第一个参数是对象的原型 第二个参数是对象的属性
+```
+var element = Object.create(HTMLElement.prototype)
+```
+2. 定义对象的属性
+- 使用Object.defineProperty和Object.defineProperties这两个方法定义一个对象的属性
+```
+Object.defineProperty(element,'title',{
+    writable:true
+})
+```
+3. 定义生命周期的方法
+- 在JS中 对象的生命周期是由一个个不同的状态组成的
+    1. 被创建 createdCallback
+    2. 插入到DOM中 attachedCallback
+    3. 从DOM中移除 detachedCallback
+    4. 对象的某一属性值更新 attributeChangedCallback
+```
+element.createCallback = function(){
+
+}
+```
+4. 注册新元素
+- 使用document.registerElement方法可以在DOM中注册一个新元素
+```
+var MyNameElement = document.registerElement('my-name',{prototype:element})
+// 以下向body中动态加载该元素 也可以直接在html中写<my-name>标签
+var myNameElement = new MyNameElement();
+myNameElement.innerHTML = 'hello'
+document.body.appendChild(myNameElement)
+```
+- 将产生如下HTML
+```
+<my-name>hello<my-name>
+```
+5. 扩展元素
+- 一个元素可以用extends继承原生元素或者其他自定义元素
+
+### Pug
+- Pug是一款健壮 灵活 功能丰富的HTML模版引擎 专门为Node.js平台开发 Pug是Jade改名而来 是一种通过缩进(表示标签间的嵌套关系)的方式来编写代码的过程 在编译过程中 不需要考虑标签是否闭合 可以加快写代码速度 也为代码复用提供了便捷
+### Vite
+- 法语单词快速 发音/vit/ 如veet 是一种构建工具 旨在为现代Web项目提供更快 更精简的开发体验 
+> 主要由两个主要部分组成
+1. 一个开发服务器 提供了对原生ES6模块的丰富功能增强 例如极快的热模块替换(HMR)
+2. 一个构建命令 将代码与Rollup捆绑在一起 预先配置为输出高度优化的静态资产以用于生成
+### Volar
+- 为模版表达式 组件prop 甚至是插槽验证提供了语法高亮和智能提示
+
 1. shim()/垫片
     - 一个小型库，可透明地截取API，更改传递的参数，处理操作本身，或将操作重定向到别处。
     - 垫片通常在API的行为发生变化时出现，从而导致仍依赖旧功能的旧应用程序出现兼容性问题。在这些情况下，较新的代码之上的较薄的兼容层仍然可以支持较旧的API。垫片也可以用于在不同的软件平台上运行程序，而不是开发它们。

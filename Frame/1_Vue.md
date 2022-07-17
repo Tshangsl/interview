@@ -1,3 +1,370 @@
+### 实例property
+> $slots
+- 用来以编程方式访问通过插槽分发的内容 每个具名插槽都有其相应的property(例如:v-slot:foo中的内容将会在this.$slots.foo()中被找到) default property包括了所有没有被包含在具名插槽中的节点 或v-slot:defauly的内容
+- 在使用渲染函数编写一个组件时 访问this.$slots会很有帮助
+
+### Minxin
+- Minxin提供一种非常灵活的方式 来分发Vue组件中的可复用功能
+- 一个mixin对象可以包含任意组件选项 当组件使用mixin对象时 所有mixin对象的选项都被混合进入该组件本身的选项
+> 选项合并
+- 在数据的property发生冲突时 会以组件自身的数据为优先
+- 同名钩子函数将合并成一个数组 因此都将被调用 mixin对象的钩子将在组件自身钩子之前调用
+- 值为对象的选项 如methods components 和directives 将被合并为同一个对象 两个对象键名冲突时 取组件对象的键值对
+> 全局mixin
+- 使用时格外小心 一旦使用全局mixin 它将影响每一个之后创建的组件
+> 自定义选项合并策略
+- 默认策略为简单覆盖已有值 如果想让某个自定义选项以自定义逻辑进行合并 可以在app.config.optionMergeStrategies中添加一个函数
+### 组合式API 响应式API
+> 组合式API可以用来做什么
+- 组合API可以进一步拆分选项API中的JS逻辑 可以吧某一逻辑的data/computed/watch/methods/生命周期钩子 单独封装到一个函数(也可单独一个文件) 一般给拆分后的函数命名useXxx
+> 新的字段setup
+- 是组合API的标志属性 是个函数 其返回值可以被模版识别并渲染 类似data
+- 组合api的入口 执行时机 组件创建之前执行 一旦props被解析就会执行setup
+- 在setup中应该避免使用this 因为它不会找到组件实例 setup的调用发生在 data property，computed property或methods被解析之前 所以它们无法在setup中被获取
+> 在setup内注册生命周期钩子
+- 组合式API上的生命周期钩子与选项式API的名称相同 但前缀为on 即mounted看起来会像onMounted
+> setup用法
+- 使用setup接收两个参数
+1. props:组件传入的属性
+- prop是响应式的 不能使用ES6解构 它会消除prop的响应性
+- 如果需要解构prop 可以在setup函数中使用toRefs函数来完成此操作
+```
+import {toRefs} from 'vue'
+setup(props){
+   const {title} = toRefs(props)
+   console.log(title.value)
+}
+```
+2. content
+- content是一个普通的JS对象 暴露了其他可能在setup中有用的值 
+- context是一个普通的JS对象 说明它不是响应式的 可以安全的对context使用ES6解构
+```
+export default{
+   setup(props,context){
+      //Attribute(非响应式对象 等同于$attrs)
+      console.log(context.attrs)
+      // 插槽(非响应式对象 等同于$slots)
+      console.log(context.slots)
+      // 触发事件(方法 等同于$emit)
+      console.log(context.emit)
+      // 暴露公共property函数
+      console.log(context.expose)
+   }
+}
+```
+> 访问组件的property
+- 执行setup时 只能访问以下property
+1. props
+2. attrs
+3. slots
+4. emits
+- 无法访问以下组件选项
+1. data
+2. computed
+3. methods
+4. refs(模版ref)
+> 结合模版使用
+- 如果setup返回一个对象 那么该对象的property以及传递给setup的props参数中的property就都可以在模版中访问到
+- 从setup返回的refs在模版中访问时是被自动浅解包的 因此不应在模版中使用.value
+> 使用渲染函数
+- setup可以返回一个渲染函数 该函数可以直接使用在同一作用域中声明的响应式状态
+- 返回一个渲染函数将阻止我们返回其他任何东西 从内部来说这不应该成为一个问题 但当我们想要将这个组件的方法通过模版ref暴露给父组件时就不同了
+- 通过调用expose来解决这个问题 给它传递一个对象 其中定义的propery将可以被外部实例访问
+> 组合式API PROVIDE/INJECT
+- 可以在组合式API中使用provide/inject 两者都只能在当前活动实例的setup()期间调用
+1. 在setup()中使用provide
+- 首先从vue显式导入provide方法 这使我们可以调用provide来定义每个property
+- provide函数允许你通过两个参数定义property
+   1. name(<String>类型)
+   2. value
+2. 在setup()中使用inject
+- 需要从vue显式导入 导入后可调用它来定义暴露给我们的组件方式
+- inject函数有两个参数
+   1. 要inject的property的name
+   2. 默认值(可选)
+3. 添加响应性
+- 为了增加provide值和inject值之间的响应性 可以在provide值时使用ref或reactive
+4. 修改响应式
+- 使用响应式provide/inject值时 建议尽可能将响应式property的所有修改限制在定义provide的组件内部
+- 有时需要在注入数据的组件内部更新inject的数据 这种情况下 建议provide一个方法来负责改变响应式property
+- 如果要确保通过provide传递的数据不会被inject的组件更改 建议对提供者的property使用readonly
+> setup函数的特点
+1. setup函数return的内容 在模版中可以直接使用 包括变量和方法
+2. setup不能使用this关键字
+> toRef
+- 可以用来为源响应式对象上的某个property新创建一个ref 然后ref可以被传递 它会保持对其源property的响应式连接
+- 将响应式对象中的某个属性单独给外部使用时
+> toRefs
+- 和toRef功能是一致的 但是可以批量创建多个ref对象
+> useXxx函数内部实现
+- 这个use作为函数名前缀是一个命名习惯 实际起名并没有限制
+- 每一个函数中的watch/computed/生命周期钩子 他们都以函数的形式出现
+- 这里只有生命周期的钩子名字前面多了on前缀 比如mounted=>onMounted
+> 定义响应数据(reactive/ref)
+- 响应数据就是值变化可以驱动DOM变化的数据 我们之前在data中定义的数据就是响应数据 但是在setup中如果我们定义数据 这里并没有data函数 取而代之的是reactive/ref函数
+1. reactive
+- 定义响应式数据 输入只能是对象类型 返回输入对象的响应版本
+2. ref
+- 同样是定义响应数据 和reactive区别是返回值响应数据的格式不同 ref返回的数据需要用.value访问
+> 模版引用
+- 在使用组合式API时 响应式引用和模版引用的概念是统一的 为了获取对模版内元素或组件实例的引用 可以向往常一样声明ref并从setup()返回
+> v-for中的用法
+- 组合式API模版引用在v-for内部使用时没有特殊处理 
+> 侦听模版引用
+- watch()和watchEffect()在DOM挂载或更新之前运行副作用 所以侦听器运行时 模版引用还未被更新
+- 使用模版引用的侦听器应该用flush:'post'选项定义 这将在DOM更新后运行副作用 确保模版引用和DOM保持同步 并引用正确的元素
+### ref&reactive
+> reactive
+- 返回对象的响应式副本 响应式转换是深层的 它影响所有嵌套property
+```
+const obj = reactive({count:0})
+const count = obj.count
+```
+- reactive不支持对基本类型数据响应式
+> ref
+- 接受一个内部值并返回一个响应式且可变的ref对象 ref对象仅有一个.value property 指向该内部值
+```
+const data = ref(xxx);
+const dataValue = data.value
+```
+- 调用ref方法来定义响应式数据时 当参数为对象类型时 里面用的是reactive方法 也就是说上面的data.value 事实上是reactive方法创造出来的
+- ref传入对象为参数时和传入基本类型为参数返回结果情况是不一样的
+- 基本类型返回值value是具体的值 对象类型返回值value是reactive方法创建proxy对象
+### 路由元信息
+> 接受属性对象的meta属性
+- 它可以在路由地址和导航守卫上都被访问到
+> 路由记录
+- routes配置中的每个路由对象为路由记录 路由记录可以是嵌套的 因此 当一个路由匹配成功后 它可能匹配多个路由记录
+- 一个路由匹配到的所有路由记录会暴露为$route对象(还有在导航守卫中的路由对象)的$route.matched数组 可以遍历这个数组来检查路由记录中的meta字段
+- Vue Router还提供一个$router.meta方法 它是一个非递归合并所有meta字段的(从父字段到子字段)的方法
+### 导航守卫
+- vue-router提供的导航守卫主要通过跳转或取消的方式守卫导航 
+1. 全局的
+   1. 全局前置守卫 router.beforeEach
+   ```
+   const router = createRouter({})
+   router.beforeEach((to,from)=>{
+      // 返回false以取消导航
+      return false
+   })
+   ```
+   2. 全局解析守卫 router.beforeResolve
+   - 每次导航时都会触发
+   - 是获取数据或执行其他任何操作(如果用户无法进入页面时你希望避免执行的操作)
+   3. 全局后置钩子 router.afterEach
+   - 与守卫不同 这些钩子不会接受next函数也不会改变导航本身
+   - 它们对于分析 更改页面标题 声明页面等辅助功能以及其他许多事情有用
+2. 单个路由独享
+   1. beforeEnter
+   - 只在进入路由时触发 不会在params query 或hash改变时触发 只有在从一个不同的路由导航时才会被处罚
+3. 组件级
+   - 在路由组件内直接定义路由导航守卫(传递给路由配置的)
+   1. beforeRouteEnter
+   - 在渲染该组件的对应路由被验证前调用
+   - 不能获取组件实例this 因为当守卫执行时 组件实例还没被创建
+   2. beforeRouteUpdate
+   - 在当前路由改变 但是该组件被复用时调用
+   - 此时组件已经挂载好了 导航守卫可以访问组件实例 this
+   3. beforeRouteLeave
+   - 在导航离开渲染该组件的对应路由时被调用
+   - 与beforeRouteUpdate一样 它可以访问组件实例this
+   - 这个离开守卫通常用来预防用户在还未保存修改前突然离开 该导航可以通过返回false取消
+
+### 不同的历史模式
+- 在创建路由实例时 history配置允许我们在不同的历史模式中进行选择
+> Hash模式
+- 使用createWebHashHistory()创建的
+- 它在内部传递的实际URL之前使用了一个哈希自负(#)
+> HTML5模式
+- 用createWebHistory()创建 推荐使用这个模式
+- 当使用这种历史模式时 Url会看起来很正常
+
+### 路由组件传参
+> 布尔模式
+- 当props设置为true时 route.params将被设置为组件的props
+
+### 重命名和别名
+- 在写redirect时 可以省略component配置 因为它从来没有被直接访问过 所以没有组件要渲染
+- 唯一例外的是钱套路有 如果一个路由记录有children和redirect属性 它也应该有component属性
+
+### 命名路由
+- 除了path之外 你还可以为任何路由提供name
+
+### 编程式导航
+- router.push方法会向history栈添加一个新的记录 当用户点击浏览器回退按钮时 会回到之前的URL
+- 点击<router-link>时 内部会调用这个方法 所以点击<router-link :to="...">相当于调用router.push(...)
+
+### 路由配置 sensitive和strict
+- 默认情况下所有路由不区分大小写 并且能匹配带有或不带有尾部斜线的路由 这种行为可以通过strict和sensitive选项来修改 它们可以应用在整个全局路由和当前路由
+
+### 带参数的动态路由匹配
+- 路径参数用冒号:表示
+- 除了$route.params之外 $route对象还公开 $route.query(如果URL中存在参数) $route.hash
+### router-view
+- 将显示与url对应的组件 可以把它放在任何地方 适应你的布局
+- 这里的<router-view>是一个顶层的router-view 它渲染顶层路由匹配的组件 同样 一个被渲染的组件也可以包含自己嵌套的<router-view>
+- 要将组件渲染到这个嵌套的router-view中 我们需要在路由中配置children
+- 通过app.use(router) 可以在任意组件中以this.$router的形式访问它 并且以this.$route的形式访问路由
+- this.$router与直接使用通过createRouter创建的router实例完全相同 使用this.$router的原因是 不想每个需要操作路由的组件中都导入路由
+### 组合式API基础
+> setup组件选项
+- 新的setup选项在组件被创建之前执行 一旦props被解析完成 它就将被作为组合式API的入口
+- 在setup中应该避免使用this 因为它不会找到组件实例 setuo的调用发生在data property,computed property或methods被解析之前 所以它们无法在setup中被获取
+- setup选项是一个接收props和context的组件 将setup返回的所有内容都暴露给组件的其余部分(计算属性 方法 生命周期钩子等等)以及组件的模版
+
+### 异步组件
+- 大型应用中 可能需要将应用分割成小一些的代码块 并且只在需要的时候才从服务器加载一个模块 为了实现这个效果 Vue有一个defineAsyncComponent方法
+```
+const {createApp,defineAsyncComponent} = Vue
+const app = createApp({})
+const AsyncComp = defineAsyncComponent(
+   ()=>
+      new Promise((resolve,reject)=>{
+         resolve({
+            template:'<div>async</div>'
+         })
+      })
+)
+app.component('async-example',AsyncComp)
+```
+- 此方法接受一个返回Promise的工厂函数 从服务器检索组件定义后 应调用Promise的resolve回调 也可以调用reject(reason)来表示加载失败
+> 与Suspense一起使用
+- 异步组件在默认情况下是可挂起的 这意味着如果它在父链中有一个<Suspense>它将被视为该<Suspense>的异步依赖 这种情况下 加载状态将由<Suspense>控制 组件自身的加载 错误 延迟和超时选项都将被忽略
+- 在其选项中指定suspensible:false 异步组件可以退出Suspense控制 并始终控制自己的加载状态
+
+### provide/inject
+- 无论组件层次结构有多深 父组件都可以作为其所有子组件的依赖提供者
+- 这个特性有两个部分：父组件有一个provide选项来提供数据 子组建有一个inject选项来开始使用这些数据
+- 要访问组件实例property 需要将provide转换为返回对象的函数 这使我们能够更安全地继续开发该组件 而不必担心可能更改/删除子组件所依赖的某些内容
+```
+app.component('todo-list',{
+   data(){
+      return{
+         todos:['Feed a cat','Buy tickets']
+      }
+   },
+   provide(){
+      return{
+         todoLength:this.todos.length
+      }
+   }
+})
+```
+> 处理响应式
+- 传递一个 ref property 或reactive对象给provide
+- 为provide的todoLength分配一个组合式API computed property
+
+### slot
+> 具名插槽
+- <slot>元素有一个特殊的attribute:name 通过它可以为不同的插槽分配独立的ID 由此决定内容应该渲染到什么地方 一个不带name的<slot>出口会带有隐含的名字default
+- 在向具名插槽提供内容时 可以在一个<template>元素上使用v-slot指令 并以v-slot的参数的形式提供其名称
+- v-slot只能添加在<template>上
+
+### 父级模版里的所有内容都是在父级作用域中编译的 子模版里所有内容都是在子作用域中编译的
+
+### 自定义事件
+- 与组件和prop一样 事件名提供了自动的大小写转换 如果在子组件中触发一个以camelCase(驼峰式命名)命名的事件 你可在父组件中添加一个kebab-case(短横线分隔命名)的监听器
+```
+this.$emit('myEvent')
+<my-component @my-event="doSomething"></my-component>
+```
+
+### 非prop的Attribute
+- 一个非prop的attribute是指传向一个组件 但是该组件没有相应props或emits定义的attribute 常见的示例包含class style和id attribute 可以通过$attrs property访问那些attribute
+
+### props
+> 规则
+- JS中对象和数组都是通过引用传入的
+- 作为一个通用规则 应该避免修改任何prop 包括对象和数组 因为这种做法无视了单向数据绑定 且可能会导致意料之外的结果
+> prop验证
+- 当prop验证失败时(开发环境构建版本的)Vue将会产生一个控制台的警告
+
+### 动态组件
+- 通过Vue的<component>元素加一个特殊的is attribute来实现
+```
+<component :is="currentTabComponent"></component>
+```
+- 上述 currentTabComponent可以包括
+1. 已注册组件的名字
+2. 一个组件选项对象
+### 解析DOM模版时的注意事项 kebab cased和camelCased属性
+- HTML attribute名不区分大小写 因此浏览器将所有大写字符解释称小写
+- 当在DOM模版中使用时驼峰prop名称和event处理器参数需要使用它们的kebab-cased(横线字符分隔)等效值
+### Vue3中的is
+- 当它用于原生HTML元素时 is的值必须以vue:开头 才可以被解释为Vue组件 这是避免和原声自定义元素混淆
+### Vue子组件向父组件通信
+```
+// 子组件
+<button @click = "$emit('enlargeText',0.1)">
+Enlarge Text
+</button>
+```
+- 当在父级组件监听这个事件时 可以通过$event访问到被抛出的这个值
+```
+// 父组件
+<blog-post @enlarge-text="postFontSize+=$event"></blog-post>
+```
+- 如果这个时间处理函数是一个方法 则这个值会作为第一个参数传入这个方法
+```
+<blog-post @enlarge-text="onEnlargeText"></blog-post>
+methods:{
+   onEnlargeText(enlargeAmount){
+      this.postFontSize+=enlargeAmount
+   }
+}
+```
+### Vue中的指令
+- 职责是 当表达式的值改变时 将其产生的连带影响 响应式地作用于DOM
+> 动态参数
+- 可以在指令参数中使用JS表达式 方法是用方括号括起来
+```
+<a v-bind:[attributeName]='url'></a>
+```
+- 这里的attributeName会被作为一个JS表达式进行动态求值 求得的值将作为最终参数来使用
+- 可以使用动态参数为一个动态的事件名绑定处理函数
+```
+<a v-on:[eventName]="doSometing"></a>
+```
+
+### Vue中的mount方法
+- 与大多数应用方法不同 mount不返回应用本身 
+- 相反 它返回根组件实例
+- 虽然没有完全遵循MVVM模型 但是Vue的设计也受到了它的启发 因此在文档中经常会使用vm(ViewModel的缩写)这个变量名表示组件实例
+
+### 组件实例property
+- 可以将用户定义的property添加到组件实例中 如methods props computed inject setup 组件实例的所有property 无论如何定义 都可以在组件的模版中访问
+- Vue还通过组件实例暴露了一些内置property 如$attrs和$emit 这些property都有一个$前缀 以避免与用户定义的property名冲突
+
+### Vue的内置API
+- Vue使用$前缀通过组件实例暴露自己的内置API 它还为内部property保留_前缀 
+
+### 生命周期钩子函数使用
+- 不要在选项property或回调上使用箭头函数 因为箭头函数没有this this会作为变量一直想上级词法作用域查找 直到找到为止 经常导致Uncaught TypeError:Cannot read property of undefined/Uncaught TypeError:this.myMethod is not a function
+
+### Vue组件与自定义元素的关系
+- Vue组件与自定义元素非常类似 是Web Components规范的一部分 Vue的组件设计(如插槽API)在浏览器原生支持该规范前就部分受到了它的影响
+- 它们之间主要的不同在于 Vue组件的数据模型是作为框架的一部分而设计的 而该框架为构建复杂应用提供了很多必要的附加功能 例如响应式模版和状态管理 这两者都没有被该规范所覆盖
+
+### 单文件组件<script setup>
+- 是在单文件组件(SFC)中使用组合式API的编译时语法躺 想必于简单的<script>语法 它具有更多优势
+1. 更少的样板内容 更简洁的代码
+2. 能够使用纯TS声明props和抛出事件
+3. 更好的运行时性能(其模版会被编译成与其同一作用域的渲染函数 没有任何中间代理)
+4. 更好的IDE类型推断性能(减少语言服务器从代码中抽离类型的工作)
+
+### Vue Test Utils
+- 是Vue.js官方的单元测试实用工具库
+### Vue Loader
+- 一个Webpack的loader 允许你以一种名为单文件组件(SFCs)的格式撰写Vue组件
+> 提供的酷炫特性
+1. 允许为Vue组件的每个部分使用其他的Webpack loader 例如在<style>的部分使用Sass和在<template>部分使用Pug
+2. 允许在一个.vue文件中使用自定义块 并对其运用自定义的loader链
+3. 使用webpack loader将<style>和<template>中引用的资源当作模块依赖来处理
+4. 为每个组件模拟出Scoped CSS
+5. 在开发过程中使用热重载来保持状态
+- 简而言之 webpack和Vue Loader的结合提供了一个现代 灵活且极其强大的前端工作流 来帮助撰写Vue.js应用
+### Vue Awesome
+- 一个基于Vue.js的强大的SVG图标组件 内置Font Awesome图标
 ### <router-view> Props
 >name
 - 如果<router-view>设置了name 则会渲染对应的路由配置中components下的相应组件
