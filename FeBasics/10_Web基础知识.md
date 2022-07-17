@@ -1,3 +1,7 @@
+### The Elm Architecture
+- Elm架构是一种用于构建交互式程序的模式 例如web应用程序和游戏
+- Elm架构在Elm中很简单 但在任何前端项目中都很有用 事实上 像Redux这样的项目已经受到The Elm Architecture的启发 所以可以看到这种模式的衍生品 
+
 ### Vite
 - 是一个web开发构建工具 由于其原生ES模块导入方式 可以实现闪电般的冷服务器启动
 ### unpkg

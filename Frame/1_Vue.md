@@ -1,3 +1,56 @@
+### defineComponent
+- 从实现上 defineComponent只返回传递给它的对象 但是就类型而言 返回的值有一个合成类型的构造函数 用于手动渲染函数 TSX和IDE工具支持
+> 用途
+1. 显示Vue Options提示
+- 这个API一般是在TS或者TSX文件中使用的
+- 没有使用defineComponent的情况下 IDE不会有任何Vue Options的提示
+- 用了defineComponent之后 IDE给出了相应的options提示
+- 背后的原理是利用TS定义了defineComponent参数类型实现的
+2. 给予正确的参数类型判断
+- 拿setup来说 defineComponent可以为setup函数的props穿参做出正确的类型推断
+- 如果没有使用defineComponent 是没有办法推断出来的需要自己显式的去定义类型
+3. 可返回一个合成类型的构造函数
+### Vuex
+- 状态存储是响应式的
+- 改变store中的状态的唯一途径就是显式提交(commit)mutation
+1. state
+> 在Vue组件中获取Vuex状态
+- 从store实例中读取状态最简单的方法就是在计算属性中返回某个状态
+- Vuex通过Vue的插件系统将store实例从根组件注入到所有的子组件里 且子组件能通过this.$store访问到
+> mapState辅助函数
+2. getter
+- Vuex允许在store中定义getter(可以认为是store的计算属性)
+- getter接受state作为其第一个参数
+> 通过属性访问
+- getter会暴露为store.getters对象
+- getter可以接受其他getter作为第二个参数
+- getter在通过属性访问时是作为Vue的响应式系统的一部分缓存其中
+> 通过方法访问
+- 可以通过让getter返回一个函数 来实现给getter传参 在对store里的数组进行查询时非常有用
+> mapGetters辅助函数
+- 仅仅是将store中的getter映射到局部计算属性
+3. mutation
+- 更改Vuex的store中的状态的唯一方法是提交mutation
+- Vuex中的mutation非常类似事件 每个mutation都有一个字符串的事件类型(type)和一个回调函数(handler) 这个回调函数是实际进行状态更改的地方 它会接受state作为第一个参数
+> 提交载荷(Payload)
+- 可以向store.commit传入额外的参数 即mutation的载荷(payload) 大多数情况下 载荷应该是一个对象 这样可以包含多个字段并且记录的mutation会更易读
+> 对象风格的提交方式
+- 提交mutation的另一种方式是直接使用包含type属性的对象 当使用对象风格的提交方式 整个对象都作为载荷传给mutation函数 
+> mutation必须是同步函数
+> 在组件中提交mutation
+- this.$store.commit('xxx')提交mutation 或使用mapMutations辅助函数将组建中的methods映射为store.commit调用
+4. Action
+> 与Mutation不同之处
+1. Action提交的是mutation 而不是直接变更状态
+2. Action可以包含任意异步操作
+- Action函数接受一个与store实例具有相同方法和属性的context对象 因此可以调用context.commit提交一个mutation 或者通过context.stat和context.getters获取state和getters
+- 实践中会经常用到ES2015的参数解构来简化代码
+> 分发Action
+- Action通过store.dispatch方法触发
+- 支持同样的载荷方法和对象方法进行分发
+> 在组件中分发Action
+- 组件中使用this.$store.diapatch('xxx')分发action或者使用mapActions辅助函数将组件的methods映射为store.dispatcj调用
+
 ### 实例property
 > $slots
 - 用来以编程方式访问通过插槽分发的内容 每个具名插槽都有其相应的property(例如:v-slot:foo中的内容将会在this.$slots.foo()中被找到) default property包括了所有没有被包含在具名插槽中的节点 或v-slot:defauly的内容
@@ -270,7 +323,14 @@ this.$emit('myEvent')
 ```
 
 ### 非prop的Attribute
-- 一个非prop的attribute是指传向一个组件 但是该组件没有相应props或emits定义的attribute 常见的示例包含class style和id attribute 可以通过$attrs property访问那些attribute
+- 一个非prop的attribute是指传向一个组件 但是该组件没有相应props或emits定义的attribute 常见的示例包含class style和id v-on监听器 attribute 可以通过$attrs property访问那些attribute
+- 当组件返回单个根节点时 非prop的attribute将自动添加到根节点的attribute中
+- 同样的规则也适用于事件监听器 
+> 禁用Attribute继承
+- 如果不希望组件的根组件继承attribute 可以在组件的选项中设置inheritAttrs:false
+- 禁用attribute继承的常见场景是需要将attribute应用于根节点之外的其他元素
+> 多个根节点上的Attribute继承
+- 与单个根节点组件不同 具有多个根节点的组件不具有自动attribute fallthrough(隐式贯穿)行为 如果未显式绑定$attrs 将发出运行时警告
 
 ### props
 > 规则
