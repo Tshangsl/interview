@@ -1,3 +1,76 @@
+### Node的path模块
+> 定义
+- path为Nodejs常用的内置模块 主要为了更加方便的处理文件和目录路径
+```
+let path = require('path')
+```
+- path模块根据node应用程序所在的系统环境不同而呈现出不同的默认操作 在windows操作系统中 path会根据windows的路径规范来操作
+1. path.extname(path)
+- 获取path对应扩展名
+```
+console.log(path.extname('text.config.html'))
+扩展名 .html
+path.extname('index')
+```
+2. path.join([...paths])
+- 路径合并 格式化path路径
+```
+var i = path.join('/a','/b','11.png') //i指a/b/11.png
+var i = path.join(__dirname,'../') //i指当前目录的上一级
+```
+- __dirname和__filename是不受node命令所属路径影响的 这两个命令是node的命令
+3. __dirname 获取当前文件所属目录的绝对路径
+```
+console.log(__dirname)
+// D:\node
+```
+4. __filename 获取当前文件的绝对路径
+```
+console.log(__filename)
+// D:\node\day.js
+```
+5. path.dirname()返回路径所在文件夹名称
+```
+path.dirname('/foo/bar/baz/asdf/quux')
+/foo/bar/baz/asdf
+```
+6. path.basename 返回path的最后一部分
+```
+path.basename('/foo/bar/baz/asdf/quux.html');
+// 返回 quux.html
+path.basename('/foo/bar/baz/asdf/quux.html',.html)
+// 返回quux
+```
+7. path.normalize 格式化path路径
+```
+path.normalize('/foo/bar/baz/asdf/quux/..')
+// 返回/foo/bar/baz/asdf
+```
+8. path.resolve cd命令
+```
+path.resolve('foo/bar','/tmp/file/','..','a/../subfile')
+相当于
+cd foo/bar
+cd /tmp/file/
+cd ..
+cd a/../subfile
+pwd
+```
+9. path.sep 获取文件路径的分隔符
+```
+'foo\\bar\\baz'.split(path.sep)
+returns
+['foo','bar','baz']
+```
+10. path.relative 返回从某个路径下到另一个路径的相对路径
+```
+path.relative('C:\\a\\b\\c','C:\\a\\d\\e')
+// returns
+'..\\..\\d\\e'
+path.relative('/data/a/b/c','/data/a/d/e')
+// returns
+'../../d/e'
+```
 ### Node的mysql模块
 > 定义
 - 是Node.js下专门用于操作mysql数据库的模块

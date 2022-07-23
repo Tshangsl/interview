@@ -9,3 +9,14 @@
 >attr()函数的结果
 1. 如果有相应的属性 返回指定属性值
 2. 如果没有相应的属性 返回值是undefined
+
+### jquery on()方法
+```
+$(document).ready(function(){
+    $('p').on('click',function(){
+        alert('被惦记')
+    })
+})
+```
+- on()方法在被选元素及子元素上添加一个或多个事件处理程序
+- 自jquery版本1.7起 on()方法是bind() live() delegate()方法的新的替代品

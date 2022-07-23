@@ -1,3 +1,18 @@
+### Bower 
+- 一个针对Web开发的包管理器 该工具主要用来帮助用户轻松安装CSS JS 图像等相关包 并管理这些包之间的依赖
+- 功能有些类似于Component 不同之处是 Component是围绕GitHub系统构建的 而Bower既可以管理基于本地资源的包 也可以管理基于git系统的包
+- 在Bower中 可以通过component.json文件来定义包的名称 版本 代码中的主要元素 版本之间的依赖关系等
+
+### IVIEW
+- Iview是一套基于Vue.js的开源UI组件库 主要服务于PC界面的中后台产品
+
+### Fiddler
+- 一个HTTP写意调试代理工具 能够记录并检查电脑和互联网之间的http通讯 设置断点 查看所有进出Fiddler的数据(指cookie html js css等文件) Fiddler比其他网络调试器更加简单 它暴露HTTP通讯且提供了一个用户友好的格式
+
+### JSP
+> 定义
+- 全称JavaServer Pages是由Sun公司主导创建的一种动态网页技术标准 JSP部署于网络服务器上 可以响应客户端发送的请求 并根据请求内容动态的生成HTML XML 或其他格式文档的Web网页 然后返回给请求者 JSP技术以Java语言作为脚本语言 为用户的HTTP请求提供服务 并能和服务器上的其他Java程序共同处理复杂的业务需求
+
 ### The Elm Architecture
 - Elm架构是一种用于构建交互式程序的模式 例如web应用程序和游戏
 - Elm架构在Elm中很简单 但在任何前端项目中都很有用 事实上 像Redux这样的项目已经受到The Elm Architecture的启发 所以可以看到这种模式的衍生品 

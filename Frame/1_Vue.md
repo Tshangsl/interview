@@ -1,4 +1,249 @@
+### getCurrentInstance
+> 用途
+- 获取当前组件的实例 上下文来操作router和vuex等 由vue提供 按需引入 import {getCurrentInstance} from 'vue'
+- 获取组件上下文
+   1. const {ctx} = getCurrentInstance() 
+   - 这种方式只能在开发环境下使用 生产环境下的ctx将访问不到
+   2. const {proxy} = getCurrentInstance()
+   - 此方法在开发环境以及生产环境下都能放到组件上下文对象(推荐) ctx中包含了组件中由ref和reactive创建的响应式数据对象 以及以下对象及方法 proxy.$attrs proxy.$data proxy.$el proxy.$emit proxy.$forceUpdate proxy.$nextTick proxy.$options proxy.$parent proxy.$props proxy.$refs proxy.$root proxy.$slots proxy.$watch
+
+### Vue.config.js
+- vue-cli3脚手架搭建完成后 项目目录中没有vue.config.js文件 需要手动创建
+> 创建vue.config.js
+- vue.config.js(相当于之前webpack.config.js)是一个可选的配置文件 如果项目的根目录存在这个文件 那么它会被@vue/cli-service自动加载 也可以使用package.json中的Vue字段 但这种写法需要严格遵照JSON格式来写
+> vue.config.js配置
+- 这个文件应该导出一个包含了选项的对象
+```
+//这里webpack配置会和公共的webpack.config.js进行合并
+module.exports = {
+
+}
+```
+> 配置选项
+1. publicPath
+- Type:string Default:'/' 部署应用包时的基础URL 用法和webpack本身的output.publicPath一直 这个值也可以被设置为空字符串('')或是相对路径('./') 这样所有的资源都会被链接为相对路径 这样打出来的包可以被部署在任意路径
+2. outputDir
+- Type:string Default:'dist' 输出文件目录 当运行Vue-cli-service build(npm run build)时生成的生产环境构建文件的目录 注意目标目录在构建之前就被清除(构建时传入-no-clean可关闭该行为)
+3. assetsDir
+- Type:string Default:'' 放置生成的静态资源(js css img fonts)的目录 从生成的资源覆写filename或chunkFilename时 assetsDir会被忽略
+4. indexPath
+- Type:string Default:'index.html' 指定生成的index.html的输出路径(相对于outputDir)也可以是一个绝对路径
+5. filenameHashing
+- Type:boolean Default:true 默认情况下生成的静态资源在它们的文件名中包含了hash以便更好的控制缓存 然而这也要求index的HTML是被Vue CLI自动生成的 如果你无法使用Vue CLI生成的index HTML 可以通过将这个选项设为false来关闭文件名哈希
+6. pages
+- Type:Object Defaults:undefined 在muti-page(多页)模式下构建应用 每个page应该有一个对应的JS入口文件 其值应该是一个对象 对象的key是入口的名字 value是一个置顶了entry,template,filename,title和chunks的对象(除了entry之外都是可选的)或一个指定其entry的字符串
+- 在多页应用模式下构建时 webpack配置会包含不一样的插件(这时会存在多个html-webpack-plugin和preload-webpack-plugin的实例)
+```
+// 用于多页配置 默认是undefined
+pages:{
+   index:{
+      // page的入口文件
+      entry:'src/index/main.js'
+      // 模版文件
+      template:'public/index.html'
+      // 在dist/index.html的输出文件
+      filename:'index.html'
+      // 当使用页面title选项时
+      // template中的title标签需要的是<title><%= htmlwebpackPlugin.options.title%></title>
+      title:'Index Page'
+      // 在这个页面中包含的块 默认情况下会包含
+      // 提取出来的通用chunk和vendor chunk
+      chunks['chunk-vendors','chunk-common','index']
+   }
+}
+```
+### Vue多页面开发
+> 需求
+- Vue是单页面应用 对多页面的页面间的相互跳转没有过渡效果 难以维护 当一个应用越来越大时 考虑到多页面应用
+> 对比
+1. 多页面应用模式(MPA)由多个完整页面构成 单页应用模式(SPA)由一个外壳页面和多个页面片段构成
+2. 多页应用模式(MPA)页面之间的跳转是从一个页面跳转到另一个页面 单页应用模式(SPA)页面片段之间的跳转是把一个页面片段删除或隐藏 加载另一个页面片段并显示出来 这是片段之间的模拟跳转 没有离开壳页面
+3. 多页应用模式(MPA)整页刷新 单页应用模式(SPA)页面片段局部刷新
+4. 多页应用模块(MPA)跳转后公共资源重新加载 单页应用模式(SPA)跳转后公共资源不重新加载
+5. url模式
+```
+MPA
+http://xxx/page1.html
+http://xxx/page2.html
+```
+```
+SPA
+http://xxx/shell.html#page1
+http://xxx/shell.html#page2
+```
+6. 多页面应用模式(MPA)页面间切换加载慢 不流畅 用户体验差 特别是在移动设备上 但页应用模式(SPA)页面片段间切换快 用户体验好 包括在移动设备上
+7. 多页应用模式(MPA)无法实现转场动画 单页应用模式(SPA)容易实现转场动画
+8. 多页应用模式(MPA)页面间传递数据依赖URL cookie或者localStorage实现麻烦 单页应用模式(SPA)因为在一个页面内 页面片段间传递数据很容易实现
+9. 多页应用模式(MPA)搜索引擎优化(SEO)可以直接做 单页应用模式需要单独方案做 有些麻烦
+10. 多页应用模式(MPA)特别适合对搜索引擎友好的网站 单页应用模式对体验要求高的应用 特别是移动应用
+11. 多页应用模式(MPA)开发难度低一些框架选择容易 单页应用模式(SPA)开发难度高一些 需要专门的框架降低这种模式的开发难度
+> 用Vue3构建多页面应用
+- Vue工程化开发时依赖于webpack 而webpack是将所有的资源整合到一块后形成一个html文件一堆js文件 如果用vue实现多页面应用 就需要对他的依赖进行重新配置 也就是修改webpack的配置文件
+> Vue多页面开发步骤
+1. 进入\build\webpack.base.conf.js目录下 在module.exports的域里 找到entry在那里配置多个入口
+2. 对开发环境 run dev里进行修改 打开\build\webpack.dev.conf.js文件 在module.exports那里找到plugins 在chunks那里的app指的是webpack.base.conf.js的entry那里与之对应的变量名 chunks的作用是每次编译 运行时每个入口都会对应一个entry 如果没写则引入所有页面的资源
+3. 对run build也就是编译环境进行配置
+4. 打开/build/webpack.prod.conf.js文件
+5. 在index.html的同级目录下创建one.html与two.html
+### Vuex命名空间namespace
+> 需求
+- 默认情况下 模块内部的action mutation和getter是注册在全局命名空间的 这样使得多个模块能够对同一mutation或action作出响应 如果希望模块具有更高的封装度和复用性 要用到命名空间
+1. 使模块成为一个命名空间
+- 在单个模块中通过添加namespace:true的方式使其成为带命名空间的模块
+```
+const moduleA = {
+   namespaced:true,
+   state:{
+      count:10,
+   },
+   getters:{},
+   mutations:{},
+   actions:{}
+}
+```
+2. 组件中如何获取到带有命名空间moduleA中的state数据
+   1. 基本方式
+   ```
+   this.$store.state.moduleA.countA
+   ```
+   2. mapState辅助函数方式
+   ```
+   ...mapState({
+      count:state=>state.moduleB.countB
+   })
+   ```
+3. 组件中调用命名空间模块中的getters
+   1. 
+   ```
+   commonGetter(){
+      this.$store.getters['moduleA/moduleAGetter']
+   }
+   ```
+   2. 
+   ```
+   ...mapGetters('moduleA',['moduleAGetter']) 次数的moduleA不是以前缀的形式出现
+   ```
+   3. 
+   ```
+   ...mapState({
+      paramGetter:'moduleA/moduleAGetter'
+   })
+   ```
+### Vue事件总线EventBus
+> 定义
+- EventBus又称为事件总线 在Vue中可以使用EventBus来作为沟通桥梁的概念 就像是所有组件共用相同的事件中心 可以向该中心注册发送事件或接收事件 所有组件都可以上下平行地通知其他组件 但也就是太方便所以如果使用不慎 就会造成难以维护的灾难 因此才需要更完善的Vuex作为状态管理中心 将通知的概念上升到共享状态层次
+> 使用
+1. 初始化
+- 首先需要创建事件总线并将其导出 以便其他模块可以使用或者监听它 可以通过两种方式来处理
+   1. 新创建一个.js文件 比如event-bus.js
+   ```
+   // event-bus.js
+   import Vue from 'vue'
+   export const EventBus = new Vue()
+   ```
+   - 实质上EventBus是一个不具备DOM的组件 它具有的仅仅只是它的实例方法 因此它非常轻便
+   2. 可以直接在项目的main.js初始化EventBus
+   ```
+   Vue.prototype.$EventBus = new Vue()
+   ```
+   - 这种方式初始化的EventBus是一个全局的事件总线
+- 创建EventBus 接下来要在组件中加载它 并且调用同一个方法 就如在父子组件中互相传递消息一样
+2. 发送事件
+```
+<template>
+   <button @click="sendMsg()"><button>
+</template>
+<script>
+import {EventBus} from '../event-bus.js'
+export default{
+   methods:{
+      sendMsg(){
+         EventBus.$emit('aMsg','来自A页面的信息')
+      }
+   }
+}
+</script>
+```
+3. 接收事件
+```
+<template>
+   <p>{{msg}}</p>
+</template>
+<script>
+import {
+   EventBus
+} from '../event-bus.js'
+export default{
+   data(){
+      return{
+         msg:''
+      }
+   },
+   mounted(){
+      EventBus.$on('aMsg',(msg)=>{
+         this.msg = msg;
+      })
+   }
+}
+</script>
+```
+   - 这里主要用到两个方法
+   1. 发送消息
+   ```
+   EventBus.$emit(channel:string,callback(payload1,..))
+   ```
+   2. 监听接收消息
+   ```
+   EventBus.$on(channel:string,callback(payload1,..))
+   ```
+   > 使用不当的灾难
+   1. Vue是单页面应用 如果在某一个页面刷新后 与之相关的EventBus会被移除 导致业务走不下去 
+   2. 如果业务有反复操作的页面 EventBus在监听时就会触发很多次 
+4. 移除事件的监听
+```
+import{
+   eventBus
+} from './event-bus.js'
+EventBus.$off('aMsg',{})
+```
+- 也可以使用EventBus.$off('aMsg')来移除应用内所有对此某个事件的监听 或者直接调用EventBus.$off()移除所有事件频道 不需要添加任何参数
+> 全局EventBus
+- 它的工作原理是发布/订阅方法 通常称为Pub/Sub
+1. 创建全局EventBus
+```
+var EventBus = new Vue();
+Object.defineProperties(Vue.prototype,{
+   $bus:{
+      get: function(){
+         return EventBus
+      }
+   }
+})
+```
+- 在这个特定的总线中使用两个方法$on和$emit 一个用于创建发出的事件$emit 一个用于订阅$on
+```
+var EventBus = new Vue();
+this.$bus.$emit('nameOfEvent',{...pass some event data})
+this.$bus.$on('nameOfEvent',($event)=>{
+
+})
+```
+- 然后可以在某个Vue页面使用this.$bus.$emit('sendMsg','web')另一个页面使用
+```
+this.$bus.$on('sendMessage',function(value){
+   console.log(value)
+})
+```
+- 同时也可以使用this.$bus.$off(sendMsg)移除事件监听
 ### defineComponent
+- defineComponent函数 只是对setup函数进行封装 返回options的对象
+```
+export function defineComponent(options:unknown){
+   return isFunction(options)?(setup:options):options
+}
+```
+- defineComponent最重要的是在TS下给予了组件正确的参数类型推断
+
 - 从实现上 defineComponent只返回传递给它的对象 但是就类型而言 返回的值有一个合成类型的构造函数 用于手动渲染函数 TSX和IDE工具支持
 > 用途
 1. 显示Vue Options提示
