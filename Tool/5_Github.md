@@ -325,6 +325,25 @@ git push origin :branch-name
 - 各分支都有自己新的commit 
 - develop新增需求a feat:a
 - feat新增需求b feat:b
+### git restore
+### git config
+### mac电脑下查看.git文件
+- git使用git.config指令来指定与git相关的配置
+- config配置有system级别 global(用户级别) local(当前仓库)三个级别 三个设置范围system>global>local 底层配置会覆盖顶层设置 分别使用--system/global/local可以定位到配置文件
+1. git config --list 查看git的配置列表
+2. 命令行配置
+```
+git config --global user.name 'username'
+git config --global user.email 'email'
+```
+- --global表示全局 即当前用户都有效 该配置会出现在～/.gitconfig文件中 ~表示当前用户的目录
+- 不加 --global 是局部的 局部只对当前仓库生效 它的配置信息会在当前仓库根目录/.git/config文件下
+- 局部变量覆盖全局变量和编程语言中的变量关系是一致的
+3. 命令行修改
+```
+git config --replace-all user.name 'name'
+git config --replace-all user.email 'email'
+```
 ### git本地新建分支并提交到远程仓库
 1. 建立本地仓库
 - 查看当前项目根目录中有没有.git文件(隐藏文件) 如果没有 右键 git bash here 输入git init建立本地仓库
