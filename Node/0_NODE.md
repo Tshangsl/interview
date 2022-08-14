@@ -1,4 +1,5 @@
 ### Node的path模块
+<<<<<<< HEAD
 > 定义
 - path为Nodejs常用的内置模块 主要为了更加方便的处理文件和目录路径
 ```
@@ -71,6 +72,22 @@ path.relative('/data/a/b/c','/data/a/d/e')
 // returns
 '../../d/e'
 ```
+=======
+> 用途
+- path模块提供了用于处理文件和目录的路径的实用工具
+- 在Windows操作系统上运行时 path模块将假定正在使用Windows样式的路径
+> 引入path模块
+```
+const path = require('path')
+```
+> 方法
+1. path.extname(path)
+- 返回path的扩展名 即path的最后一部分中从最后一次出现的.字符到字符串的结尾
+- 如果path的最后一部分没有.或者除了path的基本名称的第一个字符之外没有.这个字符 则返回空字符串
+2. path.join([...paths])
+- 使用特定于平台的分隔符作为定界符将所有给定的path片段连接在一起 然后规范化生成的路径
+- 零长度的path片段被忽略 如果连接的路径字符串是零长度字符串 则返回. 表示当前工作目录 Windows系统\
+>>>>>>> 6a7c897353547a7898ce4dc6bfa8c553d5e5c32a
 ### Node的mysql模块
 > 定义
 - 是Node.js下专门用于操作mysql数据库的模块
