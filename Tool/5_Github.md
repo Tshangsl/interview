@@ -725,3 +725,53 @@ git push [remote name] :refs/tags/[tag name]
 3. 如果这个文件已经提交 那么就是安全的 如果被修改了 且没有提交 则不安全
 - 用git checkout -b <newbranch> 创建并切换到一个新分支总是安全的 没有文件被创建 没有文件被删除 没有文件被更新 索引也没有任何改变
 - 使用git checkout -b <newbranch> <start_point>不一样 git会应用上述的安全检查规则
+### git获取commit id
+- 获取完整的commit id
+```
+git rev-parse HEAD
+```
+- 获取short commit id
+```
+git rev-parse --short HEAD
+```
+### commit id
+- commit id是用来唯一标识每一个commit的 使用git log命令可以看到一大堆hash化的commit-id
+- git的原子粒度最细就到commit id 
+- 同一次commit里有两个文件改动 想分别进行处理 是没有办法的 git管理的粒度不到这里
+> Head
+- git操作时要有Head的概念 Head就是一个指针 指向一个commit id 
+- 你以为head指向的是一个branch 实际底层也是指向这个branch的最后 也就是最新的那一个commit id
+- Head并非只能指向一个branch最新的commit id 它可以指向该分支上的任何一个commit id
+> checkout
+>reset
+>revert
+### 使用git stash暂存文件
+- 将本地改动暂存起来
+```
+git stash
+```
+- 将本地改动暂存起来并添加备注
+```
+git stash save 'message'
+```
+- 切换到其他分支 切换回来
+- 查看所有暂存列表
+```
+git stash list
+```
+- 恢复stash的修改 将之前暂存的修改恢复到工作区
+```
+git stash pop
+```
+- 应用对应的stash
+- 使用该条命令 不会清空已有的stash的列表项 并能应用到当前的工作区 不需要这个缓存的话 再手动清除
+```
+git stash apply stash@${num}
+```
+### 配置git alias提升效率
+```
+git config --global alias.<简化的字符> 原是命令
+```
+- --global是全局参数 配置一次后 这些命令可以适用这台电脑下所有仓库
+- 这些命令实际上更新了全局的.gitconfig文件 该文件用来保存全局的git配置
+- 除了使用命令修改 也可以直接修改该文件.gitconfig的alias项来设置别名
