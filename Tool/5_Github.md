@@ -775,3 +775,19 @@ git config --global alias.<简化的字符> 原是命令
 - --global是全局参数 配置一次后 这些命令可以适用这台电脑下所有仓库
 - 这些命令实际上更新了全局的.gitconfig文件 该文件用来保存全局的git配置
 - 除了使用命令修改 也可以直接修改该文件.gitconfig的alias项来设置别名
+### 远程新建分支拉到本地 本地修改后提交
+1. 远程新建origina
+2. 本地在其他分支上
+```
+git pull origin origina:origina
+```
+3. 本地新建origina分支 内容是远程的origina分支 此时本地origina分支和远程的origina分支没有关联
+4. 修改后add commit后需要使用
+```
+git push origin origina:origina
+```
+- 命令将本地修改推到远程 并与远程对应分支创建关联 此时再使用git branch -vv可以看到本地分支已经与远程对应分支关联
+### 本地新建分支并推到远程 远程同步建立相关分支并和本地分支管理
+1. git checkout -b locala
+2. 修改完 add commit
+3. git push origin locala:locala 修改推到远程 远程新建相关分支 并且本地分支与远程对应分支关联
