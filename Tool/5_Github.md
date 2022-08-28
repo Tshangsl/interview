@@ -638,4 +638,90 @@ git tag -d 标签名
 ```
 git push origin:refs/tags/标签名
 ```
-
+### 重命名远程仓库
+```
+git remote rename [old-name] [new-name]
+```
+### 从远端拉取
+```
+git pull <远程主机名> <远程分支名>:<本地分支名>
+```
+- 取回origin主机的master分支 与本地的master分支合并
+```
+git pull origin master:master
+```
+- 如果远程分支是与当前分支合并 即当前为master分支 则冒号后面的部分可以省略
+### 推送到远端仓库
+```
+git push <远程主机名><本地分支名>:<远程分支名>
+```
+- 如果省略远程分支名 则表示将本地分支推送与之存在追踪关系的远程分支(通常两者同名)如果该远程分支不存在则会被新建
+- 下面这条命令表示 将本地的master分支推送到origin主机的master分支 如果后者不存在 则会被新建
+```
+git push origin master
+```
+- 如果当前分支与多个主机存在追踪关系 则可以使用-u选项指定一个默认主机 这样后面就可以不加任何参数使用git push 
+```
+Branch master set up to track remote branch master from [remote-name]
+```
+- 如果远程主机的版本比本地版本新 推送时Git会报错 要求先在本地做git pull合并差异 然后再推送到远程主机 这时如果一定要推送 可以使用--force选项
+- 下面命令使用--force选项 导致远程主机上更新的版本被覆盖 除非很确定要这样做 否则应该尽量避免使用--force选项
+```
+git push --force origin
+```
+### 取消关联远端仓库
+- 移除远程仓库 不再关联
+```
+git remote rm [remote-name]
+```
+### 列出所有本地分支
+- -r选项 可以用来查看远程分支 
+- -a选项 查看所有分支
+- -vv选项查看所有跟踪分支
+- --merged选项查看哪些分支已经合并到当前分支
+- --no-merged选项查看其他分支
+```
+git branch
+```
+### 创建标签
+- 后面可跟commit id用来给过去的commit打标签
+```
+git tag [tag name]
+```
+- 加-m参数 添加存储在标签中的信息
+```
+git tag -a [tag name]
+```
+### 推送标签到远程仓库
+- 推送标签
+```
+git push [remote name] [tagname]
+```
+- 推送大量标签
+```
+git push [remote name] --tags
+```
+### 在特定的标签上创建一个新分支
+```
+git checkout -b [branchname] [tagname]
+```
+### 删除标签
+- 删除本地标签
+```
+git tag -d [tagname]
+```
+- 删除远程仓库标签
+```
+git push [remote name] :refs/tags/[tag name]
+```
+### git checkout branch2
+- 这条命令对工作区做了什么
+1. 对于每一个在分支1但是不在分支2的文件 git会删除它们
+2. 对于每一个在分枝2但是不在分支1的文件 git会创建它们(用合适的内容)
+3. 对于每一个既在分支1又在分支2的文件 如果版本不同 那么git会更新工作区的文件 使之与分支2的版本匹配
+- 上面每一步都有可能会破坏当前的工作区(工作区和暂存区对每个分支是共用的)
+1. 对于1 删除一个文件 如果这个文件在工作区1的版本和它在分支1的版本是一致的 那么删除它就是安全的 如果你修改了它 还没有提交 那么删除就是不安全的
+2. 对于2 创建一个文件 如果工作区还不存在这个文件 那就是安全的 如果工作区已经有这个文件 但是内容是错的 那么就不安全
+3. 如果这个文件已经提交 那么就是安全的 如果被修改了 且没有提交 则不安全
+- 用git checkout -b <newbranch> 创建并切换到一个新分支总是安全的 没有文件被创建 没有文件被删除 没有文件被更新 索引也没有任何改变
+- 使用git checkout -b <newbranch> <start_point>不一样 git会应用上述的安全检查规则
