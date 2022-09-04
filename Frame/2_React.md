@@ -1,7 +1,5 @@
 最新token
 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
-
-
 [http]
     proxy = http://127.0.0.1:7890
 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
