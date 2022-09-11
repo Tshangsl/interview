@@ -6,6 +6,487 @@ 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
 
 git remote set-url origin https://<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>@github.com/<xiaoli6>/<interview>.git
 
+### 元素和组件
+### JSX
+- javascript的语法扩展
+- jsx可以很好地描述ui应该呈现出它应有交互的本质形式
+- jsx可能会使人联想起模版语言 但它具有javasript的全部功能
+- jsx可以生成react元素
+### JSX也是一个表达式
+- 在编译之后 JSX表达式会被转为普通Javascript函数调用 并且对其取值后得到JS对象
+- 可以在if语句和for循环的代码块中使用JSX 将JSX赋值给变量 把JSX当作参数传入 以及从函数中返回JSX
+### JSX特定属性
+1. 可以通过使用引号 来将属性值指定为字符串字面量
+```
+const element = <div tabIndex="0"></div>
+```
+2. 可以使用大括号 来在属性值中插入一个JS表达式
+<!-- ```
+const element = <img src={user.avatarUrl}></img>;
+``` -->
+- 在属性中嵌入JS表达式时 不要在大括号外面加上引号 应该仅使用引号(对于字符串值)或大括号(对于表达式)中的一个 对于同一属性 不能同时使用这两种符号
+### 命名
+- 因为JSX语法上更接近JS而不是HTML 所以React DOM使用camelCase(小驼峰命名)来定义属性的名称 而不使用HTML属性名称的命名约定
+- 如JSX里的class变成了className
+### 使用JSX指定子元素
+- 假如一个标签里面没有内容 可以使用/>来闭合标签 就像XML语法一样
+```
+const element = <img src={user.avatarUrl} />
+```
+- JSX标签里面能够包含很多子元素
+```
+const element = (
+    <div>
+        <h1>hello</h1>
+        <h2>Good to see you here</h2>
+    </div>
+)
+```
+### JSX防止注入
+- 可以安全地在JSX当中插入用户输入内容
+```
+const title = response.potentiallyMaliciousInput;
+<!-- 直接使用是安全的 -->
+const element = <h1>{title}</h1>
+```
+- React DOM在渲染所有输入内容之前 默认会进行转义 它可以确保在你的应用中 永远不会注入那些并非自己明确编写的内容 所有的内容在渲染之前都被转换成了字符串 这样可以有效防止XSS(cross-site-scripting 跨站脚本)攻击
+### JSX表示对象
+- Babel会把JSX转译成一个名为React.createElement()函数调用
+- 以下两种示例代码完全等效
+```
+const element = (
+    <h1 className="greeting">
+    Hello
+    </h1>
+)
+const element = React.createElement(
+    'h1',
+    {className:'greeting'},
+    'Hello'
+)
+```
+- React.createElement会预先执行一些检查 以帮助你编写无错代码 但实际上它创建了一个这样的对象
+```
+const element = {
+    type:'h1',
+    props:{
+        className:'greeting',
+        children:'Hello'
+    }
+}
+```
+- 这些对象被称为React元素 它们描述了你希望在屏幕上看到的内容 React通过读取这些对象 然后使用它们来构建DOM以及保持随时更新
+### 元素渲染
+- 元素是构成React应用的最小砖块
+- 元素描述了你在屏幕上想看到的内容
+```
+const element = <h1>Hello</h1>
+```
+- 与浏览器的DOM元素不同 React元素是创建开销极小的普通对象 React DOM会负责更新DOM来与React元素保持一致
+### 将一个元素渲染为DOM
+- 想要将一个React元素渲染到根DOM节点中 只需把它们一起传入ReactDOM.render()
+### 更新已渲染的元素
+- React元素是不可变对象 一旦被创建 就无法更改它的子元素或属性
+### React只更新它需要更新的部分
+### 组件&Props
+- 组件允许你将UI拆分为独立可复用的代码片段 并对每个片段进行独立构思
+- 组件 从概念上类似于JS函数 它接受任意的入参(即props) 并返回用于描述页面展示内容的React元素
+### 组件名称必须以大写字母开头
+- React会将小写字母开头的组件视为原生DOM标签
+### 组件
+- 建议从组件自身的角度命名props 而不是依赖于调用组件的上下文命名
+### props的只读性
+- 组件无论是使用函数声明还是通过class声明 都绝不能修改自身的props
+- React非常灵活 但它也有一个严格的规则
+- 所有React组件都必须像纯函数一样保护它们的props不被更高
+### state&生命周期
+- State与props类似 但是state是私有的 并且完全受控于当前组件
+- 每次组件更新时 组件内的render方法都会被调用 但只要在相同的DOM节点中渲染<Clock /> 就仅有一个Clock组件的class实例被创建使用 这就使得我们可以使用如state或生命周期方法等很多其他特性
+> 正确使用state
+1. 不要直接修改State
+- 构造函数是唯一可以给this.state赋值的地方
+2. State的更新可能是异步的
+- 出于性能考虑 React可能会把多个setState()调用合并成一个调用
+- 因为this.props和this.state可能会异步更新 所以不要依赖他们的值来更新下一个状态
+- 解决这个问题 可以让setState()接收一个函数而不是一个对象 这个函数用上一个state作为第一个参数 将此次更新被应用时的props做为第二个参数
+```
+this.setState((state,props)=>{
+    counter:state.counter+props.increment
+})
+```
+- 使用普通的函数同样可以
+```
+this.setState(function(state,props){
+    return{
+        counter:state.counter+props.increment
+    }
+})
+```
+3. State的更新会被合并
+- 当你调用setState()时 React会把你提供的对象合并到当前的state
+### 自上而下/单向的数据流
+- 任何的state总是所属于特定的组件 而从该state派生的任何数据或UI只能影响树中低于它们的组件
+- 在React应用中 组件是有状态组件还是无状态组件属于组件实现的细节 它可能会随着时间的推移而改变 可以在有状态的组件中使用无状态的组件 反之亦然
+### 事件处理
+- React元素的事件处理和DOM元素的很相似 但是有一点语法上的不同
+1. React事件的命名采用小驼峰式(camelCase) 而不是纯小写
+2. 使用JSX语法时你需要传入一个函数作为事件处理函数 而不是一个字符串
+3. 不能通过返回false的方式阻止默认行为 必须显式使用preventDefault
+- e是一个合成事件 React根据W3C规范来定义这些合成事件 所以不需要担心跨浏览器的兼容性问题
+- 使用React时 一般不需要使用addEventListener为已创建的DOM元素添加监听器 事实上 只需要在该元素初始渲染时添加监听器即可
+### JSX回调函数中的this
+- 在Javascript中 class的方法默认不会绑定this 如果忘记绑定this.handleClick并把它传入了onClick 当你调用这个函数时 this的值为undefined
+- 这不是React特有的行为 这其实与JS函数工作原理有关 通常情况下 如果你没有在方法后面添加() 例如onClick={this.handleClick} 你应该为这个方法绑定this
+### 向事件处理程序传递参数
+1. 箭头函数
+```
+<button onClick={(e)=>this.deleteRow(id,e)}>Delete Row</button>
+```
+2. Function.prototype.bind
+```
+<button onClick={this.deleteRow.bind(this,id)}>Delete Row</button>
+```
+- 在这两种情况下 React的事件对象e会被作为第二个参数传递 如果通过箭头函数的方式 事件对象必须显式的进行传递 而通过bind方式 事件对象以及更多的参数将会被隐式的进行传递
+### 条件渲染
+1. if
+- React中的条件渲染和JavaScript中的一样 使用JS运算符if或条件运算符去创建元素来表现当前的状态 然后让React根据它们来更新UI
+> 元素变量
+- 可以使用变量来储存元素 它可以帮助你有条件地渲染组件的一部分 而其他的渲染部分不会因此而改变
+2. 与运算符 &&
+- 通过花括号包裹代码 可以在JSX中嵌入任何表达式 这也包括JS中的逻辑与(&&)运算符 它可以很方便地进行元素的条件渲染
+3. 三目运算符
+- 另一种内联条件渲染的方法是使用Javascript中的三目运算符 condition?true:false
+4. 阻止组件渲染
+- 极少数情况下 希望能隐藏组件 即使它已经被其他组件渲染 若要完成此操作 可以让render方法直接返回null 而不进行任何渲染
+- 在组件的render方法中返回null并不会影响组件的生命周期
+### 列表&key
+> 渲染多个组件
+- 可以通过使用{} 在JSX内构建一个元素集合
+- map函数
+> key
+- key帮助React识别哪些元素改变了 比如被添加或删除 应当给数组中每一个元素赋予一个确定的标识
+- 一个元素的key最好是这个元素在列表中拥有一个独一无二的字符串 通常用数据中的id作为元素的key
+> 用key提取组件
+- 元素的key只有放在就近的数组上下文中才有意义
+- 一个好的经验法则是 在map()方法中的元素需要设置key属性
+> key只是在兄弟节点之间必须唯一
+- 数组元素中使用的key在其兄弟节点之间应该是独一无二的 然而 它们不需要是全局唯一的 当我们生成两个不同的数组 可以使用相同的key值
+- key会传递信息给React 但不会传递给你的组件 如果你的组件中需要使用key属性的值 请用其他属性吗显式传递这个值
+> 在JSX中嵌入map()
+- JSX允许在大括号中嵌入任何表达式 可以内联map()返回的结果
+### 表单
+- 在React里 HTML表单元素的工作方式和其他的DOM元素有些不同 这是因为表单元素通常会保持一些内部state 例如这个纯HTML表单只接受一个名称
+```
+<form>
+    <label>
+        名字：
+        <input type="text" name="name"/>
+    </label>
+    <input type="submit" value="提交"/>
+```
+- 此表单具有默认的HTML表单行为 即在用户提交表单后浏览到新页面 
+> 受控组件
+- 在HTML中 表单元素(如<input><textarea><select>)之类的表单元素通常自己维护state 并根据用户输入进行更新
+- 在React中 可变状态(mutable state)通常保存在组件的state属性中 并且只能通过使用setState()来更新
+- 把两者结合起来 使React的state成为唯一数据源 渲染表单的React组件还控制着用户输入过程中表单发生的操作 被React以这种方式控制取值的表单输入元素就叫做受控组件
+> textarea
+- 在HTML中 <textarea>元素通过其子元素定义其文本
+```
+<textarea>
+    textarea中的文本
+</textarea>
+```
+- 在React中 <textarea>使用value属性代替 这样 可以使得使用<textarea>的表单和使用单行input的表单非常类似
+> select标签
+- 在HTML中 <select>创建下拉列表标签 
+- React并不会使用selected属性 而是根select标签上使用value属性 这在受控组件中更便捷 只需在根标签中更新它
+> 文件input标签
+- 在HTML中 <input type="file">允许用户从存粗设备中选择一个或多个文件 将其上传到服务器 或通过使用JS的File API进行控制
+- 因为它的value只读 所以它是React中的一个非受控组件
+> 处理多个输入
+- 当需要处理多个input元素时 我们可以给每个元素添加name属性 并让处理函数根据event.target.name的值选择要执行的操作
+> 受控输入空值
+- 在受控组件上指定value的prop会阻止用户更改输入 如果你指定了value 但输入仍可编辑 则可能是意外将value设置为undefined或null
+### 状态提升
+- 在React中 将多个组件中需要共享的state向上移动到它们的最近共同父组件中 便可实现共享state 
+- 在React应用中 任何可变数据应当只有一个相对应的唯一数据源 
+- 如果某些数据可以由props或state推导出 那么它就不应该存在于state中
+### 组合vs继承
+- React有十分强大的组合模式 推荐使用组合而非继承来实现组件间的代码重用
+> 包含关系
+- 有些组件无法提前知道它们子组件的具体内容 在SideBar(侧边栏)和Dialog(对话框)等展示通用容器(box)的组件中特别容易遇到
+- 建议这些组件使用一个特殊的children prop来将他们的字组件传递到渲染结果中
+```
+function FancyBorder(props){
+    return(
+        <div className = ('FancyBorder FancyBorder-'+props.color)>
+        {props.children}
+        </div>
+    )
+}
+```
+- 这使得别的组件可以通过JSX嵌套 将任意组件作为子组件传递给它们
+```
+function WelcomeDialog() {
+  return (
+    <FancyBorder color="blue">
+      <h1 className="Dialog-title">
+        Welcome
+      </h1>
+      <p className="Dialog-message">
+        Thank you for visiting our spacecraft!
+      </p>
+    </FancyBorder>
+  );
+}
+```
+- 少数情况下 可能需要在一个组件中预留出几个洞 这种情况下 可以不使用children 而是自行约定 将所需内容传入props 并使用相应prop
+- <Contacts />和<Chat />之类的React元素本质就是对象(object) 所以可以把他们当作props像其他数据一样传递 React中没有槽这一概念的限制 可以将任何东西作为props进行传递
+> 特例关系
+- 有时 会把一些组件看作是其他组件的特殊实例 比如WelcomeDialog可以说是Dialog的特殊实例
+- React中 可以通过组合来实现这一点 特殊组件可以通过props定制并渲染一般组件
+> 继承
+- Props和组合为你提供清晰而安全地定制组件外观和行为的灵活方式 组件可以接受任意props 包括基本数据类型 React元素以及函数
+- 如果想要在组件中复用非UI的功能 建议将其提取为一个单独的JS模块 如函数 对象或类 组件可以直接引入(import)而无需通过extend继承它们
+### 无障碍辅助功能
+- 网络无障碍辅助功能(Accessibility 也被称为a11y 因为以A开头 以Y结尾 中间一共是11个字母) 是一种可以帮助所有人获得服务的设计和创造 无障碍辅助功能是使得辅助技术正确解读网页的必要条件
+- React对于创建可访问网站有着全面的支持 而这通常是通过标准HTML技术实现的
+> WCAG
+- 网络内容无障碍指南(Web Content Accessibility Guidelines WCAG)为开发无障碍网站提供指南
+> WAI-ARIA
+- 网络无障碍倡议-无障碍互联网应用(Web Accessibility Initiative-)文件包含了创建完全无障碍JS部件所需技术
+- JSX支持所有aria-* HTML属性 虽然大多数React的DOM变量和属性命名都使用驼峰命名(camelCased) 但aria-*应该像其在HTML中一样使用带连字符的命名法(也叫诸如hyphen-cased kebab-case lisp-case)
+1. 语义化的HTML
+2. 无障碍表单
+- for在JSX中应该被写作htmlFor
+3. 控制焦点
+4. 鼠标和指针事件
+5. 更复杂的部件
+6. 其他考虑因素
+7. 开发及测试
+### 代码分割
+> 打包
+- 大多数React应用都会使用Webpack Rollup或Browserify这类的构建工具来打包文件 
+- 打包是一个将文件引入并合并到一个单独文件的过程 最终形成一个bundle 接着在页面上引入该bundle 整个应用即可一次性加载
+> 代码分割
+- 代码分割是由诸如Webpack Rollup和Browserify(factor-bundle)这类大包起支持的一项技术 能够创建多个包并在运行时动态加载
+- 对你的应用进行代码分割能够帮助你懒加载当前用户所需要的内容 能够显著的提高你的应用性能 尽管没有减少应用整体的代码体积 但是可以避免加载客户永远不需要的代码 并在初始加载时减少所需加载的代码
+> import()
+- 在你的应用之引入代码分割的最佳方式是通过动态import()语法
+- 使用前
+```
+import {add} from './math';
+console.log(add(16,26));
+```
+- 使用之后
+```
+import('./math').then(math=>{
+    console.log(math.add(16,26));
+})
+```
+- 当Webpack解析到该语法时 会自动进行代码分割
+> React.lazy
+- React.lazy和Suspense技术还不支持服务端渲染 
+- React.lazy函数能让你像渲染常规组件一样处理动态引入(的组件)
+- 使用之前
+```
+import OtherComponent from './OtherComponent'
+```
+- 使用之后
+```
+const OtherComponent = React.lazy(()=>import('./OtherComponent'))
+```
+- 此代码将会在组件首次渲染时 自动导入包含OtherComponent组件的包
+- React.lazy接收一个函数 这个函数需要动态调用import() 它必须返回一个Promise 该Promise需要resolve一个default export的React组件
+- 然后应在Suspense组件中渲染lazy组件 如此使得我们可以使用在等待加载lazy组件时做优雅降级(如loading指示器)
+### Context
+- Context提供了一个无需为每层组件手动添加props 就能在组件树间进行数据传递的方法
+> 何时使用Context
+- Context设计目的是为了共享哪些对于一个组件树而言是全局的数据 例如当前认证的用户 主题或首选语言
+- 使用一个Provider来将当前的theme传递给以下的组件树 无论多深 任何组件都能读取到这个值
+- 指定contextType复去当前的theme context React会往上找到最近的theme Provider 然后使用它的值
+> 使用Context之前的考虑
+- Context主要应用场景在于很多不同层级的组件需要访问同样一些的数据 应谨慎使用 因为这会使组件的复用性变差
+- 如果只是想避免层层传递一些属性 组件组合(component composition)有时是一个比context更好的解决方案
+> 一种无需context的解决方案是将Avatar组件自身传递下去 因而中间组件无需知道user或者avatarSize等props
+- 这种对组件的控制反转减少了在你的应用中要传递的props数量 这在很多场景下会使得你的代码更加干净 使你对根组件有更多的把控 
+- 但是这并不适用于每一个场景 这种将逻辑提升到组件树的更高层次来处理 会使得这些高层组件变得更复杂 并且会强行将低层组件适应这样的形式
+- 这种模式足够覆盖很多场景 在这些场景下 你需要将子组件和直接关联的父组件解耦 如果子组件需要在渲染前和父组件进行一些交流 可以进一步使用render props
+> API
+1. React.createContext
+```
+const myContext = React.createContext(defaultValue)
+```
+- 创建一个Context对象 当React渲染了一个订阅了这个Context对象的组件 这个组件会从组件树中离自身最近的那个匹配的Provider中读取到当前的context值
+- 只有当组件所处的树中没有匹配到Provider时 其defaultValue参数才会生效 这有助于在不使用Provider包装组件的情况下组件进行测试 将undefined传递给Provider的value时 消费组件的defaultValue不会生效
+2. Context.Provider
+```
+<MyContext.Provider value={xx}>
+```
+- 每个Context对象都会返回一个Provider React组件 它允许消费组件订阅context的变化
+- Provider接收一个value属性 传递给消费组件 一个Provider可以和多个消费组件有对应关系 多个Provider也可以嵌套使用 里层的会覆盖外层的数据
+- 当Provider的value值发生变化时 它内部的所有消费组件都会重新寻阿然 Provider及其内部consumer组件都不受制于shouldComponentUpdate函数 因此当consumer租价在其祖先组件退出更新的情况下也能更新
+- 通过新旧值检测来确定变化 使用了与Object.is相同的算法
+3. Class.contextType
+4. Context.Consumer
+5. Context.diaplayName
+### 错误边界(Error Boundaris)
+- 部分UI的JS错误不应该导致整个应用崩溃 为了解决这个问题 React16引入了一个新的概念 错误边界
+- 错误边界是一种React组件 这种组件可以捕获并打印发生在其子组件树任何位置的JS错误 并且 它会渲染出备用UI 而不是渲染哪些崩溃了的子组件树 错误边界在渲染期间 生命周期方法和整个组件树的构造函数中捕获错误
+> 错误边界无法捕获以下场景中产生的错误
+1. 事件处理
+2. 异步代码
+3. 服务端渲染
+4. 它自身抛出来的错误(并非它的子组件)
+- 错误边界的工作方式类似于JS的catch{} 不同的地方在于错误边界值针对React组件
+- 只有class组件才可以成为错误边界组件 大多数情况下 只需要声明一次错误边界组件并在整个应用中使用它
+- 错误边界仅可以捕获其子组件的错误 它无法捕获其自身的错误
+> 自React15的命名更改
+- React15中有一个支持有限的错误边界方法unstable_handleError 此方法不再起作用 同时自React 16 Beta发布起 你需要在代码中将其修改为componentDidCatch
+### Refs转发
+- 一项将ref自动地通过组件传递到其一子组件的技巧 对于大多数应用中的组件来说 这通常不是必需的 但其对某些组件 尤其是可重用的组件库是很有用的
+> 转发refs到DOM组件
+- Ref转发是一个可选特性 其允许某些组件接收ref 并将其向下传递(转发它)给子组件
+- 在下面的示例中 FancyButton使用React.forwardRef来获取传递给它的ref 然后转发到它渲染的DOM button
+```
+const FancyButton = React.forwardRef((props,ref)=>{
+    <button ref={ref} className="FancyButton">
+        {props.children}
+    </button>
+})
+<!-- 可以直接获取DOM button的ref -->
+const ref = React.createRef();
+<FancyButton ref={ref}> Click me</FancyButton>
+<!-- 当ref挂载完成 ref.current将指向<button> DOM节点 -->
+```
+- 这样 使用FancyButton的组件可以获取底层DOM节点button的ref 并在必要时访问 就像其直接使用DOM button一样
+- 第二个参数ref只在使用React.forwardRef定义组件时存在 常规函数和class组件不接收ref参数 其props中也不存在ref
+- ref转发不仅限于DOM组件 也可以转发refs到class组件实例中
+> 在高阶组件中转发refs
+- 这个技巧对高阶组件特别有用
+- refs将不会透传下去 这是因为ref不是prop属性 就像key一样 其被React进行了特殊处理 如果你对HOC添加ref 该ref将引用最外层的容器组件而不是被包裹的组件
+- 这意味着用于FancyButton组件的refs实际上将被挂载到LogProps组件
+- 可以使用React.forwardRef API明确的将refs转发到内部的FancyButton组件
+- React.forwardRef接受一个渲染函数 其接收prosp和ref参数并返回一个React节点
+> 在DevTools中显示自定义名称
+- React.forwardRef接收一个渲染函数 React Devtools使用该函数来解决为ref转发组件显示的内容
+### Fragments
+- React中的一个常见模式是一个组件返回多个元素 Fragments允许你将子列表分组 而无需向DOM添加额外节点
+```
+render(){
+    return (
+        <React.Fragment>
+            <Child A/>
+            <Child B/>
+        </React.Fragment>
+    )
+}
+```
+- 还有一种新的短语法可用于声明它们
+> 短语法
+- 可以使用一种新的 且更简短的语法来声明Fragments 它看起来像空标签
+- 可以像使用任何其他元素一样使用<></> 除了它不支持key或属性
+```
+class Columns extends React.Component{
+    render(){
+        return(
+            <>
+                <td>Hello</td>
+                <td>World</td>
+            </>
+        )
+    }
+}
+```
+> 带key的Fragments
+- 使用显式<React.Fragemnt>语法声明的片段可能具有key
+- 一个使用场景是将一个集合映射到一个Fragments数组
+- key是唯一可以传递给Fragment的属性
+### 高阶组件 HOC
+- 高阶组件(HOC)是React中用于复用组件逻辑的一种高级技巧 HOC自身不是React API的一部分 它是一种基于React的组合特性而形成的设计模式
+- 具体而言 高阶组件是参数为组件 返回值为新组件的函数
+- 组件是将props转换为UI 而高阶组件是将组件转换为另一个组件
+- HOC不会修改传入的组件 也不会使用继承来复制其行为 相反HOC通过将组件包装在容器组件中来组成新组件 HOC是纯函数 没有副作用
+> 不要改变原始组件 使用组合
+- 不要试图在HOC中修改组件原型(或以其他方式改变它)
+- HOC不应该修改传入组件 而应该使用组合的方式 通过将组件包装在容器组件中实现功能
+> 约定:最大化可组合性
+- 并不是所有的HOC都一样 有时它仅接受一个参数 也就是被包裹的组件
+> 约定:包装显示名称以便轻松调试
+- HOC创建的容器组件会与任何其他组件一样 会显示在React Developer Tools中 
+> 注意事项
+1. 不要在render方法中使用HOC
+- 这不仅仅是性能问题 重新挂载组件会导致该组件及其所有子组件的状态丢失
+> Refs不会被传递
+- 虽然高阶组件的约定是将所有props传递给被包装组件 但这对于ref并不使用
+- 是因为ref实际上并不是一个prop 就像key一样 它是由React专门处理的
+- 如果将ref添加到HOC的返回组件中 则ref引用指向容器组件 而不是被包装组件
+- 这个问题的解决方案是通过使用React.forwardRef API引入
+### 与第三方库协同
+。。。
+### 深入JSX
+- JSX仅仅只是React.createElement(component,props,...children)函数的语法糖
+> 指定React元素类型
+- JSX标签第一部分指定了React元素的类型
+- 大写字母开头的JSX标签意味着它们是React组件 这些标签会被编译为对命名变量的直接引用 所以 当你使用JSX <Foo />表达式时 FOO必须包含在作用域内
+1. React必须在作用域内
+- 由于JSX会编译成React.createElement调用形式 所以React库也必须包含在JSX代码作用域内
+2. 在JSX类型中使用点语法
+- JSX中 可以使用点语法来饮用一个React组件 当你在一个模块中导出许多React组件时 这会非常方便
+3. 用户定义的组件必须以大写字母开头
+- 小写字母开头的元素代表一个HTML内置组件 传递给React.createElement(作为参数)
+- 大写字母开头的元素则对应着在JS引入或自定义的组件 如<Foo />会被编译为React.createElement(Foo)
+4. 在运行时选择类型
+- 解决这个问题 需要首先将类型赋值给一个大写字母开头的变量
+> JSX中的Props
+- 有多种方式可以在JSX中指定props
+1. JS表达式作为Props
+- 可以把包裹在{}中的JS表达式作为一个prop传递给JSX元素
+2. 字符串字面量
+- 可以将字符串字面量赋值给props 以下两个JSX表达式是等价的
+```
+<MyComponent message = "hello world">
+<MyComponent message = {"hello world"}>
+```
+- 当将字符串字面量赋值给prop时 它的值是未转义的 以下两个JSX表达式是等价的
+```
+<MyComponent message="&lt;3" />
+<MyComponent message={'<3'} />
+```
+3. props默认值为"True"
+- 如果没给prop赋值 它的默认值是true 
+- 通常 不建议不传递value给prop 因为这可能与ES6对象简写混淆
+- 这样实现只是为了保持和HTML中标签属性的行为一致
+4. 属性展开
+- 如果已经有了一个props对象 可以使用展开运算符... 来在JSX中传递整个props对象
+- 还可以选择性只保留当前组件需要接收的props 并使用展开运算符将其他props传递下去
+- 属性展开在某些情况下很有用 但是也很容易将不必要的props传递给不相关的组件 或者将无效的HTML属性传递给DOM
+> JSX中的子元素
+- 包含在开始和结束标签之间的JSX表达式内容将作为特定属性props.children传递给外层组件 有几种不同的方法来传递子元素
+1. 字符串字面量
+- 可以将字符串放在开始和结束标签之间 此时props.children就只是该字符串 这对于很多内置的HTML元素很有用
+- JSX会移除行首尾的空格以及空行 与标签相邻的空行均会被删除 文本字符串之间的新行会被压缩为一个空格 
+2. JSX子元素
+- 子元素允许多个JSX元素组成 这对于嵌套组件非常有用
+- 可以将不同类型的子元素混合在一起 可以将字符串字面量与JSX子元素一起使用
+- 这也是JSX类似HTML的一种表现
+- React组件也能够返回存储在数组中的一组元素
+3. Javascript表达式作为子元素
+- Javascript表达式可以被包裹在{}中作为子元素
+- 以下表达式是等价的
+```
+<MyComponent>foo</MyComponent>
+<MyComponent>{'foo'}</MyComponent>
+```
+- 这对于展示任意长度的列表非常有用
+- Javascript表达式也可以和其他类型的子元素组合 这种做法可以方便的代替模版字符串
+4. 函数作为子元素
+- 通常 JSX中的Javascript表达式将会被计算成为字符串 React元素或者是列表
+- 不过props.children和其他prop一样 它可以传递任意类型的数据 而不仅仅是React已知的可渲染类型
+- 如 有一个自定义组件 可以把回调函数作为props.children进行传递
+5. 布尔类型 Null 以及Undefined将会忽略
+- false null undefined adn true是合法的子元素 但它们并不会被渲染
+- 这有助于依据特定条件来渲染其他的React元素
 ### 条件渲染
 > &&运算符
 - JS中 true&&expression总是会返回expression false&&expression总是会返回false
