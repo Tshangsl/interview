@@ -487,6 +487,319 @@ class Columns extends React.Component{
 5. 布尔类型 Null 以及Undefined将会忽略
 - false null undefined adn true是合法的子元素 但它们并不会被渲染
 - 这有助于依据特定条件来渲染其他的React元素
+### 性能优化
+1. 使用生产版本
+### Portals
+- Portal提供了一种将子节点渲染到存在于父组件以外的DOM节点的优秀的方案
+```
+ReactDOM.createPortal(child,conatiner)
+```
+1. 第一个参数child 是任何可渲染的React子元素 如一个元素 字符串或fragment
+2. 第二个参数container 是一个DOM元素
+- 通常来讲 当你从组件的render方法返回一个元素时 该元素将被挂载到DOM节点中离其最近的父节点
+```
+render(){
+    return(
+        <div>
+            {this.props.children}
+        </div>
+    )
+}
+```
+- 然而 有时候将子元素插入到DOM节点中的不同位置也是有好处的
+```
+render(){
+    // React并没有创建一个新的div 它只是把子元素渲染到domNode中
+    // domNode是一个可以在任何位置有效DOM节点
+    return ReactDOM.createPortal(
+        this.props.children,
+        domNode
+    )
+}
+```
+- 一个portal的典型用例是当父组件有overflow:hidden或z-index样式时 但你需要子组件能够在视觉上跳出其容器 例如 对话框 悬浮卡 以及提示框
+> 通过Portal进行事件冒泡
+- 一个从portal内部触发的事件会一直冒泡至包含React树的祖先 即便这些元素并不是DOM树中的祖先
+### Profiler API
+- Profiler测量渲染一个React应用多久渲染一次 以及渲染一次的代价 它的目的是识别出应用中渲染较慢的部分 或是可以使用类似memoization优化的部分 并从相关优化中获益
+### 不使用ES6
+- 通常会用JS的class关键字来定义React组件
+```
+class Greeting extends React.Component{
+    render(){
+        return <h1>Hello,{this.props.name}</h1>;
+    }
+}
+```
+- 如果还未使用过ES6 可以使用create-react-class抹开
+```
+var createReactClass = require('create-react-class');
+var Greeting = createReactClass({
+    render:function(){
+        return <h1>Hello,{this.props.name}</h1>
+    }
+})
+```
+> ES6的class与createReactClass()方法区别
+1. 声明默认属性
+- 无论是函数组件还是class组件 都拥有defaultProps属性
+- 如果使用createReactClass()方法创建组件 那就需要在组件中定义getDefaultProps()函数
+2. 初始化State
+- 如果使用ES6的class关键字创建组件 可以通过给this.state赋值的方式来定义组件的初始state
+- 如果使用createReactClass()方法创建组件 你需要提供一个单独的getInitialState方法 让其返回初始state
+3. 自动绑定
+- 对于使用ES6的class关键字创建的React组件 组件中的方法遵循与常规ES6 class相同的语法规则 这意味着这些方法不会自动绑定this到这个组件实例 需要在constructor中显式调用.bind(this)
+- 如果使用createReactClass()方法创建组件 组件中的方法会自动绑定至实例 
+> 绑定this指针的三种做法
+1. 在constructoer中绑定方法
+2. 使用箭头函数 比如onClick={(e)=>{this.handleClick(e)}}
+3. 继续使用createReactClass
+### 不使用JSX
+- 每个JSX元素只是调用React.createElement(component,props,...children)的语法糖 因此使用JSX可以完成的任何事情都可以通过纯JS完成
+- 组件可以是字符串 也可以是React.Component的子勒 它还能是一个普通的函数
+### Refs and the DOM
+- Refs提供一种方式 允许我们访问DOM节点或在render方法中创建的React元素
+> 何时使用Refs
+1. 管理焦点 文本选择 或媒体播放
+2. 触发强制动画
+3. 集成第三方DOM库
+> 创建Refs
+- Refs是使用React.createRef()创建的 并通过ref属性附加到React元素
+- 在构造组件时 通常将Refs分配给实例属性 以便可以在整个组件中引用它们
+```
+class MyComponent extends React.Component{
+    constructor(props){
+        super(props);
+        this.myRef = React.createRef();
+    }
+    render(){
+        return <div ref={this.myRef}>
+    }
+}
+```
+> 访问Refs
+- 当ref被传递给render中的元素时 对该节点的引用可以在ref的current属性中被访问
+```
+const node = this.myRef.current;
+```
+- ref的值根据节点的类型有所不同
+1. 当ref属性用于HTML元素时 构造函数中使用React.createRef()创建的ref接收底层DOM元素作为其current属性
+2. 当ref属性用于自定义class组件时 ref对象接收组件的挂载实例作为其current属性
+3. 不能在函数组件上使用ref属性 因为它们没有实例
+> 将DOM Refs暴露给父组件
+- Ref转发使组件可以像暴露自己的ref一样暴露子组件的ref
+> 回调Refs
+- 能更精细的控制何时refs被设置和解除
+- 不同于传递createRef()创建的ref属性 你会传递一个函数 这个函数接受React组件实例或HTML DOM元素作为参数 使它们能在其他地方被存储和访问
+。。。。
+> 过时API:String类型的Refs
+### Rener Props
+- 一种在React组件之间使用一个值为函数的prop共享代码的简单技术
+- 具有render prop的组件接受一个函数 该函数返回一个React元素并调用它而不是实现自己的渲染逻辑
+> 使用Render Props来解决横切关注点(Cross-Cutting Concerns)
+- 提供一个render方法让<Mouse>能够动态决定什么需要渲染 而不是克隆<Mounse>组件然后硬编码来解决特定的用例
+- render props是一个用于告知组件需要渲染什么内容的函数prop
+> 使用props而非render
+- render prop是因为模式才被称为render prop 不一定要用名为render的prop来使用这种技术
+- 任何被用于告知组件需要渲染什么内容的函数prop在技术上都可以被称为render prop
+> 将Render Props与React.PureComponent一起使用时要小心
+### 严格模式
+- StrictMode是一个用来突出显示应用程序中潜在问题的工具 与Fragment一样 StricMode不会渲染任何可见的UI 它为其后代元素触发额外的检查和警告
+- 严格模式检查仅在开发模式下运行 它们不会影响生产构建
+> StrictMode有助于
+1. 识别不安全的生命周期
+2. 关于使用过时字符串ref API的警告
+3. 关于使用废弃的findDOMNode的警告
+4. 检测意外的副作用
+5. 检测过时的context API
+### 使用PropTypes进行类型检查
+1. 限制单个元素
+- 可以通过PropTypes.element来确保传递给组件的children中只包含了一个元素
+2. 默认Prop值
+- 可以通过配置特定的defaultProps属性来定义props的默认值
+### 非受控组件
+- 大多数情况下 推荐使用受控组件处理表单数据
+- 在一个受控组件中 表单数据是由React组件来管理的 
+- 另一种替代方案是使用非受控组件 这时表单数据将交由DOM节点来处理
+### Web Components
+- React和Web Components为解决不同的问题而生 Web Components为可复用组件提供强大的封装 而React提供了声明式的解决方案 使DOM与数据保持同步 两者旨在互补
+- 开发人员可以自由选择在Web Components中使用React 或者在React中使用Web Components 或两者共存
+> Web Components通常暴露的是命令式API
+### API
+### React顶层API
+> React
+- React是React库的入口
+- 如果通过使用<script>标签的方式来加载React 则可以通过React全局变量对象来获得React的顶层API
+- 使用ES6与npm时 可以通过编写import React from 'react'来引入它们
+- 使用ES5与npm时 可以通过编写var React = require('react')来引入它们
+> ReactDOM
+- 如果使用一个<script>标签引入React 所有顶层API都能在全局ReactDOM上调用
+- 如果使用npm和ES6 可以用import ReactDOM from 'react-dom'
+- 如果使用npm和ES5 可以用var ReactDOM = require('react-dom')
+
+- react-dom的package提供了可在应用顶层使用的DOM(DOM-specific)方法 如果有需要 可以把这些方法用于React模型以外的地方
+1. render()
+- 在提供的container里渲染一个React元素 并返回对该组件的引用(或者针对无状态组件返回null)
+```
+ReactDOM.render(element,container[,callback])
+```
+2. hydrate()
+3. unmountComponentAtNode()
+4. findDOMNode()
+5. createPortal()
+> ReactDOMClient
+> ReactDOMServer
+> DOM元素
+- React实现了一套独立于浏览器的DOM系统 兼顾了性能和跨浏览器的兼容性 
+- 在React中 所有的DOM特性和属性(包括事件处理)都应该是小驼峰命名的方式
+- 例外的情况是aria-*以及data-*属性 一律使用小谢字母命名
+
+- 属性差异
+- React与HTML之间有很多属性存在差异
+1. checked
+2. className
+3. dangerouslySetInnerHTML
+4. htmlFor
+5. onChange
+6. selected
+7. style
+- 接受一个采用小驼峰命名属性的JavaScript对象 而不是CSS字符串
+- 这与DOM中style的JS属性是一致的 同时会更高效 且能预防跨站脚本(XSS)的安全漏洞
+- React会自动添加"px"后缀到内联样式为数字的属性后 如需使用"px"以外的单位 需将此值设为数字与所需单位组成的字符串
+8. suppressContentEditableWarning
+9. suppressHydrationWarning
+10. value
+
+- All Supported HTML Attributes
+- React16中 任何标准的或自定义的DOM属性都是完全支持的
+- React为DOM提供了一套以JS为中心的API 由于React组件经常采用自定义或和DOM相关的props的关系 React采用了小驼峰命名的方式
+### 合成事件
+- SyntheticEvent实例将被传递给你的事件处理函数 它是浏览器的原生事件的跨浏览器包装器 除兼容所有浏览器外 它还拥有和浏览器原生事件相同的接口 包括stopPropagation()和preventDefault()
+> 事件池
+> 支持的事件
+1. 剪贴板事件
+- 事件名
+```
+onCopy onCut onPaste
+```
+- 属性
+```
+DOMDataTransfer clipboardData
+```
+2. 复合事件
+- 事件名
+```
+onCompositionEnd onCompositionStart onCompositionUpdate
+```
+- 属性
+```
+string data
+```
+3. 键盘事件
+- 事件名
+```
+onKeyDown onKeyPress onKeyUp
+```
+4. 焦点事件
+- 事件名
+```
+onFocus onBlur
+```
+- 属性
+```
+DOMEventTarget relatedTarget
+```
+- 这些焦点事件在React DOM上的所有元素都有效 不只是表单元素
+### Test Utilities
+- ReactTestUtils 可搭配所选的测试框架 轻松实现React组件测试
+。。。
+### Test Renderer
+- 这个package提供一个React渲染器 用于将React组件渲染成纯JS对象 无需依赖DOM或原生移动环境
+- 这个package提供的主要功能是在不依赖浏览器或jsdom情况下 返回某个事件点由React DOM或React Native平台渲染出的视图结构快找 类似于DOM树
+### JS环境要求
+- React16依赖集合类型Map和Set
+### Hook
+- Hook是React16.8的新增特性 它可以让你在不编写class的情况下使用state以及其他的React特性
+> 解决的问题
+1. 在组件之间复用状态逻辑很难
+- Hook使你在无需修改组件结构的情况下复用状态逻辑
+2. 复杂组件变得难以理解
+- Hook将组件中相互关联的部分拆分成更小的函数(比如设置订阅或请求数据) 而非强制按照生命周期划分 还可以使用reducer来管理组件的内部状态 使其更加可预测
+3. 难以理解的class
+- Hook使你在非class的情况下可以使用更多的React特性
+> 什么是Hook
+- 一些可以让你在函数组件里钩入React state及生命周期等特性的函数
+- Hook不能在class组件中使用
+> State Hook
+> Effect Hook
+- 给函数组件增加了操作副作用的能力 与class组件中的componentDidMount componentDidUpdate componentWillUnmount具有相同用途 只不过是被合并成了一个API
+- 调用useEffect就是在告诉React在完成对DOM的更改后运行副作用函数 
+- 由于副作用函数是在组件内声明的 它们可以访问到组件的props和state
+- 默认情况下 React会在每次渲染后调用副作用函数 包括第一次渲染时 
+- 副作用函数还可以通过返回一个函数来指定如何清除副作用
+- 通过使用Hook 可以把组件内相关的副作用组织在一起 而不要把它们拆分到不同的生命周期函数中
+> 副作用
+- 数据获取 订阅 手动修改DOM
+> Hook使用规则
+1. 只能在函数最外层调用Hook 不要在循环 条件判断或者子函数中调用
+2. 只能在React的函数组件中调用Hook 不要在其他JS函数中调用
+> Hook是什么
+- 一个特殊的函数 可以让你钩入React的特性 例如 useState是允许你在React函数组件中添加state的Hook
+> 读取state
+- 想在class中显示当前的count 读取this.state.count
+```
+<p>You clicked {this.state.count}</p>
+```
+- 函数中 可以直接用count
+```
+<p>You clicked {count} times</p>
+```
+> 方括号有什么用
+- 这种JS语法叫数组解构 它意味着我们同时创建了fruit和setFruit两个变量
+> Effect Hook
+- 可以让你在函数组件中执行副作用操作
+- 数据获取 设置订阅 手动更改React组件中的DOM都属于副作用
+- componentDidMount componentDidUpdate componentWillUnmount
+> 两种副作用
+1. 无需清除的effect
+- React更新DOM之后运行一些额外的代码 如发送网络请求 手动变更DOM 记录日志
+- 与componentDidMount或componentDidUpdate不同 使用useEffect调度的effect不会阻塞浏览器更新屏幕 这让你的应用看起来响应更快
+2. 需要清除的effect
+- 订阅外部数据源 需要清除 防止引起内存泄露
+- effect返回一个函数 React将会在执行清除操作时调用它 React会在组件卸载时执行清除操作
+> Hook允许我们按照代码用途分离它们 而不是像生命周期函数那样 React将按照effect声明的顺序依次调用组件中的每一个effect
+> 提示：通过跳过Effect进行性能优化
+- 如果某些特定值在两次重渲染之间没有发生变化 可以通知React跳过对effect的调用 只要传递数组作为useEffect的第二个可选参数即可
+- 如果数组中有多个元素 即使只有一个元素发生变化 React也会执行effect
+```
+useEffect(()=>{
+    document.title=`You clicked ${count} times`
+},[count])
+```
+- 如果想执行只运行一次的effect(仅在组件挂载和卸载时执行) 可以传递一个空数组([])作为第二个参数 这就告诉React effect不依赖于props或state中的任何值 所以它永远都不需要重复执行
+> 自定义Hook
+- 通过自定义Hook 可以将组建逻辑提取到可重用的函数中
+> 提取自定义Hook
+- 当我们想在两个函数之间共享逻辑时 会把它提取到第三个函数中 而组件和Hook都是函数 所以也同样适用这种方式
+- 自定义Hook是一个函数 其名称以use开头 函数内部可以调用其他Hook
+- 与React组件不同 自定义Hook不需要具有特殊的标识 可以自由的决定它的参数是什么 以及它应该返回什么(如果需要的话)
+- 它就像是一个正常的函数 但是它的名字应该始终以use开头 这样可以一眼看出其符合Hook的规则
+> 自定义Hook是一种自然遵循Hook设计的约定 而不是React的特性
+1. 自定义Hook必须以"use"开头 
+- 不遵循则无法判断某个函数是否包含对其内部Hook的调用 React将无法自动检查你的Hook是否违反了Hook的规则
+2. 在两个组件中使用相同的Hook不会共享state 
+- 自定义Hook是一种重用状态逻辑的机制(例如设置为订阅并存储当前值) 所以每次使用自定义Hook时 其中的所有state和副作用都是完全隔离的
+3. 每次调用Hook 它都会获取独立的state
+> 在多个Hook之间传递信息
+- 由于Hook本身就是函数 因此我们可以在它们之间传递信息
+> 自定义Hook
+- 自定义Hook解决了以前在React组件中无法灵活共享逻辑的问题
+- 可以创建涵盖各种场景的自定义Hook 如表单处理 动画 订阅声明 计时器
+> useReducer
+- Reducers非常便于单独测试 且易于扩展 以表达复杂的更新逻辑
+- 在复杂组件中使用reducer管理内部state的需求很常见 已经将userReducer的Hook内置到React
+> useState
+- 与class组件中的setState方法不同 useState不会自动合并更新对象 可以用函数式的setState结合展开运算符来达到合并更新对象的效果
 ### 条件渲染
 > &&运算符
 - JS中 true&&expression总是会返回expression false&&expression总是会返回false
