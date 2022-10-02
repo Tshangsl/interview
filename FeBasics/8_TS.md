@@ -27,7 +27,7 @@
     ```
     3. 编译ts文件
     ```
-    tsc hellwoeld.ts
+    tsc hellworld.ts
     ```
 3. 典型ts工作流程
 - ts文件被ts编译器 根据配置的变异选项编译成js文件 对于大多数使用ts开发的web项目 还会对编译生成的js文件进行打包处理 然后再进行部署

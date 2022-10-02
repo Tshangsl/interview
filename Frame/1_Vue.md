@@ -1,3 +1,336 @@
+### Vue3 响应式基础
+> 声明响应式状态
+- 可以使用reactive()函数创建一个响应式对象或数组
+- 响应式对象其实是JavaScript Proxy 其行为表现与一般对象相似
+- 不同之处在于Vue能够跟踪对响应式对象属性的访问与更改操作
+- 要在组件模版中使用响应式状态 需要在setup()函数中定义并返回
+```
+import { reactive } from 'vue'
+export default{
+   // setup是一个专门用于组合式API的特殊钩子函数
+   setup(){
+      const state = reactive({count:0})
+      <!-- 暴露state到模版 -->
+      return{
+         state
+      }
+   }
+}
+<div>{{state.count}}</div>
+```
+- 自然 可以在同一个作用域下定义一个更新state的函数 并作为一个方法与state一起暴露出去
+```
+import {reactive} from 'vue'
+export default{
+   setup(){
+      const state = reactive({count:0})
+      function increment(){
+         state.count++
+      }
+      // 不要忘记同时暴露increment函数
+      return{
+         state,
+         increment
+      }
+   }
+}
+```
+- 暴露的方法通常会被用作事件监听器
+```
+<button @click="increment">
+   {{state.count}}
+</button>
+```
+> <script setup>
+- 在setup()函数中手动暴露大量的状态和方法非常繁琐 幸运的事 我们可以通过使用构建工具来简化该操作 当使用单文件组件(SFC)时 可以使用<script setup>来大幅简化代码
+```
+<script setup>
+import {reactive} from 'vue'
+const state = reactive({count:0})
+function increment(){
+   state.count++
+}
+</script>
+<template>
+   <button @click="increment">
+      {{state.count}}
+   </button>
+</template>
+```
+- <script setup>中的顶层的导入和变量声明可以在同一组件的模版中直接使用 可以理解为模版中的表达式和<script setup>中的代码处在同一个作用域中
+> DOM更新时机
+- 要等待一个状态改变后的DOM更新完成 可以使用nextTick()这个全局API
+```
+import {nextTick} from 'vue'
+function increment(){
+   state.count++
+   nextTick(()=>{
+      // 访问更新后的DOM
+   })
+}
+```
+> 深层响应性
+- 在Vue中 状态都是默认深层响应式的 这意味着即使在更改深层次的对象或数组 你的改动也能被检测到
+- 也可以直接创建一个浅层响应式对象 它们仅在顶层具有响应性 一般仅在某些特殊场景中需要
+> 响应式代理 vs 原始对象
+- reactive()返回的是一个原始对象的Proxy 它和原始对象是不相等的
+- 只有代理对象是响应式的 更改原始对象不会触发更新 因此使用Vue的响应式系统的最佳实践是仅使用你声明对象的代理版本
+- 为保持访问代理的一致性 对同一个原始对象调用reactive()会总是返回同样的代理对象 而对一个已存在的代理对象调用reactive()会返回其本身
+- 这个规则对嵌套对象也适用 依靠深层响应性 响应式对象内的嵌套对象依然是代理
+> reactive()的局限性
+1. 仅对对象类型有效(对象 数组和Map Set这样的集合类型)而对string number boolean这样的原始类型无效
+2. 因为Vue的响应式系统是通过属性访问进行跟踪的 因此我们必须始终保持对该响应式对象的相同引用 这意味着我们不可以随意的替换一个响应式对象 因为这将导致对初始引用的响应性连接丢失 当我们将响应式对象的属性赋值或解构至本地变量时 或是将该属性传入一个函数时 我们会失去响应性
+> 用ref()定义响应式变量
+- reactive()的种种限制归根结底是因为JS没有可以作用于所有值类型的引用机制 因此Vue提供一个ref()方法来允许我们创建可以使用任何值类型的响应式ref
+```
+import { ref } from 'vue'
+const count = ref(0)
+```
+- ref(0)将传入参数的值包装为一个带.value属性的ref对象
+```
+const count = ref(0)
+console.log(count.value)
+```
+- 和响应式对象的属性类似 ref的.value属性也是响应式的 同时当值为对象类型时 会用reactive()自动转换它的.value
+- 一个包含对象类型值的ref可以响应式地替换整个对象
+- ref被传递给函数或是从一般对象上被解构时 不会丢失响应性
+- 简言之 ref()让我们能创造一种对任意值的引用 并能够在不丢失响应性的前提下传递这些引用 这个功能很重要 因为它经常用于将逻辑提取到组合函数中
+> ref在模版中的接包
+- 当ref在模版中作为顶层属性被访问时 它们会被自动解包 所以不需要使用.value
+- 仅当ref是模版渲染上下文的顶层属性时才适用自动解包
+> ref在响应式对象中的解包
+- 当一个ref被嵌套在一个响应式对象中 作为属性被访问或更改时 它会自动解包 因为会表现得和一般的属性一样
+- 如果将一个新的ref赋值给一个关联了已有ref的属性 那么它会替换掉旧的ref
+- 只有当嵌套在一个深层响应式对象内时 才会发生ref解包 当起作为浅层响应式对象的属性被访问时不会解包
+- 跟响应式对象不同 当ref作为响应式数组或像Map这种原生集合类型的元素被访问时 不会进行解包
+### computed 计算属性
+```
+const iser = computed(()=>{
+   return author.books.length>0?'Yes':'No'
+})
+```
+- computed()方法期望接收一个getter函数 返回值为一个计算属性ref 
+- Vue的计算属性会自动追踪响应式依赖 它会检测到er依赖于author.books 所以当author.books改变时 任何依赖于er的绑定都会同时更新
+> 可写计算属性
+- 计算属性默认仅能通过计算函数得出结果 尝试修改一个计算属性时 会收到一个运行时警告 只在某些特殊场景中可能才需要用到可写属性 可以通过同时提供getter和setter来创建
+1. 计算属性不应有副作用
+- 不要在计算属性中做异步请求或者更改DOM
+2. 避免直接修改计算属性值
+### Class与Style绑定
+- Vue专门为class和style的v-bind用法提供了特殊的功能增强 除了字符串外 表达式的值也可以是对象或数组
+> 在组件上使用
+- 对于只有一个根元素的组件 当你使用了class的attribute时 这些class会被添加到根元素上 并与该元素上已有的class合并
+- 如果你的组件有多个根元素 你将需要指定哪个根元素来接收这个class 可以通过组件的$attrs属性来实现制定
+> 绑定内联样式
+- 绑定数组
+- 可以给:style绑定一个包含多个样式对象的数组 这些对象会被合并后渲染到同一元素上
+> 自动前缀
+- 在:style中使用了需要浏览器特殊前缀的css属性时 Vue会自动为他们加上相应的前缀 Vue是运行时检查该属性是否支持在当前浏览器中使用 如果浏览器不支持某个属性 那么将测试加上各个浏览器特殊前缀 以找到哪一个是被支持的
+### 列表渲染
+- v-for块中可以完整的访问父作用域内的属性和变量 v-for也支持使用可选的第二个参数表示当前项的位置索引
+- 对于多层嵌套的v-for 作用域的工作方式和函数的作用域很类似 每个v-for作用域都可以访问到父级作用域
+> v-for与对象
+- 可以使用v-for来便利一个对象的所有属性 遍历的顺序会基于该对象调用Object.keys()的返回值来决定
+> 在v-for里使用范围值
+- v-for可以直接接受一个整数值 在这种用例中 会将该模版给予1...n的取值范围重复多次
+> <template>上的v-for
+- 与模版上的v-if类似 可以在<template>标签上使用v-for来渲染一个包含多个元素的块
+> 通过key管理状态
+- 默认模式是高效的 但只适用于列表渲染输出的结果不依赖子组件状态或者临时DOM状态(例如表单输入值)的情况
+> 组件上使用v-for
+- 可以直接在组件上使用v-for 和在一般的元素上使用没有区别
+```
+<MyCom v-for = "item in items" :key="item.id"></MyCom>
+```
+- 这不会自动将任何数据传递给组件 因为组件有自己独立的作用域 为了将迭代后的数据传递到组件中 还需要传递props
+- 不自动将item注入组件的原因是 这会使组件与v-for的工作方式紧密耦合 明确其数据的来源可以使组件在其他情况下重用
+> 数组变化侦测
+1. 变更方法
+- Vue能够侦听响应式数组的变更方法 并在它们被调用时触发相关更新
+- push() pop() shift() unshift() splice() sort() reverse()
+2. 替换一个数组
+- 不可变immutable方法
+- filter() concat() slice()
+- 不会更改原数组 总是返回一个新数组 遇到非变更方法时 需要将旧的数组替换为新的
+> 展示过滤或排序后的结果
+- 计算属性中使用reverse()和sort()时务必小心 这两个方法将变更原始数组 计算函数中不应该这么做 在调用这些方法之前创建一个原数组的副本
+### 事件处理
+> 监听事件
+- 事件处理器的值可以是
+1. 内联事件处理器
+- 事件被触发时执行的内联JS语句(与onclick类似)
+2. 方法事件处理器
+- 一个指向组件上定义的方法的属性名或是路径
+- 方法事件处理器会自动接收原生DOM事件并触发执行 可以通过被触发事件的event.target.tagName访问到该DOM元素
+> 在内联事件处理器中访问事件参数
+- 有时需要在内联事件处理器中访问原生DOM事件 可以向该处理器方法传入一个特殊的$event变量或者使用内联箭头函数
+### 表单输入绑定
+- v-model会忽略任何表单元素上初始的value checked 或selected attribute 它将始终将当前绑定的JS状态视为数据的正确来源
+- 复选框
+- true-value 和 false-value是Vue特有的attributes 仅支持和v-model配套使用
+### 生命周期钩子
+- 每个Vue组件实例在创建时都需要经历一系列的初始化步骤 比如设置好数据侦听 编译模版 挂载实例到DOM 以及在数据改变时更新DOM 
+- 在此过程中 它会运行被称为生命周期钩子的函数 让开发者有机会在特定阶段运行自己的代码
+> 注册周期狗子
+- onMounted钩子可以用来在组件完成初始渲染并创建DOM节点后运行代码
+- 当调用onMounted时 Vue会自动将回调函数注册到当前正被初始化的组件实例上 这意味着这些钩子应当在组件初始化时被同步注册
+### 侦听器
+- 在组合式API中 可以使用watch函数在每次响应式状态发生变化时触发回调函数
+> 侦听数据源类型
+- watch的第一个参数可以是不同形式的数据源 它可以是一个ref(包括计算属性) 一个响应式对象 一个getter函数 或多个数据源组成的数组
+```
+const x = ref(0)
+const y = ref(0)
+
+// 单个ref
+watch(x,(newX)=>{
+   console.log(`x is ${newX}`)
+})
+// getter函数
+watch(
+   ()=>x.value+y.value,
+   (sum)=>{
+      console.log(`sum of x+y is: ${sum}`)
+   }
+)
+// 多个来源组成的数组
+watch([x,()=>y.value],([newX,newY])=>{
+   console.log(`x is ${newX} and y is ${newY}`)
+})
+```
+- 不能直接侦听响应式对象的属性值
+```
+const obj = reactive({count:0})
+// 错误 因为watch()得到的参数是一个number
+watch(obj.count,(count)=>{
+   console.log(`count is ${count}`)
+})
+```
+- 这里需要用一个返回该属性的getter函数
+```
+watch(
+   () => obj.count,
+   (count) =>{
+      console.log(`count is:`${count})
+   }
+)
+```
+> 深层侦听器
+- 直接给watch()传入一个响应式对象 会隐式地创建一个深层侦听器 该回调函数在所有嵌套的变更时都会被触发
+- 相比之下 一个返回响应式对象的getter函数 只有在返回不同的对象时 才会触发回调
+- 也可以给上面这个例子 显式加上deep选项 强制转为深层侦听器
+> watchEffect
+- watch()是懒执行的 仅当数据源变化时 才会执行回调
+- 某些场景中 希望在创建侦听器时 立即执行一遍回调
+- watchEffect()会立即执行一遍回调函数 如果这时函数产生了副作用 Vue会自动追踪副作用的依赖关系 自动分析出响应源
+```
+watchEffect(async ()=>{
+   const response = await fetch(url.value);
+   data.value = await response.json()
+})
+```
+- 这个例子中 回调回立即执行 在执行期间 它会自动追踪url.value作为依赖(和计算属性的行为类似) 每当url.value变化时 回调会再次执行
+- watchEffect仅会在其同步执行期间 才追踪以来 在使用异步回调时 只有在第一个await正常工作前访问到的属性才会被追踪
+> watch vs watchEffect
+- 都能响应式地执行有副作用的回调 它们之间的主要区别是追踪响应式依赖的方式
+1. watch只追踪明确侦听的数据源 它不会追踪任何在回调中访问到的东西
+- 仅在数据源确实改变时才会触发回调 watch会避免在发生副作用时追踪以来
+- 因此 我们能更加精确的控制回调函数的触发时机
+2. watchEffect 则会在副作用发生期间追踪依赖
+- 它会在同步执行过程中 自动追踪所有能访问到的响应式属性
+- 这更方便 而且代码往往更简洁 但有时其响应性依赖关系会不那么明确
+> 回调的触发时机
+- 更改了响应式状态 它可能会同时触发Vue组件更新和侦听器回调
+- 默认情况下 用户创建的侦听器回调 都会在Vue组件更新之前被调用 这意味着你在侦听器回调中访问的DOM将是被Vue更新之前的状态
+- 如果想在侦听器回调中能访问被Vue更新之后的DOM 需要指明flush:'post'选项
+```
+watch(source,callback,{
+   flush:'post'
+})
+watchEffect(callback,{flush:'post'})
+```
+- 后置刷新的watchEffect()有个更方便的别名 watchPostEffect()
+```
+import {watchPostEffect} from 'vue'
+watchPostEffect(()=>{})
+```
+> 停止侦听器
+- 在setup()或<script setup>中用同步语句创建的侦听起 会自动绑定到宿主组件实例上 并且会在宿主组件卸载时自动停止 大多数情况下 无需关心怎么停止一个侦听器
+- 一个关键点是 侦听器必须用同步语句创建 如果用异步回调创建一个侦听器 那么它不会绑定到当前组件上 必须手动停止它 以防内存泄露
+- 要手动停止一个侦听器 需要调用watch或watchEffect返回的函数
+```
+const unwatch = watchEffects(()=>{})
+// 当侦听器不再需要时
+unwatch()
+```
+- 需要异步创建侦听器的情况很少 尽可能选择同步创建 如需等待一些一步数据 可以使用条件式的侦听逻辑
+### 模版引用
+- 需要直接访问底层DOM 使用特殊的ref attribute
+```
+<input ref = "input">
+```
+- ref是一个特殊的attribute 它允许我们在一个特定的DOM
+
+### 创建一个Vue应用
+> 应用实例
+- 每个Vue应用都是通过createApp函数创建一个新的应用实例
+```
+import {createApp} from 'vue'
+const app = createApp({})
+```
+> 根组件
+- 传入createApp的对象实际上是一个组件 每个应用都需要一个根组件 其他组件将作为其自组件
+- 如果使用的是单文件组件 可以直接从另一个文件中导入根组件
+```
+import {createApp} from 'vue'
+import App from './App.vue'
+
+const app = createApp(app)
+```
+> 挂载应用
+- 应用实例必须在调用了.mount()方法后才会渲染出来 该方法接收一个容器参数 可以是一个实际的DOM元素或是一个CSS选择器字符串
+```
+<div id="app"></div>
+app.mount('#app')
+```
+- 应用根组件的内容将会被渲染在容器元素里面 容器元素自己将不会被视为应用的一部分
+- .mount()方法应该始终在整个应用配置和资源注册完成后被调用 不同于其他资源注册方法 它的返回值是根组件实例 而非应用实例
+> DOM中的根组件模版
+- 当在未采用构建流程的情况下使用Vue时 可以在挂载容器中直接书写根组件模版
+- 当根组件没有设置template选项时 Vue将自动使用容器的innerHTML作为模版
+```
+<div id="app">
+  <button @click="count++">{{ count }}</button>
+</div>
+
+import { createApp } from 'vue'
+
+const app = createApp({
+  data() {
+    return {
+      count: 0
+    }
+  }
+})
+
+app.mount('#app')
+```
+> 应用配置
+- 应用实例会暴露一个.config对象允许我们配置一些应用级的选项 例如定义一个应用级的错误处理器 它将捕获所有由子组件上抛而未被处理的错误
+```
+app.config.errorHandler = (err) =>{
+
+}
+```
+- 应用实例还提供一些方法来注册应用范围内可用的资源 例如注册一个组件
+```
+app.component('TodoDeleteBtn',TodoDeleteBtn);
+```
+- 这使得TodoDeleteBtn在应用的任何地方都是可用的
+> 多个应用实例
+- 应用实例并不只限于一个 createApp API允许你在同一个页面中创建多个共存的Vue应用 而且每个应用都拥有自己的用于配制和全局资源的作用域
+- 如果你正在使用Vue来增强服务端渲染HTML 并且只想要Vue去控制一个大型页面中特殊的一小部分 应避免将一个单独的Vue应用实例挂载到整个页面上 而是应该创建多个小的应用实例 将它们分别挂载到所需的元素上
+
 ### Vue模版语法 
 
 > 动态绑定多个值
