@@ -81,6 +81,8 @@
 10. FETCH_HEAD:是一个版本链接，记录在本地的一个文件中，指向目前已经从远程仓库取下来的分支的末端版本。
 11. COMMIT_EDITMSG:commit 编辑
 ### ssh
+
+## Git 命令
 ### git fetch
 1. git fetch <远程主机名> 这个命令将某个远程主机的全部更新全部取回本地
 2. git fetch <远程主机名> <分支名> 只想取回特定分支的更新
@@ -326,8 +328,39 @@ git push origin :branch-name
 - develop新增需求a feat:a
 - feat新增需求b feat:b
 ### git restore
+- 针对暂存区的恢复
+- 已经在本地仓库的文件 使用git restore --staged不能恢复到工作区 restore命令只针对暂存区
+> git restore [file]
+- 将不在缓存区的文件撤销更改
+> git restore --staged [file]
+- 将提交到暂存区的文件恢复到工作区
+### git reflog
+- 显示可引用的历史版本记录
+- 使用git log命令只可以查看到HEAD指针以及其之前的版本信息
+- git reflog可以查看到所有历史版本信息 
+- reflog不是git仓库的一部分 它单独存储 是本地的(git reflog命令显示的内容 应该是存储在.git/logs/HEAD文件中 或.git/logs/refs目录中的文件)
+- git reflog 保留从clone仓库开始 用户所有在本地库中的操作
 ### git config
-### mac电脑下查看.git文件
+> config文件分类
+- Git中有三层config文件 系统，全局，本地
+- 对于同一配置项 三个配置文件的优先级是1<2<3
+- Git的配置文件是纯文本的 可以直接手动编辑这些配置文件
+1. 查看系统config
+```
+git config --system --list
+```
+- /etc/gitconfig 包含了适用于系统所有用户和所有选项的值 git的安装目录 --system系统
+2. 查看当前用户(global)配置
+```
+git config --global --list
+```
+- ~/.gitconfig 只适用于当前登陆用户的配置 --glocal全局
+3. 查看当前仓库配置信息
+```
+git config --local --list
+```
+- 位于git项目目录中的.git/config 适用于特定git项目的配置 --local当前项目
+
 - git使用git.config指令来指定与git相关的配置
 - config配置有system级别 global(用户级别) local(当前仓库)三个级别 三个设置范围system>global>local 底层配置会覆盖顶层设置 分别使用--system/global/local可以定位到配置文件
 1. git config --list 查看git的配置列表
@@ -343,6 +376,225 @@ git config --global user.email 'email'
 ```
 git config --replace-all user.name 'name'
 git config --replace-all user.email 'email'
+```
+### git配置credential helper
+- 向git提供用户名和密码
+### git diff
+- git diff命令比较文件的不同 即比较文件在暂存区和工作区的差异
+- git diff命令显示已写入暂存区和已经被修改但尚未写入暂存区文件的区别
+> 显示暂存区和工作区的差异
+```
+git diff [file]
+```
+> 显示暂存区和上一次提交(commit)的差异
+```
+git diff -cached [file]
+git diff -staged [file]
+```
+> 显示两次提交之间的差异
+```
+git diff [first-branch]...[second-branch]
+```
+- git status显示上次提交更新后的更改或者写入缓存的改动
+- git diff一行一行的显示这些改动具体是什么
+### git remote
+- 用于在远程仓库的操作
+0. 展示当前关联的其他仓库列表
+```
+git remote
+```
+1. 显示所有远程仓库 输出会包含每一个仓库的URL
+```
+git remote -v
+```
+2. 显示某个远程仓库的信息
+```
+git remote show xx(xx为远程地址的别名)
+```
+3. 添加远程版本库
+```
+git remote add [name][url]
+```
+- name是自己取的仓库的名字 url是地址
+4. 删除远程仓库
+```
+git remote rm name
+```
+5. 修改仓库名
+```
+git remote rename oldname newname
+```
+### 远端主机
+> 添加远端主机(git remote add/git clone)
+- git中有两种方式添加远端主机
+1. 隐式添加
+- git clone <远端地址> 指令
+- 克隆远端仓库的同时 会自动添加该远端主机到当前目录 并默认主机名为origin
+2. 显式添加
+- git remote add <主机别名><远端地址>
+- 指令中 主机别名参数为自定义指定 远端地址即远端服务器上的访问地址
+- 可以为任一目录指定任意数量远端主机
+> 查看远端主机信息
+1. git remote
+- 查看当前仓库指定的所有远端主机的简要信息 别名列表
+2. git remote -v
+- 查看详细信息列表
+> 查看特定主机信息
+1. git remote show <主机别名>
+- 可以看到详细信息 远端地址 远程所有分支
+- 以及在各本地分支上使用git pull或git push指令操作时对应的远程分支
+> 重命名远端主机别名
+1. git remote rename <旧主机别名> <新别名>
+> 删除某个远程版本库关联
+1. git remote remove/rm <主机别名>
+> 添加一个远程版本库关联
+1. git remote add 
+### 本地有一个初始化好的仓库 又一个创建好的远程空仓库 将两者关联
+1. git remote add origin xxx.git 先添加到本地仓库
+2. git push -u origin master 表示把当前仓库的master分支和远端仓库的master分支关联起来
+### git add
+1. 添加一个或多个文件到暂存区
+```
+git add [file1] [file2]
+```
+2. 把当前目录下所有文件改动都添加到暂存区
+```
+git add .
+```
+3. 把当前仓库内所有文件改动都添加到暂存区
+```
+git add -A
+```
+4. 提交到本地仓库
+```
+git commit -am
+```
+### git rm
+1. git rm .env
+- 执行完这个命令就表示.env文件从git仓库中删除了 配合.gitignore就能保证以后所有的.env文件变更都不用担心被提交到远程仓库
+2. git rm -r dist
+- 删除dist目录
+### git reset
+```
+git reset [--soft|--mixed|--hard][HEAD]
+```
+> 参数
+1. --soft
+- 重置最新一次提交版本 不会修改暂存区和工作区
+2. --mixed
+- 默认参数 用于重置暂存区的文件与上一次的提交保持一致 工作区文件内容保持不变
+3. --hard
+- 重置所有提交到上一个版本 并修改工作去 会彻底回到上一个提交版本 在代码中看不到当前提交的代码 工作区改动被重置
+### git revert
+### git tag
+- 两种标签形式
+1. 轻量标签 lightweight
+- 只是某个commit的引用 可以理解为是一个commit的别名
+```
+git tag v1.0.0
+```
+2. 附注标签 annotated
+- 是存储在git仓库中的一个完整对象 包含打标签者的名字 电子邮箱地址 日期地址
+- 它是可以被校验的 可以使用GNU Privacy Guard(GPG)签名并验证
+> 查看标签
+1. git tag
+- 直接列出所有的标签
+2. git tag -l xxx
+- 可以根据xxx进行标签的筛选
+3. git show 标签名
+- 查看标签的信息 (轻量标签和附注标签的信息是不一样的)
+> 创建标签
+1. 创建轻量标签
+```
+git tag 标签名
+```
+- 直接给当前的提交版本创建一个[轻量标签]
+```
+git tag 标签名 提交版本号
+```
+- 给指定的提交版本创建一个[轻量标签]
+2. 创建附注标签
+```
+git tag -a 标签名称 -m 附注信息
+```
+- 直接给当前的提交版本创建一个[附注标签]
+```
+git tag -a 标签名称 提交版本号 -m 附注信息
+```
+- 给指定的提交版本创建一个[附注标签]
+- -a立即为annotated的首字符 表示附注标签
+- -m指定附注信息
+3. 删除标签
+```
+git tag -d 标签名称
+```
+- 删除指定名称的标签
+> 远程仓库tag的操作
+1. 推送到远程仓库
+- 默认情况下 git push命令并不会把标签推送到远程仓库中
+- 因此 必须手动的将本地的标签推送到远程仓库中
+```
+git push origin 标签名称
+```
+- 将指定的标签上传到远程仓库
+```
+git push origin --tags
+```
+- 将所有不在远程仓库中的标签上传到远程仓库
+2. 删除远程仓库的标签
+- 删除远程仓库上的标签同样也需要手动执行
+```
+git push origin :regs/tags/标签名称
+git push origin --delete 标签名称
+```
+> 检出标签
+- 在这个标签的基础上进行其他的开发或操作
+- 以标签指定的版本为基础版本 新建一个分支 继续其他的操作
+```
+git checkout -b 分支名称 标签名称
+```
+### git show
+### git push
+1. 推送分支并创建关联关系
+```
+git push --set-upstream origin branch1
+```
+### git fetch
+- 合并远端分支
+```
+git merge origin/[当前分支名]
+```
+### HEAD是什么
+- .git/HEAD文件 它存储着当前working directory所处的某次commit 打开文件内容为
+```
+ref:refs/heads/master
+```
+- refs目录下存储的是仓库和tags 每个仓库下又有分枝 每个tags下又有tag 一个tag对应某次commit
+```
+存储local master分支的最新commit对象的SHA-1
+refs/heads/master
+
+存储远程仓库 master分支的最新commit对象的SHA-1
+refs/remotes/origin/master
+
+存储tag的SAH-1
+tags/xxx
+```
+> HEAD是当前分支引用的指针 它总是指向某次commit 默认是上一次的commit 这表示HEAD将是下一次提交的父节点
+- 通常可以把HEAD看作上一次提交的快照 HEAD的指向是可以改变的 比如提交了commit 切换了仓库 分支 或者回滚了版本 切换了tag
+> 用Git对项目进行版本管理时
+1. 用HEAD表示当前版本
+2. HEAD^表示上一个版本 同HEAD~1
+3. HEAD^^表示上上个版本 HEAD~2
+4. HEAD~100表示上100个版本
+> 查看HEAD指向
+```
+cat .git/HEAD
+```
+- 存储当前分支 如ref:refs/heads/master
+- 如果HEAD指向一个引用 可以用
+```
+git symbolic-ref HEAD
 ```
 ### git本地新建分支并提交到远程仓库
 1. 建立本地仓库
@@ -791,3 +1043,40 @@ git push origin origina:origina
 1. git checkout -b locala
 2. 修改完 add commit
 3. git push origin locala:locala 修改推到远程 远程新建相关分支 并且本地分支与远程对应分支关联
+### git cherry pick
+- 将代码从一个分支转移到另一个分支
+1. 需要另一个分支的所有代码变动 采用合并git merge
+2. 需要部分代码变动(某几个提交) 采用cherry pick
+> 基本用法
+- git cherry-pick命令的作用 是将指定的提交commit应用于其他分支
+```
+git cherry-pick <commitHash>
+```
+- 该命令会将指定的提交commitHash 应用于当前分支 这会在当前分枝产生一个新的提交 当然它们的哈希值会不一样
+- git cherry-pick命令的参数 不一定是提交的哈希值 分支名也是可以的 表示转移该分支的最新提交
+> 转移多个提交
+- cherry pick 支持一次转移多个提交
+```
+git cherry-pick <hashA><hashB>
+```
+- 该命令将A B两个提交应用到当前分支 会在当前分支生成两个对应的新提交
+```
+git cherry-pick A..B
+```
+- 该命令可以转移从A到B的所有提交 它们必须按照正确的顺序放置 提交A必须早于提交B 否则命令将失败 但不会报错 该命令 提交A将不会包含在Cherry pick
+```
+git cherry-pick A^..B
+```
+- 该语法包含commit A
+> 代码冲突
+- 如果操作过程中发生代码冲突 Cherry pick会停下来 让用户决定如何继续操作
+1. --continue
+```
+git cherry-pick --continue
+```
+2. --abort
+- 发生代码冲突后 放弃合并 回到操作前的样子
+3. --quit
+- 发生代码冲突后 退出Cherry pick 但是不回到操作前的样子
+### git rebase
+- rebase 变基 改变基座 
