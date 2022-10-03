@@ -342,6 +342,7 @@ git push origin :branch-name
 > git restore --staged [file]
 - 将提交到暂存区的文件恢复到工作区
 ### git reflog
+- 显示的是一个HEAD指向发生改变的时间列表
 - 显示可引用的历史版本记录
 - 使用git log命令只可以查看到HEAD指针以及其之前的版本信息
 - git reflog可以查看到所有历史版本信息 
@@ -383,6 +384,19 @@ git config --global user.email 'email'
 ```
 git config --replace-all user.name 'name'
 git config --replace-all user.email 'email'
+```
+4. 编辑配置文件
+```
+git config --global --edit
+```
+5. 删除全局配置项
+- 删除了user.name这个配置
+```
+git config --global --unset user.name
+```
+6. 配置别名
+```
+git config --global alias.co checkout
 ```
 ### git配置credential helper
 - 向git提供用户名和密码
@@ -472,7 +486,7 @@ git add .
 ```
 git add -A
 ```
-4. 提交到本地仓库
+4. add和commit的合并 便捷写法(未追踪的文件无法直接提交到暂存区/本地仓库)
 ```
 git commit -am
 ```
@@ -481,6 +495,12 @@ git commit -am
 - 执行完这个命令就表示.env文件从git仓库中删除了 配合.gitignore就能保证以后所有的.env文件变更都不用担心被提交到远程仓库
 2. git rm -r dist
 - 删除dist目录
+```
+删除工作区/暂存区的文件
+git rm [file1][file2]
+停止追踪指定文件 但该文件会保留在工作区
+git rm --cached [file]
+```
 ### git reset
 ```
 git reset [--soft|--mixed|--hard][HEAD]
@@ -595,10 +615,49 @@ git checkout -b 分支名称 标签名称
 ### git commit
 1. git commit -amend
 - 对最近一次的提交的信息进行修改 此操作会修改commit的hash值
+### git commit -amend
+- 编辑器会弹出上一次提交的信息 可以在这里修改提交信息
+```
+git commit -amend -m '本次提交的说明'
+加入--no-edit标记会修复提交但不修改提交信息 编辑器不会弹出上一次提交的信息
+git commit --amend --no-edit
+```
+- git commit -amend既可以修改上次提交的文件内容 也可以修改上次提交的说明 会用一个新的commit更新并替换最近一次提交的commit 
+- 如果暂存区有内容 这个新的commit会把任何修改内容和上一个commit的内容结合起来 如果暂存区没有内容 那么这个操作就只会把上次的commit消息重写一遍
+- 永远不要修复一个已经推送到公共仓库中的提交 会拒绝推送到仓库
 ### git push
 1. 推送分支并创建关联关系
 ```
 git push --set-upstream origin branch1
+```
+2. 
+```
+将本地仓库的文件推送到远程分支
+如果远程仓库没有这个分支 会新建一个同名的远程分支
+如果省略远程分支名 则表示两者同名
+git push <远程主机名> <本地分支名>:<远程分支名>
+git push origin branchname
+```
+3. 
+```
+如果省略本地分支名 则表示删除指定的远程分支
+因为这等同于推送一个空的本地分支到远程分支
+git push origin :master
+等同于
+git push origin --delete master
+```
+4. 
+```
+建立当前分支和远程分支的追踪关系
+git push -u origin master
+如果当前分支与远程分支之间存在追踪关系 
+则可以省略分支和-u
+git push
+```
+5. 
+```
+不管是否存在对应的远程分支 将本地的所有分支都推送到远程主机
+git push --all origin
 ```
 ### git fetch
 - 合并远端分支
@@ -782,7 +841,7 @@ git pull origin master
 
 > 查看相关命令
 
-1. 查看仓库状态
+1. 查看工作区和暂存区状态
 
 ```
 git status
