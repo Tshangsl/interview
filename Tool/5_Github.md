@@ -653,6 +653,8 @@ git push -u origin master
 如果当前分支与远程分支之间存在追踪关系 
 则可以省略分支和-u
 git push
+也可以使用以下命令建立当前分支和远程分支的追踪关系
+git push --set-upstream origin master
 ```
 5. 
 ```
@@ -902,13 +904,29 @@ git checkout --文件名
 1. 查看分支
 
 ```
-git branch
+查看本地分支
+git branch | git branch -l
+查看远程分支
+git branch -r
+查看所有分支(本地分支+远程分支)
+git branch -a
+查看所有分支并带上最新的提交信息
+git branch -av
+查看本地分支对应的远程分支
+git branch -vv
 ```
 
-2. 创建分支
+2. 新建分支
 
 ```
+在别的分支下新建一个分支 新分支会复制当前分支的内容
+注意：如果当前分支有修改 但是没有提交到仓库 此时修改的内容是不会被复制到新分支
 git branch 分支名
+切换分支(切换分支时 本地工作区 仓库 都会相应切换到对应分支的内容)
+git checkout branchname
+修改当前分支名
+git branch -m branchname
+
 ```
 
 3. 切换分支
