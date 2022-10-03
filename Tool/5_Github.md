@@ -544,7 +544,6 @@ git push origin --tags
 2. 删除远程仓库的标签
 - 删除远程仓库上的标签同样也需要手动执行
 ```
-git push origin :regs/tags/标签名称
 git push origin --delete 标签名称
 ```
 > 检出标签
@@ -554,6 +553,11 @@ git push origin --delete 标签名称
 git checkout -b 分支名称 标签名称
 ```
 ### git show
+- 可以用于显示提交日志的相关信息
+1. git show 默认显示HEAD 想显示某个提交信息 git show后带上某个提交的hash
+### git commit
+1. git commit -amend
+- 对最近一次的提交的信息进行修改 此操作会修改commit的hash值
 ### git push
 1. 推送分支并创建关联关系
 ```
