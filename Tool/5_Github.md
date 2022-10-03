@@ -790,4 +790,4 @@ git push origin origina:origina
 ### 本地新建分支并推到远程 远程同步建立相关分支并和本地分支管理
 1. git checkout -b locala
 2. 修改完 add commit
-3. git push origin locala:locala 修改推到远程 远程新建相关分支 并且本地分支与远程对应分支关联
+3. git push origin locala:locala 修改推到远程 远程新建相关分支 并且本地分支与远程对应分支关联ss
