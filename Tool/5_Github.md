@@ -660,7 +660,7 @@ git push <远程主机名><本地分支名>:<远程分支名>
 ```
 git push origin master
 ```
-- 如果当前分支与多个主机存在追踪关系 则可以使用-u选项指定一个默认主机 这样后面就可以不加任何参数使用git push 
+- 如果当前分支与多个主机存在追踪关系 则可以使用-u选项指定一个默认主机 这样后面就可以不加任何参数使用git push xxx
 ```
 Branch master set up to track remote branch master from [remote-name]
 ```
