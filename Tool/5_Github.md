@@ -88,7 +88,13 @@
 2. git fetch <远程主机名> <分支名> 只想取回特定分支的更新
 - 最常见的命令如取回origin主机的master分支 git fetch origin master
 - 取回更新后 会返回一个FETCH_HEAD 指的是某个branch在服务器上的最新状态 可以在本地通过它查看刚取回的更新信息 git log -p FETCH_HEAD
+3. git fetch
+- 获取远程仓库所有分支的更新
 ### git pull
+> 使用rebase的模式进行合并
+```
+git pull --rebase <远程主机名><远程分支名>:<本地分支名>
+```
 > 过程可以理解为
 1. git fetch origin master 从远程主机的master分支拉取最新内容
 2. git merge FETCH_HEAD 将拉取下来的最新内容合并到当前所在的分支中
@@ -202,6 +208,7 @@ git log [] [..] [[-]...]
 6. git branch -d -r<branchname> 删除远程分支 删除后还需推送到服务器
    git push origin:<branchname>
 7. git branch -m <oldbranch> <newbranch> 重新命名本地分支
+8. git branch -m <old-branch-name> <new-branch-name>
 > 使用git branch删除分支
 1. 删除本地分支
 git branch -d +分支名称 
@@ -486,6 +493,36 @@ git reset [--soft|--mixed|--hard][HEAD]
 3. --hard
 - 重置所有提交到上一个版本 并修改工作去 会彻底回到上一个提交版本 在代码中看不到当前提交的代码 工作区改动被重置
 ### git revert
+> 基础语法
+1. 
+```
+git revert -n commitid
+```
+- 只会反做commitid对应的内容 然后重新commit一个信息 不会影响其他的commit内容
+2. 反做多个commitid
+```
+git revert -n commitida..commitb
+```
+- 反做commita到commitb之间的所有commit
+
+- 可以撤销指定的提交内容 撤销后会生成一个新的commit
+> 两种commit
+1. 常规commit
+- 使用git commit提交的commit
+2. merge commit
+- 使用git merge合并两个分支之后 会得到一个新的merge commit
+> 两种commit的不同
+- merge commit包含两个parent commit 代表该merge commit是从哪两个commit合并过来的
+> revert常规commit
+- 使用git revert <commit id>即可 git会生成一个新的commit 将指定的commit内容从当前分支上撤除
+> revert merge commit
+- 需要添加-m选项代表这次revert的是一个merge commit
+- 如果直接使用git revert <commitid> git不知道到底撤除哪一条分支上的内容 需要指定一个parent number标识出主线 主线的内容将会保留 而另一条分支的内容将被revert
+- -m选项接收的参数是一个数字 数字取值为1和2 也就是merge行里面列出来的第一个还是第二个 其含义用来保留某个分支
+- 要revert will-be-revert分支上的内容 即保留主分支 应该设置主分支为主线
+```
+git revert -m 1 bd86846
+```
 ### git tag
 - 两种标签形式
 1. 轻量标签 lightweight
