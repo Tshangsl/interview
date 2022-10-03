@@ -656,7 +656,7 @@ git pull origin master:master
 git push <远程主机名><本地分支名>:<远程分支名>
 ```
 - 如果省略远程分支名 则表示将本地分支推送与之存在追踪关系的远程分支(通常两者同名)如果该远程分支不存在则会被新建
-- 下面这条命令表示 将本地的master分支推送到origin主机的master分支 如果后者不存在 则会被新建
+- 下面这条命令表示 将本地的master分支推送到origin主机的master分支 如果后者不存在 则会被新建 sss
 ```
 git push origin master
 ```
