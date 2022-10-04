@@ -43,7 +43,7 @@
    - .git 文件夹中还包含 git 自动创建的 master 分支 并将 head 指针指向 master 分支 使用 commit 命令可以将暂存区中文件添加到本地仓库
 4. 远程仓库
    - 不是在本地仓库中 项目代码在远程 git 服务器上 比如项目放在 github 上 就是一个远程仓库 通常使用 clone 命令将远程仓库拷贝到本地仓库中 开发后推送到远程仓库
-### git 工作原理
+### Git工作原理
 > 定义
 - Git 是一个开源的分布式版本控制系统，可以有效，高速地处理从很小到非常大的项目版本管理。Git 是[Linus Torvalds]为了帮助管理 Linux 内核开发而开发的一个开放源码的版本控制软件
 - Torvalds 开始着手开发 Git 是为了作为一种过渡方案来代替 BitKe
@@ -61,14 +61,54 @@
 1. 工作区 workspace->git add->暂存区 index->git commit->本地仓库 Repository->git push->远程仓库
 2. 远程仓库区->git fetch->使用 refs/remotes 下对应分支文件记录远程分支末端 commit_id 和本地仓库区->git merge->工作区
 3. 远程仓库区->git pull->使用 refs/remotes 下对应分支文件记录远程分支末端 commit_id and 本地仓库区 and 工作区
-### git中的HEAD head 和master
+### Git中的HEAD head 和master
 > 概念
 - HEAD是当前活跃分支的游标
 - HEAD并非只能指向分支的最顶端(时间节点距今最近的那个)实际上它可以指向任何一个节点 它就是Git内部用来追踪当前位置的存在
 > HEAD和head
 - HEAD是current branch(当下的分支) 当使用git checkout切换分支时 HEAD修订版本重新指向新的分支 有时HEAD会指向一个没有分支名字的修订版 这种情况叫detached HEAD
 - head是commit对象的引用 每个head都有一个名字(分支名字或者标签名字等)但是默认情况下 每个叫master的repository都会有一个head 一个repository可以包含任意数量的head 一个repository可以包含任意数量的head 任意时候 只要这个head被选择成为current head 那么这个head就成了HEAD总是大写
-### 本地 git 项目中.git 目录下的文件
+### HEAD是什么
+- .git/HEAD文件 它存储着当前working directory所处的某次commit 打开文件内容为
+```
+ref:refs/heads/master
+```
+- refs目录下存储的是仓库和tags 每个仓库下又有分枝 每个tags下又有tag 一个tag对应某次commit
+```
+存储local master分支的最新commit对象的SHA-1
+refs/heads/master
+
+存储远程仓库 master分支的最新commit对象的SHA-1
+refs/remotes/origin/master
+
+存储tag的SAH-1
+tags/xxx
+```
+> HEAD是当前分支引用的指针 它总是指向某次commit 默认是上一次的commit 这表示HEAD将是下一次提交的父节点
+- 通常可以把HEAD看作上一次提交的快照 HEAD的指向是可以改变的 比如提交了commit 切换了仓库 分支 或者回滚了版本 切换了tag
+> 用Git对项目进行版本管理时
+1. 用HEAD表示当前版本
+2. HEAD^表示上一个版本 同HEAD~1
+3. HEAD^^表示上上个版本 HEAD~2
+4. HEAD~100表示上100个版本
+> 查看HEAD指向
+```
+cat .git/HEAD
+```
+- 存储当前分支 如ref:refs/heads/master
+- 如果HEAD指向一个引用 可以用
+```
+git symbolic-ref HEAD
+```
+### commit id
+- commit id是用来唯一标识每一个commit的 使用git log命令可以看到一大堆hash化的commit-id
+- git的原子粒度最细就到commit id 
+- 同一次commit里有两个文件改动 想分别进行处理 是没有办法的 git管理的粒度不到这里
+> Head
+- git操作时要有Head的概念 Head就是一个指针 指向一个commit id 
+- 你以为head指向的是一个branch 实际底层也是指向这个branch的最后 也就是最新的那一个commit id
+- Head并非只能指向一个branch最新的commit id 它可以指向该分支上的任何一个commit id
+### 本地 Git 项目中.git 目录下的文件
 1. refs:存储 git 各种引用的目录，包含分支，远程分支和标签。
 2. objects:是存储 git 各种对象及备用的对象库，包含正常的压缩和压缩后的。
 3. info:存储 git 信息的目录 如判处特定后缀的文件
@@ -80,143 +120,74 @@
 9. HEAD:代码库当前分支的志向
 10. FETCH_HEAD:是一个版本链接，记录在本地的一个文件中，指向目前已经从远程仓库取下来的分支的末端版本。
 11. COMMIT_EDITMSG:commit 编辑
-### ssh
 
 ## Git 命令
 ### git fetch
-1. git fetch <远程主机名> 这个命令将某个远程主机的全部更新全部取回本地
-2. git fetch <远程主机名> <分支名> 只想取回特定分支的更新
-- 最常见的命令如取回origin主机的master分支 git fetch origin master
-- 取回更新后 会返回一个FETCH_HEAD 指的是某个branch在服务器上的最新状态 可以在本地通过它查看刚取回的更新信息 git log -p FETCH_HEAD
-3. git fetch
-- 获取远程仓库所有分支的更新
-### git pull
-> 使用rebase的模式进行合并
 ```
+将某个远程主机的全部更新取回本地
+git fetch <远程主机名>
+只取回特定分支的更新
+git fetch <远程主机名> <分支名>
+查看刚取回的更新信息
+git log -p FETCH_HEAD
+```
+### git pull
+```
+使用rebase模式进行合并
 git pull --rebase <远程主机名><远程分支名>:<本地分支名>
 ```
-> 过程可以理解为
-1. git fetch origin master 从远程主机的master分支拉取最新内容
-2. git merge FETCH_HEAD 将拉取下来的最新内容合并到当前所在的分支中
-
-1. 基于本地的FETCH_HEAD记录 对比本地的FETCH_HEAD记录与远程仓库的版本号 然后git fetch获得当前指向的远程分支的后续版本的数据
-2. 利用git merge将其与本地的当前分支合并
-- git pull后不加参数时 跟git push一样 默认是git pull origin 当前分支名 
-- 远程仓库没有跟本地当前分支名一样的分支 肯定会报错
-- 本地master分支执行git pull 时就是git pull origin master
-### git fetch 和 git pull 区别
-1. git fetch:将远程主机的最新内容拉到本地，用户在检查了以后决定是否合并到工作本机分支中，具体操作如下。
-```
-git fetch origin master:temp
-// 本地新建一个temp分支 并将远程origin仓库的master分支代码下载到本地temp分支
-git diff temp
-// 比较远程代码和本地代码的区别
-git merge temp
-// 将temp分支合并到本地master分支
-git branch -d temp
-// 如果不想保留分支 可以将其删除
-```
-2. git pull:给予本地的 FETCH_HEAD 记录，对比本地的 FETCH_HEAD 与远程仓库的版本号，然后 git fetch 获得当前的远程分支的后续版本的数据，然后利用 git merge 将其与本地的分支合并，可以认为是 git pull 是 git fetch 和 git merge 两个步骤的合并，git pull 过程可以理解为下。
-```
-git fetch origin master // 将远端的master分支拉取最新内容
-git merge FETCH_HEAD //将拉去的最新内容和当前分支合并
-```
-- git pull 用法
-```
-git pull 远程主机名 远程分支名:本地分支名
-// 将远程主机的某个分支 与本地的指定分支合并
-```
-- git pull 合并后可能会出现冲突 需要手动解决冲突
-```
-error:Your local changes to the following files would be overwritten by merge
-Please commit your changes or stash them before you merge
-// 更改的代码与本地的修改代码有冲突 先提交你的改变或现将本地修改缓存起来
-```
-- git stash 解决冲突
-
-```
-git stash //现将本地修改暂存起来
-git stash list // 查看保存信息
-git pull //拉取内容
-git stash pop //还原暂存的内容
-```
 ### git status
-> 用途
 - git status命令用于显示工作目录和暂存区的状态 使用此命令能看到哪些修改被暂存 哪些没有 哪些文件没有被git tracked到
-- git status命令可以列出当前目录中所有还没有被git管理的文件和被git管理且被修改但还未提交(git commit)的文件
 - 通过git status -uno可以只列出所有已经被git管理的且被修改但没提交的文件
 - git status不显示已经commit到项目历史中去的信息 看项目历史的信息要使用git log
-> git status相对来说是一个简单的命令 它简单的展示状态信息 输出的内容分为3个分类/组
+-å git status相对来说是一个简单的命令 它简单的展示状态信息 输出的内容分为3个分类/组
 1. Changes to be committed:代表被 add 的文件 被加载到了暂存区
 2. Changes not staged for commit:代表在当前分支中被修改的文件 还没有背 add 暂存在工作区
 3. Untracked files:没有tracked过的文件 即从没有add过的文件
-> 忽略文件(untracked文件)
+- 忽略文件(untracked文件)
 - 没有tracked的文件分两类 
 1. 已经被放在工作目录下但还是没有执行git add的
 2. 一些编译了的程序文件(如 .pyc .obj .exe)
 - Git在.gitignore中把要忽略的文件放在其中 每一个想忽略的文件应当独占一行 *这个符号可以作为通配符使用 如在项目根目录下的.gitignore文件中加入下面内容能阻止.pyc和.tmp文件出现在git status中
-```
-*.pyc
-*.tmp
-```
 ### git log
-> 用途
-- 用来查看历史提交记录 如果不指定分支或master 默认情况下git log显示的是目前你Head位置的git提交日志
+- 查看历史提交记录 不指定分支或master 默认情况下git log显示的是目前你Head位置的git提交日志
 ```
-git log [] [..] [[-]...]
+不带任何参数 会列出所有历史记录 最近的排在最上方 显示提交对象的哈希值 作者 提交日期 提交说明
+git log
+查看版本号与备注
+git log --pretty=online
+图形化显示log
+git log --graph
+git log -p
+显示每次更新的修改文件的统计信息
+git log --stat
 ```
-1. git log
-- commit 哈希id
-- 提交的Author信息
-- 提交的日期和时间
-- commit info信息
-- 不带任何参数 它会列出所有历史记录 最近的排在最上方 显示提交对象的哈希值 作者 提交日期 和提交说明 如果记录过多 则按Page Up,Page Down,来控制显示
-- 按q退出历史记录列表
-2. git log -p 
-- 与--stat类似 但更详细 可以看到每个文件更为详细的修改内容 控制输入每个commit具体修改的内容 输入的形式以diff的形式给出
-- 按补丁显示每个更新间的差异 比git log -stat命令信息更全
-3. git log --stat
-- 使用--stat参数主要可以在git log的基础上输入文件增删改的统计数据
-- 显示每次更新的修改文件的统计信息 每个提交都列出了修改过的文件 以及其中添加和移除的行数 并在最后列出所有增减行数小计
-4. git log --shortstat
-- 只显示--stat中最后的行数添加修改删除统计
-5. git --name-only
-- 仅在已修改的提交信息后显示文件清单
-6. git --name-status
-- 显示新增 修改 和删除的文件清单
-7. git --abbrev-commit
-- 仅显示SHA-1的前几个字符 而非所有的40个字符
-8. git --relative-date
-- 使用较短的相对事件显示(如 two weeks ago)
-9. git --graph
-- 显示ASCII图形表示的分支合并历史 类似一个树形结构
-10. git log --oneline
-- 只显示提交的SHA1值和提交信息 SHA1还是缩短显示前几位 一般为前七位
-11. git log --author="xxx"
-- 用来过滤commit 限定输出给定的用户 有利于查找团队某个人的提交历史
-12. git log --after/git log --before
-- 限定指定日期范围的log 即按照日期查找
-13. git log --decorate
-- 用来控制log输出时 显示对应commit所属的branch和tag信息
 ### git branch
-> 常见命令
-1. git branch 查看本地所有分支
-2. git branch -r 查看远程所有分支
-3. git branch -a 查看本地和远程的所有分支
-4. git branch <branchname>新建分支
-5. git branch -d <branchname> 删除本地分支
-6. git branch -d -r<branchname> 删除远程分支 删除后还需推送到服务器
-   git push origin:<branchname>
-7. git branch -m <oldbranch> <newbranch> 重新命名本地分支
-8. git branch -m <old-branch-name> <new-branch-name>
-> 使用git branch删除分支
-1. 删除本地分支
-git branch -d +分支名称 
-2. 删除远程分支
-git branch -r -d origin/branch-name
-git push origin :branch-name
------
-- git checkout -b feat/max_stock_PRJ-00217883 origin/feat/
+```
+查看本地所有分支
+git branch|git branch -l
+查看远程所有分支
+git branch -r
+查看本地和远程的所有分支
+git branch -a
+新建分支但不切换到新建的分支上
+git branch xxx
+删除本地分支
+git branch -d xxx
+删除本地分支 然后推送到服务器
+git branch -d -r origin/xxx
+git push origin :xxx
+重命名本地分支
+git branch -m oldname newname
+查看所有分支并带上最新的提交信息
+git branch -av
+查看本地分支对应的远程分支
+git branch -vv
+查看哪些分支已经合并到当前分支
+git branch --merged
+查看其他分支
+git branch --no-merged
+```
 ### git tag
 1. 定义 创建时间
 - 项目的版本管理中 每当一个release版本发布时 需要做一个记录 以便以后需要的时候能查找特定的版本 这时候就用到tag这个功能
@@ -228,35 +199,33 @@ git push origin :branch-name
 - tag就像是一个里程碑 一个标志 一个点 branch是一个新的征程一条线
 - tag是静态的 branch要往前走
 - 稳定版本备份用tag 新功能多人开发用branch(开发完成后merge到master)
-3. 相关操作命令
-   1. 打标签
-   ```
-   git tag -a 0.1.3 -m 'Release version 0.1.3'
-   ```
-   - -a 0.1.3是增加名为0.1.3的标签
-   - -m后跟着的是标签分备注
-   - 打标签的操作发生在我们commit修改到本地仓库后
-   2. 提交
-   ```
-   git add .
-   git commit -m 'fixed some bugs'
-   git tag -a 0.1.3 -m 'Release version 0.1.3'
-   ```
-   3. 提交标签到远程服务器上
-   ```
-   git push origin master
-   git push origin -tags
-   ```
-   - tags参数表示提交所有tag至服务器端 普通的git push origin master操作不会推送标签到服务器端
-   - 如果指定特性的tag git push origin [tagname]
-   4. 删除标签
-   ```
-   git tag -d 0.1.3
-   ```
-   5. 删除远端服务器的标签
-   ```
-   git push origin :refs/tags/0.1.3
-   ```
+```
+直接列出所有的标签 标签不是按时间顺序列出 而是按字母排序
+git tag
+可以根据xxx进行标签的筛选
+git tag -l xxx
+查看标签的信息 (轻量标签和附注标签的信息是不一样的)
+git show 标签名
+给当前的提交版本创建一个轻量标签
+git tag 标签名
+给指定的提交版本创建一个轻量标签
+git tag 标签名 提交版本号
+直接给当前的提交版本创建一个[附注标签]
+git tag -a 标签名 -m 附注信息
+给指定的提交版本创建一个[附注标签]
+git tag -a 标签名称 提交版本号 -m 附注信息
+删除标签
+git tag -d 标签名称
+将指定的标签上传到远程仓库
+git push origin 标签名称
+将所有不在远程仓库中的标签上传到远程仓库
+git push origin --tags
+删除远程仓库的标签
+git push origin --delete 标签名称
+git push origin :refs/tags/<tagname>
+以标签指定的版本为基础版本 新建一个分支 继续其他的操作
+git checkout -b 分支名称 标签名称
+```
 ### git checkout
 1. git checkout <branchname> 切换到某个分支
 2. git checkout --force <branchname> 强制切换到某个分支 会丢失当前已修改的内容
@@ -268,16 +237,11 @@ git push origin :branch-name
 1. 先提交修改
 2. 使用stash命名暂存 之后使用stash pop恢复
 - origin为远程地址别名
-### git remote命令
-1. git remote -v 显示所有远程仓库
-2. git remote show xxx(xxx为远程仓库别名)显示某个远程仓库信息
-3. git remote rm name 删除远程仓库
-4. git remote rename oldname newname 修改仓库名
 ### git stash命令
 > 原理
 - 将本地没提交的内容(git commit的内容不会被缓存 git add的内容会被缓存)进行缓存并从当前分支移除 缓存的数据结构为堆栈 先进后出
 - 能够将所有未提交的修改保存至堆栈中 用于后续恢复当前工作内容
-- 如果
+- 如果文件没有提交到暂存区(使用git add .追踪新的文件) 使用该命令会提示No local changed to save 无法将修改保存到堆栈中
 > 参数
 1. git stash & git stash save 相同 将没有提交的内容缓存并移除 这条缓存名称为最新一次提交的commit -m的内容 如果没有本地提交则是远程仓库是commit内容
 - git stash save ‘xxx’  加上自己的注解进行缓存
@@ -287,14 +251,20 @@ git push origin :branch-name
 - 返回缓存的列表
 3. git stash pop
 - 将堆栈中最新的内容pop出来应用到当前分支上 且删除堆中的记录
-4. git stash apply
+4. git stash apply stash@{index}
 - 与pop相似 但他不会在堆栈中删除这条缓存 适合在多个分支中进行缓存应用
-5. git stash drop [名]
-- 删除单个缓存
+5. git stash drop stash@{index}
+- 恢复的同时把stash记录也删除
 6. git stash clear
 - 全清
 7. git stash branch
 - 指定或最新缓存创建分支
+8. git stash -u
+- 存储未追踪的文件
+9. git stash show stash@{index}
+- 查看当前记录中修改了哪些文件
+10. git stash show -p stash@{index}
+- 查看当前记录中修改了哪些文件的内容
 ### git rebase
 > 用法
 1. 合并当前分支的多个commit记录
@@ -337,12 +307,13 @@ git push origin :branch-name
 - develop新增需求a feat:a
 - feat新增需求b feat:b
 ### git restore
-- 针对暂存区的恢复
-- 已经在本地仓库的文件 使用git restore --staged不能恢复到工作区 restore命令只针对暂存区
-> git restore [file]
-- 将不在缓存区的文件撤销更改
-> git restore --staged [file]
-- 将提交到暂存区的文件恢复到工作区
+- 针对暂存区的恢复 已经在本地仓库的文件 使用git restore --staged不能恢复到工作区 restore命令只针对暂存区
+```
+将不在缓存区的文件撤销更改
+git restore [file]
+将提交到暂存区的文件恢复到工作区
+git restore --staged [file]
+```
 ### git reflog
 - 显示的是一个HEAD指向发生改变的时间列表
 - 显示可引用的历史版本记录
@@ -400,51 +371,46 @@ git config --global --unset user.name
 ```
 git config --global alias.co checkout
 ```
-### git配置credential helper
-- 向git提供用户名和密码
 ### git diff
-- git diff命令比较文件的不同 即比较文件在暂存区和工作区的差异
-- git diff命令显示已写入暂存区和已经被修改但尚未写入暂存区文件的区别
-> 显示暂存区和工作区的差异
 ```
-git diff [file]
+查看工作区和暂存区单个文件的对比
+git diff filename
+查看工作区和暂存区所有文件的对比
+git diff
+查看工作区和暂存区所有文件的对比 并显示出所有有差异的文件列表
+git diff --stat
+查看暂存区与上次提交到本地仓库的快照(即最新提交到本地仓库的快照)的对比
+git diff --cached/--staged [file]
+查看工作区与上次提交到本地仓库的快照(即最新提交到本地仓库的快照)的对比
+git diff branchname
+查看工作区与HEAD指向(默认当前分支最新的提交)的对比
+git diff HEAD
+查看两个本地分支中某一个文件的对比
+git diff branchname..branchname filename
+查看两个本地分支所有的对比
+git diff branchname..branchname
+查看远程分支和本地分支的对比
+git diff origin/branchname..branchname
+查看远程分支与远程分支的对比
+git diff origin/branchname..origin/branchname
+查看两个commit的对比
+git diff commit1..commit2
 ```
-> 显示暂存区和上一次提交(commit)的差异
-```
-git diff -cached [file]
-git diff -staged [file]
-```
-> 显示两次提交之间的差异
-```
-git diff [first-branch]...[second-branch]
-```
-- git status显示上次提交更新后的更改或者写入缓存的改动
-- git diff一行一行的显示这些改动具体是什么
 ### git remote
-- 用于在远程仓库的操作
-0. 展示当前关联的其他仓库列表
 ```
+查看所有远程主机
 git remote
-```
-1. 显示所有远程仓库 输出会包含每一个仓库的URL
-```
+查看关联的远程仓库的详细信息
 git remote -v
-```
-2. 显示某个远程仓库的信息
-```
-git remote show xx(xx为远程地址的别名)
-```
-3. 添加远程版本库
-```
-git remote add [name][url]
-```
-- name是自己取的仓库的名字 url是地址
-4. 删除远程仓库
-```
-git remote rm name
-```
-5. 修改仓库名
-```
+显示某个远程仓库的信息
+git remote show 远程地址别名
+添加远程仓库
+git remote add [仓库名称][地址]
+删除远程仓库的关联
+git remote rm/remove projectname
+设置远程仓库的关联
+git remote set-url origin <newurl>
+重命名远程仓库名
 git remote rename oldname newname
 ```
 ### 远端主机
@@ -457,42 +423,27 @@ git remote rename oldname newname
 - git remote add <主机别名><远端地址>
 - 指令中 主机别名参数为自定义指定 远端地址即远端服务器上的访问地址
 - 可以为任一目录指定任意数量远端主机
-> 查看远端主机信息
-1. git remote
-- 查看当前仓库指定的所有远端主机的简要信息 别名列表
-2. git remote -v
-- 查看详细信息列表
-> 查看特定主机信息
-1. git remote show <主机别名>
-- 可以看到详细信息 远端地址 远程所有分支
-- 以及在各本地分支上使用git pull或git push指令操作时对应的远程分支
-> 重命名远端主机别名
-1. git remote rename <旧主机别名> <新别名>
-> 删除某个远程版本库关联
-1. git remote remove/rm <主机别名>
-> 添加一个远程版本库关联
-1. git remote add 
 ### 本地有一个初始化好的仓库 又一个创建好的远程空仓库 将两者关联
 1. git remote add origin xxx.git 先添加到本地仓库
 2. git push -u origin master 表示把当前仓库的master分支和远端仓库的master分支关联起来
 ### git add
-1. 添加一个或多个文件到暂存区
 ```
+添加一个或多个文件到暂存区
 git add [file1] [file2]
-```
-2. 把当前目录下所有文件改动都添加到暂存区
-```
+把当前目录下所有文件改动都添加到暂存区
 git add .
-```
-3. 把当前仓库内所有文件改动都添加到暂存区
-```
+把当前仓库内所有文件改动都添加到暂存区
 git add -A
-```
-4. add和commit的合并 便捷写法(未追踪的文件无法直接提交到暂存区/本地仓库)
-```
+add和commit的合并 便捷写法(未追踪的文件无法直接提交到暂存区/本地仓库)
 git commit -am
 ```
 ### git rm
+```
+删除暂存区和工作区的文件
+git rm filename
+只删除暂存区的文件 不删除工作区的文件
+git rm --cached filename
+```
 1. git rm .env
 - 执行完这个命令就表示.env文件从git仓库中删除了 配合.gitignore就能保证以后所有的.env文件变更都不用担心被提交到远程仓库
 2. git rm -r dist
@@ -545,75 +496,13 @@ git revert -n commitida..commitb
 ```
 git revert -m 1 bd86846
 ```
-### git tag
-- 两种标签形式
-1. 轻量标签 lightweight
-- 只是某个commit的引用 可以理解为是一个commit的别名
-```
-git tag v1.0.0
-```
-2. 附注标签 annotated
-- 是存储在git仓库中的一个完整对象 包含打标签者的名字 电子邮箱地址 日期地址
-- 它是可以被校验的 可以使用GNU Privacy Guard(GPG)签名并验证
-> 查看标签
-1. git tag
-- 直接列出所有的标签
-2. git tag -l xxx
-- 可以根据xxx进行标签的筛选
-3. git show 标签名
-- 查看标签的信息 (轻量标签和附注标签的信息是不一样的)
-> 创建标签
-1. 创建轻量标签
-```
-git tag 标签名
-```
-- 直接给当前的提交版本创建一个[轻量标签]
-```
-git tag 标签名 提交版本号
-```
-- 给指定的提交版本创建一个[轻量标签]
-2. 创建附注标签
-```
-git tag -a 标签名称 -m 附注信息
-```
-- 直接给当前的提交版本创建一个[附注标签]
-```
-git tag -a 标签名称 提交版本号 -m 附注信息
-```
-- 给指定的提交版本创建一个[附注标签]
-- -a立即为annotated的首字符 表示附注标签
-- -m指定附注信息
-3. 删除标签
-```
-git tag -d 标签名称
-```
-- 删除指定名称的标签
-> 远程仓库tag的操作
-1. 推送到远程仓库
-- 默认情况下 git push命令并不会把标签推送到远程仓库中
-- 因此 必须手动的将本地的标签推送到远程仓库中
-```
-git push origin 标签名称
-```
-- 将指定的标签上传到远程仓库
-```
-git push origin --tags
-```
-- 将所有不在远程仓库中的标签上传到远程仓库
-2. 删除远程仓库的标签
-- 删除远程仓库上的标签同样也需要手动执行
-```
-git push origin --delete 标签名称
-```
-> 检出标签
-- 在这个标签的基础上进行其他的开发或操作
-- 以标签指定的版本为基础版本 新建一个分支 继续其他的操作
-```
-git checkout -b 分支名称 标签名称
-```
 ### git show
 - 可以用于显示提交日志的相关信息
 1. git show 默认显示HEAD 想显示某个提交信息 git show后带上某个提交的hash
+```
+查看单个标签具体信息
+git show <tagname>
+```
 ### git commit
 1. git commit -amend
 - 对最近一次的提交的信息进行修改 此操作会修改commit的hash值
@@ -628,28 +517,22 @@ git commit --amend --no-edit
 - 如果暂存区有内容 这个新的commit会把任何修改内容和上一个commit的内容结合起来 如果暂存区没有内容 那么这个操作就只会把上次的commit消息重写一遍
 - 永远不要修复一个已经推送到公共仓库中的提交 会拒绝推送到仓库
 ### git push
-1. 推送分支并创建关联关系
 ```
+推送分支并创建关联关系
 git push --set-upstream origin branch1
-```
-2. 
-```
+
 将本地仓库的文件推送到远程分支
 如果远程仓库没有这个分支 会新建一个同名的远程分支
 如果省略远程分支名 则表示两者同名
 git push <远程主机名> <本地分支名>:<远程分支名>
 git push origin branchname
-```
-3. 
-```
+
 如果省略本地分支名 则表示删除指定的远程分支
 因为这等同于推送一个空的本地分支到远程分支
 git push origin :master
 等同于
 git push origin --delete master
-```
-4. 
-```
+
 建立当前分支和远程分支的追踪关系
 git push -u origin master
 如果当前分支与远程分支之间存在追踪关系 
@@ -657,49 +540,11 @@ git push -u origin master
 git push
 也可以使用以下命令建立当前分支和远程分支的追踪关系
 git push --set-upstream origin master
-```
-5. 
-```
+
 不管是否存在对应的远程分支 将本地的所有分支都推送到远程主机
 git push --all origin
 ```
-### git fetch
-- 合并远端分支
-```
-git merge origin/[当前分支名]
-```
-### HEAD是什么
-- .git/HEAD文件 它存储着当前working directory所处的某次commit 打开文件内容为
-```
-ref:refs/heads/master
-```
-- refs目录下存储的是仓库和tags 每个仓库下又有分枝 每个tags下又有tag 一个tag对应某次commit
-```
-存储local master分支的最新commit对象的SHA-1
-refs/heads/master
 
-存储远程仓库 master分支的最新commit对象的SHA-1
-refs/remotes/origin/master
-
-存储tag的SAH-1
-tags/xxx
-```
-> HEAD是当前分支引用的指针 它总是指向某次commit 默认是上一次的commit 这表示HEAD将是下一次提交的父节点
-- 通常可以把HEAD看作上一次提交的快照 HEAD的指向是可以改变的 比如提交了commit 切换了仓库 分支 或者回滚了版本 切换了tag
-> 用Git对项目进行版本管理时
-1. 用HEAD表示当前版本
-2. HEAD^表示上一个版本 同HEAD~1
-3. HEAD^^表示上上个版本 HEAD~2
-4. HEAD~100表示上100个版本
-> 查看HEAD指向
-```
-cat .git/HEAD
-```
-- 存储当前分支 如ref:refs/heads/master
-- 如果HEAD指向一个引用 可以用
-```
-git symbolic-ref HEAD
-```
 ### git本地新建分支并提交到远程仓库
 1. 建立本地仓库
 - 查看当前项目根目录中有没有.git文件(隐藏文件) 如果没有 右键 git bash here 输入git init建立本地仓库
@@ -787,17 +632,6 @@ git merge --squash
 ```
 - 不会生成新的提交 
 ### 常见 git 命令
-> 创建仓库
-1. 创建
-
-```
-git init
-```
-2. 配置用户名和邮箱
-```
-git config --global user.name 'mingzi'
-git config --global user.email '邮箱'
-```
 3. 创建钥匙
 ```
 ssh-keygen -t rsa -C 'youxiang'
@@ -808,238 +642,11 @@ ssh-keygen -t rsa -C 'youxiang'
 ssh -T git@github.com
 ```
 
-5. 关联远程仓库
-
-```
-git remote add origin 远程仓库地址
-```
-
-6. 删除关联
-
-```
-git remote rm origin
-```
-
-7. 初次拉取远程到本地
-
-```
-git pull origin master --allow-unrelated-histories
-git clone 远程地址
-```
-
-> 提交与拉取命令
-
-1. 添加文件
-
-```
-git add '文件名'
-git add .
-```
-
-2. 提交文件
-
-```
-git commit -m '备注'
-```
-
-3. 本地推到远程
-
-```
-git push origin master
-```
-
-4. 忽略提交的文件名写入此文件中
-
-```
-touch .gitignore
-```
-
-5. 拉取远程到本地
-
-```
-git pull origin master
-```
-
-> 查看相关命令
-
-1. 查看工作区和暂存区状态
-
-```
-git status
-```
-
-2. 查看提交日志(比较全面的信息)
-
-```
-git log
-```
-
-3. 查看版本号与备注
-
-```
-git log --pretty=online
-```
-
-4. 查看操作记录
-
-```
-git reflog
-```
-
-5. 查看文件的修改内容
-
-```
-git diff
-```
-
-> 返回某个版本(需要提交到仓库的文件)
-
-1. 回到上一个版本
-
-```
-git reset --hard HEAD^
-```
-
-2. 回到前 100 个版本
-
-```
-git reset --hard HEAD~100
-```
-
-3. 回到具体版本号
-
-```
-git reset --hard 具体版本号
-```
-
 4. 回到最后一次 git commit 或者 git add 状态
 
 ```
 git checkout --文件名
 ```
-
-> 分支相关命令
-
-1. 查看分支
-
-```
-查看本地分支
-git branch | git branch -l
-查看远程分支
-git branch -r
-查看所有分支(本地分支+远程分支)
-git branch -a
-查看所有分支并带上最新的提交信息
-git branch -av
-查看本地分支对应的远程分支
-git branch -vv
-```
-
-2. 新建分支
-
-```
-在别的分支下新建一个分支 新分支会复制当前分支的内容
-注意：如果当前分支有修改 但是没有提交到仓库 此时修改的内容是不会被复制到新分支
-git branch 分支名
-切换分支(切换分支时 本地工作区 仓库 都会相应切换到对应分支的内容)
-git checkout branchname
-修改当前分支名
-git branch -m branchname
-
-```
-
-3. 切换分支
-
-```
-git checkout 分支名
-```
-
-4. 创建切换同时进行
-
-```
-git checkout -b 分支名
-```
-
-5. 删除分支
-
-```
-git branch -D 分支名
-```
-
-6. 删除远程分支
-
-```
-git push origin --delete 分支名
-```
-
-7. 把 a 合并到 b 分支 先切换到 b 分支
-
-```
-git merge a分支名
-```
-
-8. 查看分支合并图
-
-```
-git log --graph
-```
-
-> 标签管理
-
-1. 打标签
-
-```
-git tag 标签名
-```
-
-2. 查看所有标签
-
-```
-git tag
-```
-
-3. 切换到指定的标签名
-
-```
-git checkout 标签名
-```
-
-4. 推送标签到远程
-
-```
-git push origin 标签名
-```
-
-5. 拉取远程到本地 分支名称要为新的
-
-```
-git checkout -b [分支名称][tagit g标签名称]
-```
-
-6. 删除本地标签
-
-```
-git tag -d 标签名
-```
-
-7. 删除远程标签
-
-```
-git push origin:refs/tags/标签名
-```
-### 重命名远程仓库
-```
-git remote rename [old-name] [new-name]
-```
-### 从远端拉取
-```
-git pull <远程主机名> <远程分支名>:<本地分支名>
-```
-- 取回origin主机的master分支 与本地的master分支合并
-```
-git pull origin master:master
-```
-- 如果远程分支是与当前分支合并 即当前为master分支 则冒号后面的部分可以省略
 ### 推送到远端仓库
 ```
 git push <远程主机名><本地分支名>:<远程分支名>
@@ -1057,20 +664,6 @@ Branch master set up to track remote branch master from [remote-name]
 - 下面命令使用--force选项 导致远程主机上更新的版本被覆盖 除非很确定要这样做 否则应该尽量避免使用--force选项
 ```
 git push --force origin
-```
-### 取消关联远端仓库
-- 移除远程仓库 不再关联
-```
-git remote rm [remote-name]
-```
-### 列出所有本地分支
-- -r选项 可以用来查看远程分支 
-- -a选项 查看所有分支
-- -vv选项查看所有跟踪分支
-- --merged选项查看哪些分支已经合并到当前分支
-- --no-merged选项查看其他分支
-```
-git branch
 ```
 ### 创建标签
 - 后面可跟commit id用来给过去的commit打标签
@@ -1103,67 +696,15 @@ git tag -d [tagname]
 ```
 git push [remote name] :refs/tags/[tag name]
 ```
-### git checkout branch2
-- 这条命令对工作区做了什么
-1. 对于每一个在分支1但是不在分支2的文件 git会删除它们
-2. 对于每一个在分枝2但是不在分支1的文件 git会创建它们(用合适的内容)
-3. 对于每一个既在分支1又在分支2的文件 如果版本不同 那么git会更新工作区的文件 使之与分支2的版本匹配
-- 上面每一步都有可能会破坏当前的工作区(工作区和暂存区对每个分支是共用的)
-1. 对于1 删除一个文件 如果这个文件在工作区1的版本和它在分支1的版本是一致的 那么删除它就是安全的 如果你修改了它 还没有提交 那么删除就是不安全的
-2. 对于2 创建一个文件 如果工作区还不存在这个文件 那就是安全的 如果工作区已经有这个文件 但是内容是错的 那么就不安全
-3. 如果这个文件已经提交 那么就是安全的 如果被修改了 且没有提交 则不安全
-- 用git checkout -b <newbranch> 创建并切换到一个新分支总是安全的 没有文件被创建 没有文件被删除 没有文件被更新 索引也没有任何改变
-- 使用git checkout -b <newbranch> <start_point>不一样 git会应用上述的安全检查规则
 ### git获取commit id
-- 获取完整的commit id
 ```
+获取完整的commit id
 git rev-parse HEAD
-```
-- 获取short commit id
-```
+获取short commit id
 git rev-parse --short HEAD
 ```
-### commit id
-- commit id是用来唯一标识每一个commit的 使用git log命令可以看到一大堆hash化的commit-id
-- git的原子粒度最细就到commit id 
-- 同一次commit里有两个文件改动 想分别进行处理 是没有办法的 git管理的粒度不到这里
-> Head
-- git操作时要有Head的概念 Head就是一个指针 指向一个commit id 
-- 你以为head指向的是一个branch 实际底层也是指向这个branch的最后 也就是最新的那一个commit id
-- Head并非只能指向一个branch最新的commit id 它可以指向该分支上的任何一个commit id
-> checkout
->reset
->revert
-### 使用git stash暂存文件
-- 将本地改动暂存起来
-```
-git stash
-```
-- 将本地改动暂存起来并添加备注
-```
-git stash save 'message'
-```
-- 切换到其他分支 切换回来
-- 查看所有暂存列表
-```
-git stash list
-```
-- 恢复stash的修改 将之前暂存的修改恢复到工作区
-```
-git stash pop
-```
-- 应用对应的stash
-- 使用该条命令 不会清空已有的stash的列表项 并能应用到当前的工作区 不需要这个缓存的话 再手动清除
-```
-git stash apply stash@${num}
-```
-### 配置git alias提升效率
-```
-git config --global alias.<简化的字符> 原是命令
-```
-- --global是全局参数 配置一次后 这些命令可以适用这台电脑下所有仓库
-- 这些命令实际上更新了全局的.gitconfig文件 该文件用来保存全局的git配置
-- 除了使用命令修改 也可以直接修改该文件.gitconfig的alias项来设置别名
+### git alias
+
 ### 远程新建分支拉到本地 本地修改后提交
 1. 远程新建origina
 2. 本地在其他分支上
@@ -1215,5 +756,3 @@ git cherry-pick --continue
 - 发生代码冲突后 放弃合并 回到操作前的样子
 3. --quit
 - 发生代码冲突后 退出Cherry pick 但是不回到操作前的样子
-### git rebase
-- rebase 变基 改变基座 
