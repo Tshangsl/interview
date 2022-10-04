@@ -276,6 +276,8 @@ git push origin :branch-name
 ### git stash命令
 > 原理
 - 将本地没提交的内容(git commit的内容不会被缓存 git add的内容会被缓存)进行缓存并从当前分支移除 缓存的数据结构为堆栈 先进后出
+- 能够将所有未提交的修改保存至堆栈中 用于后续恢复当前工作内容
+- 如果
 > 参数
 1. git stash & git stash save 相同 将没有提交的内容缓存并移除 这条缓存名称为最新一次提交的commit -m的内容 如果没有本地提交则是远程仓库是commit内容
 - git stash save ‘xxx’  加上自己的注解进行缓存
@@ -767,6 +769,23 @@ git fetch
 ```
 git checkout -b 本地分支名 origin/远程分支名
 ```
+### git merge
+> 三种常用合并方法
+1. 默认fast-forward HEAD指针直接指向被合并的分支
+```
+git merge
+```
+- 会在当前分支的提交历史中添加进被合并分支的提交历史
+2. 禁止快进式合并
+```
+git merge --no-ff
+```
+- 会生成一个新的提交 让当前分支的提交历史不会那么乱
+3. 
+```
+git merge --squash
+```
+- 不会生成新的提交 
 ### 常见 git 命令
 > 创建仓库
 1. 创建
