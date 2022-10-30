@@ -1,3 +1,89 @@
+### JS中函数的几种写法
+1. 常规写法
+```
+function foo(){
+
+}
+foo()
+```
+2. 匿名函数写法
+- 给一个变量赋值为一个函数 即变量也为函数对象
+```
+var foo = function(){
+    alert('匿名函数定义')
+}
+foo()
+```
+3. 将方法作为一个对象
+- 将函数作为对象的方法写法 采用JSON格式(JSON对象)
+```
+var test={
+    foo1:function(){},
+    foo2:function(){}
+}
+test.foo1()
+test.foo2()
+```
+4. 构造函数中给对象添加方法
+- JS中每个对象都有prototype属性 返回对象类型原型的引用
+```
+var foo = function(){}
+foo.prototype.test = function(){
+
+}
+var myfoo = new foo()
+myfoo.test()
+```
+5. 自执行函数
+> JS自执行函数的几种写法
+1. (foo())
+```
+(
+    function(){alert('h');}()
+)
+```
+2. (foo)()
+```
+(function(){alert('h')})()
+```
+3. function前面加运算符 常见的是!与void
+```
+!function(){alert('hello')}()
+void function(){alert(2)}()
+```
+6. 箭头函数
+- this定义函数时绑定的 继承父级
+```
+```
+### JS写法常见问题
+```
+myfun:function(){}
+myfun = function(){}
+function myfun(){}
+var myfun = function(){}
+myfun.prototype.myFun = function(){}
+```
+1. myfun:function(){}
+- 这个必须写在对象内部 这是一个对象的方法 写在外面会报错
+```
+var a = {
+    myfun:function(){}
+}
+```
+2. myfun = function(){}
+- 任何时候都不要这样写 这就变成了全局对象window的一个属性 要记住加上var 
+- 以下这种方式是对的
+```
+var myfun = function(){}
+```
+- 这是一种声明函数的方式 左边是一个变量 右边是一个函数的表达式 意思是把一个匿名的函数表达式赋值给变量myfun 只是声明了一个变量指向一个函数对象
+- JS解析时 会先把函数和变量提前解析 
+- function myfun(){}这种声明方法会把函数整个语句显式提前到脚本或者函数前
+### JS实例和对象的区别
+1. 实例是类的具象化产品
+2. 对象是一个具有多种属性的内容结构
+- 实例都是对象 而对象不全是实例 JS中没有类(ES6之前)的语法 所以类的概念就通过创建一个对象来实现
+
 0. JS 
 - 与大多数编程语言不同 JS没有输入或输出的概念 它是一个在宿主环境(host environment)下运行的脚本语言 任何与外界沟通的机制都是宿主环境提供的
 - 浏览器是最常见的宿主环境 但在非常多的其他程序中也包含JS解释器 如Adobe Acrobat,Adobe Photoshop SVG图像 Yahoo!的Widget引擎 Node.js之类的服务端环境 NoSQL数据库(如开源的Apache CouchDB)嵌入式计算机 以及包括GNOME(GNU/Linux上最流行地GUI之一)在内的桌面环境等等
